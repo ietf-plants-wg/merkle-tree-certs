@@ -208,7 +208,7 @@ This increased overhead additionally impacts CT logs themselves. Most of a log's
 
 Additionally, as PKIs transition to shorter-lived certificates {{CABF-153}} {{CABF-SC081}}, the number of entries in the log will grow.
 
-This document introduces Merkle Tree certificates, a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
+This document introduces Merkle Tree certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
 
 This achieves the following:
 
@@ -1051,16 +1051,9 @@ Subtree signatures can be used to sign timestamped log checkpoints with a non-ze
 
 ### Signature Algorithms
 
-The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. This document defines the following signature algorithms:
+The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used.
 
-* ECDSA with P-256 and SHA-256 {{!FIPS186-5=DOI.10.6028/NIST.FIPS.186-5}}
-* ECDSA with P-384 and SHA-384 {{!FIPS186-5}}
-* Ed25519 {{!RFC8032}}
-* ML-DSA-44 {{!FIPS204}}
-* ML-DSA-65 {{!FIPS204}}
-* ML-DSA-87 {{!FIPS204}}
-
-For the three ML-DSA-based algorithms, the context string MUST be the empty string.
+In this document, any PKIX signature algorithm MAY be used, such as the ML-DSA algorithms defined in {{!RFC9881}}. The signature is generated as in PKIX, except that the input is the structure defined in {{signature-format}}. In particular, in ML-DSA algorithms, the context string MUST be an empty string, as in {{Section 3 of !RFC9881}}.
 
 Other documents or deployments MAY define other signature schemes and formats. Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
 
@@ -1309,21 +1302,88 @@ If a new landmark is allocated every hour, landmark-relative certificate subtree
 
 Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
 
+## Representing Certification Authorities
+
+This section defines X.509 Certificate {{!RFC5280}} representation for information about a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and one associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:
+
+* The `subject` field MUST be the CA issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
+
+* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}
+
+* The `extensions` field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.
+
+Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
+
+* The key usage extension ({{Section 4.2.1.3 of !RFC5280}} MUST be present and assert the `keyCertSign` bit.
+
+* The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
+
+The id-pe-mtcCertificationAuthority is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.
+
+~~~asn.1
+id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) pe(1) TBD }
+
+ext-mtcCertificationAuthority EXTENSION ::= {
+    SYNTAX MTCCertificateAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    CRITICALITY TRUE
+}
+
+-- From draft-ietf-tls-trust-anchor-ids
+TrustAnchorID ::= RELATIVE-OID
+
+MTCCertificationAuthority ::= SEQUENCE {
+    logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    cosignerID     TrustAnchorID,
+    cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial      INTEGER
+}
+~~~
+
+The fields of a MTCCertificationAuthority structure are defined as follows:
+
+* `logHash` describes the hash function used in the log. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
+
+* `cosignerID` is the CA cosigner's cosigner ID ({{cosigners}}) as a RELATIVE-OID.
+
+* `cosignerSigAlg` the CA cosigner's signature algorithm ({{signature-algorithms}}).
+
+* `minSerial` is an integer describing the minimum allowed serial number in the issuance log ({{log-pruning}}).
+
+If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. The key MAY be used to directly sign certificate revocations lists (CRLs) {{!RFC5280}} and OCSP responses {{!RFC6960}}. CRLs and OCSP apply to Merkle Tree Certificates unchanged, though later documents MAY introduce new integrations.
+
+This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol define a new format, this SHOULD be represented in CA certificates with a new extension type.
+
+A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
+
 # Relying Parties
 
 This section discusses how relying parties verify Merkle Tree Certificates.
 
-## Trust Anchors
+## Relying Party Configuration
 
 In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:
 
+* The log hash, e.g. SHA-256
 * The log ID ({{log-ids}})
 * A set of supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
 * A list of revoked ranges of indices ({{revocation-by-index}})
 
-[[TODO: Define some representation for this. In a trust anchor, there's a lot of room for flexibility in what the client stores. In principle, we could even encode some of this information in an X.509 intermediate certificate, if an application wishes to use this with a delegation model with intermediates, though the security story becomes more complex. Decide how/whether to do that.]]
+This information may be obtained, in part, from a CA certificate structure, defined in {{representing-certification-authorities}}:
+
+* The log hash is determined from the id-pe-mtcCertificationAuthority extension.
+
+* The log ID is determined from the certificate's subject.
+
+* The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. {{trusted-cosigners}} gives some guidance on this.
+
+* No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate additional out-of-band information.
+
+* The revoked indices contains the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional out-of-band information.
 
 ## Verifying Certificate Signatures
 
@@ -1378,13 +1438,15 @@ Authenticity:
 Transparency:
 : The relying party only accepts entries that are publicly accessible, so that monitors, particularly the subject of the certificate, can notice any unauthorized certificates
 
-Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. If the CA is transitioning from an old to new key, the relying party SHOULD accept both keys until certificates that predate the new key expire. This is analogous to the signature in a traditional X.509 certificate.
+Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. This is analogous to the signature in a traditional X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}. If the CA is transitioning from an old to new key, the relying party SHOULD accept both keys until certificates that predate the new key expire.
 
 While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
 
 To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, {{TLOG-WITNESS}} describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. {{revocation-by-index}} discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, {{TLOG-MIRROR}} describes a "mirror" cosigner role.
 
-Relying parties MAY accept the same set of additional cosigners across issuance logs.
+Relying parties MAY accept the same set of additional cosigners across CAs.
+
+In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This is analogous to a traditional X.509 application, where CA information is determined directly from a CA certificate. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.
 
 Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.
 
@@ -1703,6 +1765,14 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Algor
 |---------|-----------------|------------|
 | TBD     | id-alg-mtcProof | [this-RFC] |
 
+# Certificate Extension
+
+IANA is requested to add the following entry to the "SMI Security for PKIX Certificate Extension" registry {{?RFC7299}}:
+
+| Decimal | Description                      | References |
+|---------|----------------------------------|------------|
+| TBD     | id-alg-mtcCertificationAuthority | [this-RFC] |
+
 ## Relative Distinguished Name Attribute
 
 IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{?I-D.ietf-lamps-x509-alg-none}}:
@@ -1725,7 +1795,7 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SIGNATURE-ALGORITHM, AlgorithmIdentifier{},
+  SIGNATURE-ALGORITHM, DIGEST-ALGORITHM, AlgorithmIdentifier{},
   FROM AlgorithmInformation-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -1764,6 +1834,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
     extensions            [3] EXPLICIT Extensions{{CertExtensions}}
                                            OPTIONAL
 }
+
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) TBD }
@@ -1780,6 +1851,23 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 at-trustAnchorID ATTRIBUTE ::= {
     TYPE TrustAnchorID
     IDENTIFIED BY id-rdna-trustAnchorID
+}
+
+id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) pe(1) TBD }
+
+ext-mtcCertificationAuthority EXTENSION ::= {
+    SYNTAX MTCCertificateAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    CRITICALITY TRUE
+}
+
+MTCCertificationAuthority ::= SEQUENCE {
+    logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    cosignerID     TrustAnchorID,
+    cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial      INTEGER
 }
 
 END
@@ -2214,3 +2302,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Use a tlog-compatible signature scheme for ease of deployment
+
+- Define a CA certificate representation
