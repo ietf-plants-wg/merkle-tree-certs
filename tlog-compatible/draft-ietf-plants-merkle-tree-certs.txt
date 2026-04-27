@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 26 October 2026                                      Apple Inc.
+Expires: 29 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           24 April 2026
+                                                           27 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 October 2026.
+   This Internet-Draft will expire on 29 October 2026.
 
 Copyright Notice
 
@@ -1286,8 +1286,8 @@ Table of Contents
    string subtree/v1, followed by a newline (U+000A), followed by a zero
    byte (U+0000).
 
-   cosigner_name and log_origin, are computed from the cosigner ID and
-   the issuance log's ID (Section 5.2), respectively.  The contain the
+   cosigner_name and log_origin are computed from the cosigner ID and
+   the issuance log's ID (Section 5.2), respectively.  They contain the
    concatenation of:
 
    *  The 16-byte ASCII string oid/1.3.6.1.4.1.
@@ -1981,9 +1981,10 @@ Table of Contents
        sufficient set of valid signatures from cosigners to satisfy the
        relying party's cosigner requirements (Section 7.3).
        Unrecognized cosigners MUST be ignored.  Signatures are verified
-       as described in Section 5.4.1.  The subtree_hash field of the
-       CosignedMessage is set to expected_subtree_hash.  The timestamp
-       field is set to zero.
+       as described in Section 5.4.1.  Reconstruct the CosignedMessage
+       from MTCProof's start and end, the cosigner ID for cosigner_name,
+       the log ID for log_origin, expected_subtree_hash for
+       subtree_hash, and timestamp set to zero`.
 
    This procedure only replaces the signature verification portion of
    X.509 path validation.  The relying party MUST continue to perform
@@ -3537,7 +3538,7 @@ C.1.  Subtree Signed Note Format
 
    key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 
-   [[TODO: When all this to C2SP, allocate a codepoint for a more
+   [[TODO: When all this moves to C2SP, allocate a codepoint for a more
    idiomatic key ID construction.]]
 
 C.2.  Requesting Subtree Signatures
