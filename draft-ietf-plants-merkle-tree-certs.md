@@ -1022,11 +1022,16 @@ This is equivalent to the concatenation of:
 
 For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
 
-`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. If `start` is non-zero, then `timestamp` MUST be zero.
+`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log.
 
-If `timestamp` is non-zero, it MUST be the time that the signature was produced, represented as seconds since the Epoch as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally `end` MUST be the size of the largest consistent tree that the cosigner has observed for the log.
+If `timestamp` is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally, if `timestamp` is non-zero, the following MUST be true:
 
-If `timestamp` is zero, no statement is made about the signing time or largest observed tree.
+* `start` MUST be zero.
+* `end` MUST be the size of the largest consistent tree that the cosigner has observed for the log.
+
+`timestamp` MAY be zero, in which case no additional constraints are placed on `start` or `end`, and no statement is made about the signing time or largest observed tree.
+
+### Signature Semantics
 
 Before signing a subtree of some log, the cosigner MUST ensure that `subtree_hash` is consistent with its view of the log. Different cosigner roles may obtain this assurance differently. For example:
 
@@ -1038,8 +1043,7 @@ In both cases, the cosigner MUST ensure that, as it updates its view of the log,
 
 When a cosigner signs a subtree, it is held separately responsible *both* for the subtree being consistent with its other signatures, *and* for the cosigner-specific additional statements. That is, if a cosigner signs an inconsistent subtree, it is held responsible for its additional statements on all entries in the inconsistent subtree, even if some other signed subtree exists that asserts different entries.
 
-Subtree signatures can be used to sign timestamped log checkpoints by setting `start` to zero and a non-zero `timestamp`. These signatures are not directly used in Merkle Tree Certificates ({{certificate-format}}), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI. This may include log serving or integrating an issuance log into a transparency ecosystem. For example, {{TLOG-TILES}} and {{TLOG-WITNESS}} use such signatures.
-
+Subtree signatures can be used to sign timestamped log checkpoints with a non-zero `timestamp`. A signature with a non-zero `timestamp` asserts the complete state of the cosigner's view of the log at a given time. These signatures are not directly used in Merkle Tree Certificates ({{certificate-format}}), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI. This may include log serving or integrating an issuance log into a transparency ecosystem. For example, {{TLOG-TILES}} and {{TLOG-WITNESS}} use such signatures.
 
 ### Signature Algorithms
 
