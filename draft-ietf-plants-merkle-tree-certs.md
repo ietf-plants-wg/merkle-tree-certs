@@ -1010,7 +1010,7 @@ This signature format is designed to be compatible with the ML-DSA-44 signature 
 
 `label` is a fixed prefix for domain separation. Its value MUST be the string `subtree/v1`, followed by a newline (U+000A), followed by a zero byte (U+0000).
 
-`cosigner_name` and `log_origin`, are computed from the cosigner ID and the issuance log's ID ({{log-ids}}), respectively. The contain the concatenation of:
+`cosigner_name` and `log_origin` are computed from the cosigner ID and the issuance log's ID ({{log-ids}}), respectively. They contain the concatenation of:
 
 * The 16-byte ASCII string `oid/1.3.6.1.4.1.`
 * The trust anchor ID's ASCII representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}})
@@ -1338,7 +1338,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. If `[start, end)` matches a trusted subtree ({{trusted-subtrees}}), check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. The `subtree_hash` field of the CosignedMessage is set to `expected_subtree_hash`. The `timestamp` field is set to zero.
+1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, the log ID for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero`.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
@@ -2004,7 +2004,7 @@ Each note signature has a key name of the cosigner name. The signature's key ID 
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 ~~~
 
-[[TODO: When all this to C2SP, allocate a codepoint for a more idiomatic key ID construction.]]
+[[TODO: When all this moves to C2SP, allocate a codepoint for a more idiomatic key ID construction.]]
 
 ## Requesting Subtree Signatures
 
