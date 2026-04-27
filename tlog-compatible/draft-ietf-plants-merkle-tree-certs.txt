@@ -103,7 +103,8 @@ Table of Contents
      5.3.  Log Entries
      5.4.  Cosigners
        5.4.1.  Signature Format
-       5.4.2.  Signature Algorithms
+       5.4.2.  Signature Semantics
+       5.4.3.  Signature Algorithms
      5.5.  Certification Authority Cosigners
      5.6.  Publishing Logs
        5.6.1.  Log Pruning
@@ -1306,16 +1307,23 @@ Table of Contents
 
    start and end MUST define a valid subtree of the log, and
    subtree_hash MUST be the subtree's hash value in the cosigner's view
-   of the log.  If start is non-zero, then timestamp MUST be zero.
+   of the log.
 
    If timestamp is non-zero, it MUST be the time that the signature was
-   produced, represented as seconds since the Epoch as defined in
-   Section 4.19 of Volume 1 of [POSIX].  Additionally end MUST be the
-   size of the largest consistent tree that the cosigner has observed
-   for the log.
+   produced.  This time is represented as seconds since the Epoch, as
+   defined in Section 4.19 of Volume 1 of [POSIX].  Additionally, if
+   timestamp is non-zero, the following MUST be true:
 
-   If timestamp is zero, no statement is made about the signing time or
-   largest observed tree.
+   *  start MUST be zero.
+
+   *  end MUST be the size of the largest consistent tree that the
+      cosigner has observed for the log.
+
+   timestamp MAY be zero, in which case no additional constraints are
+   placed on start or end, and no statement is made about the signing
+   time or largest observed tree.
+
+5.4.2.  Signature Semantics
 
    Before signing a subtree of some log, the cosigner MUST ensure that
    subtree_hash is consistent with its view of the log.  Different
@@ -1342,15 +1350,17 @@ Table of Contents
    even if some other signed subtree exists that asserts different
    entries.
 
-   Subtree signatures can be used to sign timestamped log checkpoints by
-   setting start to zero and a non-zero timestamp.  These signatures are
-   not directly used in Merkle Tree Certificates (Section 6.1), but
-   cosigners MAY generate them, subject to the rules above, as part of
-   other functions in a PKI.  This may include log serving or
-   integrating an issuance log into a transparency ecosystem.  For
-   example, [TLOG-TILES] and [TLOG-WITNESS] use such signatures.
+   Subtree signatures can be used to sign timestamped log checkpoints
+   with a non-zero timestamp.  A signature with a non-zero timestamp
+   asserts the complete state of the cosigner's view of the log at a
+   given time.  These signatures are not directly used in Merkle Tree
+   Certificates (Section 6.1), but cosigners MAY generate them, subject
+   to the rules above, as part of other functions in a PKI.  This may
+   include log serving or integrating an issuance log into a
+   transparency ecosystem.  For example, [TLOG-TILES] and [TLOG-WITNESS]
+   use such signatures.
 
-5.4.2.  Signature Algorithms
+5.4.3.  Signature Algorithms
 
    The cosigner's public key specifies both the key material and the
    signature algorithm to use with the key material.  In order to change
