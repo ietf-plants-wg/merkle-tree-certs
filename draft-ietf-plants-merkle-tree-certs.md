@@ -1473,13 +1473,48 @@ When both a landmark and standalone certificate are supported by a relying party
 
 This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
+Order objects reach the "valid" state once a standalone certificate is issued. The standalone certificate is made available at the "certificate" URL in the order object. No additional states for order objects are defined.
 
-When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
+Two new fields are defined:
 
-The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}} and serves it from the alternate URL.
+ - In the directory, a "newRelativeCertificate" field.
+ - In order objects, a "landmarkURL" field.
 
-ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
+An ACME server that supports Merkle Tree certificates MUST have the "newRelativeCertificate" field in its directory. It also MUST add a "landmarkURL" field to order objects when (a) the order is in the "valid" state and (b) the "certificate" URL dereferences to a Merkle Tree certificate.
+
+The "landmarkURL" field of an order MUST contain a URL that dereferences to a landmark sequence as described in {{landmark-tree-sizes}}. That landmark sequence MUST refer to the same issuance log identified by the standalone certificate's Issuer field.
+
+An ACME client wishing to obtain a landmark-relative certificate follows these steps:
+
+ - Download the standalone certificate (from the "certificate" field) and extract the serial number.
+ - Poll the "landmarkURL" field of that certificate's order.
+ - Once the landmark sequence contains a landmark with tree size greater than the serial number, send a request to the "newRelativeCertificate" field from the directory to request a landmark-relative certificate.
+
+## New Relative Certificate resource
+
+The ACME client requests landmark-relative certificate issuance by sending a POST request to the server's newRelativeCertificate resource.  The body of the POST is a JWS object whose JSON payload contains this field:
+
+standalone (required, string):
+: the standalone certificate to be promoted to a landmark-relative certificate, in the base64url-encoded version of the DER format.
+
+The ACME server chooses an appropriate landmark, constructs a landmark-relative certificate that corresponds to the standalone certificate, and responds with it.
+
+The response follows the format defined for downloading the "certificate" URL defined in {{Section 7.4.2 of !RFC8555}}. The contents MUST contain a landmark-relative certificate with serial number and issuer equal to those values in the standalone certificate.
+
+If there is no suitable landmark available, the ACME server responds with a problem document containing one of these problem types:
+
+ - urn:ietf:params:acme:error:landmarkNotReady - the CA does not have a landmark available with tree size greater than the serial number. Clients should treat this error as fatal rather than retrying, because polling the "landmarkURL" should have resulted in waiting long enough for a landmark to be ready.
+ - urn:ietf:params:acme:error:certificateTooOldForLandmark - the CA refuses to generate a landmark-relative certificate because the standalone certificate is too old (defined by CA policy). Clients should treat this error as fatal.
+
+The ACME server MAY require that the account requesting landmark-relative certificate issuance be the same account that requested the standalone certificate.
+
+## Caching
+
+ACME clients that manage many certificates SHOULD cache the contents of retrieved landmark sequences and reuse those contents when deciding whether a given standalone certificate is ready to be promoted to a landmark-relative certificate. Clients SHOULD obey the caching headers defined in {{Section 5 of !RFC9110}}.
+
+## Additional Certificate Information
+
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates.
 
 # Deployment Considerations
 
@@ -1682,6 +1717,31 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 | Decimal | Description           | References |
 |---------|-----------------------|------------|
 | TBD     | id-rdna-trustAnchorID | [this-RFC] |
+
+## ACME Resource Types
+
+IANA is requested to add the following entry to the "ACME Resource Types" registry defined in {{Section 9.7.5 of !RFC8555}}:
+
+| Field Name             | Resource Type                       | Reference  |
+|------------------------|-------------------------------------|------------|
+| newRelativeCertificate | New landmark-relative certificate   | [this-RFC] |
+
+## ACME Order Object Fields
+
+IANA is requested to add the following entry to the "ACME Order Object Fields" registry defined in {{Section 9.7.2 of !RFC8555}}:
+
+| Field Name  | Field Type | Configurable | Reference  |
+|-------------|------------|--------------|------------|
+| landmarkURL | string     | false        | [this-RFC] |
+
+## ACME Error Types
+
+IANA is requested to add the following entries to the "ACME Error Types" registry defined in {{Section 9.7.4 of !RFC8555}}:
+
+| Type                         | Description                                                                                                | Reference  |
+|------------------------------|------------------------------------------------------------------------------------------------------------|------------|
+| landmarkNotReady             | The CA does not yet have a landmark with tree size greater than the standalone certificate's serial number | [this-RFC] |
+| certificateTooOldForLandmark | The CA refuses to issue a landmark-relative certificate because the standalone certificate is too old     | [this-RFC] |
 
 --- back
 
