@@ -926,14 +926,25 @@ Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentatio
 struct {} Empty;
 
 enum {
-    null_entry(0), tbs_cert_entry(1), (2^16-1)
+    null_entry(0), tbs_cert_entry(1), accumulated(2), (2^16-1)
 } MerkleTreeCertEntryType;
 
+enum {
+  (2^16-1)
+} AccumulatedType;
+
 struct {
+    uint64 accumulated_count;
     MerkleTreeCertEntryType type;
     select (type) {
        case null_entry: Empty;
+
        case tbs_cert_entry: opaque tbs_cert_entry_data[N];
+
+       case accumulated:
+         AccumulatedType accumulated_type;
+         select(accumulated_type) {}
+
        /* May be extended with future types. */
     }
 } MerkleTreeCertEntry;
@@ -972,6 +983,8 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 * `subjectPublicKeyInfoHash` contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding.
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
+
+When `type` is `accumulated`, the entry may contain metadata and other operational information that accumulates over the lifetime of the log. For example, future documents may define a new value for `AccumulatedType` that contains pointers to cryptographically secure indices of the log's contents. The `accumulated_count` field is populated for every log entry to contain the total number of `accumulated` log entries, counting the current log entry if it is also has an `accumulated` type.
 
 MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
 
@@ -1181,11 +1194,12 @@ struct {
     uint64 start;
     uint64 end;
     HashValue inclusion_proof<0..2^16-1>;
+    uint64 accumulated_count;
     MTCSignature signatures<0..2^16-1>;
 } MTCProof;
 ~~~
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}.
+`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `accumulated_count` contains the `accumulated_count` from the leaf MerkleTreeCertEntry. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}.
 
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
 
