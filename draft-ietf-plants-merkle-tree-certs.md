@@ -876,6 +876,8 @@ Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A
 
 ## Certification Authority Identifiers {#ca-ids}
 
+[[TODO: consider renaming "issuer ID". When the term is used in the context "CA issuer ID," it can sound like it refers to the CA's issuer, but it refers to the CA, and the ID that the CA uses in the issuer field of certificates that it issues.]]
+
 Each CA that operates one or more issuance log is identified by an *issuer ID*, which is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}. This issuer ID determines a PKIX distinguished name ({{Section 4.1.2.4 of !RFC5280}}). The distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type `id-rdna-trustAnchorID`, defined below:
 
 ~~~asn.1
@@ -919,8 +921,6 @@ A CA can operate one or more issuance logs. Each log that the CA operates is ass
 
 The combination of the CA issuer ID and the log number uniquely identify an issuance log.
 
-TODO: Log numbers (as written) are positive instead of non-negative. 0 is intentionally excluded to force `serialNumbers` to have more than 64 bits and ensure that the parsing code for certificate consumers properly handles extracting the log number. This has a side effect of making all serial numbers be positive integers, which has another benefit described in the TODO in {{certificate-format}}.
-
 ## Log Entries
 
 Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentation syntax below. A MerkleTreeCertEntry describes certificate information that the CA has validated and certified.
@@ -951,7 +951,6 @@ When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume th
 ~~~asn.1
 TBSCertificateLogEntry ::= SEQUENCE {
     version               [0] EXPLICIT Version DEFAULT v1,
-    logNumber                 INTEGER,
     issuer                    Name,
     validity                  Validity,
     subject                   Name,
@@ -968,8 +967,6 @@ TBSCertificateLogEntry ::= SEQUENCE {
 The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `version`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` have the same semantics as the corresponding TBSCertificate fields, defined in {{Section 4.1.2 of !RFC5280}}.
-
-* `logNumber` is the log number, as described in {{log-ids}}.
 
 *  `issuer` is the CA's issuer ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
@@ -1160,9 +1157,7 @@ The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
 The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA issuer ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
-The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the logNumber in the TBSCertificateLogEntry. The `serialNumber` MUST be equal to `(logNumber << 64) | index`.
-
-TODO: {{log-entries}} reserves entry zero with a `null_entry` type so the index will be positive. This was done because {{Section 4.1.2.2 of !RFC5280}} forbids zero as a serial number. However, with the inclusion of a positive `logNumber` in the `serialNumber`, the serial number will always be positive regardless of the index, and the `null_entry` type could be removed.
+The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{log-ids}}). The `serialNumber` MUST be equal to `(log_number << 64) | index`.
 
 The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
@@ -1302,6 +1297,10 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 * A set of supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 
+A relying party MAY be configured on a per-CA basis with a minimum log number, such that it will only trust certificates from logs with a log number greater than or equal to that minimum.
+
+[[TODO: Define how CAs manage their log numbers. In particular, make it explicit that logs must be numbered sequentially or at least in increasing order.]]
+
 Additionally, a relying party MAY be configured with the following for each log operated by the CA:
 
 * The log's log number ({{log-ids}})
@@ -1318,12 +1317,15 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}.
 
-1. Let `index` be the lowest 64 bits of the certificate's serial number and let `log_number` be the serial number bit shifted right 64 bits.
-   1. If `index` is contained in one of the relying party's revoked ranges ({{revocation-by-index}}), abort this process and fail verification.
+1. Let `serial` be the certificate's serial number. If `serial` is negative, abort this process and fail verification.
+
+1. Let `index` be the least significant 64 bits of `serial` and let `log_number` be `serial >> 64`. If any of the following conditions are true, abort this process and fail verification:
+   * The `log_number` is zero
+   * The `log_number` is smaller than the minimum log number for that CA ({{trust-anchors}})
+   * `index` is contained in one of the relying party's revoked ranges ({{revocation-by-index}})
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
-   1. Set `logNumber` to the `log_number` extracted from the TBSCertificate's `serialNumber`.
    1. Set `subjectPublicKeyAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
    1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
@@ -1342,7 +1344,6 @@ In this procedure, `entry_hash` can equivalently be computed in a single pass fr
 1. Initialize a hash instance.
 1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
 1. Write the TBSCertificate's `version` field to the hash.
-1. Write the `logNumber` field (exctracted from the TBSCertificate's `serialNumber`) to the hash.
 1. Write the TBSCertificate contents octets to the hash, startin from the `issuer` field, up to (but not including) the `subjectPublicKeyInfo` field.
 1. Write the `subjectPublicKeyInfo`'s `algorithm` field to the hash.
 1. Write the octet 0x04 to the hash. This is an OCTET STRING identifer.
@@ -1401,15 +1402,15 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 ## Revocation by Index
 
-For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of indices. This allows a relying party to efficiently revoke entries of an issuance log, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
+For each trusted Merkle Tree issuance log, the relying party maintains a list of revoked ranges of indices. This allows a relying party to efficiently revoke entries of an issuance log, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
 
-When a relying party is first configured to trust a CA, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
+When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
 
 A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies ({{trusted-cosigners}}) do not require durable logging (e.g. via {{TLOG-MIRROR}}) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.
 
 When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the {{SCTNotAfter}} mechanism used in some PKIs.
 
-The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because Merkle Tree certificates use log indices as serial numbers, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.
+The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because Merkle Tree certificates are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.
 
 # Use in TLS
 
@@ -1987,7 +1988,9 @@ In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always f
 
 ## Subtree Signed Note Format
 
-A subtree, with signatures, can be represented as a signed note {{SIGNED-NOTE}}. A log origin can be constructed from the log's CA issuer ID and log number ({{log-ids}}) in the following manner: The log origin is the concatenation of the ASCII string `oid/1.3.6.1.4.1.`, the CA issuer ID as its trust anchor ID's ASCII representation, the byte `0x2f` (ASCII character "/"), and the log number as an ASCII string in decimal with no leading zeroes.
+A subtree, with signatures, can be represented as a signed note {{SIGNED-NOTE}}. A log origin can be constructed from the log's CA issuer ID and log number ({{log-ids}}) in the following manner: The CA issuer ID and log number are combined into a single RELATIVE-OID by appending the log number to the CA issuer ID's trust anchor ID. The log origin is the concatenation of the ASCII string `oid/1.3.6.1.4.1.` and the ASCII representation of this RELATIVE-OID. For example, the checkpoint origin for a CA with issuer ID `32473.1` and log number `2` would be `oid/1.3.6.1.4.1.32473.1.2`.
+
+[[TODO: This format is implicitly stating that the CA issuer ID's trust anchor ID is not just a single OID, but a full OID arc with children representing the specific logs. We should be more explicit about this somewhere, probably in {{ca-ids}} or {{log-ids}}.]]
 
 The note body is a sequence of the following lines, each terminated by a newline character (U+000A):
 
