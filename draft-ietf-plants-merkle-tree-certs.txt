@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 26 October 2026                                      Apple Inc.
+Expires: 30 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           24 April 2026
+                                                           28 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 October 2026.
+   This Internet-Draft will expire on 30 October 2026.
 
 Copyright Notice
 
@@ -514,11 +514,23 @@ Table of Contents
 4.  Subtrees
 
    This section extends the Merkle Tree definition in Section 2.1 of
-   [RFC9162] by defining a _subtree_ of a Merkle Tree.  A subtree is an
-   interior node of a Merkle Tree, which can be efficiently shown
-   consistent with the original Merkle Tree and any Merkle Tree with
-   additional elements appended.  This specification uses subtrees to
-   reduce the size of inclusion proofs.
+   [RFC9162] by defining a _subtree_ of a Merkle Tree.  A subtree is
+   itself a Merkle Tree, built over an interval of entries from the
+   original tree.  Section 4.1 defines a subtree formally, including the
+   constraints on those intervals.
+
+   As with Merkle Trees, a subtree inclusion proof, defined in
+   Section 4.3, can prove an entry is contained in some subtree.
+   Subtrees, and thus their inclusion proofs, are smaller than those of
+   the original tree, so this document uses subtree inclusion proofs as
+   a certificate size optimization.
+
+   Not all intervals can form subtrees.  Subtrees are limited to
+   intervals that can be efficiently proven consistent with the original
+   tree, using subtree consistency proofs defined in Section 4.4.
+   However, every interval of a Merkle Tree can be efficiently covered
+   by two subtrees.  Section 4.5 describes how to determine these
+   subtrees.
 
 4.1.  Definition of a Subtree
 
