@@ -1919,9 +1919,9 @@ Table of Contents
 6.5.  Representing Certification Authorities
 
    This section defines X.509 Certificate [RFC5280] representation for
-   information about an MTC CA, specifically identifying the issuance
-   log (Section 5) and one associated CA cosigner (Section 5.5).  This
-   information is encoded as follows:
+   information about a Merkle Tree Certificate CA.  It identifies the
+   issuance log (Section 5) and one associated CA cosigner
+   (Section 5.5).  This information is encoded as follows:
 
    *  The subject field MUST be the CA issuance log's log ID as a PKIX
       distinguished name, as described in Section 5.2.
