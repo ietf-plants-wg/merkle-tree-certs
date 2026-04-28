@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-26T03:47:52.529640+00:00",
+  "timestamp": "2026-04-28T03:55:51.022284+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -2645,9 +2645,17 @@
       "labels": [],
       "body": "Right now we have the following IDs, to denote the various different animals:\n\n1. The log has an ID\n2. Each cosigner has an ID, including the cosigner operated by the log (CA) operator\n3. The landmark sequence has an ID arc\n\nFor now, they refer to slightly different things, and we allow for some generality that we may not need:\n\n* A CA can have multiple cosigners for a single log\n* A landmark sequence could be allocated by an entity other than the CA, if the CA finds this difficult\n\nIt is not clear how many of these we need. The first is somewhat related to the question of how best to manage key rotation and log rotation. The second is... almost certainly not needed. I think it just came out of building atop tlog in the most orthogonal ways possible.\n\nAnd then there's the question of whether these IDs are allowed to overlap or must they be different. I think that comes from designs of cosigner negotiation.\n\nOnce the dust settles on the rest of the details, we should take a pass and:\n* Decide if any IDs should overlap\n* If IDs don't overlap, perhaps ask the CA operator to pick an ID arc, and then the protocol determines the substructure for you.",
       "createdAt": "2025-10-15T16:13:39Z",
-      "updatedAt": "2025-10-15T16:13:39Z",
+      "updatedAt": "2026-04-27T17:20:41Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Via chatting with @nharper: whatever our ID allocation strategy is, we should have a section that summarizes all the IDs that one CA has.",
+          "createdAt": "2026-04-27T17:20:41Z",
+          "updatedAt": "2026-04-27T17:20:41Z"
+        }
+      ]
     },
     {
       "number": 153,
@@ -11082,7 +11090,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-04-23T20:50:18Z",
+      "updatedAt": "2026-04-27T01:48:21Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -11181,9 +11189,23 @@
         {
           "author": "lukevalenta",
           "authorAssociation": "COLLABORATOR",
-          "body": "Quick note: section 7.4 refers to pushing landmark subtrees down to RPs, in\r\nwhich case consistency proofs to a signed checkpoint are sufficient. See\r\nsection 6.2 for the construction of certificates which _does_\r\nrequire cosignatures on the exact subtree. (This was also a point of\r\nconfusion in [1], so we should probably clarify the text.)\r\n\r\n[1]\r\nhttps://mailarchive.ietf.org/arch/msg/plants/qFo9aC8WxZBBD936aVYKMhEfqjM/\r\n\r\nOn Thu, Apr 23, 2026 at 4:38\u202fPM Brendan McMillion ***@***.***>\r\nwrote:\r\n\r\n> *Bren2010* left a comment (ietf-plants-wg/merkle-tree-certs#172)\r\n> <https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172?email_source=notifications&email_token=ABAARLFMOORNLRA5IIUYXRL4XJ5LRA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIMZQG44DKMZWG432M4TFMFZW63VHMNXW23LFNZ2KKZLWMVXHJNLQOJPWG33NNVSW45C7N5YGK3S7MNWGSY3L#issuecomment-4307853677>\r\n>\r\n> If the landmark sequence points to valid landmark log entries, great!\r\n> Otherwise, the server has to do more work to find a recent landmark log\r\n> entry.\r\n>\r\n> If by \"the server has to do more work\", you mean that the server has to\r\n> process a linear number of certificates, that's not really ideal. The CA is\r\n> an untrusted party here, it shouldn't be able to force the server to do a\r\n> prohibitive amount of work to remain secure.\r\n>\r\n> To issue landmark-relative certificates, the CA has to get cosignatures on\r\n> the landmark subtrees (via /sign-subtree, currently described in Appendix\r\n> C.2).\r\n>\r\n> In 7.4 the document says \"It is not necessary that the cosigners have\r\n> generated signatures over the specific subtrees, only that they are\r\n> consistent.\" So that would need to change to require 1.) cosignatures that\r\n> indicate an intent to make a landmark, over the specific subtrees, and 2.)\r\n> have cosigners verify existence of a landmark log entry before signing. And\r\n> you'd still have the other downsides we've discussed, so this wouldn't be\r\n> my preference.\r\n>\r\n> Isn't this PR doing the same thing? The server only learns about fresh\r\n> accumulated_counts (and corresponding vindexes) when it gets a fresh\r\n> certificate?\r\n>\r\n> No, the server is able to go to the CA (or a mirror) at any time and find\r\n> a newer accumulated log entry (if one exists). The server uses its\r\n> certificate to gossip the tree head with browsers, so gossip here is\r\n> limited to issuance frequency. But if the server is stateful, then any fork\r\n> will be detected eventually. So while the landmark log entry idea is\r\n> best-case as fast as re-issuance, the accumulated log entry idea is\r\n> worst-case (= your chosen CA is malicious) as fast as re-issuance and\r\n> best-case as fast as your CA will allow (allowing you to detect\r\n> mis-issuances by other CAs sooner).\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172?email_source=notifications&email_token=ABAARLFMOORNLRA5IIUYXRL4XJ5LRA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIMZQG44DKMZWG432M4TFMFZW63VHMNXW23LFNZ2KKZLWMVXHJNLQOJPWG33NNVSW45C7N5YGK3S7MNWGSY3L#issuecomment-4307853677>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/ABAARLFVFO7CNO76T5DVAXL4XJ5LRAVCNFSM6AAAAACRLDRLCKVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHM2DGMBXHA2TGNRXG4>\r\n> .\r\n> You are receiving this because you commented.Message ID:\r\n> ***@***.***>\r\n>\r\n\r\n\r\n-- \r\nLuke Valenta\r\nSystems Engineer - Research\r\n",
+          "body": "Quick note: section 7.4 refers to pushing landmark subtrees down to RPs, in\r\nwhich case consistency proofs to a signed checkpoint are sufficient. See\r\nsection 6.2 for the construction of certificates which _does_\r\nrequire cosignatures on the exact subtree. (This was also a point of\r\nconfusion in [1], so we should probably clarify the text.)\r\n\r\n[1]\r\nhttps://mailarchive.ietf.org/arch/msg/plants/qFo9aC8WxZBBD936aVYKMhEfqjM/\r\n\r\nEDIT: After reading your response on the mailing list, I realize that what I wrote above is wrong. I was conflating the \"landmark-anchored standalone MTCs\" case from [1] (where you would need cosignatures on the landmark subtrees) with landmark-relative certificates (where you don't). Thanks for the correction!\r\n\r\nOn Thu, Apr 23, 2026 at 4:38\u202fPM Brendan McMillion ***@***.***>\r\nwrote:\r\n\r\n> *Bren2010* left a comment (ietf-plants-wg/merkle-tree-certs#172)\r\n> <https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172?email_source=notifications&email_token=ABAARLFMOORNLRA5IIUYXRL4XJ5LRA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIMZQG44DKMZWG432M4TFMFZW63VHMNXW23LFNZ2KKZLWMVXHJNLQOJPWG33NNVSW45C7N5YGK3S7MNWGSY3L#issuecomment-4307853677>\r\n>\r\n> If the landmark sequence points to valid landmark log entries, great!\r\n> Otherwise, the server has to do more work to find a recent landmark log\r\n> entry.\r\n>\r\n> If by \"the server has to do more work\", you mean that the server has to\r\n> process a linear number of certificates, that's not really ideal. The CA is\r\n> an untrusted party here, it shouldn't be able to force the server to do a\r\n> prohibitive amount of work to remain secure.\r\n>\r\n> To issue landmark-relative certificates, the CA has to get cosignatures on\r\n> the landmark subtrees (via /sign-subtree, currently described in Appendix\r\n> C.2).\r\n>\r\n> In 7.4 the document says \"It is not necessary that the cosigners have\r\n> generated signatures over the specific subtrees, only that they are\r\n> consistent.\" So that would need to change to require 1.) cosignatures that\r\n> indicate an intent to make a landmark, over the specific subtrees, and 2.)\r\n> have cosigners verify existence of a landmark log entry before signing. And\r\n> you'd still have the other downsides we've discussed, so this wouldn't be\r\n> my preference.\r\n>\r\n> Isn't this PR doing the same thing? The server only learns about fresh\r\n> accumulated_counts (and corresponding vindexes) when it gets a fresh\r\n> certificate?\r\n>\r\n> No, the server is able to go to the CA (or a mirror) at any time and find\r\n> a newer accumulated log entry (if one exists). The server uses its\r\n> certificate to gossip the tree head with browsers, so gossip here is\r\n> limited to issuance frequency. But if the server is stateful, then any fork\r\n> will be detected eventually. So while the landmark log entry idea is\r\n> best-case as fast as re-issuance, the accumulated log entry idea is\r\n> worst-case (= your chosen CA is malicious) as fast as re-issuance and\r\n> best-case as fast as your CA will allow (allowing you to detect\r\n> mis-issuances by other CAs sooner).\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172?email_source=notifications&email_token=ABAARLFMOORNLRA5IIUYXRL4XJ5LRA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIMZQG44DKMZWG432M4TFMFZW63VHMNXW23LFNZ2KKZLWMVXHJNLQOJPWG33NNVSW45C7N5YGK3S7MNWGSY3L#issuecomment-4307853677>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/ABAARLFVFO7CNO76T5DVAXL4XJ5LRAVCNFSM6AAAAACRLDRLCKVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHM2DGMBXHA2TGNRXG4>\r\n> .\r\n> You are receiving this because you commented.Message ID:\r\n> ***@***.***>\r\n>\r\n\r\n\r\n-- \r\nLuke Valenta\r\nSystems Engineer - Research\r\n",
           "createdAt": "2026-04-23T20:50:17Z",
-          "updatedAt": "2026-04-23T20:50:17Z"
+          "updatedAt": "2026-04-26T11:31:35Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "One more question: why `accumulated_count` instead of an `accumulated_index`? Basically, instead of making the per-entry field be a count that requires binary search to find some entry, it could be an index in the tree pointing directly to the latest entry of interest at the time the log entry is created.",
+          "createdAt": "2026-04-26T11:37:07Z",
+          "updatedAt": "2026-04-26T14:53:38Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "That assumes third-party auditors verify each log entry. The counter approach is secure without assuming third-party auditors. Yes, verifiable indexes require assuming that third-party auditors exist, but that assumption is specific to that application. You can think of other applications where being able to authenticate \"most recent\" is valuable and where pulling in that assumption isn't otherwise necessary. The prime example being revocation.\r\n\r\nEdit: Thinking about it some more, another cool point is secure pruning. In a pruned part of the log, I can keep only the `accumulated` log entries and the log(n)-sized search path that leads to them. That lets you verify that those were in fact all of the `accumulated` log entries that were created, even though everything else is deleted.",
+          "createdAt": "2026-04-27T01:10:54Z",
+          "updatedAt": "2026-04-27T01:48:21Z"
         }
       ],
       "reviews": []
@@ -13537,7 +13559,7 @@
       "labels": [],
       "body": "The previous language said a subtree \"is\" an interior node. It seemed clearer to say that it is an interior node plus all of its children.\r\n\r\nI wound up defining three named kinds of subtrees, which I think are helpful in conceptualizing what's going on: Full Subtree, Right Subtree, and Partial Subtree. Then we can say early on that we'll be using a Full Subtree combined with a Right Subtree to cover arbitrary ranges.\r\n\r\nAlso, I defined a Right Subtree `[start, n)` to only be contained in the Merkle Tree of size `n`. In the tree of size `n+1`, at least one of the nodes has a different hash, so the Right Subtree `[start, n)` isn't really contained in it. This allows us to remove some language around \"directly contained,\" which I found confusing. Note: I haven't yet updated the consistency proof section, since I wanted to first see if folks found this tweak compelling.",
       "createdAt": "2026-04-17T00:12:46Z",
-      "updatedAt": "2026-04-17T07:09:14Z",
+      "updatedAt": "2026-04-28T01:46:19Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13548,7 +13570,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "WDYT about https://github.com/ietf-plants-wg/merkle-tree-certs/pull/216? It doesn't change quite as much as this PR does, but gives a hopefully clearer overview.",
+          "createdAt": "2026-04-28T01:46:19Z",
+          "updatedAt": "2026-04-28T01:46:19Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc71-bnq",
@@ -13567,6 +13597,44 @@
               "body": "All Right Subtrees of non-power-of-two-sized Merkle Tree being partial does not seem to hold. E.g., consider Subtree [4,6) in Merkle Tree of size 6.\n\n- 6 is not a power of two.\n- 0 <= 4 < 6 <= 6 and BIT_CEIL(6-4) = 2 divides 4, so [4,6) is a Subtree.\n- 6-4=2=2^1, so [4,6) is a Full Subtree.\n- [4,6) is of form [A,n), so [4,6) is Right Subtree.\n\nWhat does hold is that any non-power-of-two-sized Merkle Tree has at least one Partial Right Subtree.",
               "createdAt": "2026-04-17T07:09:14Z",
               "updatedAt": "2026-04-17T07:09:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75b5_w",
+          "commit": {
+            "abbreviatedOid": "b79fb63"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Sorry this slipped through my inbox. Overall, it confuses me somewhat that this PR seem to define a *ton* of concepts, but then the document overall doesn't really use them very much. Do we actually need all of these?",
+          "createdAt": "2026-04-27T23:45:58Z",
+          "updatedAt": "2026-04-27T23:52:06Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Do we actually need all this? It does seem odd to introduce this in the global terminology section but then we never actually use this term exception to explain subtrees a bit.",
+              "createdAt": "2026-04-27T23:45:58Z",
+              "updatedAt": "2026-04-27T23:52:06Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "Doesn't this bring back the original confusion? The subtree isn't necessarily an interior node of _this_ Merkle Tree. It's also a little odd in that a Merkle Tree in 9162 and 6962 is formally defined as this funky hash function. The tree only comes from implicitly looking at the call tree. (I don't know if I'd have defined it that way, but unless we want to take on redefining all that, I think that's what we have to work with.)",
+              "createdAt": "2026-04-27T23:47:55Z",
+              "updatedAt": "2026-04-27T23:52:06Z"
+            },
+            {
+              "originalPosition": 38,
+              "body": "This terminology seems slightly unfortunate. \"Right subtree\" also sounds like \"take the right subtree _of this node_\", which means something very different.",
+              "createdAt": "2026-04-27T23:49:10Z",
+              "updatedAt": "2026-04-27T23:52:06Z"
+            },
+            {
+              "originalPosition": 53,
+              "body": "Is the idea that we'd delete the other section then?",
+              "createdAt": "2026-04-27T23:50:34Z",
+              "updatedAt": "2026-04-27T23:52:06Z"
             }
           ]
         }
@@ -13925,13 +13993,13 @@
       "labels": [],
       "body": "This makes minor changes to the signature scheme to make it compatible with https://c2sp.org/tlog-cosignature, with the aim that MTCs can be more easily deployed by using unmodified tlog-based software.\r\n\r\nThis does not add a normative dependency on tlog, though we do non-normatively cite a tlog document so readers know the signature construction was chosen to be compatible. It also remains unnecessary to use tlog to implement MTCs. This is just defining the format for the signature input.\r\n\r\nWhile I'm here, some of the discussion about cosignatures was... very confusing. We were talking about keeping a current checkpoint and everything, without defining cosigner roles. Let's leave exact state to the cosigner roles and instead, here, we can just abstractly define what you need to guarantee.\r\n\r\n\"Cosigners SHOULD publish their current checkpoint, along with the checkpoint signature\" was particularly weird since it doesn't say how to publish it. While it is true for basically all cosigners in CT-like deployments, it should be for the individual cosigner roles to define.",
       "createdAt": "2026-04-23T14:58:32Z",
-      "updatedAt": "2026-04-24T22:37:54Z",
+      "updatedAt": "2026-04-28T00:37:35Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "tlog-compatible",
-      "headRefOid": "5943ecf62cdea1c8d72f0c93448dcab04408df6f",
+      "headRefOid": "7d9ddf556c3adca9d65de149c3ec5ccc7bc498f4",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -13997,8 +14065,184 @@
               "updatedAt": "2026-04-24T22:37:54Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc74Ytxa",
+          "commit": {
+            "abbreviatedOid": "43c26ca"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-24T01:21:41Z",
+          "updatedAt": "2026-04-26T17:32:20Z",
+          "comments": [
+            {
+              "originalPosition": 59,
+              "body": "```suggestion\n`cosigner_name` and `log_origin` are computed from the cosigner ID and the issuance log's ID ({{log-ids}}), respectively. They contain the concatenation of:\n```",
+              "createdAt": "2026-04-26T15:03:36Z",
+              "updatedAt": "2026-04-26T17:32:20Z"
+            },
+            {
+              "originalPosition": 73,
+              "body": "Possible rephrasing to first state the wire-format rules, and then give the semantics:\n```suggestion\nIf `start` is non-zero, then `timestamp` MUST be zero. Otherwise, `timestamp` MAY be zero or it MAY be the time that the signature was produced, represented as seconds since the Epoch as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}; in the latter case `end` MUST be the size of the largest consistent tree that the cosigner has observed for the log.\n\nA non-zero `timestamp` is an assertion about the signing time and the largest observed tree; a zero `timestamp` makes no such statement.\n```",
+              "createdAt": "2026-04-26T15:29:39Z",
+              "updatedAt": "2026-04-26T17:32:20Z"
+            },
+            {
+              "originalPosition": 71,
+              "body": "If the edit below is accepted:\n```suggestion\n`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log.\n```",
+              "createdAt": "2026-04-26T15:30:03Z",
+              "updatedAt": "2026-04-26T17:32:20Z"
+            },
+            {
+              "originalPosition": 76,
+              "body": "If the edit above is accepted:\n```suggestion\n```",
+              "createdAt": "2026-04-26T15:39:43Z",
+              "updatedAt": "2026-04-26T17:32:21Z"
+            },
+            {
+              "originalPosition": 165,
+              "body": "```suggestion\n[[TODO: When all this moves to C2SP, allocate a codepoint for a more idiomatic key ID construction.]]\n```",
+              "createdAt": "2026-04-26T15:40:33Z",
+              "updatedAt": "2026-04-26T17:32:21Z"
+            },
+            {
+              "originalPosition": 135,
+              "body": "Just to explicitly list everything that goes into CosignedMessage:\n```suggestion\n1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, the log ID for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero`.\n```",
+              "createdAt": "2026-04-26T15:50:35Z",
+              "updatedAt": "2026-04-26T17:32:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75bEg9",
+          "commit": {
+            "abbreviatedOid": "2143734"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-27T22:51:22Z",
+          "updatedAt": "2026-04-27T22:51:22Z",
+          "comments": [
+            {
+              "originalPosition": 73,
+              "body": "Hmm. I feel like this makes it a lot harder to tell what a non-zero timestamp *means*. I'll take another pass at this and see if it works better.",
+              "createdAt": "2026-04-27T22:51:22Z",
+              "updatedAt": "2026-04-27T22:51:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75bKkG",
+          "commit": {
+            "abbreviatedOid": "2143734"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-27T22:58:29Z",
+          "updatedAt": "2026-04-27T22:58:29Z",
+          "comments": [
+            {
+              "originalPosition": 73,
+              "body": "Eh yeah feel free to ignore!",
+              "createdAt": "2026-04-27T22:58:29Z",
+              "updatedAt": "2026-04-27T22:58:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75bY8N",
+          "commit": {
+            "abbreviatedOid": "5943ecf"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-27T23:13:17Z",
+          "updatedAt": "2026-04-27T23:13:17Z",
+          "comments": [
+            {
+              "originalPosition": 73,
+              "body": "How's this version?",
+              "createdAt": "2026-04-27T23:13:17Z",
+              "updatedAt": "2026-04-27T23:13:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75bhLQ",
+          "commit": {
+            "abbreviatedOid": "7d9ddf5"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-27T23:22:04Z",
+          "updatedAt": "2026-04-27T23:22:04Z",
+          "comments": [
+            {
+              "originalPosition": 73,
+              "body": "Reads well to me!",
+              "createdAt": "2026-04-27T23:22:04Z",
+              "updatedAt": "2026-04-27T23:22:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75ceBE",
+          "commit": {
+            "abbreviatedOid": "43c26ca"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-28T00:37:35Z",
+          "updatedAt": "2026-04-28T00:37:35Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "(Talked with Aaron out of band and it sounds like this is resolved.)",
+              "createdAt": "2026-04-28T00:37:35Z",
+              "updatedAt": "2026-04-28T00:37:35Z"
+            }
+          ]
         }
       ]
+    },
+    {
+      "number": 216,
+      "id": "PR_kwDOJIBkVc7WK-Sq",
+      "title": "Clarify and expand on the subtree overview",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/216",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This begins the section with an overview of what subtrees are used for, and all the operations on them that matter for this specification. The subsequent sections define them more formally.",
+      "createdAt": "2026-04-28T01:45:51Z",
+      "updatedAt": "2026-04-28T01:45:51Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b0c83104918f10e8c813783f77434143eab4ef97",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "subtree-overview",
+      "headRefOid": "6ac50ebd1dc8f90d15515765fcc325d54fd15dab",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
