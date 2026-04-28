@@ -407,7 +407,11 @@ Landmark-relative certificates are constructed and used as follows. {{fig-landma
 
 # Subtrees
 
-This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} by defining a *subtree* of a Merkle Tree. A subtree is an interior node of a Merkle Tree, which can be efficiently shown consistent with the original Merkle Tree and any Merkle Tree with additional elements appended. This specification uses subtrees to reduce the size of inclusion proofs.
+This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} by defining a *subtree* of a Merkle Tree. A subtree is itself a Merkle Tree, built over an interval of entries from the original tree. {{definition-of-a-subtree}} defines a subtree formally, including the constraints on those intervals.
+
+As with Merkle Trees, a subtree inclusion proof, defined in {{subtree-inclusion-proofs}}, can prove an entry is contained in some subtree. Subtrees, and thus their inclusion proofs, are smaller than those of the original tree, so this document uses subtree inclusion proofs as a certificate size optimization.
+
+Not all intervals can form subtrees. Subtrees are limited to intervals that can be efficiently proven consistent with the original tree, using subtree consistency proofs defined in {{subtree-consistency-proofs}}. However, every interval of a Merkle Tree can be efficiently covered by two subtrees. {{arbitrary-intervals}} describes how to determine these subtrees.
 
 ## Definition of a Subtree
 
