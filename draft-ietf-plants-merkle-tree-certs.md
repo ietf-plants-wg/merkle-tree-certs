@@ -1344,7 +1344,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 
 The fields of a MTCCertificationAuthority structure are defined as follows:
 
-* `logHash` describes the hash function used in the log. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
+* `logHash` describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
 
 * `cosignerID` is the CA cosigner's cosigner ID ({{cosigners}}) as a RELATIVE-OID.
 
@@ -1367,7 +1367,7 @@ This section discusses how relying parties verify Merkle Tree Certificates.
 In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:
 
 * The log ID ({{log-ids}})
-* The log hash, e.g. SHA-256
+* The log hash algorithm, e.g. SHA-256
 * A set of supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
@@ -1377,7 +1377,7 @@ This information may be obtained, in part, from a CA certificate structure, defi
 
 * The log ID is determined from the certificate's subject.
 
-* The log hash is determined from the id-pe-mtcCertificationAuthority extension.
+* The log hash algorithm is determined from the id-pe-mtcCertificationAuthority extension.
 
 * The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. {{trusted-cosigners}} gives some guidance on this.
 
