@@ -4558,7 +4558,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 <p id="section-6.5-7">The fields of a MTCCertificationAuthority structure are defined as follows:<a href="#section-6.5-7" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.5-8.1">
-            <p id="section-6.5-8.1.1"><code>logHash</code> describes the hash function used in the log. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-6.5-8.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.5-8.1.1"><code>logHash</code> describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-6.5-8.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.5-8.2">
             <p id="section-6.5-8.2.1"><code>cosignerID</code> is the CA cosigner's cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) as a RELATIVE-OID.<a href="#section-6.5-8.2.1" class="pilcrow">¶</a></p>
@@ -4594,7 +4594,7 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.1-2.1.1">The log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>)<a href="#section-7.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.2">
-            <p id="section-7.1-2.2.1">The log hash, e.g. SHA-256<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.2.1">The log hash algorithm, e.g. SHA-256<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.3">
             <p id="section-7.1-2.3.1">A set of supported cosigners, as pairs of cosigner ID and public key<a href="#section-7.1-2.3.1" class="pilcrow">¶</a></p>
@@ -4615,7 +4615,7 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.1-4.1.1">The log ID is determined from the certificate's subject.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.2">
-            <p id="section-7.1-4.2.1">The log hash is determined from the id-pe-mtcCertificationAuthority extension.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.2.1">The log hash algorithm is determined from the id-pe-mtcCertificationAuthority extension.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.3">
             <p id="section-7.1-4.3.1">The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a> gives some guidance on this.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>

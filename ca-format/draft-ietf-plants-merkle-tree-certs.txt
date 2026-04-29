@@ -1968,9 +1968,9 @@ Table of Contents
    The fields of a MTCCertificationAuthority structure are defined as
    follows:
 
-   *  logHash describes the hash function used in the log.  For example,
-      if the hash is SHA-256, it would be mda-sha256 as defined in
-      Section 8 of [RFC5912].
+   *  logHash describes the hash algorithm used in the log.  For
+      example, if the hash is SHA-256, it would be mda-sha256 as defined
+      in Section 8 of [RFC5912].
 
    *  cosignerID is the CA cosigner's cosigner ID (Section 5.4) as a
       RELATIVE-OID.
@@ -2012,7 +2012,7 @@ Table of Contents
 
    *  The log ID (Section 5.2)
 
-   *  The log hash, e.g. SHA-256
+   *  The log hash algorithm, e.g. SHA-256
 
    *  A set of supported cosigners, as pairs of cosigner ID and public
       key
@@ -2031,7 +2031,7 @@ Table of Contents
 
    *  The log ID is determined from the certificate's subject.
 
-   *  The log hash is determined from the id-pe-
+   *  The log hash algorithm is determined from the id-pe-
       mtcCertificationAuthority extension.
 
    *  The CA cosigner is determined from the certificate's subject
