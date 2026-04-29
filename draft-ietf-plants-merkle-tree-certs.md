@@ -1373,7 +1373,7 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 * An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
 * A list of revoked ranges of indices ({{revocation-by-index}})
 
-This information may be obtained, in part, from a CA certificate structure, defined in {{representing-certification-authorities}}:
+This information may be obtained from a CA certificate structure, defined in {{representing-certification-authorities}}:
 
 * The log ID is determined from the certificate's subject.
 
@@ -1381,9 +1381,9 @@ This information may be obtained, in part, from a CA certificate structure, defi
 
 * The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. {{trusted-cosigners}} gives some guidance on this.
 
-* No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate additional out-of-band information.
+* No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.
 
-* The revoked indices contains the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional ranges obtained via out-of-band information.
+* The revoked index ranges include the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional ranges from out-of-band information.
 
 ## Verifying Certificate Signatures
 
