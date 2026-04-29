@@ -2099,7 +2099,7 @@ Table of Contents
        as described in Section 5.4.1.  Reconstruct the CosignedMessage
        from MTCProof's start and end, the cosigner ID for cosigner_name,
        the log ID for log_origin, expected_subtree_hash for
-       subtree_hash, and timestamp set to zero`.
+       subtree_hash, and timestamp set to zero.
 
    This procedure only replaces the signature verification portion of
    X.509 path validation.  The relying party MUST continue to perform
