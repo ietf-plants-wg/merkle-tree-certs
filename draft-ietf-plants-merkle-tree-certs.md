@@ -208,7 +208,7 @@ This increased overhead additionally impacts CT logs themselves. Most of a log's
 
 Additionally, as PKIs transition to shorter-lived certificates {{CABF-153}} {{CABF-SC081}}, the number of entries in the log will grow.
 
-This document introduces Merkle Tree certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
+This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
 
 This achieves the following:
 
@@ -1304,17 +1304,17 @@ Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for
 
 ## Representing Certification Authorities
 
-This section defines X.509 Certificate {{!RFC5280}} representation for information about a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and one associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:
+This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and one associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:
 
 * The `subject` field MUST be the CA issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
 
-* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}
+* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}.
 
 * The `extensions` field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.
 
 Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
 
-* The key usage extension ({{Section 4.2.1.3 of !RFC5280}} MUST be present and assert the `keyCertSign` bit.
+* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert the `keyCertSign` bit.
 
 * The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
 
@@ -1326,7 +1326,7 @@ id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
     mechanisms(5) pkix(7) pe(1) TBD }
 
 ext-mtcCertificationAuthority EXTENSION ::= {
-    SYNTAX MTCCertificateAuthority
+    SYNTAX MTCCertificationAuthority
     IDENTIFIED BY id-pe-mtcCertificationAuthority
     CRITICALITY TRUE
 }
@@ -1348,13 +1348,13 @@ The fields of a MTCCertificationAuthority structure are defined as follows:
 
 * `cosignerID` is the CA cosigner's cosigner ID ({{cosigners}}) as a RELATIVE-OID.
 
-* `cosignerSigAlg` the CA cosigner's signature algorithm ({{signature-algorithms}}).
+* `cosignerSigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
 
 * `minSerial` is an integer describing the minimum allowed serial number in the issuance log ({{log-pruning}}).
 
-If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. The key MAY be used to directly sign certificate revocations lists (CRLs) {{!RFC5280}} and OCSP responses {{!RFC6960}}. CRLs and OCSP apply to Merkle Tree Certificates unchanged, though later documents MAY introduce new integrations.
+If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. The key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}. CRLs and OCSP apply to Merkle Tree Certificates unchanged, though later documents MAY introduce new integrations.
 
-This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol define a new format, this SHOULD be represented in CA certificates with a new extension type.
+This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
 
 A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
 
@@ -1366,8 +1366,8 @@ This section discusses how relying parties verify Merkle Tree Certificates.
 
 In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:
 
-* The log hash, e.g. SHA-256
 * The log ID ({{log-ids}})
+* The log hash, e.g. SHA-256
 * A set of supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
@@ -1375,15 +1375,15 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 
 This information may be obtained, in part, from a CA certificate structure, defined in {{representing-certification-authorities}}:
 
-* The log hash is determined from the id-pe-mtcCertificationAuthority extension.
-
 * The log ID is determined from the certificate's subject.
+
+* The log hash is determined from the id-pe-mtcCertificationAuthority extension.
 
 * The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. {{trusted-cosigners}} gives some guidance on this.
 
 * No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate additional out-of-band information.
 
-* The revoked indices contains the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional out-of-band information.
+* The revoked indices contains the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional ranges obtained via out-of-band information.
 
 ## Verifying Certificate Signatures
 
@@ -1765,13 +1765,13 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Algor
 |---------|-----------------|------------|
 | TBD     | id-alg-mtcProof | [this-RFC] |
 
-# Certificate Extension
+## Certificate Extension
 
 IANA is requested to add the following entry to the "SMI Security for PKIX Certificate Extension" registry {{?RFC7299}}:
 
 | Decimal | Description                      | References |
 |---------|----------------------------------|------------|
-| TBD     | id-alg-mtcCertificationAuthority | [this-RFC] |
+| TBD     | id-pe-mtcCertificationAuthority | [this-RFC] |
 
 ## Relative Distinguished Name Attribute
 
@@ -1858,7 +1858,7 @@ id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
     mechanisms(5) pkix(7) pe(1) TBD }
 
 ext-mtcCertificationAuthority EXTENSION ::= {
-    SYNTAX MTCCertificateAuthority
+    SYNTAX MTCCertificationAuthority
     IDENTIFIED BY id-pe-mtcCertificationAuthority
     CRITICALITY TRUE
 }
