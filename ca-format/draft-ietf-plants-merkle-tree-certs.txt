@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 30 October 2026                                      Apple Inc.
+Expires: 31 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           28 April 2026
+                                                           29 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 October 2026.
+   This Internet-Draft will expire on 31 October 2026.
 
 Copyright Notice
 
@@ -148,11 +148,11 @@ Table of Contents
    13. IANA Considerations
      13.1.  Module Identifier
      13.2.  Algorithm
-   14. Certificate Extension
-     14.1.  Relative Distinguished Name Attribute
-   15. References
-     15.1.  Normative References
-     15.2.  Informative References
+     13.3.  Certificate Extension
+     13.4.  Relative Distinguished Name Attribute
+   14. References
+     14.1.  Normative References
+     14.2.  Informative References
    Appendix A.  ASN.1 Module
    Appendix B.  Merkle Tree Structure
      B.1.  Binary Representations
@@ -210,7 +210,7 @@ Table of Contents
    Additionally, as PKIs transition to shorter-lived certificates
    [CABF-153] [CABF-SC081], the number of entries in the log will grow.
 
-   This document introduces Merkle Tree certificates (MTCs), a new form
+   This document introduces Merkle Tree Certificates (MTCs), a new form
    of X.509 certificate that integrates logging with certificate
    issuance.  Each CA maintains a log of everything it issues, signing
    views of the log to assert it has issued the contents.  The CA
@@ -1918,16 +1918,16 @@ Table of Contents
 
 6.5.  Representing Certification Authorities
 
-   This section defines X.509 Certificate [RFC5280] representation for
-   information about a Merkle Tree Certificate CA.  It identifies the
-   issuance log (Section 5) and one associated CA cosigner
-   (Section 5.5).  This information is encoded as follows:
+   This section defines the X.509 Certificate [RFC5280] representation
+   of a Merkle Tree Certificate CA.  It identifies the issuance log
+   (Section 5) and one associated CA cosigner (Section 5.5).  This
+   information is encoded as follows:
 
    *  The subject field MUST be the CA issuance log's log ID as a PKIX
       distinguished name, as described in Section 5.2.
 
    *  The subjectPublicKeyInfo field MUST be the public key of the CA
-      cosigner Section 5.5
+      cosigner Section 5.5.
 
    *  The extensions field MUST contain a critical extension of type id-
       pe-mtcCertificationAuthority, defined below.
@@ -1935,7 +1935,7 @@ Table of Contents
    Other fields and extensions in [RFC5280] apply unmodified.  In
    particular:
 
-   *  The key usage extension (Section 4.2.1.3 of [RFC5280] MUST be
+   *  The key usage extension (Section 4.2.1.3 of [RFC5280]) MUST be
       present and assert the keyCertSign bit.
 
    *  The basic constraints extension (Section 4.2.1.9 of [RFC5280])
@@ -1950,7 +1950,7 @@ Table of Contents
        mechanisms(5) pkix(7) pe(1) TBD }
 
    ext-mtcCertificationAuthority EXTENSION ::= {
-       SYNTAX MTCCertificateAuthority
+       SYNTAX MTCCertificationAuthority
        IDENTIFIED BY id-pe-mtcCertificationAuthority
        CRITICALITY TRUE
    }
@@ -1975,7 +1975,7 @@ Table of Contents
    *  cosignerID is the CA cosigner's cosigner ID (Section 5.4) as a
       RELATIVE-OID.
 
-   *  cosignerSigAlg the CA cosigner's signature algorithm
+   *  cosignerSigAlg is the CA cosigner's signature algorithm
       (Section 5.4.3).
 
    *  minSerial is an integer describing the minimum allowed serial
@@ -1985,12 +1985,13 @@ Table of Contents
    subjectPublicKeyInfo MUST NOT be used to directly sign TBSCertificate
    structures, as in a traditional X.509 CA.  Instead, it is used to
    sign subtrees as described in Section 5.4.1.  The key MAY be used to
-   directly sign certificate revocations lists (CRLs) [RFC5280] and OCSP
-   responses [RFC6960].  CRLs and OCSP apply to Merkle Tree Certificates
-   unchanged, though later documents MAY introduce new integrations.
+   directly sign certificate revocation lists (CRLs) [RFC5280] and
+   Online Certificate Status Protocol (OCSP) responses [RFC6960].  CRLs
+   and OCSP apply to Merkle Tree Certificates unchanged, though later
+   documents MAY introduce new integrations.
 
    This extension indicates the subtree signature format defined in
-   Section 5.4.1.  If a later version of the protocol define a new
+   Section 5.4.1.  If a later version of the protocol defines a new
    format, this SHOULD be represented in CA certificates with a new
    extension type.
 
@@ -2010,9 +2011,9 @@ Table of Contents
    In order to accept certificates from a Merkle Tree CA, a relying
    party MUST be configured with:
 
-   *  The log hash, e.g. SHA-256
-
    *  The log ID (Section 5.2)
+
+   *  The log hash, e.g. SHA-256
 
    *  A set of supported cosigners, as pairs of cosigner ID and public
       key
@@ -2029,10 +2030,10 @@ Table of Contents
    This information may be obtained, in part, from a CA certificate
    structure, defined in Section 6.5:
 
+   *  The log ID is determined from the certificate's subject.
+
    *  The log hash is determined from the id-pe-
       mtcCertificationAuthority extension.
-
-   *  The log ID is determined from the certificate's subject.
 
    *  The CA cosigner is determined from the certificate's subject
       public key and id-pe-mtcCertificationAuthority extension.  The
@@ -2044,8 +2045,8 @@ Table of Contents
       of-band information.
 
    *  The revoked indices contains the half-open range [0, minSerial),
-      but the relying party MAY incorporate additional out-of-band
-      information.
+      but the relying party MAY incorporate additional ranges obtained
+      via out-of-band information.
 
 7.2.  Verifying Certificate Signatures
 
@@ -3034,20 +3035,20 @@ Table of Contents
 
                                  Table 2
 
-14.  Certificate Extension
+13.3.  Certificate Extension
 
    IANA is requested to add the following entry to the "SMI Security for
    PKIX Certificate Extension" registry [RFC7299]:
 
-        +=========+==================================+============+
-        | Decimal | Description                      | References |
-        +=========+==================================+============+
-        | TBD     | id-alg-mtcCertificationAuthority | [this-RFC] |
-        +---------+----------------------------------+------------+
+        +=========+=================================+============+
+        | Decimal | Description                     | References |
+        +=========+=================================+============+
+        | TBD     | id-pe-mtcCertificationAuthority | [this-RFC] |
+        +---------+---------------------------------+------------+
 
-                                  Table 3
+                                 Table 3
 
-14.1.  Relative Distinguished Name Attribute
+13.4.  Relative Distinguished Name Attribute
 
    IANA is requested to add the following entry to the "SMI Security for
    PKIX Relative Distinguished Name Attribute" registry
@@ -3061,9 +3062,9 @@ Table of Contents
 
                                  Table 4
 
-15.  References
+14.  References
 
-15.1.  Normative References
+14.1.  Normative References
 
    [I-D.ietf-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
@@ -3151,7 +3152,7 @@ Table of Contents
               Encoding Rules (CER) and Distinguished Encoding Rules
               (DER)", ISO/IEC 8824-1:2021 , February 2021.
 
-15.2.  Informative References
+14.2.  Informative References
 
    [APPLE-CT] Apple, "Apple's Certificate Transparency policy", 5 March
               2021, <https://support.apple.com/en-us/HT205280>.
@@ -3342,7 +3343,7 @@ Appendix A.  ASN.1 Module
        mechanisms(5) pkix(7) pe(1) TBD }
 
    ext-mtcCertificationAuthority EXTENSION ::= {
-       SYNTAX MTCCertificateAuthority
+       SYNTAX MTCCertificationAuthority
        IDENTIFIED BY id-pe-mtcCertificationAuthority
        CRITICALITY TRUE
    }
