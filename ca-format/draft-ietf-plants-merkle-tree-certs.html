@@ -4609,7 +4609,7 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.1-2.6.1">A list of revoked ranges of indices (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>)<a href="#section-7.1-2.6.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.1-3">This information may be obtained, in part, from a CA certificate structure, defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 6.5</a>:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">This information may be obtained from a CA certificate structure, defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 6.5</a>:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-4.1">
             <p id="section-7.1-4.1.1">The log ID is determined from the certificate's subject.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
@@ -4621,10 +4621,10 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.1-4.3.1">The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a> gives some guidance on this.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.4">
-            <p id="section-7.1-4.4.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate additional out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.4.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.5">
-            <p id="section-7.1-4.5.1">The revoked indices contains the half-open range <code>[0, minSerial)</code>, but the relying party MAY incorporate additional ranges obtained via out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.5.1">The revoked index ranges include the half-open range <code>[0, minSerial)</code>, but the relying party MAY incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

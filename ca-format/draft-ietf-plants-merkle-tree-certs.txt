@@ -2026,8 +2026,8 @@ Table of Contents
 
    *  A list of revoked ranges of indices (Section 7.5)
 
-   This information may be obtained, in part, from a CA certificate
-   structure, defined in Section 6.5:
+   This information may be obtained from a CA certificate structure,
+   defined in Section 6.5:
 
    *  The log ID is determined from the certificate's subject.
 
@@ -2040,12 +2040,12 @@ Table of Contents
       Section 7.3 gives some guidance on this.
 
    *  No trusted subtrees are directly represented by the CA certificate
-      structure, but the relying party MAY incorporate additional out-
-      of-band information.
+      structure, but the relying party MAY incorporate trusted subtrees
+      from out-of-band information.
 
-   *  The revoked indices contains the half-open range [0, minSerial),
-      but the relying party MAY incorporate additional ranges obtained
-      via out-of-band information.
+   *  The revoked index ranges include the half-open range [0,
+      minSerial), but the relying party MAY incorporate additional
+      ranges from out-of-band information.
 
 7.2.  Verifying Certificate Signatures
 
