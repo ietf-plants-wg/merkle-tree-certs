@@ -1979,16 +1979,15 @@ Table of Contents
       (Section 5.4.3).
 
    *  minSerial is an integer describing the minimum allowed serial
-      number in the issuance log (Section 5.6.1).
+      number (entry index) in the issuance log (Section 5.6.1).
 
    If this extension is present, the key described in
    subjectPublicKeyInfo MUST NOT be used to directly sign TBSCertificate
    structures, as in a traditional X.509 CA.  Instead, it is used to
-   sign subtrees as described in Section 5.4.1.  The key MAY be used to
-   directly sign certificate revocation lists (CRLs) [RFC5280] and
-   Online Certificate Status Protocol (OCSP) responses [RFC6960].  CRLs
-   and OCSP apply to Merkle Tree Certificates unchanged, though later
-   documents MAY introduce new integrations.
+   sign subtrees as described in Section 5.4.1.  However, the key MAY be
+   used to directly sign certificate revocation lists (CRLs) [RFC5280]
+   and Online Certificate Status Protocol (OCSP) responses [RFC6960], if
+   permitted by other X.509 constraints such as the key usage extension.
 
    This extension indicates the subtree signature format defined in
    Section 5.4.1.  If a later version of the protocol defines a new
