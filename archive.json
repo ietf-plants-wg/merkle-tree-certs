@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-28T03:55:51.022284+00:00",
+  "timestamp": "2026-04-30T03:53:52.644622+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3330,6 +3330,22 @@
           "updatedAt": "2026-04-22T20:02:33Z"
         }
       ]
+    },
+    {
+      "number": 217,
+      "id": "I_kwDOJIBkVc8AAAABAxd1YA",
+      "title": "Override RFC 5280 MUSTs on AKID and SKID",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/217",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "AKID and SKID are *yet another* subject <-> issuer pointer in X.509, this time because X.509 foolishly allowed multiple CAs to share the same subject name.\n\nWe define the subject format, so we don't have this problem. As such, SKIDs on the CA and AKIDs on the issued certificate are just a waste of bytes (both in the log and in TLS) and should just be omitted.",
+      "createdAt": "2026-04-28T23:13:10Z",
+      "updatedAt": "2026-04-28T23:13:10Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -11090,7 +11106,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-04-27T01:48:21Z",
+      "updatedAt": "2026-04-30T03:14:17Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -11206,6 +11222,27 @@
           "body": "That assumes third-party auditors verify each log entry. The counter approach is secure without assuming third-party auditors. Yes, verifiable indexes require assuming that third-party auditors exist, but that assumption is specific to that application. You can think of other applications where being able to authenticate \"most recent\" is valuable and where pulling in that assumption isn't otherwise necessary. The prime example being revocation.\r\n\r\nEdit: Thinking about it some more, another cool point is secure pruning. In a pruned part of the log, I can keep only the `accumulated` log entries and the log(n)-sized search path that leads to them. That lets you verify that those were in fact all of the `accumulated` log entries that were created, even though everything else is deleted.",
           "createdAt": "2026-04-27T01:10:54Z",
           "updatedAt": "2026-04-27T01:48:21Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> That assumes third-party auditors verify each log entry. The counter approach is secure without assuming third-party auditors.\r\n\r\nIsn't there an attack where the CA writes non-monotonic counter values to the log(n) entries that would be returned to the verifier to trick them into accepting an old accumulated log entry? This would be caught with either a global auditor, like mentioned in Section 5, or might be caught if the verifier keeps state across checks or has other peers doing similar checks, but I don't think the binary search for a verifier in isolation gives security guarantees (or at least, more work is needed to demonstrate that).\r\n\r\n",
+          "createdAt": "2026-04-28T18:53:47Z",
+          "updatedAt": "2026-04-28T18:54:15Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "One other idea I wanted to explore (not fully thought out yet): put the index of the most recent 'accumulated log entry' in each checkpoint. Mirror cosigners only sign the checkpoint if that pointer is correct (so they take on additional responsibilities). The server can still learn the set of RP-trusted cosigners by serving its standalone certificate in a TLS handshake, and can then request a recent checkpoint cosigned by the same set of cosigners to get an up-to-date vindex root. This probably has different security guarantees than your proposal, but also doesn't require any per-entry state.",
+          "createdAt": "2026-04-28T19:01:23Z",
+          "updatedAt": "2026-04-28T19:01:23Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> This would be caught with either a global auditor, like mentioned in Section 5, or might be caught if the verifier keeps state across checks or has other peers doing similar checks, but I don't think the binary search for a verifier in isolation gives security guarantees (or at least, more work is needed to demonstrate that).\r\n\r\nYes, the expectation is that the verifier retains state. Retaining state will generally just be necessary to detect forks, though it also helps here. The expectation is also that all users are doing the search in a way that maximizes their ability to detect conflicts with each other. The general idea for the algorithm is Section 4 [here](https://ietf-wg-keytrans.github.io/draft-protocol/draft-ietf-keytrans-protocol.html#name-updating-views-of-the-tree)\r\n\r\n> One other idea I wanted to explore (not fully thought out yet): put the index of the most recent 'accumulated log entry' in each checkpoint. Mirror cosigners only sign the checkpoint if that pointer is correct (so they take on additional responsibilities).\r\n\r\nThis would be interesting to consider, but muddles the layers of abstraction between MTC (defining a log entry format) and tlog-mirror (agnostic to log entry contents). You think that muddling is worth avoiding 8 (or 4) bytes?",
+          "createdAt": "2026-04-30T01:20:19Z",
+          "updatedAt": "2026-04-30T03:14:17Z"
         }
       ],
       "reviews": []
@@ -13652,13 +13689,13 @@
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-04-25T16:16:44Z",
+      "updatedAt": "2026-04-28T20:47:00Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
       "headRepository": "nharper/merkle-tree-certs",
       "headRefName": "log-numbers",
-      "headRefOid": "0631d5348da4cd6dc2382b7202ebe5028380d6a9",
+      "headRefOid": "254edfd13d84f6228677a988f95771cec8c60739",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -13978,6 +14015,62 @@
               "updatedAt": "2026-04-24T20:32:47Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75YrjG",
+          "commit": {
+            "abbreviatedOid": "254edfd"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-27T20:32:27Z",
+          "updatedAt": "2026-04-28T20:47:00Z",
+          "comments": [
+            {
+              "originalPosition": 54,
+              "body": "Removed.",
+              "createdAt": "2026-04-27T20:32:27Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            },
+            {
+              "originalPosition": 63,
+              "body": "Removed `logNumber`.",
+              "createdAt": "2026-04-27T20:32:38Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            },
+            {
+              "originalPosition": 116,
+              "body": "Removed the TODO.",
+              "createdAt": "2026-04-27T20:32:47Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            },
+            {
+              "originalPosition": 142,
+              "body": "Changed \"lowest\" to \"least significant\". I prefer \"least significant\" over \"modulo 2^64\", because we already least-significant bits in the draft, but we don't have modulo operators. Also added language to reject log number 0.\n\nAdded a bit to {{trust-anchors}} that a client can have a minimum log number.",
+              "createdAt": "2026-04-27T22:19:43Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            },
+            {
+              "originalPosition": 156,
+              "body": "I don't understand this comment. Subtrees are an optional optimization \u2014 it's fine for `[start, end)` to not match any trusted subtrees (because the RP has none at all, or the RP has none for that log), and we go on to the next step to verify the standalone cert.",
+              "createdAt": "2026-04-27T22:22:19Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            },
+            {
+              "originalPosition": 24,
+              "body": "I'm not a fan of \"issuance log\" referring to all log numbers together made up of a bunch of trees, because that diverges from what we consider a \"log\" to be today in CT (RFC 6962 and Static CT) and TLOG.\n\nI added a TODO to consider renaming \"issuer ID\", because I agree that this term can be confusing.",
+              "createdAt": "2026-04-28T18:47:37Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            },
+            {
+              "originalPosition": 185,
+              "body": "Switched it to dot, and added a TODO to explicitly document that we're using a full OID arc (though since the last component here is always a log number and this constructed OID isn't used anywhere else, we probably don't need to take over the whole OID arc).",
+              "createdAt": "2026-04-28T20:45:02Z",
+              "updatedAt": "2026-04-28T20:47:00Z"
+            }
+          ]
         }
       ]
     },
@@ -13986,24 +14079,26 @@
       "id": "PR_kwDOJIBkVc7VBa1l",
       "title": "Align signature scheme with tlog-cosignature",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/215",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This makes minor changes to the signature scheme to make it compatible with https://c2sp.org/tlog-cosignature, with the aim that MTCs can be more easily deployed by using unmodified tlog-based software.\r\n\r\nThis does not add a normative dependency on tlog, though we do non-normatively cite a tlog document so readers know the signature construction was chosen to be compatible. It also remains unnecessary to use tlog to implement MTCs. This is just defining the format for the signature input.\r\n\r\nWhile I'm here, some of the discussion about cosignatures was... very confusing. We were talking about keeping a current checkpoint and everything, without defining cosigner roles. Let's leave exact state to the cosigner roles and instead, here, we can just abstractly define what you need to guarantee.\r\n\r\n\"Cosigners SHOULD publish their current checkpoint, along with the checkpoint signature\" was particularly weird since it doesn't say how to publish it. While it is true for basically all cosigners in CT-like deployments, it should be for the individual cosigner roles to define.",
       "createdAt": "2026-04-23T14:58:32Z",
-      "updatedAt": "2026-04-28T00:37:35Z",
+      "updatedAt": "2026-04-28T19:07:42Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "tlog-compatible",
       "headRefOid": "7d9ddf556c3adca9d65de149c3ec5ccc7bc498f4",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-04-28T19:07:39Z",
+      "mergedAt": "2026-04-28T19:07:39Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a47597e73dadd4399ad38d5c928fa941d2148cba"
+      },
       "comments": [],
       "reviews": [
         {
@@ -14215,6 +14310,46 @@
               "updatedAt": "2026-04-28T00:37:35Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc74LwUd",
+          "commit": {
+            "abbreviatedOid": "7d9ddf5"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "\ud83d\udcaf ",
+          "createdAt": "2026-04-23T15:38:20Z",
+          "updatedAt": "2026-04-28T17:35:35Z",
+          "comments": [
+            {
+              "originalPosition": 115,
+              "body": "```suggestion\nkey ID = SHA-256(key name || 0x0A || 0xFF || \"subtree/v1\")[:4]\n```",
+              "createdAt": "2026-04-23T15:38:20Z",
+              "updatedAt": "2026-04-28T17:35:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc751Q3Q",
+          "commit": {
+            "abbreviatedOid": "7d9ddf5"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-28T18:36:05Z",
+          "updatedAt": "2026-04-28T18:36:05Z",
+          "comments": [
+            {
+              "originalPosition": 115,
+              "body": "Oh this'll just get deleted with https://github.com/C2SP/C2SP/pull/245 anyway. This was back when I thought we needed a signed-note representation for subtrees and did some ad-hoc MTC-specific thing for the key IDs. I think, while it's (very, very temporarily) MTC-specific, having the \"mtc-\" prefix there makes sense.\n\n(But mostly I figure I'll leave it alone since it's doomed to be removed.)",
+              "createdAt": "2026-04-28T18:36:05Z",
+              "updatedAt": "2026-04-28T18:36:05Z"
+            }
+          ]
         }
       ]
     },
@@ -14223,26 +14358,482 @@
       "id": "PR_kwDOJIBkVc7WK-Sq",
       "title": "Clarify and expand on the subtree overview",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/216",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This begins the section with an overview of what subtrees are used for, and all the operations on them that matter for this specification. The subsequent sections define them more formally.",
       "createdAt": "2026-04-28T01:45:51Z",
-      "updatedAt": "2026-04-28T01:45:51Z",
+      "updatedAt": "2026-04-28T14:58:39Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "b0c83104918f10e8c813783f77434143eab4ef97",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "subtree-overview",
       "headRefOid": "6ac50ebd1dc8f90d15515765fcc325d54fd15dab",
+      "closedAt": "2026-04-28T14:58:35Z",
+      "mergedAt": "2026-04-28T14:58:35Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b2ed4aba1a922de9d0a15ab4ba650115b7fb2dbd"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc75i4Sf",
+          "commit": {
+            "abbreviatedOid": "6ac50eb"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-28T07:30:30Z",
+          "updatedAt": "2026-04-28T07:30:30Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc75u8sG",
+          "commit": {
+            "abbreviatedOid": "6ac50eb"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-28T14:43:29Z",
+          "updatedAt": "2026-04-28T14:43:29Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 218,
+      "id": "PR_kwDOJIBkVc7WhvFg",
+      "title": "Define an MTC CA certificate format",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\"MTC CA certificate\", of course, stands for Merkle Tree Certificate certification authority certificate, because we are all certifiably good at naming things.\r\n\r\nCloses #96.",
+      "createdAt": "2026-04-28T23:41:33Z",
+      "updatedAt": "2026-04-30T02:25:49Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a47597e73dadd4399ad38d5c928fa941d2148cba",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "ca-format",
+      "headRefOid": "aaba50909ae6654a3addcb533bb79ae468a730e6",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "~~(Will send mail about this tomorrow.)~~ Or now...",
+          "createdAt": "2026-04-28T23:41:52Z",
+          "updatedAt": "2026-04-29T01:58:46Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc758WmG",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T00:18:13Z",
+          "updatedAt": "2026-04-29T00:24:06Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "```suggestion\nThis section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and one associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:\n```",
+              "createdAt": "2026-04-29T00:18:13Z",
+              "updatedAt": "2026-04-29T00:24:06Z"
+            },
+            {
+              "originalPosition": 82,
+              "body": "```suggestion\nIf this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. The key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and OCSP responses {{!RFC6960}}. CRLs and OCSP apply to Merkle Tree Certificates unchanged, though later documents MAY introduce new integrations.\n```\n\nAlso, in order to sign OCSP responses, it would need to assert the digitalSignature KU. I think it's totally fine if it does that, but the combination of line 1317 and this line (saying it MAY be used) might be interpreted as implying that an MTC CA can sign OCSP even without the digitalSignature KU.",
+              "createdAt": "2026-04-29T00:19:50Z",
+              "updatedAt": "2026-04-29T00:24:06Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "```suggestion\nThis extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.\n```",
+              "createdAt": "2026-04-29T00:20:22Z",
+              "updatedAt": "2026-04-29T00:24:06Z"
+            },
+            {
+              "originalPosition": 98,
+              "body": "nit:\n```suggestion\n* The log ID ({{log-ids}})\n* The log hash, e.g. SHA-256\n```",
+              "createdAt": "2026-04-29T00:21:45Z",
+              "updatedAt": "2026-04-29T00:24:06Z"
+            },
+            {
+              "originalPosition": 109,
+              "body": "same nit:\n```suggestion\n* The log ID is determined from the certificate's subject.\n\n* The log hash is determined from the id-pe-mtcCertificationAuthority extension.\n```",
+              "createdAt": "2026-04-29T00:22:14Z",
+              "updatedAt": "2026-04-29T00:24:06Z"
+            },
+            {
+              "originalPosition": 124,
+              "body": "Shouldn't we just ban key rotations? If you need to use a new key, start a new tree.",
+              "createdAt": "2026-04-29T00:23:33Z",
+              "updatedAt": "2026-04-29T00:24:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc758FvW",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Some small cleanup/nits (feel free to ignore any you feel don't apply), but otherwise LGTM!",
+          "createdAt": "2026-04-28T23:56:38Z",
+          "updatedAt": "2026-04-29T01:15:54Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "```suggestion\n* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}.\n```",
+              "createdAt": "2026-04-28T23:56:38Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "Non-blocking nit: Not sure if we're doing upper or lowercase 'c', but we should be consistent. If we're doing lowercase, should 'tree' also be lowercase? Right now the doc has several instances of each. I guess the rule is uppercase 'Certificate' when talking about the protocol, and lowercase 'certificate' when talking about the cert objects. Maybe we just try to remove the 'Merkle Tree' prefix when talking about cert objects? Or even 'MTC certificates'\n```suggestion\nThis document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.\n```",
+              "createdAt": "2026-04-29T00:09:30Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 80,
+              "body": "A parenthetical or something here might be a nice reminder for readers.\n```suggestion\n* `minSerial` is an integer describing the minimum allowed serial number (leaf index) in the issuance log ({{log-pruning}}).\n```",
+              "createdAt": "2026-04-29T00:15:19Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 82,
+              "body": "```suggestion\nIf this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. The key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}. CRLs and OCSP apply to Merkle Tree Certificates unchanged, though later documents MAY introduce new integrations.\n```",
+              "createdAt": "2026-04-29T00:19:26Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 97,
+              "body": "Just to clarify that this is the algorithm, not a root hash or something.\n```suggestion\n* The log hash algorithm, e.g. SHA-256\n```",
+              "createdAt": "2026-04-29T00:21:26Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 115,
+              "body": "```suggestion\n* The revoked indices contains the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional ranges obtained via out-of-band information.\n```",
+              "createdAt": "2026-04-29T00:25:46Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 178,
+              "body": "```suggestion\n    SYNTAX MTCCertificationAuthority\n```",
+              "createdAt": "2026-04-29T00:30:55Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "```suggestion\n    SYNTAX MTCCertificationAuthority\n```",
+              "createdAt": "2026-04-29T00:31:05Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 141,
+              "body": "```suggestion\n## Certificate Extension\n```",
+              "createdAt": "2026-04-29T00:31:48Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 147,
+              "body": "```suggestion\n| TBD     | id-pe-mtcCertificationAuthority | [this-RFC] |\n```",
+              "createdAt": "2026-04-29T00:32:45Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "```suggestion\n* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert the `keyCertSign` bit.\n```",
+              "createdAt": "2026-04-29T00:39:11Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Stray backtick after 'zero' at the end.\n```suggestion\n1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, the log ID for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero.\n```",
+              "createdAt": "2026-04-29T00:39:37Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 78,
+              "body": "```suggestion\n* `cosignerSigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).\n```",
+              "createdAt": "2026-04-29T00:41:45Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "```suggestion\nThis extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.\n```",
+              "createdAt": "2026-04-29T00:42:06Z",
+              "updatedAt": "2026-04-29T01:15:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc759UzA",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T01:52:50Z",
+          "updatedAt": "2026-04-29T01:52:51Z",
+          "comments": [
+            {
+              "originalPosition": 80,
+              "body": "Done. Used \"entry index\" just to avoid fussing over whether it's always a \"leaf\".",
+              "createdAt": "2026-04-29T01:52:50Z",
+              "updatedAt": "2026-04-29T01:52:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc759VO8",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T01:53:41Z",
+          "updatedAt": "2026-04-29T01:53:41Z",
+          "comments": [
+            {
+              "originalPosition": 97,
+              "body": "Applied manually since it conflicted with other comments.",
+              "createdAt": "2026-04-29T01:53:41Z",
+              "updatedAt": "2026-04-29T01:53:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc759VfH",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T01:54:15Z",
+          "updatedAt": "2026-04-29T01:54:15Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "(Applied via another parallel comment.)",
+              "createdAt": "2026-04-29T01:54:15Z",
+              "updatedAt": "2026-04-29T01:54:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc759XCz",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T01:56:49Z",
+          "updatedAt": "2026-04-29T01:56:49Z",
+          "comments": [
+            {
+              "originalPosition": 82,
+              "body": "> Also, in order to sign OCSP responses, it would need to assert the digitalSignature KU. I think it's totally fine if it does that, but the combination of line 1317 and this line (saying it MAY be used) might be interpreted as implying that an MTC CA can sign OCSP even without the digitalSignature KU.\r\n\r\nAh good call. I added a \"if permitted by other X.509 constraints such as the key usage extension\" and then removed the sentence afterwards because it didn't seem to flow.",
+              "createdAt": "2026-04-29T01:56:49Z",
+              "updatedAt": "2026-04-29T01:56:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc759Xdc",
+          "commit": {
+            "abbreviatedOid": "70d0a34"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T01:57:20Z",
+          "updatedAt": "2026-04-29T01:57:20Z",
+          "comments": [
+            {
+              "originalPosition": 124,
+              "body": "Quite possibly. @jdeblasio and I have been muttering about this. I left it alone here just because it seems orthogonal.",
+              "createdAt": "2026-04-29T01:57:20Z",
+              "updatedAt": "2026-04-29T04:07:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76Xehd",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "robstradling",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T20:22:24Z",
+          "updatedAt": "2026-04-29T20:56:10Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "[Emphasis mine] RFC5280 says that *\"The keyCertSign bit is asserted when the subject public key is used for verifying signatures **on** public key certificates\"*, and X.509 (10/2019) says *\"keyCertSign: for verifying a CA's signature **on** public-key certificates\"*.\nWhereas this PR says that *\"the key described in `subjectPublicKeyInfo` MUST NOT be used to **directly sign** TBSCertificate structures\"*.\n\nISTM that \"on\" equates to \"directly sign\", meaning that it's inappropriate to assert `keyCertSign` in an MTC CA certificate.  Instead, the appropriate key usage bit to use here is `digitalSignature`, which per RFC5280 *\"is used for verifying digital signatures, other than signatures **on** certificates (bit 5) and CRLs (bit 6)\"*.",
+              "createdAt": "2026-04-29T20:22:24Z",
+              "updatedAt": "2026-04-29T20:56:10Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "Also, given that *\"the key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}\"*, it's necessary to permit `digitalSignature` (for direct signing of OCSP responses) and `cRLSign` (for direct signing of CRLs).",
+              "createdAt": "2026-04-29T20:27:23Z",
+              "updatedAt": "2026-04-29T20:56:10Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "```suggestion\n* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert the `digitalSignature` bit, and MAY also assert the `cRLSign` bit.\n```",
+              "createdAt": "2026-04-29T20:29:48Z",
+              "updatedAt": "2026-04-29T20:56:10Z"
+            },
+            {
+              "originalPosition": 46,
+              "body": "[Emphasis mine] RFC5280 says that *\"The cA boolean indicates whether the certified public key may be used to verify **certificate signatures**\"*, and X.509 (10/2019) says that *\"The cA component with the value TRUE indicates that the certified public key may be used to verify public-key **certificate signatures**\"*.\n\nHowever, \"certificate signatures\" (signatures calculated over individual TBSCertificate structures) are not a thing in an MTC world, so ISTM that it's inappropriate to set the `cA` field to TRUE in an MTC CA certificate.",
+              "createdAt": "2026-04-29T20:45:00Z",
+              "updatedAt": "2026-04-29T20:56:10Z"
+            },
+            {
+              "originalPosition": 46,
+              "body": "```suggestion\n* The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present, MUST NOT set the `cA` field to TRUE, and MUST NOT include a `pathLenConstraint`.\n```",
+              "createdAt": "2026-04-29T20:47:39Z",
+              "updatedAt": "2026-04-29T20:56:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76Yofw",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T21:13:25Z",
+          "updatedAt": "2026-04-29T21:13:25Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "I disagree that the phrase \"certificate signatures\" exclusively applies to signatures computed over the bytes of (and only the bytes of) a TBSCertificate. A certificate signature is whatever is in the signature field of a certificate. MTCerts will contain signatures, those signatures will be computed over (a transform of) their TBSCertificate bytes (and some other bytes), and the MTCA's pubkey will be used to verify those signatures. Thus it qualifies as a CA per the language of RFC 5280 and X.509.",
+              "createdAt": "2026-04-29T21:13:25Z",
+              "updatedAt": "2026-04-29T21:13:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76YvC2",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T21:18:03Z",
+          "updatedAt": "2026-04-29T21:18:03Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "The signature \"on\" a public key certificate is the signature contained in its signature field. If this said that \"the keyCertSign bit is asserted with the private key corresponding to the subject public key is used for producing signatures over TBSCertificates\", then I'd agree with you, but that's not what the standards say -- they are phrased in terms of _verifying_ signatures, and an MTCA's public key _is_ used to verify the signature contained in a a Merkle Tree Cert.\r\n\r\nI feel less strongly about this than about the one below, however, because I agree that \"digitalSignature\" is _also_ a thing that these keypairs are clearly doing.",
+              "createdAt": "2026-04-29T21:18:03Z",
+              "updatedAt": "2026-04-29T21:18:03Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76ZbzC",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T21:49:38Z",
+          "updatedAt": "2026-04-29T21:49:38Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "It definitely should be `keyCertSign`. Practically, if we change it, now everyone's X.509 logic needs to be changed to say that sometimes the signature on the certificate uses `keyCertSign` and sometimes it uses `digitalSignature`.\r\n\r\nBut also semantically, `keyCertSign` is correct. New X.509 signature algorithms still use the `keyCertSign` bit and this is \"just\" a new signature algorithm that signs TBSCertificates in a different way.\r\n\r\nWhether they also assert other bits is a function of what else those keys are doing. The intent was to not constrain that in this sentence. I.e. \"assert the keyCertSign bit\" does not preclude other bits. I think that's consistent with RFC 5280? None of this text precludes other bits from _also_ being asserted:\r\n\r\n* https://www.rfc-editor.org/rfc/rfc5280#:~:text=extension%2C%20if%20present%2C-,asserts%20the%0A%20%20%20keyCertSign%20bit,-(Section%204.2.1.3\r\n* https://www.rfc-editor.org/rfc/rfc5280#:~:text=For%0A%20%20%20example%2C%20when%20an,bit%20would%20be%20asserted.\r\n* https://www.rfc-editor.org/rfc/rfc5280#:~:text=The%20keyCertSign%20bit%20is%20asserted%20when%20the%20subject%20public%20key%20is%0A%20%20%20%20%20%20used%20for%20verifying%20signatures%20on%20public%20key%20certificates.%20%20If%20the%0A%20%20%20%20%20%20keyCertSign%20bit%20is%20asserted%2C%20then%20the%20cA%20bit%20in%20the%20basic%0A%20%20%20%20%20%20constraints%20extension%20(Section%204.2.1.9)%20MUST%20also%20be%20asserted.\r\n* And lots of others\r\n\r\nReally this whole bit of text was not meant to introduce new constraints, just clarify what it means when we say that the rest of X.509 applies as-is. :-)",
+              "createdAt": "2026-04-29T21:49:38Z",
+              "updatedAt": "2026-04-29T21:50:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76Zcn0",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-29T21:50:18Z",
+          "updatedAt": "2026-04-29T21:50:19Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "(Ditto from other thread.)",
+              "createdAt": "2026-04-29T21:50:19Z",
+              "updatedAt": "2026-04-29T21:50:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76bsJf",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-30T00:05:01Z",
+          "updatedAt": "2026-04-30T00:05:02Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "(Added an 'at least' per some offline discussion, to make this reading more obvious.)",
+              "createdAt": "2026-04-30T00:05:01Z",
+              "updatedAt": "2026-04-30T00:05:02Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
