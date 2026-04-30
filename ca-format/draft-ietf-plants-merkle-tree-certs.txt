@@ -1932,6 +1932,11 @@ Table of Contents
    *  The extensions field MUST contain a critical extension of type id-
       pe-mtcCertificationAuthority, defined below.
 
+   *  The subject key identifier extension (Section 4.2.1.2 of
+      [RFC5280]), if present, SHOULD be set to CA's log ID Section 5.2.
+      The log ID is encoded in its binary representation, as defined in
+      Section 3 of [I-D.ietf-tls-trust-anchor-ids].
+
    Other fields and extensions in [RFC5280] apply unmodified.  In
    particular:
 
@@ -1993,6 +1998,10 @@ Table of Contents
    used to directly sign certificate revocation lists (CRLs) [RFC5280]
    and Online Certificate Status Protocol (OCSP) responses [RFC6960], if
    permitted by other X.509 constraints such as the key usage extension.
+
+   [[TODO: We currently allow a single CA to have multiple CA cosigners,
+   which complicates the CRL and OCSP story.  Resolve this.  See issue
+   #214.]]
 
    This extension indicates the subtree signature format defined in
    Section 5.4.1.  If a later version of the protocol defines a new

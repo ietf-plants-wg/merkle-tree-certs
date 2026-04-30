@@ -4521,6 +4521,9 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
           <li class="normal" id="section-6.5-2.3">
             <p id="section-6.5-2.3.1">The <code>extensions</code> field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.<a href="#section-6.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
+          <li class="normal" id="section-6.5-2.4">
+            <p id="section-6.5-2.4.1">The subject key identifier extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.2" class="relref">Section 4.2.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>), if present, SHOULD be set to CA's log ID <a href="#log-ids" class="auto internal xref">Section 5.2</a>. The log ID is encoded in its binary representation, as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-03#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-6.5-2.4.1" class="pilcrow">¶</a></p>
+</li>
         </ul>
 <p id="section-6.5-3">Other fields and extensions in <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> apply unmodified. In particular:<a href="#section-6.5-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -4572,8 +4575,9 @@ MTCCertificationAuthority ::= SEQUENCE {
 </li>
         </ul>
 <p id="section-6.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. However, the key MAY be used to directly sign certificate revocation lists (CRLs) <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and Online Certificate Status Protocol (OCSP) responses <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>, if permitted by other X.509 constraints such as the key usage extension.<a href="#section-6.5-10" class="pilcrow">¶</a></p>
-<p id="section-6.5-11">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.<a href="#section-6.5-11" class="pilcrow">¶</a></p>
-<p id="section-6.5-12">A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-6.5-12" class="pilcrow">¶</a></p>
+<p id="section-6.5-11">[[TODO: We currently allow a single CA to have multiple CA cosigners, which complicates the CRL and OCSP story. Resolve this. See issue #214.]]<a href="#section-6.5-11" class="pilcrow">¶</a></p>
+<p id="section-6.5-12">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.<a href="#section-6.5-12" class="pilcrow">¶</a></p>
+<p id="section-6.5-13">A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-6.5-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
