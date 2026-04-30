@@ -1941,9 +1941,10 @@ Table of Contents
    *  The basic constraints extension (Section 4.2.1.9 of [RFC5280])
       MUST be present and set the cA field to TRUE.
 
-   The id-pe-mtcCertificationAuthority is defined below.  This extension
-   indicates that the subject of the certificate is a CA that issues
-   Merkle Tree Certificates.  If present, it MUST be marked as critical.
+   The id-pe-mtcCertificationAuthority extension is defined below.  This
+   extension indicates that the subject of the certificate is a CA that
+   issues Merkle Tree Certificates.  If present, it MUST be marked as
+   critical.
 
    id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
@@ -1964,6 +1965,10 @@ Table of Contents
        cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
        minSerial      INTEGER
    }
+
+   For initial experimentation, early implementations of this design
+   will use the OID 1.3.6.1.4.1.44363.47.2 instead of id-pe-
+   mtcCertificationAuthority.
 
    The fields of a MTCCertificationAuthority structure are defined as
    follows:

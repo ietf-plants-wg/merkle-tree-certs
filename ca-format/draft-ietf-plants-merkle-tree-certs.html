@@ -4531,7 +4531,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-6.5-4.2.1">The basic constraints extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.9" class="relref">Section 4.2.1.9</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) MUST be present and set the <code>cA</code> field to TRUE.<a href="#section-6.5-4.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.5-5">The id-pe-mtcCertificationAuthority is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.<a href="#section-6.5-5" class="pilcrow">¶</a></p>
+<p id="section-6.5-5">The id-pe-mtcCertificationAuthority extension is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.<a href="#section-6.5-5" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-6.5-6">
 <pre>
 id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
@@ -4555,24 +4555,25 @@ MTCCertificationAuthority ::= SEQUENCE {
 }
 </pre><a href="#section-6.5-6" class="pilcrow">¶</a>
 </div>
-<p id="section-6.5-7">The fields of a MTCCertificationAuthority structure are defined as follows:<a href="#section-6.5-7" class="pilcrow">¶</a></p>
+<p id="section-6.5-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of <code>id-pe-mtcCertificationAuthority</code>.<a href="#section-6.5-7" class="pilcrow">¶</a></p>
+<p id="section-6.5-8">The fields of a MTCCertificationAuthority structure are defined as follows:<a href="#section-6.5-8" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.5-8.1">
-            <p id="section-6.5-8.1.1"><code>logHash</code> describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-6.5-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.5-9.1">
+            <p id="section-6.5-9.1.1"><code>logHash</code> describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-6.5-9.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.5-8.2">
-            <p id="section-6.5-8.2.1"><code>cosignerID</code> is the CA cosigner's cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) as a RELATIVE-OID.<a href="#section-6.5-8.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.5-9.2">
+            <p id="section-6.5-9.2.1"><code>cosignerID</code> is the CA cosigner's cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) as a RELATIVE-OID.<a href="#section-6.5-9.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.5-8.3">
-            <p id="section-6.5-8.3.1"><code>cosignerSigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.4.3</a>).<a href="#section-6.5-8.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.5-9.3">
+            <p id="section-6.5-9.3.1"><code>cosignerSigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.4.3</a>).<a href="#section-6.5-9.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.5-8.4">
-            <p id="section-6.5-8.4.1"><code>minSerial</code> is an integer describing the minimum allowed serial number (entry index) in the issuance log (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>).<a href="#section-6.5-8.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.5-9.4">
+            <p id="section-6.5-9.4.1"><code>minSerial</code> is an integer describing the minimum allowed serial number (entry index) in the issuance log (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>).<a href="#section-6.5-9.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.5-9">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. However, the key MAY be used to directly sign certificate revocation lists (CRLs) <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and Online Certificate Status Protocol (OCSP) responses <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>, if permitted by other X.509 constraints such as the key usage extension.<a href="#section-6.5-9" class="pilcrow">¶</a></p>
-<p id="section-6.5-10">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.<a href="#section-6.5-10" class="pilcrow">¶</a></p>
-<p id="section-6.5-11">A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-6.5-11" class="pilcrow">¶</a></p>
+<p id="section-6.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. However, the key MAY be used to directly sign certificate revocation lists (CRLs) <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and Online Certificate Status Protocol (OCSP) responses <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>, if permitted by other X.509 constraints such as the key usage extension.<a href="#section-6.5-10" class="pilcrow">¶</a></p>
+<p id="section-6.5-11">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.<a href="#section-6.5-11" class="pilcrow">¶</a></p>
+<p id="section-6.5-12">A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-6.5-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
