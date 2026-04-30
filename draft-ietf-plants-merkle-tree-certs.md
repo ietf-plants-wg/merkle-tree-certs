@@ -1318,7 +1318,7 @@ Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
 
 * The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
 
-The id-pe-mtcCertificationAuthority is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.
+The id-pe-mtcCertificationAuthority extension is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.
 
 ~~~asn.1
 id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
@@ -1341,6 +1341,8 @@ MTCCertificationAuthority ::= SEQUENCE {
     minSerial      INTEGER
 }
 ~~~
+
+For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`.
 
 The fields of a MTCCertificationAuthority structure are defined as follows:
 
