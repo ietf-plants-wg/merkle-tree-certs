@@ -1356,6 +1356,8 @@ The fields of a MTCCertificationAuthority structure are defined as follows:
 
 If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. However, the key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, if permitted by other X.509 constraints such as the key usage extension.
 
+[[TODO: We currently allow a single CA to have multiple CA cosigners, which complicates the CRL and OCSP story. Resolve this. See issue #214.]]
+
 This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
 
 A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
