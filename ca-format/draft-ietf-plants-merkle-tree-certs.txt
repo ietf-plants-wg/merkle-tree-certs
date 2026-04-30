@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 31 October 2026                                      Apple Inc.
+Expires: 1 November 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           29 April 2026
+                                                           30 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 31 October 2026.
+   This Internet-Draft will expire on 1 November 2026.
 
 Copyright Notice
 
@@ -1936,7 +1936,7 @@ Table of Contents
    particular:
 
    *  The key usage extension (Section 4.2.1.3 of [RFC5280]) MUST be
-      present and assert the keyCertSign bit.
+      present and assert at least the keyCertSign bit.
 
    *  The basic constraints extension (Section 4.2.1.9 of [RFC5280])
       MUST be present and set the cA field to TRUE.
