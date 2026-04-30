@@ -1314,7 +1314,7 @@ This section defines the X.509 Certificate {{!RFC5280}} representation of a Merk
 
 Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
 
-* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert the `keyCertSign` bit.
+* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert at least the `keyCertSign` bit.
 
 * The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
 
