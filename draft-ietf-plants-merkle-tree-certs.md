@@ -1312,6 +1312,8 @@ This section defines the X.509 Certificate {{!RFC5280}} representation of a Merk
 
 * The `extensions` field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.
 
+* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to CA's log ID {{log-ids}}. The log ID is encoded in its binary representation, as defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}.
+
 Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
 
 * The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert at least the `keyCertSign` bit.
