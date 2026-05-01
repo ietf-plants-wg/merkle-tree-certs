@@ -907,6 +907,14 @@ Throughout this document, the hash algorithm in use is referred to as HASH, and 
 
 Each issuance log is identified by a *log ID*, which is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}.
 
+When allocating log IDs, the entire object identifier (OID) arc is allocated for use with the issuance log. OIDs under this arc are allocated by Merkle Tree Certificates protocol. Given a log ID whose OID representation is `logID`, this document allocates the following OIDs:
+
+* For each non-negative integer `L`, the OID `{logID landmarks(0) L}` represents the landmark ({{landmark-tree-sizes}}) with number `L`. This OID may used as a trust anchor ID, as described in {{landmark-relative-certificates-tls}}.
+
+* For each non-negative integer `L`, the OID `{logID landmarkGroups(1) L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark number `L` and earlier landmarks, as defined in {{single-log-landmark-groups}}.
+
+Future extensions to this protocol MAY define further allocations.
+
 An issuance log's log ID determines a PKIX distinguished name ({{Section 4.1.2.4 of !RFC5280}}). The distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type `id-rdna-trustAnchorID`, defined below:
 
 ~~~asn.1
@@ -1249,33 +1257,19 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 ### Landmark Tree Sizes
 
-A landmark-relative certificate is constructed based on a *landmark sequence*, which is a sequence of *landmarks*. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a landmark-relative certificate with minimizing the size of the relying party's predistributed state.
+To issue landmark-relative certificates, a CA must additionally maintain a *landmark sequence*, which is a sequence of *landmarks*.
 
-A landmark sequence has the following fixed parameters:
-
-* `base_id`: An OID arc for trust anchor IDs of individual landmarks
-* `max_active_landmarks`: A positive integer, describing the maximum number of landmarks that may contain unexpired certificates at any time
-* `landmark_url`: Some URL to fetch the current list of landmarks
-
-Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to `base_id`. For example, the trust anchor ID for landmark 42 of a sequence with `base_id` of `32473.1` would be `32473.1.42`.
-
-Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
+Each landmark specifies an agreed tree size, as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
 Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
+
+As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer `max_active_landmarks` parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.
 
 The most recent `max_active_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_active_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
 
 It is RECOMMENDED that landmarks be allocated following the procedure described in {{allocating-landmarks}}. If landmarks are allocated incorrectly (e.g. past landmarks change, or `max_active_landmarks` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
 
 Relying parties will locally retain up to `2 * max_active_landmarks` hashes ({{trusted-subtrees}}) per CA, so `max_active_landmarks` should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure below, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a `max_active_landmarks` of 169. The client state is then 338 hashes, or 10,816 bytes with SHA-256.
-
-`landmark_url` MUST serve a resource with `Content-Type: text/plain; charset=utf-8` and the following lines. Each line MUST be terminated by a newline character (U+000A):
-
-* Two space-separated non-negative decimal integers: `<last_landmark> <num_active_landmarks>`.
-  This line MUST satisfy the following, otherwise it is invalid:
-  * `num_active_landmarks <= max_active_landmarks`
-  * `num_active_landmarks <= last_landmark`
-* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be strictly monotonically decreasing and lower or equal to the log's latest tree size.
 
 ### Allocating Landmarks
 
@@ -1285,6 +1279,18 @@ It is RECOMMENDED that landmarks be allocated using the following procedure:
 2. At most once per time interval, append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size.
 
 To ensure that only active landmarks contain unexpired certificates, set `max_active_landmarks` to `ceil(max_cert_lifetime / time_between_landmarks) + 1`, where `max_cert_lifetime` is the CA's maximum certificate lifetime. The `+ 1` accounts for landmarks not allocated at the exact start of their time interval, which can push certificate expiry one interval further than `ceil(max_cert_lifetime / time_between_landmarks)` alone would bound.
+
+### Publishing Landmarks
+
+CAs SHOULD publish their active landmarks, so that relying parties can configure trusted subtrees ({{trusted-subtrees}}). The following format can be used to describe this information. The format is the following sequence of lines. Each line MUST be terminated by a newline character (U+000A):
+
+* Two space-separated non-negative decimal integers: `<last_landmark> <num_active_landmarks>`.
+  This line MUST satisfy the following, otherwise it is invalid:
+  * `num_active_landmarks <= max_active_landmarks`
+  * `num_active_landmarks <= last_landmark`
+* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be strictly monotonically decreasing and lower or equal to the log's latest tree size.
+
+It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}} with content type `text/plain; charset=utf-8`.
 
 ### Constructing Landmark-Relative Certificates
 
@@ -1507,70 +1513,58 @@ Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subj
 
 Certificate selection in TLS, described in {{Section 4.4.2.2 and Section 4.4.2.3 of !RFC8446}}, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.
 
-## Extensions to Trust Anchor IDs
+## Standalone Certificates {#standalone-certificates-tls}
 
-[[TODO: Move this into draft-ietf-tls-trust-anchor-ids once the PLANTS WG is further along. See https://github.com/tlswg/tls-trust-anchor-ids/issues/62]]
+Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding log ID ({{log-ids}}). This trust anchor ID is additionally contained in the trust anchor groups defined in {{single-log-landmark-groups}}.
 
-A TLS deployment may know that all relying parties that accept one trust anchor must additionally accept another trust anchor, or desire identifiers for groups of related trust anchors. For example, in this document, the relying party will recognize up to `max_landmark` consecutive landmarks, so the latest landmark can be used to represent the range.
-
-Incorporating this knowledge into certificate selection can optimize the ClientHello or CertificateRequest extension. It is RECOMMENDED that this information be provisioned alongside the certificate, e.g. provided by the CA. This section extends the CertificatePropertyList structure ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) with the `additional_trust_anchor_ranges` certificate property to do this:
-
-~~~ tls-presentation
-enum {
-    additional_trust_anchor_ranges(1), (2^16-1)
-} CertificatePropertyType;
-
-struct {
-    TrustAnchorID base;
-    uint64 min;
-    uint64 max;
-} TrustAnchorRange;
-
-TrustAnchorRange TrustAnchorRangeList<1..2^16-1>;
-~~~
-
-A trust anchor range `r` is said to *contain* a trust anchor ID `id`, if `id`, as a relative OID, is the concatenation of `r.base` and some integer component between `min` and `max`, inclusive.
-
-The following procedure can be used to perform this check. It succeeds if `r` contains `id` and fails otherwise:
-
-1. Check that `r.base` does not end in the middle of an OID component. That is, check that the most-significant bit of the last byte of `r.base` is unset. If it is set, fail the procedure.
-2. Check that `r.base` is a prefix of `id`. If not, fail the procedure. Let `rest` be `id` with the `r.base` prefix removed.
-3. Decode `rest` as a minimally-encoded, big-endian, base-128 OID component as follows:
-   1. If `rest` is empty, fail the procedure.
-   2. If the most-significant bit of the last byte of `rest` is set, fail the procedure.
-   3. If the most-significant bit of any other byte of `rest` is unset, fail the procedure.
-   4. If the first byte of `rest` is 0x80, fail the procedure.
-   5. Set `v` to zero. Throughout this procedure, `v` will be less than 2<sup>64</sup>.
-   6. For each byte `b` of `rest`:
-      1. If `v` is greater than or equal to 2<sup>57</sup>, fail the procedure.
-      2. Set `v` to `(v << 7) + (b & 127)`.
-4. Check if `min <= v <= max`. If this is not true, fail the procedure. Otherwise, the procedure succeeds.
-
-{{Section 4.2 of !I-D.ietf-tls-trust-anchor-ids}} is updated as follows. If the ClientHello or CertificateRequest contains a `trust_anchors extension`, the authenticating party SHOULD send a certification path such that one of the following is true:
-
-* The certification path's trust anchor ID appears in the relying party's `trust_anchors` extension, or
-* One of the certification path's additional trust anchor ranges contains some ID in the relying party's `trust_anchors` extension
-
-Trust anchor ranges do not impact an authenticating party's list of available trust anchors in EncryptedExtensions (see {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}) or the HTTPS/SVCB record (see {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}). Those continue to reference the single trust anchor ID that corresponds to each certificate.
-
-In applications that use additional trust anchor ranges, relying parties MAY send a single trust anchor ID to represent all certificates whose trust anchor ranges contain that trust anchor ID. This includes:
-
-* Trust anchors that are sent in response to an EncryptedExtensions or HTTPS/SVCB message from the authenticating party
-* Trust anchors that are sent in `trust_anchors`, independently of the authenticating party
-
-## Using Trust Anchor IDs
-
-A standalone certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a standalone certificate has a trust anchor ID of the corresponding log ID ({{log-ids}}). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether the standalone certificate would be acceptable.
+Log IDs MAY be incorporated into other trust anchor groups, following the guidance in {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 [[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]
 
 A standalone certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.
 
-A landmark-relative certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmark-tree-sizes}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a landmark-relative certificate SHOULD also be provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L`, and `max` is `L + max_active_landmarks - 1`.
+## Landmark-Relative Certificates {#landmark-relative-certificates-tls}
 
-A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD configure the `trust_anchors` extension to advertise the highest supported landmark in the set. The selection procedures defined in {{!I-D.ietf-tls-trust-anchor-ids}} and {{!extensions-to-trust-anchor-ids}} will then correctly determine whether a landmark-relative certificate is compatible with the relying party.
+An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
 
-When both a landmark and standalone certificate are supported by a relying party, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
+TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate, defined against landmark number `L`, has a trust anchor ID constructed by appending components 0 and L to the issuing log ID ({{log-ids}}). For example, the trust anchor ID for landmark 42 of log `32473.1` is `32473.1.0.42`. These trust anchor IDs are additionally contained in trust anchor groups defined in {{single-log-landmark-groups}}.
+
+If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.
+
+### Single-Log Landmark Groups
+
+Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines series of trust anchor groups ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) called *landmark groups*.
+
+For each non-negative integer `L`, landmark group `L` has a trust anchor ID constructed by appending components 1 and L to the issuing log ID. For example, landmark group 42 of log `32473.1` has ID `32473.1.1.42`. Landmark group `L` indicates the relying party supports the specified log ID, and whose latest trusted subtrees is landmark `L`. Concretely, it contains the following trust anchors:
+
+* The log ID itself (see {{standalone-certificates-tls}})
+* Each landmark of the log from `L - max_active_landmarks + 1` to `L`, inclusive
+
+Landmark-relative certificates SHOULD be configured with this information, as in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party whose latest trusted subtree ({{trusted-subtrees}}) is landmark `L` SHOULD configure the `trust_anchors` extension to advertise landmark group `L`. This signals support for both standalone certificates and supported landmarks.
+
+### Timestamped Landmark Groups
+
+Landmark groups for an single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state.
+
+When needed, {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}} describes how PKIs requiring further size savings can use trust anchor groups that span multiple CA instances. For example, a single ID may signal support for a group of CAs from the same CA operator. This section describes how such groups can be applied to landmarks, using a variation of the versioning construction described in {{Section 5.1 of !I-D.ietf-tls-trust-anchor-ids}}.
+
+Trust anchor groups containing landmarks SHOULD define versions predictably based on the time. For example, if the contained CAs allocate landmarks roughly hourly, the trust anchor group might increment the version component every hour. Each given version of the group SHOULD contain the active landmarks as of the corresponding timestamp.
+
+This predictable cadence allows the CA to construct trust anchor group inclusions without additional coordination. Conversely, a relying party MAY send a version if its trusted subtrees ({{trusted-subtrees}}) are up-to-date for all contained CAs, as of the versions timestamp.
+
+In some cases, the relying party's trusted subtrees may only be partially up-to-date. The relying party, or its update service, may be unable to reach one CA in the group, e.g. due to a transient outage. This complicates timestamp-based strategies:
+
+* If the relying party sends the group with an older timestamp, it will not signal its up-to-date state for the reachable CAs. This means a single unreachable CA can disrupt service for certificates issued by unrelated CAs.
+
+* If the relying party sends the group with a newer timestamp, the relying party may signal support for landmarks it does not have. This risks connection failures. If the unreachable CA issued recent landmark-relative certificates, those certificates will fail validation.
+
+The relying party can mitigate this in a number of ways:
+
+* If the trust anchor group consists of CAs from the same operator, waiting until all CAs are reachable will be minimally disruptive.
+
+* The relying party can opt to send the group with an older timestamp, combined with other, smaller groups at newer timestamps to better describe its state.
+
+* A client relying party can send the newer timestamp and, in the event the unreachable CA did issue recent landmark-relative certificates, rely on the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}} to recover from any signaling failures.
 
 # ACME Extensions
 
@@ -2328,3 +2322,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Discuss domain separation for signatures
 
 - Recommend a maximum log entry size for tlog compatibility
+
+- Prescribe landmark OID allocation
+
+- Update TLS integration now that trust anchor IDs extension has been moved to the base draft
