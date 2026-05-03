@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-30T03:53:52.644622+00:00",
+  "timestamp": "2026-05-03T04:01:27.729143+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3305,7 +3305,7 @@
       "labels": [],
       "body": "See Ilari's comments here: https://mailarchive.ietf.org/arch/msg/plants/DkZDqqE2r7qokdwd7bHg8Fg7NBY/",
       "createdAt": "2026-04-22T19:42:29Z",
-      "updatedAt": "2026-04-22T20:02:33Z",
+      "updatedAt": "2026-05-01T17:22:03Z",
       "closedAt": null,
       "comments": [
         {
@@ -3328,24 +3328,53 @@
           "body": "Oh forgot that hadn't been merged. Yeah, we might need more text there. Also need to give mutiple CA cosigners a think.",
           "createdAt": "2026-04-22T20:02:33Z",
           "updatedAt": "2026-04-22T20:02:33Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Okay, so we have #218 which tries to explicitly say OCSP/CRL is OK, but that indeed reveals fun messes (CC @ilaril ), all relating to the fact that we allow multiple CA cosigners per CA:\n\n* The CRL-DP in the certificate is part of the log entry and thus is shared between the cosigners. So either you include one URL per CA cosigner or... something\n* If you did include one URL per cosigner, we need some way to tell which CA cosigner is which\n* On paper, you'd think we could use a different SKID per CA cosigner, since CRLs have AKIDs. However, certificates also have AKIDs to facilitate path-building (not useful here), so we really need to make the SKID common to the CA log, not the CA cosigner\n\nAs alluded to in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218#discussion_r3157969332, it's not totally clear if we really _need_ to have multiple CA cosigners per CA. Some of us have been muttering about maybe removing this, which would simplify a bunch of things. (I've not done this in #218 yet since that's a bigger change.)\n\n[Edit: Whoops, fixed the CC. Sorry for the spam, other Ilari!]",
+          "createdAt": "2026-04-30T21:04:27Z",
+          "updatedAt": "2026-05-01T17:22:03Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "I think that CC was misdirected...\n\n>     * The CRL-DP in the certificate is part of the log entry and thus is shared between the cosigners. So either you include one URL per CA cosigner or... something\n\nAFAICT, that is not allowed. RFC 5280 seems to allow only one CRL per certificate (\"each name describes a different mechanism to obtain the same CRL\").\n \n>     * If you did include one URL per cosigner, we need some way to tell which CA cosigner is which\n\nIf there was a way to attach multiple CRLs, AKID/SKID matching would seem like a natural way to do that.\n\n>     * On paper, you'd think we could use a different SKID per CA cosigner, since CRLs have AKIDs. However, certificates also have AKIDs to facilitate path-building (not useful here), so we really need to make the SKID common to the CA log, not the CA cosigner\n\nSKID common to CA log is useless for anything, since name already covers that.\n\n\n> As alluded to in [#218 (comment)](https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218#discussion_r3157969332), it's not totally clear if we really _need_ to have multiple CA cosigners per CA. Some of us have been muttering about maybe removing this, which would simplify a bunch of things. (I've not done this in [#218](https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218) yet since that's a bigger change.)\n\nIt seems like having multiple CA cosigners per log causes complexities all over the place.",
+          "createdAt": "2026-05-01T06:54:26Z",
+          "updatedAt": "2026-05-01T06:54:26Z"
         }
       ]
     },
     {
       "number": 217,
       "id": "I_kwDOJIBkVc8AAAABAxd1YA",
-      "title": "Override RFC 5280 MUSTs on AKID and SKID",
+      "title": "Override RFC 5280 MUSTs on AKID and SKID?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/217",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "AKID and SKID are *yet another* subject <-> issuer pointer in X.509, this time because X.509 foolishly allowed multiple CAs to share the same subject name.\n\nWe define the subject format, so we don't have this problem. As such, SKIDs on the CA and AKIDs on the issued certificate are just a waste of bytes (both in the log and in TLS) and should just be omitted.",
       "createdAt": "2026-04-28T23:13:10Z",
-      "updatedAt": "2026-04-28T23:13:10Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-05-01T18:28:21Z",
+      "closedAt": "2026-05-01T18:28:20Z",
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I like this idea, but it may go against the idea of \"relying parties can use their same cert validation routines, just with a new signature algorithm verifier\". I think that many chain-building implementations rely exclusively on the AKID/SKID to build a pool of candidate issuers, and then only use Issuer/Subject to whittle down that pool of candidates. If that recollection is true, then excluding the AKID/SKID would require relying parties to also change their chain-building processes.\n\n_edit_: Oh also, [ARI](https://www.rfc-editor.org/rfc/rfc9773.html#name-the-renewalinfo-resource) (via `base64url(AKI keyIdentifier)` and [OCSP](https://datatracker.ietf.org/doc/html/rfc6960#section-4.1.1) (field `issuerKeyHash`) both rely on the end-entity containing an AKID so that the request can be formulated solely from fields on the end-entity cert.",
+          "createdAt": "2026-05-01T18:18:41Z",
+          "updatedAt": "2026-05-01T18:22:13Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I think that many chain-building implementations rely exclusively on the AKID/SKID to build a pool of candidate issuers, and then only use Issuer/Subject to whittle down that pool of candidates. \n\nAll the ones I've seen go the other way. They collect candidates based on Issuer/Subject and then use AKID/SKID to either filter or prioritize candidates, when present.\n\n> edit: Oh also, [ARI](https://www.rfc-editor.org/rfc/rfc9773.html#name-the-renewalinfo-resource) (via base64url(AKI keyIdentifier) and [OCSP](https://datatracker.ietf.org/doc/html/rfc6960#section-4.1.1) (field issuerKeyHash) both rely on the end-entity containing an AKID so that the request can be formulated solely from fields on the end-entity cert.\n\nOCSP's `issuerKeyHash` seems to be fine because that's defined as the hash of the `subjectPublicKey` (hilariously, not the whole SPKI) of the issuer, not the actual AKID/SKID. Although that's yet _another_ headache caused by multiple CA cosigners.\n\nARI indeed seems to have a hard AKID dependency. Lovely. Okay fine, AKID/SKID are staying then. What a silly format. #218 at least makes them short.",
+          "createdAt": "2026-05-01T18:28:21Z",
+          "updatedAt": "2026-05-01T18:28:21Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -11106,7 +11135,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-04-30T03:14:17Z",
+      "updatedAt": "2026-04-30T15:30:18Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -11243,6 +11272,20 @@
           "body": "> This would be caught with either a global auditor, like mentioned in Section 5, or might be caught if the verifier keeps state across checks or has other peers doing similar checks, but I don't think the binary search for a verifier in isolation gives security guarantees (or at least, more work is needed to demonstrate that).\r\n\r\nYes, the expectation is that the verifier retains state. Retaining state will generally just be necessary to detect forks, though it also helps here. The expectation is also that all users are doing the search in a way that maximizes their ability to detect conflicts with each other. The general idea for the algorithm is Section 4 [here](https://ietf-wg-keytrans.github.io/draft-protocol/draft-ietf-keytrans-protocol.html#name-updating-views-of-the-tree)\r\n\r\n> One other idea I wanted to explore (not fully thought out yet): put the index of the most recent 'accumulated log entry' in each checkpoint. Mirror cosigners only sign the checkpoint if that pointer is correct (so they take on additional responsibilities).\r\n\r\nThis would be interesting to consider, but muddles the layers of abstraction between MTC (defining a log entry format) and tlog-mirror (agnostic to log entry contents). You think that muddling is worth avoiding 8 (or 4) bytes?",
           "createdAt": "2026-04-30T01:20:19Z",
           "updatedAt": "2026-04-30T03:14:17Z"
+        },
+        {
+          "author": "mhutchinson",
+          "authorAssociation": "NONE",
+          "body": "I wanted to comment on this from the perspective of a log implementer (specifically thinking of horizontally scaled designs like [Tessera](https://github.com/transparency-dev/tessera)).\r\n\r\nThis proposal introduces a strict data dependency between individual leaf contents. Currently, log sequencers can treat leaves as opaque, immutable blobs once they are hashed. There is no ordering or data dependency between leaves; they can be considered completely independently from all other leaves in the log. With this PR, the `accumulated_count` means a leaf's final hash is dependent on its sequencing order, and the content/type of previous leaves.\r\n\r\nIn a batched, distributed environment:\r\n 1. Batch Rewriting: If a batch contains one or more accumulator leaves, the sequencer must 'rewrite' the count field for every subsequent leaf in that batch before calculating the Merkle tree. This adds a significant complexity to the critical path\r\n  2. Sequencer Bottlenecks: It effectively forces a 'stop-the-world' or strongly consistent global counter for every single entry, which is difficult to reconcile with high-throughput, horizontally scaled architectures\r\n",
+          "createdAt": "2026-04-30T11:30:34Z",
+          "updatedAt": "2026-04-30T11:30:34Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "To put it differently, log operators have 3 options:\r\n\r\n- They can use a sequencer that's aware of the counter and sets it correctly. Yes, this requires a hook for application logic in the sequencer's critical path. But the sequencer is already enforcing a global order so it's not inherently less scalable, it maybe just doesn't align with current design decisions made in Tessera.\r\n- If the above isn't an option: a log operator can pause new submissions, wait for everything to flush through, increase the counter and sequence an accumulated log entry, then resume submissions. This is less good, but accumulated log entries will likely only be sequenced once per day or less often. So I still wouldn't expect this to affect the overall scalability of the system.\r\n- Log operators can just not support this extension, which is a valid and secure thing to do, and results in the counter always being 0.",
+          "createdAt": "2026-04-30T15:30:18Z",
+          "updatedAt": "2026-04-30T15:30:18Z"
         }
       ],
       "reviews": []
@@ -14420,13 +14463,13 @@
       "labels": [],
       "body": "\"MTC CA certificate\", of course, stands for Merkle Tree Certificate certification authority certificate, because we are all certifiably good at naming things.\r\n\r\nCloses #96.",
       "createdAt": "2026-04-28T23:41:33Z",
-      "updatedAt": "2026-04-30T02:25:49Z",
+      "updatedAt": "2026-05-01T18:49:49Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a47597e73dadd4399ad38d5c928fa941d2148cba",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "ca-format",
-      "headRefOid": "aaba50909ae6654a3addcb533bb79ae468a730e6",
+      "headRefOid": "d8f5b3564825725bb47bbac84f0696aed4db41c5",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -14438,6 +14481,27 @@
           "body": "~~(Will send mail about this tomorrow.)~~ Or now...",
           "createdAt": "2026-04-28T23:41:52Z",
           "updatedAt": "2026-04-29T01:58:46Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "Since there can be multiple keys for a single name, I think CRL signing would require the CA certificates to have Subject Key Identifier. While using issuer/serial in CRL would be in theory possible, I suspect that is very poorly supported in practice.",
+          "createdAt": "2026-04-30T06:16:14Z",
+          "updatedAt": "2026-04-30T06:16:14Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Since there can be multiple keys for a single name, I think CRL signing would require the CA certificates to have Subject Key Identifier. While using issuer/serial in CRL would be in theory possible, I suspect that is very poorly supported in practice.\r\n\r\nAh yup, that is indeed a mess. I've added a TODO into this PR referencing #214 and left some notes there.",
+          "createdAt": "2026-04-30T21:06:09Z",
+          "updatedAt": "2026-04-30T21:06:09Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Maybe we should say something in the security considerations about the domain separation of what the private key signs? Maybe... we should actually use the context parameter for the non standard subtree use case?",
+          "createdAt": "2026-05-01T10:50:48Z",
+          "updatedAt": "2026-05-01T10:51:31Z"
         }
       ],
       "reviews": [
@@ -14830,6 +14894,139 @@
               "body": "(Added an 'at least' per some offline discussion, to make this reading more obvious.)",
               "createdAt": "2026-04-30T00:05:01Z",
               "updatedAt": "2026-04-30T00:05:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76jk0L",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "robstradling",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-30T08:31:40Z",
+          "updatedAt": "2026-04-30T08:31:41Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "Thanks @davidben.  Per that offline discussion: 'at least' works for me, and you and Aaron persuaded me that `keyCertSign` is appropriate here.  (A signature \"on\" a certificate just means that the signature is attached to the certificate; it doesn't dictate the nature of the signature algorithm.  And `keyCertSign` really should've been called `keyCertVerify`, but it's a bit late for that now!)\r\nThis sub-thread can be marked as resolved as far as I'm concerned.",
+              "createdAt": "2026-04-30T08:31:41Z",
+              "updatedAt": "2026-04-30T08:31:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76jxUr",
+          "commit": {
+            "abbreviatedOid": "487bcfa"
+          },
+          "author": "robstradling",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-30T08:40:44Z",
+          "updatedAt": "2026-04-30T08:40:44Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "You've convinced me.  The CA cert's SPKI, and the phrases \"certificate signature\" and \"signature on certificate\", don't dictate the nature of the signature algorithm on certs issued by that CA.  So if we want to say that MTC uses a funny kind of hash/sig alg, then we absolutely can.\r\nThanks for helping me through this thought process.  This sub-thread can be marked as resolved as far as I'm concerned.",
+              "createdAt": "2026-04-30T08:40:44Z",
+              "updatedAt": "2026-04-30T08:40:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76-9dt",
+          "commit": {
+            "abbreviatedOid": "d8f5b35"
+          },
+          "author": "robstradling",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-01T10:13:17Z",
+          "updatedAt": "2026-05-01T10:13:17Z",
+          "comments": [
+            {
+              "originalPosition": 86,
+              "body": "[RFC6960 section 2.2](https://datatracker.ietf.org/doc/html/rfc6960#section-2.2) states that *\"There is one basic type of OCSP response that MUST be supported by all OCSP servers and clients\"* and that that mandatory-to-implement response type may be signed indirectly by a CA Designated Responder certificate (a leaf cert with the id-kp-OCSPSigning EKU).\nHowever, when this PR says *\"the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures\"* it forbids issuance of CA Designated Responder certificates.\nForbidding something that's mandatory-to-implement seems problematic.\n\nMight it be possible to allow an exception (to the MUST NOT rule) such that \"the key described in `subjectPublicKeyInfo`\" MAY directly sign CA Designated Responder certificates?",
+              "createdAt": "2026-05-01T10:13:17Z",
+              "updatedAt": "2026-05-01T10:13:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc76_QLu",
+          "commit": {
+            "abbreviatedOid": "d8f5b35"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-01T10:50:23Z",
+          "updatedAt": "2026-05-01T10:50:23Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc77FrYm",
+          "commit": {
+            "abbreviatedOid": "d8f5b35"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-01T18:02:35Z",
+          "updatedAt": "2026-05-01T18:02:35Z",
+          "comments": [
+            {
+              "originalPosition": 86,
+              "body": "I don't read RFC 6960 as saying that CA Designated Responders are mandatory-to-implement. _If_ you are implementing RFC 6960 (which not all CAs do anymore) then you have to have a way to produce OCSP responses. But that can be either via Designated Responders, or via signing the OCSP response directly. This language merely makes it so that using a Designated Responder is forbidden.",
+              "createdAt": "2026-05-01T18:02:35Z",
+              "updatedAt": "2026-05-01T18:02:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc77F_y6",
+          "commit": {
+            "abbreviatedOid": "d8f5b35"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-01T18:18:42Z",
+          "updatedAt": "2026-05-01T18:18:42Z",
+          "comments": [
+            {
+              "originalPosition": 86,
+              "body": "I'm confused, why would we need an exception here? A CA Designated Responder is just a certificate your CA issues, right? This whole document is about how these keys issue certificates. You would just issue certificates the way this document says to, no? (I.e. by putting them in the log, etc.)",
+              "createdAt": "2026-05-01T18:18:42Z",
+              "updatedAt": "2026-05-01T18:18:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc77GnQn",
+          "commit": {
+            "abbreviatedOid": "d8f5b35"
+          },
+          "author": "robstradling",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-01T18:49:49Z",
+          "updatedAt": "2026-05-01T18:49:49Z",
+          "comments": [
+            {
+              "originalPosition": 86,
+              "body": "@davidben OK, I can't argue with that (in which case it doesn't actually matter if @aarongable's reading is correct or not).\r\nI suppose some OCSP response verifier code might even get MTC support for free (if the underlying cert chain handling code is shared with other use cases).",
+              "createdAt": "2026-05-01T18:49:49Z",
+              "updatedAt": "2026-05-01T18:49:50Z"
             }
           ]
         }
