@@ -111,6 +111,14 @@ informative:
     - name: Henry Faltin Våge
     - org: University of Bergen
 
+  KeyReuse:
+    title: "Security in the Presence of Key Reuse: Context-Separable Interfaces and their Applications"
+    target: https://eprint.iacr.org/2019/519
+    date: 2019
+    author:
+    - name: Christopher Patton
+    - name: Thomas Shrimpton
+
   STH-Discipline:
     title: STH Discipline & Security Considerations
     target: https://mailarchive.ietf.org/arch/msg/trans/Zm4NqyRc7LDsOtV56EchBIT9r4c/
@@ -990,6 +998,8 @@ A cosignature MAY implicitly make additional statements about a subtree, determi
 
 Each cosigner has a public key and a *cosigner ID*, which uniquely identifies the cosigner. The cosigner ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}. By identifying the cosigner, the cosigner ID specifies the public key, signature algorithm, and any additional statements made by the cosigner's signatures. If a single operator performs multiple cosigner roles in an ecosystem, each role MUST use a distinct cosigner ID and SHOULD use a distinct key.
 
+Following the principle of key separation (see, e.g., {{KeyReuse}}), cosigner keys SHOULD NOT be used for purposes outside this document.
+
 A single cosigner, with a single cosigner ID and public key, MAY generate cosignatures for multiple logs. In this case, signed subtrees only need to be consistent with others for the same log.
 
 ### Signature Format
@@ -1072,7 +1082,7 @@ Entries are extensible. Future documents MAY define `type` values and what it me
 
 A CA operator MAY operate multiple CA cosigners that all certify the same log in parallel. This may be useful when, e.g., rotating CA keys. In this case, each CA instance MUST have a distinct name. The CA operator's ACME server can return all CA cosignatures together in a single certificate, with the application protocol selecting the cosignatures to use. {{use-in-tls}} describes how this is done in TLS {{!RFC8446}}.
 
-If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys.
+If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. Traditional X.509 CA keys are commonly used for multiple purposes, including signing certificates, CRLs, and OCSP responses; cosigner keys should not be added to this set.
 
 ## Publishing Logs
 
