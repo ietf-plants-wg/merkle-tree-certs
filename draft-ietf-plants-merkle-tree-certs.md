@@ -883,7 +883,7 @@ Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public sub
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
 
-Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and one or more CA cosigners ({{certification-authority-cosigners}}) that authenticate the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
+Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and CA cosigner ({{certification-authority-cosigners}}) that authenticate the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
 
 ## Log Parameters
 
@@ -1059,7 +1059,7 @@ Other documents or deployments MAY define other signature schemes and formats. L
 
 ## Certification Authority Cosigners
 
-A *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log.
+A *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as the log ID ({{log-ids}}). A CA cosigner MUST NOT sign subtreese for logs other than its corresponding issuance log.
 
 When a CA cosigner signs a subtree, it makes the additional statement that it has certified each entry in the subtree. For example, a domain-validating CA states that it has performed domain validation for each entry, at some time consistent with the entry's validity dates. CAs are held responsible for every entry in every subtree they sign. Proving an entry is included ({{subtree-inclusion-proofs}}) in a CA-signed subtree is sufficient to prove the CA certified it.
 
@@ -1070,9 +1070,7 @@ What it means to certify an entry depends on the entry type:
 
 Entries are extensible. Future documents MAY define `type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined entry format. {{new-log-entry-types}} further discusses security implications of new formats.
 
-A CA operator MAY operate multiple CA cosigners that all certify the same log in parallel. This may be useful when, e.g., rotating CA keys. In this case, each CA instance MUST have a distinct name. The CA operator's ACME server can return all CA cosignatures together in a single certificate, with the application protocol selecting the cosignatures to use. {{use-in-tls}} describes how this is done in TLS {{!RFC8446}}.
-
-If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys.
+If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from the Merkle Tree CA cosigner key.
 
 ## Publishing Logs
 
@@ -1304,7 +1302,7 @@ Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for
 
 ## Representing Certification Authorities
 
-This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and one associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:
+This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and the associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:
 
 * The `subject` field MUST be the CA issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
 
@@ -1337,10 +1335,9 @@ ext-mtcCertificationAuthority EXTENSION ::= {
 TrustAnchorID ::= RELATIVE-OID
 
 MTCCertificationAuthority ::= SEQUENCE {
-    logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
-    cosignerID     TrustAnchorID,
-    cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial      INTEGER
+    logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial INTEGER
 }
 ~~~
 
@@ -1350,15 +1347,11 @@ The fields of a MTCCertificationAuthority structure are defined as follows:
 
 * `logHash` describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
 
-* `cosignerID` is the CA cosigner's cosigner ID ({{cosigners}}) as a RELATIVE-OID.
-
-* `cosignerSigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
+* `sigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
 
 * `minSerial` is an integer describing the minimum allowed serial number (entry index) in the issuance log ({{log-pruning}}).
 
 If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. However, the key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, if permitted by other X.509 constraints such as the key usage extension.
-
-[[TODO: We currently allow a single CA to have multiple CA cosigners, which complicates the CRL and OCSP story. Resolve this. See issue #214.]]
 
 This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
 
@@ -1374,7 +1367,7 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 
 * The log ID ({{log-ids}})
 * The log hash algorithm, e.g. SHA-256
-* A set of supported cosigners, as pairs of cosigner ID and public key
+* The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
 * A list of revoked ranges of indices ({{revocation-by-index}})
@@ -1385,7 +1378,7 @@ This information may be obtained from a CA certificate structure, defined in {{r
 
 * The log hash algorithm is determined from the id-pe-mtcCertificationAuthority extension.
 
-* The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. {{trusted-cosigners}} gives some guidance on this.
+* The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The CA's cosigner ID is the log ID, determined above. The relying party incorporates this cosigner into its cosigner policy based on the guidance in {{trusted-cosigners}}.
 
 * No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.
 
@@ -1444,7 +1437,7 @@ Authenticity:
 Transparency:
 : The relying party only accepts entries that are publicly accessible, so that monitors, particularly the subject of the certificate, can notice any unauthorized certificates
 
-Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. This is analogous to the signature in a traditional X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}. If the CA is transitioning from an old to new key, the relying party SHOULD accept both keys until certificates that predate the new key expire.
+Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a traditional X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}.
 
 While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
 
@@ -1650,10 +1643,6 @@ To maximize coverage of landmark-relative certificates, authenticating parties p
 The above also applies if the authenticating party is performing a routine key rotation alongside the routine renewal. In this case, certificate negotiation would pick the key as part of the certificate selection. This slightly increases the lifetime of the old key but maintains the size optimization continuously.
 
 If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a standalone certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new landmark-relative certificate is available and relying parties are updated.
-
-## Multiple CA Keys
-
-The separation between issuance logs and CA cosigners gives CAs additional flexibility in managing keys. A CA operator wishing to rotate keys, e.g. to guard against compromise of older key material, or upgrade to newer algorithms, could retain the same issuance log and sign its checkpoints and subtrees with both keys in parallel, until relying parties are all updated. Older relying parties would verify the older signatures, while newer relying parties would verify the newer signatures. A cosignature negotiation mechanism in the application protocol (see {{use-in-tls}}) would avoid using extra bandwidth for the two signatures.
 
 # Privacy Considerations
 
@@ -1870,10 +1859,9 @@ ext-mtcCertificationAuthority EXTENSION ::= {
 }
 
 MTCCertificationAuthority ::= SEQUENCE {
-    logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
-    cosignerID     TrustAnchorID,
-    cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial      INTEGER
+    logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial INTEGER
 }
 
 END
@@ -2310,3 +2298,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Use a tlog-compatible signature scheme for ease of deployment
 
 - Define a CA certificate representation
+
+- Remove the one-to-many relationship between MTC CAs and CA cosigners
