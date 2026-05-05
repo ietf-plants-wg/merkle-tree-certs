@@ -254,8 +254,11 @@ func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners 
 				return
 			}
 
-			// No unused bits.
-			certSig.AddBytes([]byte{0})
+			if certConfig.UnusedBit {
+				certSig.AddBytes([]byte{1})
+			} else {
+				certSig.AddBytes([]byte{0})
+			}
 			certSig.AddUint64(uint64(start))
 			certSig.AddUint64(uint64(end))
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
@@ -270,6 +273,12 @@ func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners 
 					cosigs.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(cosig) })
 				}
 			})
+			if certConfig.UnusedBit {
+				if sig, err := certSig.Bytes(); err == nil && len(sig) == 0 || sig[len(sig)-1]&1 != 0 {
+					certSig.SetError(errors.New("last bit in signature with not zero, unable to encode as unused"))
+					return
+				}
+			}
 		})
 	})
 	return b.Bytes()

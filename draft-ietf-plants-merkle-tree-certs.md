@@ -177,6 +177,13 @@ informative:
     author:
       org: C2SP
 
+  TLOG-COSIGNATURE:
+    title: Transparency Log Cosignatures
+    target: https://c2sp.org/tlog-cosignature
+    date: April 2026
+    author:
+      org: C2SP
+
   # TODO: Remove these when the "Extensions to Tiled Transparency Logs" section is removed.
   TLOG-CHECKPOINT:
     title: Transparency Log Checkpoints
@@ -209,7 +216,7 @@ This increased overhead additionally impacts CT logs themselves. Most of a log's
 
 Additionally, as PKIs transition to shorter-lived certificates {{CABF-153}} {{CABF-SC081}}, the number of entries in the log will grow.
 
-This document introduces Merkle Tree certificates, a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
+This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
 
 This achieves the following:
 
@@ -415,7 +422,11 @@ Landmark-relative certificates are constructed and used as follows. {{fig-landma
 
 # Subtrees
 
-This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} by defining a *subtree* of a Merkle Tree. A subtree is an interior node of a Merkle Tree, which can be efficiently shown consistent with the original Merkle Tree and any Merkle Tree with additional elements appended. This specification uses subtrees to reduce the size of inclusion proofs.
+This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} by defining a *subtree* of a Merkle Tree. A subtree is itself a Merkle Tree, built over an interval of entries from the original tree. {{definition-of-a-subtree}} defines a subtree formally, including the constraints on those intervals.
+
+As with Merkle Trees, a subtree inclusion proof, defined in {{subtree-inclusion-proofs}}, can prove an entry is contained in some subtree. Subtrees, and thus their inclusion proofs, are smaller than those of the original tree, so this document uses subtree inclusion proofs as a certificate size optimization.
+
+Not all intervals can form subtrees. Subtrees are limited to intervals that can be efficiently proven consistent with the original tree, using subtree consistency proofs defined in {{subtree-consistency-proofs}}. However, every interval of a Merkle Tree can be efficiently covered by two subtrees. {{arbitrary-intervals}} describes how to determine these subtrees.
 
 ## Definition of a Subtree
 
@@ -985,7 +996,7 @@ This section defines a log *cosigner*. A cosigner follows some append-only view 
 
 A cosignature MAY implicitly make additional statements about a subtree, determined by the cosigner's role. This document defines one concrete cosigner role, a CA cosigner ({{certification-authority-cosigners}}), to authenticate the log and certify entries. Other documents and specific deployments may define other cosigner roles, to perform different functions in a PKI. For example, {{TLOG-WITNESS}} defines a cosigner that only checks the log is append-only, and {{TLOG-MIRROR}} defines a cosigner that mirrors a log.
 
-Each cosigner has a public key and a *cosigner ID*, which uniquely identifies the cosigner. The cosigner ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}. By identifying the cosigner, the cosigner ID specifies both the public key and the additional statements made by the cosigner's signatures. If a single operator performs multiple cosigner roles in an ecosystem, each role MUST use a distinct cosigner ID and SHOULD use a distinct key.
+Each cosigner has a public key and a *cosigner ID*, which uniquely identifies the cosigner. The cosigner ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}. By identifying the cosigner, the cosigner ID specifies the public key, signature algorithm, and any additional statements made by the cosigner's signatures. If a single operator performs multiple cosigner roles in an ecosystem, each role MUST use a distinct cosigner ID and SHOULD use a distinct key.
 
 Following the principle of key separation (see, e.g., {{KeyReuse}}), cosigner keys SHOULD NOT be used for purposes outside this document.
 
@@ -993,50 +1004,66 @@ A single cosigner, with a single cosigner ID and public key, MAY generate cosign
 
 ### Signature Format
 
-A cosigner computes a cosignature for a subtree in a log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
+A cosigner computes a *subtree signature* for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
 
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
 
-/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
-opaque TrustAnchorID<1..2^8-1>;
-
 struct {
-    TrustAnchorID log_id;
+    uint8 label[12] = "subtree/v1\n\0";
+    opaque cosigner_name<1..2^8-1>;
+    uint64 timestamp;
+    opaque log_origin<1..2^8-1>;
     uint64 start;
     uint64 end;
-    HashValue hash;
-} MTCSubtree;
-
-struct {
-    uint8 label[16] = "mtc-subtree/v1\n\0";
-    TrustAnchorID cosigner_id;
-    MTCSubtree subtree;
-} MTCSubtreeSignatureInput;
+    HashValue subtree_hash;
+} CosignedMessage;
 ~~~
 
-`log_id` MUST be the issuance log's ID ({{log-ids}}), in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}). `start` and `end` MUST define a valid subtree of the log, and `hash` MUST be the subtree's hash value in the cosigner's view of the log. The `label` is a fixed prefix for domain separation. Its value MUST be the string `mtc-subtree/v1`, followed by a newline (U+000A), followed by a zero byte (U+0000). `cosigner_id` MUST be the cosigner ID, in its binary representation.
+This signature format is designed to be compatible with the ML-DSA-44 signature construction in {{TLOG-COSIGNATURE}}, but it supports signature algorithms other than ML-DSA-44 and tree hashes other than SHA-256.
 
-The resulting signature is known as a *subtree signature*. When `start` is zero, the resulting signature describes the checkpoint with tree size `end` and is also known as a *checkpoint signature*.
+`label` is a fixed prefix for domain separation. Its value MUST be the string `subtree/v1`, followed by a newline (U+000A), followed by a zero byte (U+0000).
 
-For each supported log, a cosigner retains its checkpoint signature with the largest `end`. This is known as the cosigner's *current* checkpoint. If the cosigner's current checkpoint has tree size `tree_size`, it MUST NOT generate a signature for a subtree `[start, end)` if `start > 0` and `end > tree_size`. That is, a cosigner can only sign a non-checkpoint subtree if it is contained in its current checkpoint. In a correctly-operated cosigner, every signature made by the cosigner can be proven consistent with its current checkpoint with a subtree consistency proof ({{subtree-consistency-proofs}}). As a consequence, a cosigner that signs a subtree is held responsible for all the entries in the tree of size matching the subtree end, even if the corresponding checkpoint is erroneously unavailable.
+`cosigner_name` and `log_origin` are computed from the cosigner ID and the issuance log's ID ({{log-ids}}), respectively. They contain the concatenation of:
 
-Before signing a subtree, the cosigner MUST ensure that `hash` is consistent with its log state. Different cosigner roles may obtain this assurance differently. For example, a cosigner may compute the hash from its saved log state (e.g. if it is the log operator or maintains a copy of the log) or by verifying a subtree consistency proof ({{subtree-consistency-proofs}}) from its current checkpoint. When a cosigner signs a subtree, it is held responsible *both* for the subtree being consistent with its other signatures, *and* for the cosigner-specific additional statements.
+* The 16-byte ASCII string `oid/1.3.6.1.4.1.`
+* The trust anchor ID's ASCII representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}})
 
-Cosigners SHOULD publish their current checkpoint, along with the checkpoint signature.
+This is equivalent to the concatenation of:
 
-[[TODO: CT and tlog put timestamps in checkpoint signatures. Do we want them here? In CT and tlog, the timestamps are monotonically increasing as the log progresses, but we also sign subtrees. We can separate subtree and checkpoint signatures, with timestamps only in the latter, but it's unclear if there is any benefit to this.]]
+* The four-byte ASCII string `oid/`
+* The trust anchor ID as a full OID, in dotted decimal notation
+
+For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
+
+`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log.
+
+If `timestamp` is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally, if `timestamp` is non-zero, the following MUST be true:
+
+* `start` MUST be zero.
+* `end` MUST be the size of the largest consistent tree that the cosigner has observed for the log.
+
+`timestamp` MAY be zero, in which case no additional constraints are placed on `start` or `end`, and no statement is made about the signing time or largest observed tree.
+
+### Signature Semantics
+
+Before signing a subtree of some log, the cosigner MUST ensure that `subtree_hash` is consistent with its view of the log. Different cosigner roles may obtain this assurance differently. For example:
+
+* A cosigner may maintain a full copy of the log, e.g. if it's the log operator. The cosigner can then compute `subtree_hash` from this copy.
+
+* A cosigner may maintain the hash of the largest consistent tree observed by the log. The cosigner can then check `subtree_hash` with a subtree consistency proof ({{subtree-consistency-proofs}}).
+
+In both cases, the cosigner MUST ensure that, as it updates its view of the log, the old and new views are consistent. For example, {{TLOG-WITNESS}} defines a cosigner that checks consistency proofs ({{Section 2.1.4 of !RFC9162}}) between the two views.
+
+When a cosigner signs a subtree, it is held separately responsible *both* for the subtree being consistent with its other signatures, *and* for the cosigner-specific additional statements. That is, if a cosigner signs an inconsistent subtree, it is held responsible for its additional statements on all entries in the inconsistent subtree, even if some other signed subtree exists that asserts different entries.
+
+Subtree signatures can be used to sign timestamped log checkpoints with a non-zero `timestamp`. A signature with a non-zero `timestamp` asserts the complete state of the cosigner's view of the log at a given time. These signatures are not directly used in Merkle Tree Certificates ({{certificate-format}}), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI. This may include log serving or integrating an issuance log into a transparency ecosystem. For example, {{TLOG-TILES}} and {{TLOG-WITNESS}} use such signatures.
 
 ### Signature Algorithms
 
-The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. This document defines the following signature algorithms:
+The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used.
 
-* ECDSA with P-256 and SHA-256 {{!FIPS186-5=DOI.10.6028/NIST.FIPS.186-5}}
-* ECDSA with P-384 and SHA-384 {{!FIPS186-5}}
-* Ed25519 {{!RFC8032}}
-* ML-DSA-44 {{!FIPS204}}
-* ML-DSA-65 {{!FIPS204}}
-* ML-DSA-87 {{!FIPS204}}
+In this document, any PKIX signature algorithm MAY be used, such as the ML-DSA algorithms defined in {{!RFC9881}}. The signature is generated as in PKIX, except that the input is the structure defined in {{signature-format}}. In particular, in ML-DSA algorithms, the context string MUST be an empty string, as in {{Section 3 of !RFC9881}}.
 
 Other documents or deployments MAY define other signature schemes and formats. Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
 
@@ -1191,7 +1218,7 @@ struct {
 } MTCProof;
 ~~~
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}.
+`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
 
@@ -1210,11 +1237,9 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 
 Steps 4 and 5 are analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
 
-This document does not prescribe the specific cosigner roles, or a particular protocol for requesting cosignatures. Protocols for cosigners MAY vary depending on the needs for that cosigner. A consistency-only cosigner, such as {{TLOG-WITNESS}}, might only require a checkpoint signature and consistency proof, while a mirroring cosigner, such as {{TLOG-MIRROR}} might require the full log contents.
-
-A cosigner MAY expose a private interface for the CA, to reduce denial-of-service risk, or a cosigner MAY expose a public interface for other parties to request additional cosignatures. The latter may be useful if a relying party requires a cosigner that the CA does not communicate with. In this case, an authenticating party MAY request cosignatures and add them to the certificate. However, it is RECOMMENDED that the CA collect cosignatures for the authenticating party. This simplifies deployment, as relying party policies change over time.
-
 This document does not place any requirements on how frequently this job runs. More frequent runs results in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
+
+This document does not prescribe the specific cosigner roles, or a particular protocol for requesting cosignatures. Protocols for cosigners can vary depending on the needs of that cosigner. Some example protocols are described in {{TLOG-WITNESS}} and {{TLOG-MIRROR}}. It is RECOMMENDED that the CA collect cosignatures for the authenticating party, but the authenticating party MAY collect additional cosignatures and add them to the certificate.
 
 ## Landmark-Relative Certificates
 
@@ -1287,21 +1312,94 @@ If a new landmark is allocated every hour, landmark-relative certificate subtree
 
 Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
 
+## Representing Certification Authorities
+
+This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the issuance log ({{issuance-logs}}) and one associated CA cosigner ({{certification-authority-cosigners}}). This information is encoded as follows:
+
+* The `subject` field MUST be the CA issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
+
+* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}.
+
+* The `extensions` field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.
+
+* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to CA's log ID {{log-ids}}. The log ID is encoded in its binary representation, as defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}.
+
+Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
+
+* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert at least the `keyCertSign` bit.
+
+* The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
+
+The id-pe-mtcCertificationAuthority extension is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.
+
+~~~asn.1
+id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) pe(1) TBD }
+
+ext-mtcCertificationAuthority EXTENSION ::= {
+    SYNTAX MTCCertificationAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    CRITICALITY TRUE
+}
+
+-- From draft-ietf-tls-trust-anchor-ids
+TrustAnchorID ::= RELATIVE-OID
+
+MTCCertificationAuthority ::= SEQUENCE {
+    logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    cosignerID     TrustAnchorID,
+    cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial      INTEGER
+}
+~~~
+
+For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`.
+
+The fields of a MTCCertificationAuthority structure are defined as follows:
+
+* `logHash` describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
+
+* `cosignerID` is the CA cosigner's cosigner ID ({{cosigners}}) as a RELATIVE-OID.
+
+* `cosignerSigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
+
+* `minSerial` is an integer describing the minimum allowed serial number (entry index) in the issuance log ({{log-pruning}}).
+
+If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. However, the key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, if permitted by other X.509 constraints such as the key usage extension.
+
+[[TODO: We currently allow a single CA to have multiple CA cosigners, which complicates the CRL and OCSP story. Resolve this. See issue #214.]]
+
+This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
+
+A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
+
 # Relying Parties
 
 This section discusses how relying parties verify Merkle Tree Certificates.
 
-## Trust Anchors
+## Relying Party Configuration
 
 In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:
 
 * The log ID ({{log-ids}})
+* The log hash algorithm, e.g. SHA-256
 * A set of supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
 * A list of revoked ranges of indices ({{revocation-by-index}})
 
-[[TODO: Define some representation for this. In a trust anchor, there's a lot of room for flexibility in what the client stores. In principle, we could even encode some of this information in an X.509 intermediate certificate, if an application wishes to use this with a delegation model with intermediates, though the security story becomes more complex. Decide how/whether to do that.]]
+This information may be obtained from a CA certificate structure, defined in {{representing-certification-authorities}}:
+
+* The log ID is determined from the certificate's subject.
+
+* The log hash algorithm is determined from the id-pe-mtcCertificationAuthority extension.
+
+* The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The relying party incorporates this cosigner into its cosigner policy. {{trusted-cosigners}} gives some guidance on this.
+
+* No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.
+
+* The revoked index ranges include the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional ranges from out-of-band information.
 
 ## Verifying Certificate Signatures
 
@@ -1324,7 +1422,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. If `[start, end)` matches a trusted subtree ({{trusted-subtrees}}), check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. The `hash` field of the MTCSubtree is set to `expected_subtree_hash`.
+1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, the log ID for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
@@ -1356,13 +1454,15 @@ Authenticity:
 Transparency:
 : The relying party only accepts entries that are publicly accessible, so that monitors, particularly the subject of the certificate, can notice any unauthorized certificates
 
-Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. If the CA is transitioning from an old to new key, the relying party SHOULD accept both keys until certificates that predate the new key expire. This is analogous to the signature in a traditional X.509 certificate.
+Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. This is analogous to the signature in a traditional X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}. If the CA is transitioning from an old to new key, the relying party SHOULD accept both keys until certificates that predate the new key expire.
 
 While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
 
 To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, {{TLOG-WITNESS}} describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. {{revocation-by-index}} discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, {{TLOG-MIRROR}} describes a "mirror" cosigner role.
 
-Relying parties MAY accept the same set of additional cosigners across issuance logs.
+Relying parties MAY accept the same set of additional cosigners across CAs.
+
+In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This is analogous to a traditional X.509 application, where CA information is determined directly from a CA certificate. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.
 
 Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.
 
@@ -1605,11 +1705,11 @@ This optimization complicates studies of weak public keys, e.g. {{SharedFactors}
 
 ## Non-Repudiation
 
-When a monitor finds an unauthorized certificate issuance in a log or mirror, it must be possible to prove the CA indeed certified the information in the entry. However, only the latest checkpoint signature is retained by the transparency ecosystem, so it may not be possible to reconstruct the exact certificate seen by relying parties.
+When a monitor finds an unauthorized certificate issuance in a log or mirror, it must be possible to prove the CA indeed certified the information in the entry. However, only the latest signed checkpoint may be retained by the transparency ecosystem, so it may not be possible to reconstruct the exact certificate seen by relying parties.
 
-However, per {{certification-authority-cosigners}}, any checkpoint signature is a binding assertion by the CA that it has certified every entry in the checkpoint. Thus, given *any* signed checkpoint that contains the unauthorized entry, a Merkle inclusion proof ({{Section 2.1.3 of ?RFC9162}}) is sufficient to prove the CA issued the entry. This is analogous to how, in {{Section 3.2.1 of ?RFC9162}}, CAs are held accountable for signed CT precertificates.
+However, per {{certification-authority-cosigners}}, any subtree signature is a binding assertion by the CA that it has certified every entry in the subtree. Thus, given *any* signed checkpoint that contains the unauthorized entry, a Merkle inclusion proof ({{Section 2.1.3 of ?RFC9162}}) is sufficient to prove the CA issued the entry. This is analogous to how, in {{Section 3.2.1 of ?RFC9162}}, CAs are held accountable for signed CT precertificates.
 
-The transparency ecosystem does not retain unhashed public keys, so it also may not be possible to construct a complete certificate from the checkpoint signature and inclusion proof. However, if the log entry's `subjectPublicKeyInfoHash` does not correspond to an authorized key for the subject of the certificate, the entry is still unauthorized. A Merkle Tree CA is held responsible for all log entries it certifies, whether or not the preimage of the hash is known.
+The transparency ecosystem does not retain unhashed public keys, so it also may not be possible to construct a complete certificate from the signed checkpoint and inclusion proof. However, if the log entry's `subjectPublicKeyInfoHash` does not correspond to an authorized key for the subject of the certificate, the entry is still unauthorized. A Merkle Tree CA is held responsible for all log entries it certifies, whether or not the preimage of the hash is known.
 
 ## New Log Entry Types
 
@@ -1681,6 +1781,14 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Algor
 |---------|-----------------|------------|
 | TBD     | id-alg-mtcProof | [this-RFC] |
 
+## Certificate Extension
+
+IANA is requested to add the following entry to the "SMI Security for PKIX Certificate Extension" registry {{?RFC7299}}:
+
+| Decimal | Description                      | References |
+|---------|----------------------------------|------------|
+| TBD     | id-pe-mtcCertificationAuthority | [this-RFC] |
+
 ## Relative Distinguished Name Attribute
 
 IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{?I-D.ietf-lamps-x509-alg-none}}:
@@ -1703,7 +1811,7 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SIGNATURE-ALGORITHM, AlgorithmIdentifier{},
+  SIGNATURE-ALGORITHM, DIGEST-ALGORITHM, AlgorithmIdentifier{},
   FROM AlgorithmInformation-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -1742,6 +1850,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
     extensions            [3] EXPLICIT Extensions{{CertExtensions}}
                                            OPTIONAL
 }
+
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) TBD }
@@ -1758,6 +1867,23 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 at-trustAnchorID ATTRIBUTE ::= {
     TYPE TrustAnchorID
     IDENTIFIED BY id-rdna-trustAnchorID
+}
+
+id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) pe(1) TBD }
+
+ext-mtcCertificationAuthority EXTENSION ::= {
+    SYNTAX MTCCertificationAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    CRITICALITY TRUE
+}
+
+MTCCertificationAuthority ::= SEQUENCE {
+    logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    cosignerID     TrustAnchorID,
+    cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial      INTEGER
 }
 
 END
@@ -1990,13 +2116,7 @@ Each note signature has a key name of the cosigner name. The signature's key ID 
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 ~~~
 
-A subtree whose `start` is zero can also be represented as a checkpoint {{TLOG-CHECKPOINT}}. A corresponding subtree signature can be represented as a note signature using a key ID computed as follows:
-
-~~~pseudocode
-key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-checkpoint/v1")[:4]
-~~~
-
-The only difference between the two forms is the implicit transformation from the signed note text to the MTCSubtree structure.
+[[TODO: When all this moves to C2SP, allocate a codepoint for a more idiomatic key ID construction.]]
 
 ## Requesting Subtree Signatures
 
@@ -2193,3 +2313,10 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Relaxed restrictions on `null_entry`
 
 - Clarify that CRLs and OCSPs apply to MTCs unmodified
+
+## Since draft-ietf-plants-merkle-tree-certs-03
+{:numbered="false"}
+
+- Use a tlog-compatible signature scheme for ease of deployment
+
+- Define a CA certificate representation

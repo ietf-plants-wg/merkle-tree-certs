@@ -162,8 +162,13 @@ type CertificateConfig struct {
 	SubtreeStart, SubtreeEnd int
 	Checkpoint               string
 	// Must refer to a cosigner defined in the CAConfig.
-	Cosigners    []TrustAnchorID
+	Cosigners []TrustAnchorID
+	// BitFlipProof, if true, flips a bit in the inclusion proof.
 	BitFlipProof bool
+	// UnusedBit, if true, encodes the last bit in the signatureValue, which
+	// must be zero, as unused. This makes the signatureValue a non-whole
+	// number of bytes.
+	UnusedBit bool
 }
 
 func parseBase128(in []byte) (ret uint32, rest []byte, ok bool) {
