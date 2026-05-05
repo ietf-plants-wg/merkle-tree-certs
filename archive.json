@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-03T04:01:27.729143+00:00",
+  "timestamp": "2026-05-05T03:38:48.265002+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -2112,7 +2112,7 @@
       "id": "I_kwDOJIBkVc6a3JXF",
       "title": "Define a MTC trust anchor serialization",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/96",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -2121,8 +2121,8 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-10-18T18:33:05Z",
-      "updatedAt": "2026-04-16T01:37:48Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-04T20:54:18Z",
+      "closedAt": "2026-05-04T20:54:18Z",
       "comments": [
         {
           "author": "davidben",
@@ -3277,11 +3277,13 @@
       "state": "OPEN",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "davidben"
+      ],
       "labels": [],
       "body": "It's not full cosigner negotiation (#199), but initially I think we can get by with:\n\n* An analog of the CT enforcement shut-off for transparency cosigners\n* Negotiating the CA cosigner as if it were a trust anchor\n\nMore specifically, suppose you have some CA whose issuance log (or group of issuance logs post #26) named L and has CA cosigners C1, C2, C3, etc., each of which sign L. A RP that specifically wants cosigner C2 would advertise a trust anchor ID C2 (or a trust anchor group containing C2). That would tell the AP that should send a certificate from L with cosigner C2 and that it can skip cosignatures C1 and C2. The RP _may_ yet require other witness/mirror cosigners (say, one of W1, W2, W3, W4, ...), so you should still send those. The negotiation scheme says nothing (yet) about that.\n\nAnd then if either the RP or AP is incapable of negotiation and you decide that this is the fallback certificate, you send a jumbo certificate with every cosigner you've got, because you've got nothing better you can do.",
       "createdAt": "2026-04-20T18:23:53Z",
-      "updatedAt": "2026-04-23T17:12:53Z",
+      "updatedAt": "2026-05-04T17:09:52Z",
       "closedAt": null,
       "comments": [
         {
@@ -3290,6 +3292,13 @@
           "body": "How does AP know to skip C1 and C3 but still send W1, W2, W3 and W4 (or some subset thereof)? Other than there being separate negotiation for transparency cosigners?\n\nAnd as for fallback certificate, that is going to be X.509 for a long time (without negotiation one can not assume RP supports MTC at all).",
           "createdAt": "2026-04-23T17:12:53Z",
           "updatedAt": "2026-04-23T17:12:53Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Assigning this to myself, but plan is to actually make it moot by removing multiple CA cosigners.",
+          "createdAt": "2026-05-04T17:09:50Z",
+          "updatedAt": "2026-05-04T17:09:50Z"
         }
       ]
     },
@@ -3301,11 +3310,13 @@
       "state": "OPEN",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "davidben"
+      ],
       "labels": [],
       "body": "See Ilari's comments here: https://mailarchive.ietf.org/arch/msg/plants/DkZDqqE2r7qokdwd7bHg8Fg7NBY/",
       "createdAt": "2026-04-22T19:42:29Z",
-      "updatedAt": "2026-05-01T17:22:03Z",
+      "updatedAt": "2026-05-04T17:10:24Z",
       "closedAt": null,
       "comments": [
         {
@@ -3342,6 +3353,13 @@
           "body": "I think that CC was misdirected...\n\n>     * The CRL-DP in the certificate is part of the log entry and thus is shared between the cosigners. So either you include one URL per CA cosigner or... something\n\nAFAICT, that is not allowed. RFC 5280 seems to allow only one CRL per certificate (\"each name describes a different mechanism to obtain the same CRL\").\n \n>     * If you did include one URL per cosigner, we need some way to tell which CA cosigner is which\n\nIf there was a way to attach multiple CRLs, AKID/SKID matching would seem like a natural way to do that.\n\n>     * On paper, you'd think we could use a different SKID per CA cosigner, since CRLs have AKIDs. However, certificates also have AKIDs to facilitate path-building (not useful here), so we really need to make the SKID common to the CA log, not the CA cosigner\n\nSKID common to CA log is useless for anything, since name already covers that.\n\n\n> As alluded to in [#218 (comment)](https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218#discussion_r3157969332), it's not totally clear if we really _need_ to have multiple CA cosigners per CA. Some of us have been muttering about maybe removing this, which would simplify a bunch of things. (I've not done this in [#218](https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218) yet since that's a bigger change.)\n\nIt seems like having multiple CA cosigners per log causes complexities all over the place.",
           "createdAt": "2026-05-01T06:54:26Z",
           "updatedAt": "2026-05-01T06:54:26Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Assigning this to myself. Plan is resolve this by removing multiple CA cosigners.",
+          "createdAt": "2026-05-04T17:10:14Z",
+          "updatedAt": "2026-05-04T17:10:24Z"
         }
       ]
     },
@@ -3375,6 +3393,22 @@
           "updatedAt": "2026-05-01T18:28:21Z"
         }
       ]
+    },
+    {
+      "number": 219,
+      "id": "I_kwDOJIBkVc8AAAABBQuGIw",
+      "title": "Discuss domain separation of cosignatures and OCSP/CRL signatures in security considerations",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/219",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See @bwesterb's comment at https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218#issuecomment-4358961458\n\nRelated: #210 ",
+      "createdAt": "2026-05-04T20:55:05Z",
+      "updatedAt": "2026-05-04T20:55:05Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -14456,24 +14490,26 @@
       "id": "PR_kwDOJIBkVc7WhvFg",
       "title": "Define an MTC CA certificate format",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "\"MTC CA certificate\", of course, stands for Merkle Tree Certificate certification authority certificate, because we are all certifiably good at naming things.\r\n\r\nCloses #96.",
       "createdAt": "2026-04-28T23:41:33Z",
-      "updatedAt": "2026-05-01T18:49:49Z",
+      "updatedAt": "2026-05-04T20:54:23Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a47597e73dadd4399ad38d5c928fa941d2148cba",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "ca-format",
       "headRefOid": "d8f5b3564825725bb47bbac84f0696aed4db41c5",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-05-04T20:54:17Z",
+      "mergedAt": "2026-05-04T20:54:17Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -14502,6 +14538,13 @@
           "body": "Maybe we should say something in the security considerations about the domain separation of what the private key signs? Maybe... we should actually use the context parameter for the non standard subtree use case?",
           "createdAt": "2026-05-01T10:50:48Z",
           "updatedAt": "2026-05-01T10:51:31Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Maybe we should say something in the security considerations about the domain separation of what the private key signs?\r\n\r\nAh yeah @sgmenda was working on that over in #210. Let's maybe do that as a follow-up. I'll file a bug so we don't forget.\r\n\r\n> Maybe... we should actually use the context parameter for the non standard subtree use case?\r\n\r\nThat would make it incompatible with tlog-cosignature. We could change tlog-cosignature, but I think a special prefix is fine. That makes it easier to specify in light of X.509, which defines the ML-DSA sigalg AlgIDs to not use context strings, and avoids mishaps where someone applies this to an algorithm that doesn't use context strings and loses domain separation.\r\n\r\n(I know of one popular cryptographic library, whose signing API silently drops the context parameter for any ctx-less algorithm.)",
+          "createdAt": "2026-05-04T20:53:34Z",
+          "updatedAt": "2026-05-04T20:53:34Z"
         }
       ],
       "reviews": [
@@ -15027,6 +15070,93 @@
               "body": "@davidben OK, I can't argue with that (in which case it doesn't actually matter if @aarongable's reading is correct or not).\r\nI suppose some OCSP response verifier code might even get MTC support for free (if the underlying cert chain handling code is shared with other use cases).",
               "createdAt": "2026-05-01T18:49:49Z",
               "updatedAt": "2026-05-01T18:49:50Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 220,
+      "id": "PR_kwDOJIBkVc7YNoWy",
+      "title": "Only one CA cosigner per CA",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/220",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "(Or at least one distinguished one with the same name as the CA / log.)\r\n\r\nWhen we first wrote down the design, it was still pretty early in figuring out some of the details in MTCs, so we left many things flexible. In particular, I was inspired by how tlog-checkpoint just carried a collection of signatures, and the format wasn't terribly opinionated about what those signatures were. This gave a very nice base to express all manner of cosigner policies, etc.\r\n\r\nBut as we integrate more into X.509 proper, this becomes more challenging. An X.509 CA certificate has just the one slot for a public key. It has just the one SKID value that gets reflected into just the one downstream AKID value. There is just the one set of OCSP and CRL URLs, which serve objects with just the one slot for a signature.\r\n\r\nWhile it might have been possible to engineer around this (e.g. perhaps we define a new signature algorithm for OCSP and CRLs), it seems simplest to drop this. More specifically, we say that a CA is expected to have one CA cosigner whose name matches the log ID, and that's the one used in all these X.509 integrations.\r\n\r\nRemoving this does remove what might have been a handy capability: juggling multiple CA keys without interrupting the identity of the CA. However, since sending an extra ML-DSA signature is so prohibitively expensive, we would have needed a negotiation story for cosignatures to use this anyway. Gluing all those cosignatures together would really only have been useful as a fallback when those negotiation schemes fail.\r\n\r\nWithout this, our story is instead what it would have been with traditional X.509: if you need to juggling another key, go up a layer and juggle CAs, with all the strategies we have and may need to develop for managing that.\r\n\r\nIn return, we address several open issues:\r\n\r\n* Fixes #212 by making the issue moot. There is still value in general cosignature negotiation for the transparency-enforcing signatures, but it is less dire to solve in the first version.\r\n\r\n* Fixes #214 by removing the conflicts around which key to use.\r\n\r\n* CAs have one less ID to allocate, towards issue #152. That one isn't done yet. We still need to remove the landmark sequence base_id concept.",
+      "createdAt": "2026-05-05T00:12:35Z",
+      "updatedAt": "2026-05-05T00:58:31Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "single-ca-cosigner",
+      "headRefOid": "509fa6850e4a528abc54d6c1d29b4a0c26ba08f6",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc77zAX9",
+          "commit": {
+            "abbreviatedOid": "26ba43c"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-05T00:21:32Z",
+          "updatedAt": "2026-05-05T00:22:38Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "nit: typo in subtrees",
+              "createdAt": "2026-05-05T00:21:32Z",
+              "updatedAt": "2026-05-05T00:22:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc77zD8L",
+          "commit": {
+            "abbreviatedOid": "26ba43c"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-05T00:24:51Z",
+          "updatedAt": "2026-05-05T00:24:52Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Whoops, fixed!",
+              "createdAt": "2026-05-05T00:24:51Z",
+              "updatedAt": "2026-05-05T00:24:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc77zO5z",
+          "commit": {
+            "abbreviatedOid": "a7ce832"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-05T00:40:31Z",
+          "updatedAt": "2026-05-05T00:44:36Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\nCosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and CA cosigner ({{certification-authority-cosigners}}) that authenticates the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).\n```",
+              "createdAt": "2026-05-05T00:40:32Z",
+              "updatedAt": "2026-05-05T00:44:36Z"
             }
           ]
         }
