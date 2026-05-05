@@ -1398,7 +1398,7 @@ Table of Contents
    A _CA cosigner_ is a cosigner (Section 5.4) that certifies the
    contents of a log.  Each CA MUST operate a CA cosigner whose cosigner
    ID is the same as the log ID (Section 5.2).  A CA cosigner MUST NOT
-   sign subtreese for logs other than its corresponding issuance log.
+   sign subtrees for logs other than its corresponding issuance log.
 
    When a CA cosigner signs a subtree, it makes the additional statement
    that it has certified each entry in the subtree.  For example, a
