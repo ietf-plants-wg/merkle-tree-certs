@@ -883,7 +883,7 @@ Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public sub
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
 
-Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and CA cosigner ({{certification-authority-cosigners}}) that authenticate the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
+Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and CA cosigner ({{certification-authority-cosigners}}) that authenticates the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
 
 ## Log Parameters
 
