@@ -1059,7 +1059,7 @@ Other documents or deployments MAY define other signature schemes and formats. L
 
 ## Certification Authority Cosigners
 
-A *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as the log ID ({{log-ids}}). A CA cosigner MUST NOT sign subtreese for logs other than its corresponding issuance log.
+A *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as the log ID ({{log-ids}}). A CA cosigner MUST NOT sign subtrees for logs other than its corresponding issuance log.
 
 When a CA cosigner signs a subtree, it makes the additional statement that it has certified each entry in the subtree. For example, a domain-validating CA states that it has performed domain validation for each entry, at some time consistent with the entry's validity dates. CAs are held responsible for every entry in every subtree they sign. Proving an entry is included ({{subtree-inclusion-proofs}}) in a CA-signed subtree is sufficient to prove the CA certified it.
 
