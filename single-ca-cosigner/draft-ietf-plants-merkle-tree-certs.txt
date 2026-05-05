@@ -1106,9 +1106,9 @@ Table of Contents
 
    Cosigners (Section 5.4) sign assertions about the state of the
    issuance log.  A Merkle Tree CA operates a combination of an issuance
-   log and CA cosigner (Section 5.5) that authenticate the log state and
-   certifies the contents.  External cosigners may also be deployed to
-   assert correct log operation or provide other services to relying
+   log and CA cosigner (Section 5.5) that authenticates the log state
+   and certifies the contents.  External cosigners may also be deployed
+   to assert correct log operation or provide other services to relying
    parties (Section 7.3).
 
 5.1.  Log Parameters
