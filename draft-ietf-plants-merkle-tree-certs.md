@@ -184,20 +184,6 @@ informative:
     author:
       org: C2SP
 
-  # TODO: Remove these when the "Extensions to Tiled Transparency Logs" section is removed.
-  TLOG-CHECKPOINT:
-    title: Transparency Log Checkpoints
-    target: https://c2sp.org/tlog-checkpoint
-    date: March 2024
-    author:
-      org: C2SP
-  SIGNED-NOTE:
-    title: Note
-    target: https://c2sp.org/signed-note
-    date: April 2025
-    author:
-      org: C2SP
-
 ...
 
 --- abstract
@@ -1326,7 +1312,7 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 2. Using the procedure in {{arbitrary-intervals}}, the CA determines the two subtrees that cover the entries added between this checkpoint and the most recent checkpoint.
 3. The CA signs each subtree with its key(s) ({{cosigners}}).
 4. The CA requests sufficient checkpoint cosignatures ({{cosigners}}) from external cosigners to meet relying party requirements ({{trusted-cosigners}}).
-5. The CA requests subtree cosignatures ({{requesting-subtree-signatures}}) from the cosigners above.
+5. The CA requests subtree cosignatures from the cosigners above.
 6. For each certificate in the interval, the CA constructs certificates ({{certificate-format}}) using the covering subtree.
 
 Steps 4 and 5 are analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
@@ -2162,65 +2148,6 @@ This reconstructs the hashes of the subtree and full tree, which are then compar
 
 In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always false, and `fr` is always equal to `node_hash` in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree `[fn, sn + 1)` and truncated tree `tn + 1`.
 
-# Extensions to Tiled Transparency Logs (To Be Removed)
-
-[[TODO: This section is expected to be removed. It is sketched here purely for illustrative purposes, until the features are defined somewhere else, e.g. in the upstream tlog documents.]]
-
-## Subtree Signed Note Format
-
-A subtree, with signatures, can be represented as a signed note {{SIGNED-NOTE}}. Trust anchor IDs can be converted into log origins and cosigner names by concatenating the ASCII string `oid/1.3.6.1.4.1.` and the ASCII representation of the trust anchor ID. For example, the log ID from a CA with ID `32473.1` and log number 8 is `32473.1.0.8` and its checkpoint origin is `oid/1.3.6.1.4.1.32473.1.0.8`.
-
-The note body is a sequence of the following lines, each terminated by a newline character (U+000A):
-
-* The log origin
-* Two space-separated, non-negative decimal integers, `<start> <end>`
-* The subtree hash, as single hash encoded in base64
-
-Each note signature has a key name of the cosigner name. The signature's key ID is computed using the reserved signature type in {{SIGNED-NOTE}}, and a fixed string, as follows:
-
-~~~pseudocode
-key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
-~~~
-
-[[TODO: When all this moves to C2SP, allocate a codepoint for a more idiomatic key ID construction.]]
-
-## Requesting Subtree Signatures
-
-This section defines the `sign-subtree` cosigner HTTP endpoint for clients to obtain subtree signatures from non-CA cosigners, such as mirrors and witnesses. It may be used by the CA when assembling a certificate, or by an authenticating party to add a cosignature to a certificate that the CA did not themselves obtain.
-
-The cosigner MAY expose this endpoint publicly to general authenticating parties, or privately to the CA. The latter is sufficient if the CA is known to automatically request cosignatures from this cosigner when constructing certificates. If private, authenticating the CA is out of scope for this document.
-
-Clients call this endpoint as `POST <prefix>/sign-subtree`, where `prefix` is some URL prefix. For a mirror or witness, the URL prefix is the submission prefix. The client's request body MUST be a sequence of:
-
-* The requested subtree as a signed note ({{subtree-signed-note-format}}), with zero or more signatures. The endpoint MAY require signatures from the CA as a DoS mitigation, as described below.
-* A blank line
-* A checkpoint, signed by the requested cosigner. The checkpoint's tree size must be at least `end`.
-* A blank line
-* Zero or more subtree consistency proof ({{subtree-consistency-proofs}}) lines. Each line MUST encode a single hash in base64 {{!RFC4648}}. The client MUST NOT send more than 63 consistency proof lines.
-
-Each line MUST terminate in a newline character (U+000A).
-
-The cosigner performs the following steps:
-
-1. Check that the checkpoint contains signatures from itself
-2. Check that the subtree consistency proof proves consistency between the subtree hash and the checkpoint
-3. If all checks pass, cosign the subtree, as described in {{cosigners}}
-
-On success, the response body MUST be a sequence of one or more note signature lines {{SIGNED-NOTE}}, each starting with an em dash character (U+2014) and ending with a newline character (U+000A). The signatures MUST be cosignatures from the cosigner key(s) on the subtree.
-
-Instead of statelessly validating checkpoints by signature, the cosigner MAY statefully check the requested checkpoint against internal witness or mirror state. In this case, if the cosigner needs a newer checkpoint, it responds with a "409 Conflict" with its latest signed checkpoint. In this case, the subtree cosigning SHOULD remember and accept the last few signed checkpoints, to minimize conflicts.
-
-If operating statefully, the subtree cosigner process only needs read access to the mirror or witness state and can freely operate on stale state without violating any invariants.
-
-Mirrors MAY choose to check subtree hashes by querying their log state, instead of evaluating proofs.
-
-Publicly-exposed subtree cosigning endpoints MAY mitigate DoS in a variety of techniques:
-
-* Only cosigning recent subtrees, as old subtrees do not need to be co-signed
-* Caching subtree signatures
-* Requiring a CA signature on the subtree; CAs are only expected to sign two subtrees ({{arbitrary-intervals}}) for each checkpoint
-* Rate-limiting requests
-
 # Acknowledgements
 {:numbered="false"}
 
@@ -2402,3 +2329,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Group components of a CA into a CA-specific section that enumerates the parts of a CA
 
 - Canonicalize the order of cosignatures in MTCProofs
+
+- Remove subtree signer API in favor of https://github.com/C2SP/C2SP/pull/245 in {{TLOG-WITNESS}}
