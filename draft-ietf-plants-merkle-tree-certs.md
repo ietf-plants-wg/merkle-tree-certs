@@ -998,7 +998,7 @@ A cosignature MAY implicitly make additional statements about a subtree, determi
 
 Each cosigner has a public key and a *cosigner ID*, which uniquely identifies the cosigner. The cosigner ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}. By identifying the cosigner, the cosigner ID specifies the public key, signature algorithm, and any additional statements made by the cosigner's signatures. If a single operator performs multiple cosigner roles in an ecosystem, each role MUST use a distinct cosigner ID and SHOULD use a distinct key.
 
-Following the principle of key separation (see, e.g., {{KeyReuse}}), cosigner keys SHOULD NOT be used for purposes outside this document.
+Following the principle of key separation {{KeyReuse}}, cosigner keys SHOULD NOT be used for purposes outside this document. Additional uses MAY be defined but MUST NOT overlap with the signature format defined in {{signature-format}}. See {{domain-separation}} for additional discussion.
 
 A single cosigner, with a single cosigner ID and public key, MAY generate cosignatures for multiple logs. In this case, signed subtrees only need to be consistent with others for the same log.
 
@@ -1082,7 +1082,9 @@ Entries are extensible. Future documents MAY define `type` values and what it me
 
 A CA operator MAY operate multiple CA cosigners that all certify the same log in parallel. This may be useful when, e.g., rotating CA keys. In this case, each CA instance MUST have a distinct name. The CA operator's ACME server can return all CA cosignatures together in a single certificate, with the application protocol selecting the cosignatures to use. {{use-in-tls}} describes how this is done in TLS {{!RFC8446}}.
 
-If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. Traditional X.509 CA keys are commonly used for multiple purposes, including signing certificates, CRLs, and OCSP responses; cosigner keys should not be added to this set.
+If the CA issues certificate revocation lists (CRLs) {{!RFC5280}} or Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See {{domain-separation}} for a discussion of domain separation.
+
+If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.
 
 ## Publishing Logs
 
@@ -1366,7 +1368,7 @@ The fields of a MTCCertificationAuthority structure are defined as follows:
 
 * `minSerial` is an integer describing the minimum allowed serial number (entry index) in the issuance log ({{log-pruning}}).
 
-If this extension is present, the key described in `subjectPublicKeyInfo` MUST NOT be used to directly sign TBSCertificate structures, as in a traditional X.509 CA. Instead, it is used to sign subtrees as described in {{signature-format}}. However, the key MAY be used to directly sign certificate revocation lists (CRLs) {{!RFC5280}} and Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, if permitted by other X.509 constraints such as the key usage extension.
+If this extension is present, the key described in `subjectPublicKeyInfo` is a CA cosigner key and subject to the usage restrictions described in {{certification-authority-cosigners}}. In particular, it MUST NOT be used to directly sign TBSCertificate structures.
 
 [[TODO: We currently allow a single CA to have multiple CA cosigners, which complicates the CRL and OCSP story. Resolve this. See issue #214.]]
 
@@ -1762,6 +1764,16 @@ The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tr
 ## Revocation
 
 This document does not define a new certificate-level revocation mechanism. Existing mechanisms like CRLs and OCSP apply unchanged to Merkle Tree certificates. The sequential serial numbers assigned by issuance logs may enable future improvements to revocation, but such work is out of scope for this document.
+
+## Domain Separation
+
+The signature format defined in {{signature-format}} includes a fixed label prefix to ensure domain separation. Provided other uses of the same key use a non-overlapping prefix, signatures in one context cannot be substituted for those in another.
+
+{{certification-authority-cosigners}} permits a CA cosigner key to be used to sign CRLs and OCSP resposes. These signatures do not include a domain separation prefix. Instead, X.509 relies on an undocumented assumption that the TBSCertificate, TBSCertList, and OCSP ResponseData structures do not overlap at the level of individual ASN.1 fields.
+
+These ASN.1 structures all begin with a SEQUENCE tag, which is encoded in DER as 0x30 or the ASCII digit "0". The domain separation label used in {{signature-format}}, `subtree/v1\n\0`, does not begin with "0", so their inputs do not overlap. More generally, this label is not a prefix of any DER or BER encoding.
+
+Domain separation analysis based on the structures themselves is fragile, particularly when individual ASN.1 fields must be analyzed. This document depends on a structure-level analysis for CRLs and OCSP responses due to how these legacy protocols were defined. Future uses of the key SHOULD use a more robust mechanism, namely a fixed label prefix or a context string parameter if the signature scheme supports it.
 
 # IANA Considerations
 
