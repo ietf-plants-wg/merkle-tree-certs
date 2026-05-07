@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 7 November 2026                                      Apple Inc.
+Expires: 8 November 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                              6 May 2026
+                                                              7 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 November 2026.
+   This Internet-Draft will expire on 8 November 2026.
 
 Copyright Notice
 
@@ -145,7 +145,7 @@ Table of Contents
      12.5.  New Log Entry Types
      12.6.  Certificate Malleability
      12.7.  Revocation
-     12.8.  Domain Separation
+     12.8.  Signature Domain Separation
    13. IANA Considerations
      13.1.  Module Identifier
      13.2.  Algorithm
@@ -3035,7 +3035,7 @@ Table of Contents
    issuance logs may enable future improvements to revocation, but such
    work is out of scope for this document.
 
-12.8.  Domain Separation
+12.8.  Signature Domain Separation
 
    The signature format defined in Section 5.4.1 includes a fixed label
    prefix to ensure domain separation.  Provided other uses of the same
