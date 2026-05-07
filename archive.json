@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-05T03:38:48.265002+00:00",
+  "timestamp": "2026-05-07T03:53:20.309308+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3407,6 +3407,22 @@
       "body": "See @bwesterb's comment at https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218#issuecomment-4358961458\n\nRelated: #210 ",
       "createdAt": "2026-05-04T20:55:05Z",
       "updatedAt": "2026-05-04T20:55:05Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 221,
+      "id": "I_kwDOJIBkVc8AAAABBXk5gQ",
+      "title": "Fix the order of cosignatures?",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/221",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Cosignatures are an unordered set right now. Should we insist on a particular order, like sorting the IDs lexicographically? That way a receiver doesn't need to sort to detect duplicates, and we generally limit unnecessary variation. (On the other hand, it's one more thing a CA might mess up.)\n\nSee discussion here https://github.com/ietf-plants-wg/merkle-tree-certs/pull/220#issuecomment-4376952323\n\n(CC @ilaril)",
+      "createdAt": "2026-05-05T20:06:08Z",
+      "updatedAt": "2026-05-05T20:06:08Z",
       "closedAt": null,
       "comments": []
     }
@@ -11378,7 +11394,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-30T18:24:49Z",
-      "updatedAt": "2026-02-25T15:48:38Z",
+      "updatedAt": "2026-05-06T00:12:30Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "217ad1697b7bf53ae14ea40f5cd06c4617005625",
@@ -11410,6 +11426,13 @@
           "body": "> Please yank anything that does not make sense. I tried to guess when things were ambiguous to me, but it looks a number of the guesses went the wrong direction.\r\n\r\nHi @aww-aww, we merged many of your suggestions from this PR in #188, #189, #190 and #191.\r\n",
           "createdAt": "2026-02-25T15:48:37Z",
           "updatedAt": "2026-02-25T15:48:37Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@aww-aww anything else from this PR you think we should merge, or should we close this PR out?",
+          "createdAt": "2026-05-06T00:12:30Z",
+          "updatedAt": "2026-05-06T00:12:30Z"
         }
       ],
       "reviews": [
@@ -13586,7 +13609,7 @@
       "labels": [],
       "body": "See #208 discussion.",
       "createdAt": "2026-04-15T19:07:03Z",
-      "updatedAt": "2026-04-16T13:44:54Z",
+      "updatedAt": "2026-05-06T14:25:13Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13656,6 +13679,26 @@
               "body": "Good point, lemme think on it. \ud83e\udd14 ",
               "createdAt": "2026-04-16T13:44:54Z",
               "updatedAt": "2026-04-16T13:44:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78in79",
+          "commit": {
+            "abbreviatedOid": "a28d18e"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-06T14:25:12Z",
+          "updatedAt": "2026-05-06T14:25:13Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "WDYT about https://github.com/ietf-plants-wg/merkle-tree-certs/pull/224?",
+              "createdAt": "2026-05-06T14:25:12Z",
+              "updatedAt": "2026-05-06T14:25:13Z"
             }
           ]
         }
@@ -13766,7 +13809,7 @@
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-04-28T20:47:00Z",
+      "updatedAt": "2026-05-05T18:50:01Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -14146,6 +14189,32 @@
               "body": "Switched it to dot, and added a TODO to explicitly document that we're using a full OID arc (though since the last component here is always a log number and this constructed OID isn't used anywhere else, we probably don't need to take over the whole OID arc).",
               "createdAt": "2026-04-28T20:45:02Z",
               "updatedAt": "2026-04-28T20:47:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78K-zU",
+          "commit": {
+            "abbreviatedOid": "254edfd"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Suspect this will need a bit of a rebase with the CA format added in.",
+          "createdAt": "2026-05-05T18:42:47Z",
+          "updatedAt": "2026-05-05T18:50:01Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "Ah yeah, with https://github.com/ietf-plants-wg/merkle-tree-certs/pull/220, I now especially agree that calling the top-level thing a \"log ID\" makes no sense.\n\nHonestly, after that PR, now all we have is:\n* The CA has a trust anchor ID\n* This implicitly gives logs and landmarks IDs\n\nSo maybe we just say \"The CA has a trust anchor ID\" and \"the CA's ID {{ca-ids}}\"?",
+              "createdAt": "2026-05-05T18:42:47Z",
+              "updatedAt": "2026-05-05T18:50:01Z"
+            },
+            {
+              "originalPosition": 156,
+              "body": "I think I was mostly thinking that {trusted-subtrees} maybe should say something about how you're not expected to ship subtrees for every log, but I guess that all falls under \"this PR doesn't really say when you use log numbers\".",
+              "createdAt": "2026-05-05T18:49:25Z",
+              "updatedAt": "2026-05-06T00:11:34Z"
             }
           ]
         }
@@ -15087,18 +15156,47 @@
       "labels": [],
       "body": "(Or at least one distinguished one with the same name as the CA / log.)\r\n\r\nWhen we first wrote down the design, it was still pretty early in figuring out some of the details in MTCs, so we left many things flexible. In particular, I was inspired by how tlog-checkpoint just carried a collection of signatures, and the format wasn't terribly opinionated about what those signatures were. This gave a very nice base to express all manner of cosigner policies, etc.\r\n\r\nBut as we integrate more into X.509 proper, this becomes more challenging. An X.509 CA certificate has just the one slot for a public key. It has just the one SKID value that gets reflected into just the one downstream AKID value. There is just the one set of OCSP and CRL URLs, which serve objects with just the one slot for a signature.\r\n\r\nWhile it might have been possible to engineer around this (e.g. perhaps we define a new signature algorithm for OCSP and CRLs), it seems simplest to drop this. More specifically, we say that a CA is expected to have one CA cosigner whose name matches the log ID, and that's the one used in all these X.509 integrations.\r\n\r\nRemoving this does remove what might have been a handy capability: juggling multiple CA keys without interrupting the identity of the CA. However, since sending an extra ML-DSA signature is so prohibitively expensive, we would have needed a negotiation story for cosignatures to use this anyway. Gluing all those cosignatures together would really only have been useful as a fallback when those negotiation schemes fail.\r\n\r\nWithout this, our story is instead what it would have been with traditional X.509: if you need to juggling another key, go up a layer and juggle CAs, with all the strategies we have and may need to develop for managing that.\r\n\r\nIn return, we address several open issues:\r\n\r\n* Fixes #212 by making the issue moot. There is still value in general cosignature negotiation for the transparency-enforcing signatures, but it is less dire to solve in the first version.\r\n\r\n* Fixes #214 by removing the conflicts around which key to use.\r\n\r\n* CAs have one less ID to allocate, towards issue #152. That one isn't done yet. We still need to remove the landmark sequence base_id concept.",
       "createdAt": "2026-05-05T00:12:35Z",
-      "updatedAt": "2026-05-05T00:58:31Z",
+      "updatedAt": "2026-05-06T21:16:41Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "single-ca-cosigner",
-      "headRefOid": "509fa6850e4a528abc54d6c1d29b4a0c26ba08f6",
+      "headRefOid": "e4693ff5ed25db5c99bbcc15fbb1ca0a57f905f6",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "Might make sense to require the CA cosigner to be the first one in all stand-alone certificates.\r\n\r\nAnd this does not quite fix all X.509 integration issues, as there are known extensions that hash certificates (and there might be dark extensions that do some other \"creative\" things).",
+          "createdAt": "2026-05-05T06:21:49Z",
+          "updatedAt": "2026-05-05T06:21:49Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Might make sense to require the CA cosigner to be the first one in all stand-alone certificates.\r\n\r\nHmm. Is the idea just that a simple verifier doesn't have to write a for loop? I mean, I don't mind rigidity in general, but if I were to pick a rule, I would probably say that cosigner IDs must be lexicographically sorted, so it's each to check for duplicates, etc.\r\n\r\n> And this does not quite fix all X.509 integration issues, as there are known extensions that hash certificates (and there might be dark extensions that do some other \"creative\" things).\r\n\r\nOh? Which extensions did you have in mind?\r\n\r\nI don't think we have to make every hypothetical dark extension interact with every other one, because that's not really possible. For example, two extensions that both believe they are computed over every other extension (think embedded SCTs) cannot interoperate. I think a more practical bar for MTC, and others, is that extensions that one might plausibly wish to use together will work. It's always an option to say \"well, I guess you can't use those two features together\".",
+          "createdAt": "2026-05-05T17:40:48Z",
+          "updatedAt": "2026-05-05T17:40:48Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "> > Might make sense to require the CA cosigner to be the first one in all stand-alone certificates.\r\n> \r\n> Hmm. Is the idea just that a simple verifier doesn't have to write a for loop? I mean, I don't mind rigidity in general, but if I were to pick a rule, I would probably say that cosigner IDs must be lexicographically sorted, so it's each to check for duplicates, etc.\r\n\r\nWell, that could work too.\r\n\r\n> > And this does not quite fix all X.509 integration issues, as there are known extensions that hash certificates (and there might be dark extensions that do some other \"creative\" things).\r\n> \r\n> Oh? Which extensions did you have in mind?\r\n\r\nIgnoring stuff where it is not clear why anyone would use those with MTCs (e.g., v1 SCTs), there is the delegated credentials stuff (TLS extension 34, gated by X.509 DelegationUsage extension).\r\n\r\n> I don't think we have to make every hypothetical dark extension interact with every other one, because that's not really possible. For example, two extensions that both believe they are computed over every other extension (think embedded SCTs) cannot interoperate. I think a more practical bar for MTC, and others, is that extensions that one might plausibly wish to use together will work. It's always an option to say \"well, I guess you can't use those two features together\".\r\n\r\nThat dark extension was more about there possibly being other ways (besides hashing certificates) extensions could cause trouble. Not sure if X.509 has any extensions with \"interesting\" effects on EE certificates (there definitely are those kind of extensions for CA certificates).",
+          "createdAt": "2026-05-05T18:59:33Z",
+          "updatedAt": "2026-05-05T18:59:33Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Well, that could work too.\r\n\r\nFiled https://github.com/ietf-plants-wg/merkle-tree-certs/issues/221\r\n\r\n> there is the delegated credentials stuff (TLS extension 34, gated by X.509 DelegationUsage extension).\r\n\r\nAh fun. Specifically that the signature is computed over the whole certificate? Yeah, I guess, as things stand right now, you would need to go back and get a new version of the DC for each variant of the certificate that you've got. That is... not _insurmountable_ but definitely a huge pain. But yeah, a more ideal version would probably have signed over something else. :-/\r\n\r\n(Aside: I do think the value of DCs will go down with PQC because the benefits of delegation now come at a much, much higher bandwidth price. Not to say this is now _never_ worth the trade-off. But if you increase the costs of something and keep the benefit the same, you should expect it to lose to other solutions more often.)",
+          "createdAt": "2026-05-05T20:12:25Z",
+          "updatedAt": "2026-05-05T20:12:25Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc77zAX9",
@@ -15159,8 +15257,206 @@
               "updatedAt": "2026-05-05T00:44:36Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78SmVv",
+          "commit": {
+            "abbreviatedOid": "509fa68"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "LGTM with nit:",
+          "createdAt": "2026-05-06T02:17:39Z",
+          "updatedAt": "2026-05-06T02:20:44Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\nA *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as the log ID ({{log-ids}}). A CA cosigner MUST NOT sign checkpoints or subtrees for logs other than its corresponding issuance log.\n```\nI'm not sure if this is actually necessary, since checkpoint signatures don't show up in certs directly. But it's in line with both:\n- the statement elsewhere that a Mirror must use a different key from a CA; and\n- the basic idea that this CA key and only this CA key should be signing anything to do with this log.",
+              "createdAt": "2026-05-06T02:17:39Z",
+              "updatedAt": "2026-05-06T02:20:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78UFXt",
+          "commit": {
+            "abbreviatedOid": "509fa68"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-06T04:13:39Z",
+          "updatedAt": "2026-05-06T04:13:40Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Checkpoints are also a subset of subtrees anyway, but being explicit SGTM.",
+              "createdAt": "2026-05-06T04:13:39Z",
+              "updatedAt": "2026-05-06T04:13:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78sO2k",
+          "commit": {
+            "abbreviatedOid": "509fa68"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-06T20:46:42Z",
+          "updatedAt": "2026-05-06T20:46:42Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Oh that's a good point. But even though checkpoints meet the definition of subtrees, the signed-over data is different in each case (subtree tlog notes have `subtree x y` as their second line, while checkpoint notes have just an integer size as their second line) so I think they're technically different objects.",
+              "createdAt": "2026-05-06T20:46:42Z",
+              "updatedAt": "2026-05-06T20:46:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78s5SP",
+          "commit": {
+            "abbreviatedOid": "509fa68"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-06T21:16:41Z",
+          "updatedAt": "2026-05-06T21:16:41Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Oh! This is just because of a series of different decisions made across different ecosystems at different times. tl;dr: They are actually the same. Pay no attention to the person^Wsigned note behind the curtain.\r\n\r\nIn MTC, the only signatures are binary. Specifically it signs over this structure: https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-signature-format\r\n\r\ntlog originally used this textual [signed note](https://c2sp.org/signed-note) format. I'm not sure exactly the history (Go sumdb?). And yeah, you're right that the originally Ed25519 [tlog-checkpoint](https://c2sp.org/tlog-checkpoint) note signature algorithm would have you sign over a text thing.\r\n\r\nWe don't really want to have MTCs sign over a text thing. Among other things, that would mean that MTC cert verifiers need a base64 encoder embedded in them. So instead we can use this trick, first done in the [Static CT API](https://c2sp.org/static-ct-api), where you say that the _actual_ signature is over whatever other representation, and the signature viewed as a signed note signature technically transforms the note first. It's all very goofy.\r\n\r\nThis is now moot because we're aligning PQC tlog and MTC on a single binary signed message, specified both [in tlog](https://github.com/C2SP/C2SP/blob/main/tlog-cosignature.md#ml-dsa-44-signed-message) and in [MTC](https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-signature-format).\r\n\r\nThis signature input can represent subtrees and checkpoints. The checkpoint representation is just a special case of the subtree representation, where `start` is zero.\r\n\r\nWhen those signatures are served from a tlog checkpoint, they're still dressed up in a signed note. Viewed as a signature over the note, you first convert from the text thing to that binary format, and then sign that. But the input to the private key signature function is that singular binary format. Any reasonable notion of \"what the key signed\" needs to look at that final input. If the CA thinks \"I'm just signing my shopping list, after applying this particular transform, not a certificate\" but the output of the transform happens to be a TBSCertificate, they've still signed a certificate. :-)\r\n\r\nThis is all needlessly confusing and if we had a time machine, we wouldn't have this mess of conversions and different views of the world, but here we are. :-) The upshot is:\r\n\r\n* CA keys only generate one kind of signature, subtrees. Sometimes start is zero and sometimes it's non-zero.\r\n* Saying \"checkpoints or subtrees\" costs us nothing, so we may as well say, it, even though it's actually the same thing being signed. :-)",
+              "createdAt": "2026-05-06T21:16:41Z",
+              "updatedAt": "2026-05-06T21:17:25Z"
+            }
+          ]
         }
       ]
+    },
+    {
+      "number": 222,
+      "id": "PR_kwDOJIBkVc7Yxo7x",
+      "title": "Recommend a maximum log entry size for tlog-compatibility",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/222",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "While one could make an MTC deployment that doesn't use tlog-tiles, we expect many will. tlog-tiles and tlog-mirror use 16-bit length prefixes, so it's good to hint in the spec that this is your limit.\r\n\r\nIt's left as a SHOULD because, if your PKI is built around a different ecosystem, you might not care. It also leaves the door open to a tlog-tiles-v2 should anyone ever want to lift the limit. (Unlikely.)\r\n\r\nNote TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size. You would only trip this if, for example, you decided to ship 65KiB of SANs.",
+      "createdAt": "2026-05-06T13:05:58Z",
+      "updatedAt": "2026-05-06T13:21:20Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "log-entry-size",
+      "headRefOid": "72e1fec18fbca6b37ae87da29380abffe64d1a02",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc78ggU_",
+          "commit": {
+            "abbreviatedOid": "72e1fec"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-06T13:21:20Z",
+          "updatedAt": "2026-05-06T13:21:20Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 223,
+      "id": "PR_kwDOJIBkVc7YyH_X",
+      "title": "Add issuer alternative name to TBSCertificateLogEntry",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/223",
+      "state": "OPEN",
+      "author": "FiloSottile",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently, CAs often have managed intermediates to let entities get a \"branded\" issuer. In a root + intermediate PKI hierarchy, this has little cost. In a MTC PKI, adding an issuance log is expensive (e.g. mirrors need to learn about it, clients need to be provided landmarks, etc.).\r\n\r\nThis PR provides a mechanism to attribute cosmetically certificates to \"branded\" issuers using a Name (for equivalence to the Issuer field) in an issuer alternative name extension, without using separate issuance logs.\r\n\r\nI did some light profiling of the Name for implementation sanity (single-entry RDNs, UTF8String AttributeValues), one could do a lot more, but such rules are probably best left to root programs.",
+      "createdAt": "2026-05-06T13:27:39Z",
+      "updatedAt": "2026-05-06T13:27:39Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "issuer-alternative-name",
+      "headRefOid": "856f949fce9062ba83dcf109a0ce41d5fffa5f37",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 224,
+      "id": "PR_kwDOJIBkVc7Yzh9Z",
+      "title": "Expand on domain separation",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/224",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I took https://github.com/ietf-plants-wg/merkle-tree-certs/pull/210, merged it in with more recent changes, and expand a bit on domain separation. In particular, this discusses why signing OCSP responses and CRLs is OK.\r\n\r\n(CC @sgmenda)",
+      "createdAt": "2026-05-06T14:24:05Z",
+      "updatedAt": "2026-05-06T14:24:05Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "domain-separation",
+      "headRefOid": "6e029a7ff29ec56392ce4f1f60f6f6db163c1250",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 225,
+      "id": "PR_kwDOJIBkVc7Y5cA6",
+      "title": "Remove provisional subtree signature protocol",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/225",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This was a provisional sketch for until the protocol was added to tlog-witness. This has now[*] been done, so we can remove this from the core MTC document.\r\n\r\n[*] As of writing, it has not yet been done. The upstream PR is https://github.com/C2SP/C2SP/pull/245. I'm just getting things lined up.",
+      "createdAt": "2026-05-06T19:40:34Z",
+      "updatedAt": "2026-05-06T19:40:35Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "remove-subtree-signer",
+      "headRefOid": "c73267f1c0facd6e2b2fa8b7c2fea5fd252f666d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
