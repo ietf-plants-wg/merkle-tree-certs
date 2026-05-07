@@ -135,7 +135,6 @@ Table of Contents
      10.2.  Choosing Cosigners
      10.3.  Log Availability
      10.4.  Certificate Renewal
-     10.5.  Multiple CA Keys
    11. Privacy Considerations
    12. Security Considerations
      12.1.  Authenticity
@@ -1108,10 +1107,10 @@ Table of Contents
 
    Cosigners (Section 5.4) sign assertions about the state of the
    issuance log.  A Merkle Tree CA operates a combination of an issuance
-   log and one or more CA cosigners (Section 5.5) that authenticate the
-   log state and certifies the contents.  External cosigners may also be
-   deployed to assert correct log operation or provide other services to
-   relying parties (Section 7.3).
+   log and CA cosigner (Section 5.5) that authenticates the log state
+   and certifies the contents.  External cosigners may also be deployed
+   to assert correct log operation or provide other services to relying
+   parties (Section 7.3).
 
 5.1.  Log Parameters
 
@@ -1404,7 +1403,10 @@ Table of Contents
 5.5.  Certification Authority Cosigners
 
    A _CA cosigner_ is a cosigner (Section 5.4) that certifies the
-   contents of a log.
+   contents of a log.  Each CA MUST operate a CA cosigner whose cosigner
+   ID is the same as the log ID (Section 5.2).  A CA cosigner MUST NOT
+   sign checkpoints or subtrees for logs other than its corresponding
+   issuance log.
 
    When a CA cosigner signs a subtree, it makes the additional statement
    that it has certified each entry in the subtree.  For example, a
@@ -1429,14 +1431,6 @@ Table of Contents
    would certify that the CA has validated the information in some not-
    yet-defined entry format.  Section 12.5 further discusses security
    implications of new formats.
-
-   A CA operator MAY operate multiple CA cosigners that all certify the
-   same log in parallel.  This may be useful when, e.g., rotating CA
-   keys.  In this case, each CA instance MUST have a distinct name.  The
-   CA operator's ACME server can return all CA cosignatures together in
-   a single certificate, with the application protocol selecting the
-   cosignatures to use.  Section 8 describes how this is done in TLS
-   [RFC8446].
 
    If the CA issues certificate revocation lists (CRLs) [RFC5280] or
    Online Certificate Status Protocol (OCSP) responses [RFC6960], the
@@ -1938,7 +1932,7 @@ Table of Contents
 
    This section defines the X.509 Certificate [RFC5280] representation
    of a Merkle Tree Certificate CA.  It identifies the issuance log
-   (Section 5) and one associated CA cosigner (Section 5.5).  This
+   (Section 5) and the associated CA cosigner (Section 5.5).  This
    information is encoded as follows:
 
    *  The subject field MUST be the CA issuance log's log ID as a PKIX
@@ -1983,10 +1977,9 @@ Table of Contents
    TrustAnchorID ::= RELATIVE-OID
 
    MTCCertificationAuthority ::= SEQUENCE {
-       logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
-       cosignerID     TrustAnchorID,
-       cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial      INTEGER
+       logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+       sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+       minSerial INTEGER
    }
 
    For initial experimentation, early implementations of this design
@@ -2000,11 +1993,7 @@ Table of Contents
       example, if the hash is SHA-256, it would be mda-sha256 as defined
       in Section 8 of [RFC5912].
 
-   *  cosignerID is the CA cosigner's cosigner ID (Section 5.4) as a
-      RELATIVE-OID.
-
-   *  cosignerSigAlg is the CA cosigner's signature algorithm
-      (Section 5.4.3).
+   *  sigAlg is the CA cosigner's signature algorithm (Section 5.4.3).
 
    *  minSerial is an integer describing the minimum allowed serial
       number (entry index) in the issuance log (Section 5.6.1).
@@ -2013,10 +2002,6 @@ Table of Contents
    subjectPublicKeyInfo is a CA cosigner key and subject to the usage
    restrictions described in Section 5.5.  In particular, it MUST NOT be
    used to directly sign TBSCertificate structures.
-
-   [[TODO: We currently allow a single CA to have multiple CA cosigners,
-   which complicates the CRL and OCSP story.  Resolve this.  See issue
-   #214.]]
 
    This extension indicates the subtree signature format defined in
    Section 5.4.1.  If a later version of the protocol defines a new
@@ -2043,8 +2028,8 @@ Table of Contents
 
    *  The log hash algorithm, e.g. SHA-256
 
-   *  A set of supported cosigners, as pairs of cosigner ID and public
-      key
+   *  The CA cosigner, and any other supported cosigners, as pairs of
+      cosigner ID and public key
 
    *  A policy on which combinations of cosigners to accept in a
       certificate (Section 7.3)
@@ -2065,8 +2050,9 @@ Table of Contents
 
    *  The CA cosigner is determined from the certificate's subject
       public key and id-pe-mtcCertificationAuthority extension.  The
-      relying party incorporates this cosigner into its cosigner policy.
-      Section 7.3 gives some guidance on this.
+      CA's cosigner ID is the log ID, determined above.  The relying
+      party incorporates this cosigner into its cosigner policy based on
+      the guidance in Section 7.3.
 
    *  No trusted subtrees are directly represented by the CA certificate
       structure, but the relying party MAY incorporate trusted subtrees
@@ -2184,12 +2170,10 @@ Table of Contents
       the certificate, can notice any unauthorized certificates
 
    Relying parties SHOULD ensure authenticity by requiring a signature
-   from the most recent CA cosigner key.  This is analogous to the
-   signature in a traditional X.509 certificate.  If the relying party
-   obtains CA information from a CA certificate, the CA cosigner key is
-   determined as in Section 7.1.  If the CA is transitioning from an old
-   to new key, the relying party SHOULD accept both keys until
-   certificates that predate the new key expire.
+   from the CA cosigner key.  This is analogous to the signature in a
+   traditional X.509 certificate.  If the relying party obtains CA
+   information from a CA certificate, the CA cosigner key is determined
+   as in Section 7.1.
 
    While a CA signature is sufficient to prove a subtree came from the
    CA, this is not enough to ensure the certificate is visible to
@@ -2749,19 +2733,6 @@ Table of Contents
    revocation of the previous certificate.  This will interrupt the size
    optimization until the new landmark-relative certificate is available
    and relying parties are updated.
-
-10.5.  Multiple CA Keys
-
-   The separation between issuance logs and CA cosigners gives CAs
-   additional flexibility in managing keys.  A CA operator wishing to
-   rotate keys, e.g. to guard against compromise of older key material,
-   or upgrade to newer algorithms, could retain the same issuance log
-   and sign its checkpoints and subtrees with both keys in parallel,
-   until relying parties are all updated.  Older relying parties would
-   verify the older signatures, while newer relying parties would verify
-   the newer signatures.  A cosignature negotiation mechanism in the
-   application protocol (see Section 8) would avoid using extra
-   bandwidth for the two signatures.
 
 11.  Privacy Considerations
 
@@ -3408,10 +3379,9 @@ Appendix A.  ASN.1 Module
    }
 
    MTCCertificationAuthority ::= SEQUENCE {
-       logHash        AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
-       cosignerID     TrustAnchorID,
-       cosignerSigAlg AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial      INTEGER
+       logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+       sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+       minSerial INTEGER
    }
 
    END
@@ -3850,12 +3820,13 @@ Acknowledgements
    contributed over the history of these protocols.
 
    The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson,
-   Aaron Gable, Nick Harper, Russ Housley, Dennis Jackson, Sanketh
-   Menda, Matt Mueller, Chris Patton, Michael Richardson, Ryan Sleevi,
-   and Emily Stark for many valuable discussions and insights which led
-   to this document, as well as feedback and contributions to the
-   document itself.  We wish to thank Mia Celeste in particular, whose
-   implementation of an earlier draft revealed several pitfalls.
+   Aaron Gable, Nick Harper, Russ Housley, Dennis Jackson, Ilari
+   Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton, Michael
+   Richardson, Ryan Sleevi, and Emily Stark for many valuable
+   discussions and insights which led to this document, as well as
+   feedback and contributions to the document itself.  We wish to thank
+   Mia Celeste in particular, whose implementation of an earlier draft
+   revealed several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
    Richard Barnes in [STH-Discipline].  The size optimization in Merkle
@@ -4033,6 +4004,11 @@ Since draft-ietf-plants-merkle-tree-certs-03
    *  Use a tlog-compatible signature scheme for ease of deployment
 
    *  Define a CA certificate representation
+
+   *  Remove the one-to-many relationship between MTC CAs and CA
+      cosigners
+
+   *  Discuss domain separation for signatures
 
 Authors' Addresses
 
