@@ -1857,10 +1857,10 @@ Table of Contents
 6.3.3.  Publishing Landmarks
 
    CAs SHOULD publish their active landmarks, so that relying parties
-   configure trusted subtrees (Section 7.4).  The following format can
-   be used to describe this information.  The format is the following
-   sequence of lines.  Each line MUST be terminated by a newline
-   character (U+000A):
+   can configure trusted subtrees (Section 7.4).  The following format
+   can be used to describe this information.  The format is the
+   following sequence of lines.  Each line MUST be terminated by a
+   newline character (U+000A):
 
    *  Two space-separated non-negative decimal integers: <last_landmark>
       <num_active_landmarks>.  This line MUST satisfy the following,
