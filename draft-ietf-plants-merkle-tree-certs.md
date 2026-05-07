@@ -2322,3 +2322,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Define a CA certificate representation
 
 - Remove the one-to-many relationship between MTC CAs and CA cosigners
+
+- Discuss domain separation for signatures
