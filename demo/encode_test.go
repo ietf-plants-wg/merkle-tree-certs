@@ -27,11 +27,19 @@ func TestMarshalTBSCertificate(t *testing.T) {
 		0x94, 0x2d, 0x4b, 0xcf, 0x72, 0x22, 0xc1,
 	}
 
+	// 32-byte fixed randomizer used for deterministic plants-04 test
+	// vectors. Encoded as "00010203...1f".
+	fixedRandomizer := make([]byte, 32)
+	for i := range fixedRandomizer {
+		fixedRandomizer[i] = byte(i)
+	}
+
 	var tests = []struct {
 		version             DraftVersion
 		issuer              TrustAnchorID
 		serial              int
 		entry               *EntryConfig
+		randomizer          []byte
 		expectedTBSHex      string
 		expectedLogEntryHex string
 	}{
@@ -47,6 +55,21 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			},
 			expectedTBSHex:      "3081afa003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
 			expectedLogEntryHex: "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3000301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
+		},
+		// draft-plants-04 prefixes the MerkleTreeCertEntry with a 32-byte
+		// randomizer. The TBSCertificate itself is unchanged.
+		{
+			version: VersionPlants04,
+			issuer:  issuer,
+			serial:  1234,
+			entry: &EntryConfig{
+				PublicKey: publicKey,
+				NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+				NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+			},
+			randomizer:          fixedRandomizer,
+			expectedTBSHex:      "3081afa003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
+			expectedLogEntryHex: hex.EncodeToString(fixedRandomizer) + "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3000301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
 		},
 		// Fill in a bit of everything.
 		{
@@ -124,7 +147,7 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			t.Errorf("%d. AddTBSCertificate() gave %s, wanted %s", i, got, tt.expectedTBSHex)
 		}
 
-		log, err := MarshalTBSCertificateLogEntry(tt.version, tt.issuer, tt.entry)
+		log, err := MarshalTBSCertificateLogEntry(tt.version, tt.issuer, tt.randomizer, tt.entry)
 		if err != nil {
 			t.Errorf("%d. MarshalTBSCertificateLogEntry() failed: %s", i, err)
 		} else if got := hex.EncodeToString(log); got != tt.expectedLogEntryHex {

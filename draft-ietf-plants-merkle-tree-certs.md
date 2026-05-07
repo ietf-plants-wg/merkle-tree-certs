@@ -945,6 +945,7 @@ enum {
 } MerkleTreeCertEntryType;
 
 struct {
+    opaque randomizer[32];
     MerkleTreeCertEntryType type;
     select (type) {
        case null_entry: Empty;
@@ -957,6 +958,8 @@ struct {
 When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. This avoids zero serial numbers in the certificate format ({{certificate-format}}). Other entries MAY have type `null_entry`.
 
 When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.
+
+`randomizer` are 32 bytes chosen by the CA to make the hash of the entry unpredictable, and with it increase forgery resistance, see {{authenticity}}.
 
 `tbs_cert_entry_data` contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER {{X.690}} encoding of a TBSCertificateLogEntry, defined below. Equivalently, `tbs_cert_entry_data` contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in {{verifying-certificate-signatures}}.
 
@@ -1213,6 +1216,7 @@ struct {
 } MTCSignature;
 
 struct {
+    opaque randomizer[32];
     uint64 start;
     uint64 end;
     HashValue inclusion_proof<0..2^16-1>;
@@ -1220,7 +1224,7 @@ struct {
 } MTCProof;
 ~~~
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
+`randomizer` MUST contain the value of the corresponding field of the MerkleTreeCertEntry ({{log-entries}}). `start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
 
@@ -1413,7 +1417,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
    1. Set `subjectPublicKeyAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
    1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
-1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
+1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with `randomizer` taken from the MTCProof and contents the TBSCertificateLogEntry. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
 
 1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
 
@@ -1426,6 +1430,7 @@ This procedure only replaces the signature verification portion of X.509 path va
 In this procedure, `entry_hash` can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
 
 1. Initialize a hash instance.
+1. Write the 32-byte `randomizer` from the MTCProof to the hash.
 1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
 1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.
 1. Write the `subjectPublicKeyInfo`'s `algorithm` field to the hash.
@@ -1666,18 +1671,6 @@ In particular, relying parties that share an update process for trusted subtrees
 
 # Security Considerations
 
-## Authenticity
-
-A key security requirement of any PKI scheme is that relying parties only accept assertions that were certified by a trusted certification authority. Merkle Tree certificates achieve this by ensuring the relying party only accepts authentic subtree hashes:
-
-* In standalone certificates, the relying party's cosigner requirements ({{trusted-cosigners}}) are expected to include some signature by the CA's cosigner. The CA's cosigner ({{certification-authority-cosigners}}) is defined to certify the contents of every checkpoint and subtree that it signs.
-
-* In landmark-relative certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed ({{trusted-subtrees}}).
-
-Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.
-
-Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.
-
 ## Transparency
 
 The transparency mechanisms in this document do not prevent a CA from issuing an unauthorized certificate. Rather, they provide comparable security properties as Certificate Transparency {{?RFC9162}} in ensuring that all certificates are either rejected by relying parties, or visible to monitors and, in particular, the subject of the certificate.
@@ -1689,6 +1682,24 @@ A CA might violate the append-only property of its log and present different vie
 If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the inconsistent indices ({{revocation-by-index}}), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.
 
 A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy ({{log-availability}}). If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it. If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of _some_ entry at that index will be visible, so monitors will know the CA is failing to present an entry. Relying parties can then react by revoking the undisclosed entries by index ({{revocation-by-index}}), and likely removing the CA.
+
+The transparency guarantee of the system depends crucially on the collision resistance of the hash. If a CA can construct two different entries with the same hash, it can publish the benign once while keeping a malicious one hidden. A secure 256-bit hash provides 128-bit colission resistance.
+
+## Authenticity {#authenticity}
+
+A key security requirement of any PKI scheme is that relying parties only accept assertions that were certified by a trusted certification authority. Merkle Tree certificates achieve this by ensuring the relying party only accepts authentic subtree hashes:
+
+* In standalone certificates, the relying party's cosigner requirements ({{trusted-cosigners}}) are expected to include some signature by the CA's cosigner. The CA's cosigner ({{certification-authority-cosigners}}) is defined to certify the contents of every checkpoint and subtree that it signs.
+
+* In landmark-relative certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed ({{trusted-subtrees}}).
+
+Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. A colission-resistant hash is sufficient, but not required: it's also enough for the hash to be multi-target second-preimage resistant. A secure 256-bit hash provides 256-t multi-target second-preimage resistance against 2^t targets, and thus 200-bit authenticity for a log of 2^55 entries.
+
+The previous assumes the attacker does not influence which entries are certified. In normal operation, an attacker can request legitimate issuance of entries. An attacker might find two entries with the same hash, and request issuance for one, leading to a certification of the second. The `randomizer` thwarts this.
+
+Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches an existing entry, other than the intended public key. This is again second-preimage multitarget resistance.
+
+The subject public key hash is not randomized, and so an attacker that is able to compute colissions could find two subject public keys with the same hash, which is of no security concern given the attacker needs permission to publish either anyway.
 
 ## Public Key Hashes
 

@@ -5,6 +5,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
+	"fmt"
 	"math/bits"
 	"time"
 
@@ -190,11 +191,26 @@ func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial int, 
 	})
 }
 
-func MarshalNullEntry() []byte {
-	return []byte{byte(entryTypeNull >> 8), byte(entryTypeNull)}
+// MarshalNullEntry returns the encoding of a null MerkleTreeCertEntry. For
+// draft-plants-04 and later, this is prefixed with the 32-byte randomizer.
+func MarshalNullEntry(version DraftVersion, randomizer []byte) ([]byte, error) {
+	b := cryptobyte.NewBuilder(nil)
+	if version >= VersionPlants04 {
+		if len(randomizer) != randomizerSize {
+			return nil, fmt.Errorf("randomizer must be %d bytes, got %d", randomizerSize, len(randomizer))
+		}
+		b.AddBytes(randomizer)
+	}
+	b.AddUint16(entryTypeNull)
+	return b.Bytes()
 }
 
-func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, entry *EntryConfig) ([]byte, error) {
+const randomizerSize = 32
+
+// MarshalTBSCertificateLogEntry returns the encoding of a tbs_cert_entry
+// MerkleTreeCertEntry. For draft-plants-04 and later, the encoding is prefixed
+// with the 32-byte randomizer.
+func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, randomizer []byte, entry *EntryConfig) ([]byte, error) {
 	marshalContents := func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
 		addIssuer(tbs, issuer)
@@ -220,6 +236,14 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 		addExtensions(tbs, entry)
 	}
 	b := cryptobyte.NewBuilder(nil)
+	// Starting draft-plants-04, MerkleTreeCertEntry is prefixed with a
+	// 32-byte randomizer.
+	if version >= VersionPlants04 {
+		if len(randomizer) != randomizerSize {
+			return nil, fmt.Errorf("randomizer must be %d bytes, got %d", randomizerSize, len(randomizer))
+		}
+		b.AddBytes(randomizer)
+	}
 	b.AddUint16(entryTypeTBSCert)
 	// Starting draft-davidben-10, the SEQUENCE wrapper is omitted.
 	if version >= VersionDavidben10 {
@@ -230,7 +254,7 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 	return b.Bytes()
 }
 
-func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, randomizer []byte, index, start, end int) ([]byte, error) {
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		AddTBSCertificate(cert, issuer, index, entry)
@@ -258,6 +282,15 @@ func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners 
 				certSig.AddBytes([]byte{1})
 			} else {
 				certSig.AddBytes([]byte{0})
+			}
+			// Starting draft-plants-04, MTCProof is prefixed with the
+			// 32-byte randomizer of the corresponding MerkleTreeCertEntry.
+			if version >= VersionPlants04 {
+				if len(randomizer) != randomizerSize {
+					certSig.SetError(fmt.Errorf("randomizer must be %d bytes, got %d", randomizerSize, len(randomizer)))
+					return
+				}
+				certSig.AddBytes(randomizer)
 			}
 			certSig.AddUint64(uint64(start))
 			certSig.AddUint64(uint64(end))
