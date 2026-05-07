@@ -40,6 +40,7 @@ var (
 	flagFilterAIA      = flag.Bool("filter-aia", false, "filter out AIA extension")
 	flagPQEmbeddedSCTs = flag.Bool("pq-embedded-scts", false, "simulate embedded SCTs getting upgraded to post-quantum")
 	flagPQAlg          = flag.String("pq-alg", "ML-DSA-44", "the PQ algorithm to simulate")
+	flagUserAgent      = flag.String("user-agent", "", "the User-Agent value to send to the log")
 
 	// Put together some placeholder value based on https://www.ietf.org/archive/id/draft-davidben-tls-merkle-tree-certs-06.html#name-log-ids
 	placeholderIssuer = []byte{0x30, 0x14, 0x31, 0x12, 0x30, 0x10, 0x06, 0x08, 0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x00, 0x00, 0x0d, 0x04, 0xd6, 0x79, 0x09, 0x01}
@@ -216,8 +217,19 @@ func parseEmbeddedSCTs(cert *x509.Certificate) (embeddedSCTInfo, error) {
 	return info, nil
 }
 
+func fetch(url *url.URL) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if *flagUserAgent != "" {
+		req.Header.Add("User-Agent", *flagUserAgent)
+	}
+	return http.DefaultClient.Do(req)
+}
+
 func fetchTreeSize(baseURL *url.URL) (int, error) {
-	resp, err := http.Get(baseURL.JoinPath("checkpoint").String())
+	resp, err := fetch(baseURL.JoinPath("checkpoint"))
 	if err != nil {
 		return 0, err
 	}
@@ -253,7 +265,7 @@ func fetchDataTile(baseURL *url.URL, idx, size int) ([]byte, error) {
 	} else {
 		baseURL = baseURL.JoinPath(encodeIndex(idx)+".p", strconv.Itoa(size))
 	}
-	resp, err := http.Get(baseURL.String())
+	resp, err := fetch(baseURL)
 	if err != nil {
 		return nil, err
 	}
