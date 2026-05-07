@@ -2385,13 +2385,12 @@ Table of Contents
    up-to-date trusted subtrees.
 
    TLS implementations SHOULD use the trust_anchors extension to
-   determine support for a given landmark-relative certificates.  A
-   landmark-relative certificate, defined against landmark number L, has
-   a trust anchor ID constructed by appending components 0 and L to the
-   issuing log ID (Section 5.2).  For example, the trust anchor ID for
-   landmark 42 of log 32473.1 is 32473.1.0.42.  These trust anchor IDs
-   are additionally contained in trust anchor groups defined in
-   Section 8.2.1.
+   determine this.  A landmark-relative certificate, defined against
+   landmark number L, has a trust anchor ID constructed by appending
+   components 0 and L to the issuing log ID (Section 5.2).  For example,
+   the trust anchor ID for landmark 42 of log 32473.1 is 32473.1.0.42.
+   These trust anchor IDs are additionally contained in trust anchor
+   groups defined in Section 8.2.1.
 
    If both a landmark-relative and a standalone certificate are usable,
    an authenticating party SHOULD preferentially use the landmark-
@@ -2434,22 +2433,21 @@ Table of Contents
 
    When needed, Section 5 of [I-D.ietf-tls-trust-anchor-ids] describes
    how PKIs requiring further size savings can use trust anchor groups
-   spanning multiple CA instances, e.g. a group of CAs from the same CA
-   operator.  This section describes how such groups can be applied to
-   landmarks, using a variation of the versioning construction described
-   in Section 5.1 of [I-D.ietf-tls-trust-anchor-ids].
+   that span multiple CA instances.  For example, a single ID may signal
+   support for a group of CAs from the same CA operator.  This section
+   describes how such groups can be applied to landmarks, using a
+   variation of the versioning construction described in Section 5.1 of
+   [I-D.ietf-tls-trust-anchor-ids].
 
    Trust anchor groups containing landmarks SHOULD define versions
    predictably based on the time.  For example, if the contained CAs
    allocate landmarks roughly hourly, the trust anchor group might
    increment the version component every hour.  Each given version of
-   the group SHOULD contain all landmarks allocated before the
-   corresponding timestamp.
+   the group SHOULD contain the active landmarks as of the corresponding
+   timestamp.
 
    This predictable cadence allows the CA to construct trust anchor
-   group inclusions without additional coordination.  If the trust
-   anchor is known to be in a group, the corresponding minimum and
-   maximum versions for each landmark can be computed.  Conversely, a
+   group inclusions without additional coordination.  Conversely, a
    relying party MAY send a version if its trusted subtrees
    (Section 7.4) are up-to-date for all contained CAs, as of the
    versions timestamp.
@@ -2459,26 +2457,27 @@ Table of Contents
    be unable to reach one CA in the group, e.g. due to a transient
    outage.  This complicates timestamp-based strategies:
 
-   *  If the relying party sends the group with an older timestamp,
-      landmark-relative certificates may be unavailable for all CAs, not
-      just the unreachable one.
+   *  If the relying party sends the group with an older timestamp, it
+      will not signal its up-to-date state for the reachable CAs.  This
+      means a single unreachable CA can disrupt service for certificates
+      issued by unrelated CAs.
 
    *  If the relying party sends the group with a newer timestamp, the
-      relying party will signal support for landmarks from the
-      unreachable CA.  If the CA did indeed issue landmark-relative
-      certificates, those certificates will not work.
+      relying party may signal support for landmarks it does not have.
+      This risks connection failures.  If the unreachable CA issued
+      recent landmark-relative certificates, those certificates will
+      fail validation.
 
    The relying party can mitigate this in a number of ways:
 
-   *  If the trust anchor group comprises CAs from the same operator,
-      waiting until all CAs are reachable should be minimally
-      disruptive.
+   *  If the trust anchor group consists of CAs from the same operator,
+      waiting until all CAs are reachable will be minimally disruptive.
 
    *  The relying party can opt to send the group with an older
       timestamp, combined with other, smaller groups at newer timestamps
       to better describe its state.
 
-   *  A client relying party can send the newer timestampand, in the
+   *  A client relying party can send the newer timestamp and, in the
       event the unreachable CA did issue recent landmark-relative
       certificates, rely on the retry mechanism described in Section 4.3
       of [I-D.ietf-tls-trust-anchor-ids] to recover from any signaling
