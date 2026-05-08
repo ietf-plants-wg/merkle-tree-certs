@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 8 November 2026                                      Apple Inc.
+Expires: 9 November 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                              7 May 2026
+                                                              8 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 November 2026.
+   This Internet-Draft will expire on 9 November 2026.
 
 Copyright Notice
 
@@ -1139,9 +1139,9 @@ Table of Contents
 
    When allocating log IDs, the entire object identifier (OID) arc is
    allocated for use with the issuance log.  OIDs under this arc are
-   allocated by Merkle Tree Certificates protocol.  Given a log ID whose
-   OID representation is logID, this document allocates the following
-   OIDs:
+   allocated by the Merkle Tree Certificates protocol.  Given a log ID
+   whose OID representation is logID, this document allocates the
+   following OIDs:
 
    *  For each non-negative integer L, the OID {logID landmarks(0) L}
       represents the landmark (Section 6.3.1) with number L.  This OID
@@ -2434,10 +2434,10 @@ Table of Contents
    When needed, Section 5 of [I-D.ietf-tls-trust-anchor-ids] describes
    how PKIs requiring further size savings can use trust anchor groups
    that span multiple CA instances.  For example, a single ID may signal
-   support for a group of CAs from the same CA operator.  This section
-   describes how such groups can be applied to landmarks, using a
-   variation of the versioning construction described in Section 5.1 of
-   [I-D.ietf-tls-trust-anchor-ids].
+   support for a group of CAs across one or more CA operators.  This
+   section describes how such groups can be applied to landmarks, using
+   a variation of the versioning construction described in Section 5.1
+   of [I-D.ietf-tls-trust-anchor-ids].
 
    Trust anchor groups containing landmarks SHOULD define versions
    predictably based on the time.  For example, if the contained CAs
@@ -2447,7 +2447,8 @@ Table of Contents
    timestamp.
 
    This predictable cadence allows the CA to construct trust anchor
-   group inclusions without additional coordination.  Conversely, a
+   group inclusions (Section 7.2 of [I-D.ietf-tls-trust-anchor-ids]) for
+   issued certificates without additional coordination.  Conversely, a
    relying party MAY send a version if its trusted subtrees
    (Section 7.4) are up-to-date for all contained CAs, as of the
    versions timestamp.
