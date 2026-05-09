@@ -1693,13 +1693,13 @@ A key security requirement of any PKI scheme is that relying parties only accept
 
 * In landmark-relative certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed ({{trusted-subtrees}}).
 
-Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. A colission-resistant hash is sufficient, but not required: it's also enough for the hash to be multi-target second-preimage resistant. A secure 256-bit hash provides 256-t multi-target second-preimage resistance against 2^t targets, and thus 200-bit authenticity for a log of 2^55 entries.
+Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. A collision-resistant hash is sufficient, but not required: it's also enough for the hash to be multi-target second-preimage resistant. A secure 256-bit hash provides 256-t multi-target second-preimage resistance against 2^t targets, and thus 200-bit authenticity for a log of 2^55 entries.
 
-The previous assumes the attacker does not influence which entries are certified. In normal operation, an attacker can request legitimate issuance of entries. An attacker might find two entries with the same hash, and request issuance for one, leading to a certification of the second. The `randomizer` thwarts this.
+The previous assumes the attacker does not influence which entries are certified. In normal operation, an attacker can request legitimate issuance of entries, e.g. certificates for DNS names the attacker controls. An attacker might find two entries with the same hash, one of which of it is authorized to request. It might than request issuance for the authortized entry, leading to a certification of the other entry. The `randomizer` thwarts this.
 
 Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches an existing entry, other than the intended public key. This is again second-preimage multitarget resistance.
 
-The subject public key hash is not randomized, and so an attacker that is able to compute colissions could find two subject public keys with the same hash, which is of no security concern given the attacker needs permission to publish either anyway.
+The subject public key hash is not randomized, and so an attacker that is able to compute collisions could find two subject public keys with the same hash. However, in order to request certification of a new entry with this hash, the attacker must already be authorized for this new entry. The attacker would thus only be able to certify colliding pairs of public keys for its own identities.
 
 ## Public Key Hashes
 
