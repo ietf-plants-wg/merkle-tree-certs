@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 8 November 2026                                      Apple Inc.
+Expires: 10 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                              7 May 2026
+                                                              9 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 November 2026.
+   This Internet-Draft will expire on 10 November 2026.
 
 Copyright Notice
 
@@ -2849,7 +2849,7 @@ Table of Contents
    Given a subtree hash computed over entries that the CA certified, it
    must be computationally infeasible to construct an entry not on this
    list, and an inclusion proof, such that inclusion proof verification
-   succeeds.  A colission-resistant hash is sufficient, but not
+   succeeds.  A collision-resistant hash is sufficient, but not
    required: it's also enough for the hash to be multi-target second-
    preimage resistant.  A secure 256-bit hash provides 256-t multi-
    target second-preimage resistance against 2^t targets, and thus
@@ -2857,9 +2857,11 @@ Table of Contents
 
    The previous assumes the attacker does not influence which entries
    are certified.  In normal operation, an attacker can request
-   legitimate issuance of entries.  An attacker might find two entries
-   with the same hash, and request issuance for one, leading to a
-   certification of the second.  The randomizer thwarts this.
+   legitimate issuance of entries, e.g. certificates for DNS names the
+   attacker controls.  An attacker might find two entries with the same
+   hash, one of which of it is authorized to request.  It might than
+   request issuance for the authortized entry, leading to a
+   certification of the other entry.  The randomizer thwarts this.
 
    Log entries contain public key hashes.  It must additionally be
    computationally infeasible to compute a public key whose hash matches
@@ -2867,9 +2869,11 @@ Table of Contents
    second-preimage multitarget resistance.
 
    The subject public key hash is not randomized, and so an attacker
-   that is able to compute colissions could find two subject public keys
-   with the same hash, which is of no security concern given the
-   attacker needs permission to publish either anyway.
+   that is able to compute collisions could find two subject public keys
+   with the same hash.  However, in order to request certification of a
+   new entry with this hash, the attacker must already be authorized for
+   this new entry.  The attacker would thus only be able to certify
+   colliding pairs of public keys for its own identities.
 
 12.3.  Public Key Hashes
 
