@@ -66,6 +66,10 @@ func DraftVersionFromString(s string) (v DraftVersion, ok bool) {
 	case "plants-02":
 		return VersionPlants02, true
 	case "plants-04":
+		// TODO: not fully up-to-date with draft-04 yet. Still missing:
+		//   - CA cosigner's ID should now be the log ID (fix in provided config file).
+		//   - Signature scheme has been updated.
+		//   - Add code to synthesize the CA certs.
 		return VersionPlants04, true
 
 	default:
