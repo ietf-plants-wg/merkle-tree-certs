@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-07T03:53:20.309308+00:00",
+  "timestamp": "2026-05-10T04:02:38.373085+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -2603,7 +2603,7 @@
       "labels": [],
       "body": "When we recast MTC as X.509, we picked up all of X.509's semantics, including the fact that a CA can, at least mechanically, issue non-MTC intermediate certificates. Doing so partially bypasses transparency benefits because only the intermediate is logged, not certificates chaining off of it.\n\nI say partially because the fact that the CA has done so is definitely visible in the log. But if the intermediate is unconstrained, and a PKI is okay with it, then we don't actually know what certificates are valid. But this might vary a lot by PKI:\n\n* Maybe your PKI is okay with transparency stopping at an intermediate, as long as it has name constraints, but it's not okay with intermediates without name constraints.\n\n* Maybe your PKI is the above, but its notion of \"name\" is something other than SANs + name constraints and is looking for a random other X.509 extension\n\n* Maybe you do not want to support this at all and want to forbid all intermediates\n\n* Maybe you're just unabashedly okay with all transparency stopping at any intermediate for... some reason? I can't come up with a reason for this.\n\nIf there's a range of options, one plausible, if a bit unsatisfying, answer is that we solve this by policy. X.509 often forces us down this path, sadly. :-( We say that the MTC mechanism itself has no opinion on this, but that a relying party and root program might (and probably should!) opine on this and say what they do and don't allow.\n\nIn that case, the spec should say something about this and note that you need to pick something. We also need the technical mechanisms to apply that policy.\n\nAt a bare minimum, the technical mechanism is \"monitors can see everything the CA signs and know to look for this\" and \"relying parties will hold the CA responsible for detected violations in trust decisions\". If you see a CA=true certificate in the log, you need to treat it as impacting _every_ name (up to constraints) and monitor it it accordingly.\n\nYou might also want relying party enforcement in code so that, even if it is in there, the relying party won't accept it. For at least the \"this CA should not issue intermediates period\" policy, there is _almost_ a natural mechanism in X.509 already: path length constraints.\n\nBut only _almost_ because X.509 special-cases self-issued certificates everywhere as part of key rollover. Is it worth updating RFC 5280 to knock out the self-issued special case? (Alternatively, the enforcement can just be using some extra mechanism. Relying parties add checks atop RFC 5280 path validation all the time.)",
       "createdAt": "2025-09-18T17:26:53Z",
-      "updatedAt": "2025-10-06T20:37:18Z",
+      "updatedAt": "2026-05-07T18:03:30Z",
       "closedAt": null,
       "comments": [
         {
@@ -2612,6 +2612,13 @@
           "body": "Places where RFC 5280 special-cases self-issued certificates:\n\n* pathLenConstraint does not count self-issued certificates\n* Name constraints are not applied to SANs in self-issued certificates, unless the certificate is the final one\n* The inhibitAnyPolicy counter does not count self-issued certificates\n* The requireExplicitPolicy counter does not count self-issued certificates",
           "createdAt": "2025-10-06T20:35:16Z",
           "updatedAt": "2025-10-06T20:37:18Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "One could say that the MTC extension (including the implicit one on non-X509 anchors) just completely prohibits CA=true certificates (with implicit masking?), keyCertSign/cRLSign bits (with implicit masking if no KU), as well as any X.509 extensions that only make sense for CA certificates (e.g., policy mappings).\n\nThis does not affect delegated OCSP certificates, as those have CA=false and special EKU. Are there any other kinds of explicit delegation in X.509 (Indirect CRLs seem like implicit delegation)?",
+          "createdAt": "2026-05-07T18:03:30Z",
+          "updatedAt": "2026-05-07T18:03:30Z"
         }
       ]
     },
@@ -3095,7 +3102,7 @@
       "labels": [],
       "body": "RPs might have disjoint sets of cosigners, so we should have cosigner negotiation in the TLS handshake to allow APs to send only the required cosignatures in standalone certificates.\n\n(I didn't see an existing ticket tracking this yet.)",
       "createdAt": "2026-03-17T14:49:45Z",
-      "updatedAt": "2026-04-13T18:03:05Z",
+      "updatedAt": "2026-05-07T18:20:51Z",
       "closedAt": null,
       "comments": [
         {
@@ -3160,6 +3167,13 @@
           "body": "\"various stuff on top\" includes things like partitioning the set plus required partition count. One could represent 2 primary cosigners plus 2 out of 11 independent sets of secondaries in 8 bytes.",
           "createdAt": "2026-04-13T18:03:05Z",
           "updatedAt": "2026-04-13T18:03:05Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "Now that there can be only one CA co-signer, I would estimate that typical transparency policy could be compressed to something like 100-120 bytes (with majority of that space taken by known co-signer IDs).",
+          "createdAt": "2026-05-07T18:20:50Z",
+          "updatedAt": "2026-05-07T18:20:50Z"
         }
       ]
     },
@@ -3274,7 +3288,7 @@
       "id": "I_kwDOJIBkVc8AAAABACtHGg",
       "title": "Identify standalone certificates by cosigner ID",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/212",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -3283,8 +3297,8 @@
       "labels": [],
       "body": "It's not full cosigner negotiation (#199), but initially I think we can get by with:\n\n* An analog of the CT enforcement shut-off for transparency cosigners\n* Negotiating the CA cosigner as if it were a trust anchor\n\nMore specifically, suppose you have some CA whose issuance log (or group of issuance logs post #26) named L and has CA cosigners C1, C2, C3, etc., each of which sign L. A RP that specifically wants cosigner C2 would advertise a trust anchor ID C2 (or a trust anchor group containing C2). That would tell the AP that should send a certificate from L with cosigner C2 and that it can skip cosignatures C1 and C2. The RP _may_ yet require other witness/mirror cosigners (say, one of W1, W2, W3, W4, ...), so you should still send those. The negotiation scheme says nothing (yet) about that.\n\nAnd then if either the RP or AP is incapable of negotiation and you decide that this is the fallback certificate, you send a jumbo certificate with every cosigner you've got, because you've got nothing better you can do.",
       "createdAt": "2026-04-20T18:23:53Z",
-      "updatedAt": "2026-05-04T17:09:52Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-07T14:56:53Z",
+      "closedAt": "2026-05-07T14:56:53Z",
       "comments": [
         {
           "author": "ilaril",
@@ -3307,7 +3321,7 @@
       "id": "I_kwDOJIBkVc8AAAABAPtseA",
       "title": "Make sure OCSP and CRLs can *actually* be applied as-is",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/214",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -3316,8 +3330,8 @@
       "labels": [],
       "body": "See Ilari's comments here: https://mailarchive.ietf.org/arch/msg/plants/DkZDqqE2r7qokdwd7bHg8Fg7NBY/",
       "createdAt": "2026-04-22T19:42:29Z",
-      "updatedAt": "2026-05-04T17:10:24Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-07T14:56:54Z",
+      "closedAt": "2026-05-07T14:56:54Z",
       "comments": [
         {
           "author": "davidben",
@@ -3399,15 +3413,15 @@
       "id": "I_kwDOJIBkVc8AAAABBQuGIw",
       "title": "Discuss domain separation of cosignatures and OCSP/CRL signatures in security considerations",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/219",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "See @bwesterb's comment at https://github.com/ietf-plants-wg/merkle-tree-certs/pull/218#issuecomment-4358961458\n\nRelated: #210 ",
       "createdAt": "2026-05-04T20:55:05Z",
-      "updatedAt": "2026-05-04T20:55:05Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-07T15:00:40Z",
+      "closedAt": "2026-05-07T15:00:40Z",
       "comments": []
     },
     {
@@ -3422,9 +3436,38 @@
       "labels": [],
       "body": "Cosignatures are an unordered set right now. Should we insist on a particular order, like sorting the IDs lexicographically? That way a receiver doesn't need to sort to detect duplicates, and we generally limit unnecessary variation. (On the other hand, it's one more thing a CA might mess up.)\n\nSee discussion here https://github.com/ietf-plants-wg/merkle-tree-certs/pull/220#issuecomment-4376952323\n\n(CC @ilaril)",
       "createdAt": "2026-05-05T20:06:08Z",
-      "updatedAt": "2026-05-05T20:06:08Z",
+      "updatedAt": "2026-05-07T18:54:49Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "It would also be possible to have dedicated field (with presence-from-length) for the CA co-signature. And then have length-delimited list of transparency co-signatures.\n\nThis would not allow certificates with transparency co-signatures, but no CA co-signature. However, I do not think that would be needed for anything.",
+          "createdAt": "2026-05-07T18:09:16Z",
+          "updatedAt": "2026-05-07T18:09:16Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, that option seems a lot less tidy to me. Even if X.509 was not so friendly to it, I do like how all the signatures are somewhat unified.",
+          "createdAt": "2026-05-07T18:33:44Z",
+          "updatedAt": "2026-05-07T18:33:44Z"
+        },
+        {
+          "author": "mcpherrinm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "in DER, a set (which is logically unordered) must be encoded ascending order by the serialized value of each element. I think that makes sense here, too.\n\nI am not sure why we're using the TLS presentation language here at all instead of DER, but that's perhaps a bigger bucket of worms.",
+          "createdAt": "2026-05-07T18:51:09Z",
+          "updatedAt": "2026-05-07T18:51:09Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I am not sure why we're using the TLS presentation language here at all instead of DER, but that's perhaps a bigger bucket of worms.\n\nI forget. Probably was an arbitrary choice. \ud83e\udd37  Normally, I dislike core crypto bits using ASN.1, but this structure is already complex and variable-length, so doesn't super matter.\n\nAlthough DER wouldn't solve this. A DER SET OF will give us uniqueness of (cosigner ID, cosignature) tuples, we'd want this to just be keyed on cosigner IDs.",
+          "createdAt": "2026-05-07T18:54:49Z",
+          "updatedAt": "2026-05-07T18:54:49Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -13602,24 +13645,26 @@
       "id": "PR_kwDOJIBkVc7SvrhC",
       "title": "Recommend against reusing cosigner keys for other purposes",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/210",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "sgmenda",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "See #208 discussion.",
       "createdAt": "2026-04-15T19:07:03Z",
-      "updatedAt": "2026-05-06T14:25:13Z",
+      "updatedAt": "2026-05-07T15:00:44Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
       "headRepository": "sgmenda/merkle-tree-certs",
       "headRefName": "cosigner-key-separation",
       "headRefOid": "a28d18e11297df68a5440f4cf3429efb8f1580a5",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-05-07T15:00:43Z",
+      "mergedAt": "2026-05-07T15:00:43Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "ec23892dd033dcb36c14eaf308d653a7239be656"
+      },
       "comments": [],
       "reviews": [
         {
@@ -13716,7 +13761,7 @@
       "labels": [],
       "body": "The previous language said a subtree \"is\" an interior node. It seemed clearer to say that it is an interior node plus all of its children.\r\n\r\nI wound up defining three named kinds of subtrees, which I think are helpful in conceptualizing what's going on: Full Subtree, Right Subtree, and Partial Subtree. Then we can say early on that we'll be using a Full Subtree combined with a Right Subtree to cover arbitrary ranges.\r\n\r\nAlso, I defined a Right Subtree `[start, n)` to only be contained in the Merkle Tree of size `n`. In the tree of size `n+1`, at least one of the nodes has a different hash, so the Right Subtree `[start, n)` isn't really contained in it. This allows us to remove some language around \"directly contained,\" which I found confusing. Note: I haven't yet updated the consistency proof section, since I wanted to first see if folks found this tweak compelling.",
       "createdAt": "2026-04-17T00:12:46Z",
-      "updatedAt": "2026-04-28T01:46:19Z",
+      "updatedAt": "2026-05-09T16:06:41Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13734,6 +13779,13 @@
           "body": "WDYT about https://github.com/ietf-plants-wg/merkle-tree-certs/pull/216? It doesn't change quite as much as this PR does, but gives a hopefully clearer overview.",
           "createdAt": "2026-04-28T01:46:19Z",
           "updatedAt": "2026-04-28T01:46:19Z"
+        },
+        {
+          "author": "jsha",
+          "authorAssociation": "NONE",
+          "body": "Good points that this introduces more concepts than are really needed. I do like the improved intro in #216.\r\n\r\nMy goals here are:\r\n\r\n 1. Build a better mental model of what subtrees look like and what their shape is, particularly the shape of a pair of them.\r\n 2. Justify the constraints on subtree `start`.\r\n 3. Be more crisp about the \"contained\" relation (and remove \"directly contained\", which I found confusing).\r\n\r\nFor (3), my feeling is that a Merkle Tree \"containing\" a subtree means that not only the entries are the same but also the interior node hash values. That implies that a Partial Right Subtree is only \"contained\" in the Merkle Tree where `n == end`. Of course, we don't expect logs to store older hash values as they evolve their tree, but it seems useful conceptually.\r\n\r\nI'm happy to do another round of thinking and writing on this if it seems useful. I feel like I understand things a bit better now than when I wrote it.",
+          "createdAt": "2026-05-09T16:06:41Z",
+          "updatedAt": "2026-05-09T16:06:41Z"
         }
       ],
       "reviews": [
@@ -13809,13 +13861,13 @@
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-05-05T18:50:01Z",
+      "updatedAt": "2026-05-07T23:02:24Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
+      "baseRefOid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7",
       "headRepository": "nharper/merkle-tree-certs",
       "headRefName": "log-numbers",
-      "headRefOid": "254edfd13d84f6228677a988f95771cec8c60739",
+      "headRefOid": "55671ca4cb15b2bb5abec134de4563adf46af5f7",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -13855,6 +13907,13 @@
           "body": "> But, regardless, this all seems to be unrelated to the topic at hand. Your overall claim seems to be that we should disregard witness-based PKIs, which is a bold claim that cuts out a large number of applications.\r\n\r\nI don't believe I claimed that. I'm pointing out a problem and proposing a solution. There are multiple solutions to the same problem though, and we can compare them.\r\n\r\nYou could add text to the document saying that all cosigners should always be kept relatively up to date. You could specify cosigner-based or subtree-based revocation. These are both direct, reasonable solutions to parts of what I stated. However, you'd want to do at least one of these regardless of whether you implement log generations or reconciliation, so these aren't points of differentiation.\r\n\r\nThe benefits of reconciliation over log generations are:\r\n- Reconciliation requires no protocol mechanism in MTC and is easier to evolve over time.\r\n- With log generations, monitoring any combination of (CA, log generation, mirror) could result in observing different certificates. With reconciliation, there are no log generations and it doesn't long-term matter which mirror you use, so it's much simpler to observe all certificates issued by a CA.\r\n\r\nThe downside of reconciliation over log generations is:\r\n- It doesn't work for witnesses. However, I'd say that fits into a larger pattern of significant downsides that come from using witnesses. Another one being: the ability of a CA to cosign some certificate and then refuse to publish it. That's a much weaker transparency property than CT provides today. If witnesses are only meant for less robust, private PKI-type deployments, maybe it's fine that reconciliation isn't an option for them?\r\n\r\n> Unless it can be integrated into the design in a safe, automatic, and scaleable way, we're talking about a manual intervention, across multiple parties in the ecosystem.\r\n\r\nThe reconciliation operation is essentially: \"given list A and list B, verify that B is a superset of A.\" That can obviously be automated in a lot of ways, and generally with time complexity O(n log n) and space O(n). That's the same time and space complexity that running a mirror already takes, so I would generally expect this to be as scalable as the rest of the mirror operations. If you think it has a realistic chance of getting merged, I'm happy to write a proposal to c2sp.",
           "createdAt": "2026-04-25T16:16:44Z",
           "updatedAt": "2026-04-25T16:16:44Z"
+        },
+        {
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "body": "Rebased; \"CA issuer ID\" is no more (it's now \"CA ID\").",
+          "createdAt": "2026-05-07T23:02:24Z",
+          "updatedAt": "2026-05-07T23:02:24Z"
         }
       ],
       "reviews": [
@@ -15149,24 +15208,26 @@
       "id": "PR_kwDOJIBkVc7YNoWy",
       "title": "Only one CA cosigner per CA",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/220",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "(Or at least one distinguished one with the same name as the CA / log.)\r\n\r\nWhen we first wrote down the design, it was still pretty early in figuring out some of the details in MTCs, so we left many things flexible. In particular, I was inspired by how tlog-checkpoint just carried a collection of signatures, and the format wasn't terribly opinionated about what those signatures were. This gave a very nice base to express all manner of cosigner policies, etc.\r\n\r\nBut as we integrate more into X.509 proper, this becomes more challenging. An X.509 CA certificate has just the one slot for a public key. It has just the one SKID value that gets reflected into just the one downstream AKID value. There is just the one set of OCSP and CRL URLs, which serve objects with just the one slot for a signature.\r\n\r\nWhile it might have been possible to engineer around this (e.g. perhaps we define a new signature algorithm for OCSP and CRLs), it seems simplest to drop this. More specifically, we say that a CA is expected to have one CA cosigner whose name matches the log ID, and that's the one used in all these X.509 integrations.\r\n\r\nRemoving this does remove what might have been a handy capability: juggling multiple CA keys without interrupting the identity of the CA. However, since sending an extra ML-DSA signature is so prohibitively expensive, we would have needed a negotiation story for cosignatures to use this anyway. Gluing all those cosignatures together would really only have been useful as a fallback when those negotiation schemes fail.\r\n\r\nWithout this, our story is instead what it would have been with traditional X.509: if you need to juggling another key, go up a layer and juggle CAs, with all the strategies we have and may need to develop for managing that.\r\n\r\nIn return, we address several open issues:\r\n\r\n* Fixes #212 by making the issue moot. There is still value in general cosignature negotiation for the transparency-enforcing signatures, but it is less dire to solve in the first version.\r\n\r\n* Fixes #214 by removing the conflicts around which key to use.\r\n\r\n* CAs have one less ID to allocate, towards issue #152. That one isn't done yet. We still need to remove the landmark sequence base_id concept.",
       "createdAt": "2026-05-05T00:12:35Z",
-      "updatedAt": "2026-05-06T21:16:41Z",
+      "updatedAt": "2026-05-07T14:56:56Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "single-ca-cosigner",
       "headRefOid": "e4693ff5ed25db5c99bbcc15fbb1ca0a57f905f6",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-05-07T14:56:52Z",
+      "mergedAt": "2026-05-07T14:56:52Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b021c7dcbb6aae5558386df6de890f6ca50ef800"
+      },
       "comments": [
         {
           "author": "ilaril",
@@ -15345,24 +15406,26 @@
       "id": "PR_kwDOJIBkVc7Yxo7x",
       "title": "Recommend a maximum log entry size for tlog-compatibility",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/222",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "While one could make an MTC deployment that doesn't use tlog-tiles, we expect many will. tlog-tiles and tlog-mirror use 16-bit length prefixes, so it's good to hint in the spec that this is your limit.\r\n\r\nIt's left as a SHOULD because, if your PKI is built around a different ecosystem, you might not care. It also leaves the door open to a tlog-tiles-v2 should anyone ever want to lift the limit. (Unlikely.)\r\n\r\nNote TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size. You would only trip this if, for example, you decided to ship 65KiB of SANs.",
       "createdAt": "2026-05-06T13:05:58Z",
-      "updatedAt": "2026-05-06T13:21:20Z",
+      "updatedAt": "2026-05-07T15:01:57Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "baseRefOid": "b6751a7e3102aee135bccb1ca03447583f20ad09",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "log-entry-size",
-      "headRefOid": "72e1fec18fbca6b37ae87da29380abffe64d1a02",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "6e279eabb5612363f0e604a4c4df524d05e00dda",
+      "closedAt": "2026-05-07T15:01:53Z",
+      "mergedAt": "2026-05-07T15:01:53Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7"
+      },
       "comments": [],
       "reviews": [
         {
@@ -15376,6 +15439,19 @@
           "body": "",
           "createdAt": "2026-05-06T13:21:20Z",
           "updatedAt": "2026-05-06T13:21:20Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79AtWF",
+          "commit": {
+            "abbreviatedOid": "72e1fec"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-07T14:25:36Z",
+          "updatedAt": "2026-05-07T14:25:36Z",
           "comments": []
         }
       ]
@@ -15392,7 +15468,7 @@
       "labels": [],
       "body": "Currently, CAs often have managed intermediates to let entities get a \"branded\" issuer. In a root + intermediate PKI hierarchy, this has little cost. In a MTC PKI, adding an issuance log is expensive (e.g. mirrors need to learn about it, clients need to be provided landmarks, etc.).\r\n\r\nThis PR provides a mechanism to attribute cosmetically certificates to \"branded\" issuers using a Name (for equivalence to the Issuer field) in an issuer alternative name extension, without using separate issuance logs.\r\n\r\nI did some light profiling of the Name for implementation sanity (single-entry RDNs, UTF8String AttributeValues), one could do a lot more, but such rules are probably best left to root programs.",
       "createdAt": "2026-05-06T13:27:39Z",
-      "updatedAt": "2026-05-06T13:27:39Z",
+      "updatedAt": "2026-05-08T02:20:58Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
@@ -15404,33 +15480,116 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc79LPE6",
+          "commit": {
+            "abbreviatedOid": "856f949"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Seems reasonable. IIUC there was nothing before this PR that restricts a CA's ability to set the `issuerAltName` extension, so this just clarifies how that extensions should be used in the MTC context.\n\nWorth starting a PLANTS thread to see if there are other opinions, but I will go ahead and mark my approval.",
+          "createdAt": "2026-05-07T20:42:27Z",
+          "updatedAt": "2026-05-07T20:42:27Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79QpKm",
+          "commit": {
+            "abbreviatedOid": "856f949"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Seems reasonable. Arguably this is orthogonal to MTCs, but hinting at it here SGTM.",
+          "createdAt": "2026-05-08T02:20:58Z",
+          "updatedAt": "2026-05-08T02:20:58Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 224,
       "id": "PR_kwDOJIBkVc7Yzh9Z",
       "title": "Expand on domain separation",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/224",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "I took https://github.com/ietf-plants-wg/merkle-tree-certs/pull/210, merged it in with more recent changes, and expand a bit on domain separation. In particular, this discusses why signing OCSP responses and CRLs is OK.\r\n\r\n(CC @sgmenda)",
       "createdAt": "2026-05-06T14:24:05Z",
-      "updatedAt": "2026-05-06T14:24:05Z",
+      "updatedAt": "2026-05-07T15:00:42Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "baseRefOid": "b021c7dcbb6aae5558386df6de890f6ca50ef800",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "domain-separation",
-      "headRefOid": "6e029a7ff29ec56392ce4f1f60f6f6db163c1250",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "f254eb5866eb81cae4a2ab5d644b4dd473526fb9",
+      "closedAt": "2026-05-07T15:00:38Z",
+      "mergedAt": "2026-05-07T15:00:38Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b6751a7e3102aee135bccb1ca03447583f20ad09"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc79AmQM",
+          "commit": {
+            "abbreviatedOid": "6e029a7"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T14:21:46Z",
+          "updatedAt": "2026-05-07T14:21:46Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "Maybe qualify this is about signatures in the title?",
+              "createdAt": "2026-05-07T14:21:46Z",
+              "updatedAt": "2026-05-07T14:21:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79AoH2",
+          "commit": {
+            "abbreviatedOid": "6e029a7"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-07T14:22:46Z",
+          "updatedAt": "2026-05-07T14:22:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79BlgC",
+          "commit": {
+            "abbreviatedOid": "6e029a7"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T14:55:04Z",
+          "updatedAt": "2026-05-07T14:55:04Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "Done",
+              "createdAt": "2026-05-07T14:55:04Z",
+              "updatedAt": "2026-05-07T14:55:05Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 225,
@@ -15444,7 +15603,7 @@
       "labels": [],
       "body": "This was a provisional sketch for until the protocol was added to tlog-witness. This has now[*] been done, so we can remove this from the core MTC document.\r\n\r\n[*] As of writing, it has not yet been done. The upstream PR is https://github.com/C2SP/C2SP/pull/245. I'm just getting things lined up.",
       "createdAt": "2026-05-06T19:40:34Z",
-      "updatedAt": "2026-05-06T19:40:35Z",
+      "updatedAt": "2026-05-07T14:56:08Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
@@ -15456,7 +15615,325 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc79Ai_T",
+          "commit": {
+            "abbreviatedOid": "c73267f"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T14:19:58Z",
+          "updatedAt": "2026-05-07T14:19:58Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "Maybe reference to TLOG-WITNESS?",
+              "createdAt": "2026-05-07T14:19:58Z",
+              "updatedAt": "2026-05-07T14:19:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79AjFz",
+          "commit": {
+            "abbreviatedOid": "c73267f"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-07T14:20:01Z",
+          "updatedAt": "2026-05-07T14:20:01Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79BnYF",
+          "commit": {
+            "abbreviatedOid": "c73267f"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T14:56:08Z",
+          "updatedAt": "2026-05-07T14:56:08Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "Oh I just removed it because (4) also doesn't say the protocol and then the last paragraph in this section (\"This document does not prescribe ...\") talks about it in general, including linking to TLOG-WITNESS.",
+              "createdAt": "2026-05-07T14:56:08Z",
+              "updatedAt": "2026-05-07T14:56:08Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 226,
+      "id": "PR_kwDOJIBkVc7ZJknT",
+      "title": "Add randomizer to leafs",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/226",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "MTC provides 128-bit security for its transparency goals: a CA needs to find a SHA-256 colission to hide a certificate from monitors.\r\n\r\nBefore this commit, an outside attacker can do something similar: find a hash colission to get a benign and malicious entry with the same hash. The attacker would then ask the CA to publish the benign entry with which it'll also get the malicious one certified. Thus forgery resistance is also capped at 128 bit.\r\n\r\nThis commit adds a CA-chosen randomizer to each leaf. This does not change transparency security: that's still 128-bit, but it does bump the forgery resistance to at least the multi-target second-preimage resistance of the hash. So that's 192+ bits with less than 2^63 leafs in the tree.",
+      "createdAt": "2026-05-07T12:54:00Z",
+      "updatedAt": "2026-05-09T11:26:51Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "bas/randomizer",
+      "headRefOid": "e10767059b9f80e0c93998dda8c33fb30fdbc14a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc78-moy",
+          "commit": {
+            "abbreviatedOid": "a372fdb"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T13:13:42Z",
+          "updatedAt": "2026-05-07T13:13:43Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Should we replace this section with new text?",
+              "createdAt": "2026-05-07T13:13:43Z",
+              "updatedAt": "2026-05-07T13:13:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78-zL6",
+          "commit": {
+            "abbreviatedOid": "a372fdb"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T13:20:41Z",
+          "updatedAt": "2026-05-07T13:20:41Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Moved it down so we start with transparency.\r\n\r\n> transparency is 128-bit; forgery is 192-bit\r\n\r\nsounds better to my ear than\r\n\r\n> forgery is 192-bit; transparency is 128-bit",
+              "createdAt": "2026-05-07T13:20:41Z",
+              "updatedAt": "2026-05-07T13:21:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78-_Iq",
+          "commit": {
+            "abbreviatedOid": "a372fdb"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T13:27:28Z",
+          "updatedAt": "2026-05-07T13:27:28Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Derp, sorry, must have missed it on my phone.",
+              "createdAt": "2026-05-07T13:27:28Z",
+              "updatedAt": "2026-05-07T13:27:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc78_Axb",
+          "commit": {
+            "abbreviatedOid": "a372fdb"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-07T13:28:24Z",
+          "updatedAt": "2026-05-07T19:32:13Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "```suggestion\nGiven a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. A collision-resistant hash is sufficient, but not required: it's also enough for the hash to be multi-target second-preimage resistant. A secure 256-bit hash provides 256-t multi-target second-preimage resistance against 2^t targets, and thus 200-bit authenticity for a log of 2^55 entries.\n```",
+              "createdAt": "2026-05-07T13:28:24Z",
+              "updatedAt": "2026-05-07T19:32:13Z"
+            },
+            {
+              "originalPosition": 90,
+              "body": "Same misspelling of \"collision\".\n\n\"needs permission to publish anyway\" feels incomplete because earlier we just mentioned that attackers usually _can_ publish entries in the log. Perhaps:\n\n```suggestion\nThe subject public key hash is not randomized, and so an attacker that is able to compute collisions could find two subject public keys with the same hash. However, in order to request certification of a new entry with this hash, the attacker must already be authorized for this new entry. The attacker would thus only be able to certify colliding pairs of public keys for its own identities.\n```",
+              "createdAt": "2026-05-07T13:28:35Z",
+              "updatedAt": "2026-05-07T19:32:13Z"
+            },
+            {
+              "originalPosition": 86,
+              "body": "Suspect this is not immediately obvious without an example. (Also flows will into comment below...)\n\n```suggestion\nThe previous assumes the attacker does not influence which entries are certified. In normal operation, an attacker can request legitimate issuance of entries, e.g. certificates for DNS names the attacker controls. An attacker might find two entries with the same hash, one of which of it is authorized to request. It might than request issuance for the authortized entry, leading to a certification of the other entry. The `randomizer` thwarts this.\n```",
+              "createdAt": "2026-05-07T19:25:53Z",
+              "updatedAt": "2026-05-07T19:32:13Z"
+            },
+            {
+              "originalPosition": 22,
+              "body": "This isn't *totally* up-to-date with draft-04 yet. Though yeah incrementally updating it seems good. Maybe add a TODO comment that we still need to do other bits. Things that are missing:\n\n* CA cosigner's ID is now the log ID. I think this isn't a generator fix but a fix to the provided config file.\n* Signature scheme has been updated\n* Not a bug, but a missing feature: we should probably write some code to synthesize the CA certs too.",
+              "createdAt": "2026-05-07T19:32:07Z",
+              "updatedAt": "2026-05-07T19:32:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79x2-t",
+          "commit": {
+            "abbreviatedOid": "a372fdb"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-09T11:26:20Z",
+          "updatedAt": "2026-05-09T11:26:20Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Added todo",
+              "createdAt": "2026-05-09T11:26:20Z",
+              "updatedAt": "2026-05-09T11:26:20Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 227,
+      "id": "PR_kwDOJIBkVc7ZUAZX",
+      "title": "Update for new trust-anchor-ids draft",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/227",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The extension to trust-anchor-ids was moved upstream in https://github.com/tlswg/tls-trust-anchor-ids/pull/104. Update this accordingly.\r\n\r\nAs part of this, simplify landmark OIDs. The ability to have multiple landmark sequences per log is an unnecessary flexibility.  Between this and the simplified cosigner IDs, this PR closes #152. A CA need only pick one OID.",
+      "createdAt": "2026-05-07T21:20:02Z",
+      "updatedAt": "2026-05-08T14:35:51Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "tai-update",
+      "headRefOid": "dc4e9063e87c96876be247a94b81636f087caade",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Latest version LGTM!",
+          "createdAt": "2026-05-08T14:35:51Z",
+          "updatedAt": "2026-05-08T14:35:51Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc79O1WJ",
+          "commit": {
+            "abbreviatedOid": "e8abccd"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-08T00:23:58Z",
+          "updatedAt": "2026-05-08T12:56:13Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "```suggestion\nWhen allocating log IDs, the entire object identifier (OID) arc is allocated for use with the issuance log. OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a log ID whose OID representation is `logID`, this document allocates the following OIDs:\n```",
+              "createdAt": "2026-05-08T00:23:58Z",
+              "updatedAt": "2026-05-08T12:56:13Z"
+            },
+            {
+              "originalPosition": 148,
+              "body": "This should be setting up for the \"one group for multiple CA operators with timestamp\" case, right?\n```suggestion\nWhen needed, {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}} describes how PKIs requiring further size savings can use trust anchor groups that span multiple CA instances. For example, a single ID may signal support for a group of CAs across one or more CA operators. This section describes how such groups can be applied to landmarks, using a variation of the versioning construction described in {{Section 5.1 of !I-D.ietf-tls-trust-anchor-ids}}.\n```",
+              "createdAt": "2026-05-08T12:22:05Z",
+              "updatedAt": "2026-05-08T12:56:13Z"
+            },
+            {
+              "originalPosition": 154,
+              "body": "Not sure this is the best edit, but it a pointer to where trust anchor group inclusions are defined would be helpful. On my first read, it looked like it was saying that the CA is the one constructing the multi-CA-operator trust anchor group, but what's actually happening is that the CA is constructing the CertificatePropertiesList to send to the authenticating party.\n```suggestion\nThis predictable cadence allows the CA to construct trust anchor group inclusions ({{Section 7.2 of !I-D.ietf-tls-trust-anchor-ids}}) for issued certificates without additional coordination. Conversely, a relying party MAY send a version if its trusted subtrees ({{trusted-subtrees}}) are up-to-date for all contained CAs, as of the versions timestamp.\n```",
+              "createdAt": "2026-05-08T12:47:13Z",
+              "updatedAt": "2026-05-08T12:56:13Z"
+            },
+            {
+              "originalPosition": 169,
+              "body": "Just a thought: should we define a mechanism in trust anchor IDs for the RP to say it has all trust anchors in a timestamp-versioned group _except_ some list of IDs from lagging CAs? That might end up being smaller on the wire than old-timestamp-plus-smaller-groups.",
+              "createdAt": "2026-05-08T12:55:29Z",
+              "updatedAt": "2026-05-08T12:56:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79fXhH",
+          "commit": {
+            "abbreviatedOid": "dc4e906"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-08T14:11:21Z",
+          "updatedAt": "2026-05-08T14:30:24Z",
+          "comments": [
+            {
+              "originalPosition": 148,
+              "body": "I guess either, but sure. :-) I figure the decision tree for a PKI would look something like:\n\n* Can you just list the CAs? Use the single-log groups. That's the easiest.\n* Still too many? Use per-CA-operator groups. Still minimal coordination overhead.\n* Still too many? Okay start making multi-CA groups. That's a bit of fuss.",
+              "createdAt": "2026-05-08T14:11:21Z",
+              "updatedAt": "2026-05-08T14:30:24Z"
+            },
+            {
+              "originalPosition": 169,
+              "body": "Hehe, yeah, @bob-beck and I were talking about that. Not wrong, though it is another moving part. Could probably be added as a separate extension or a separate list in the same extension. Though we also have the retry.\n\n(I figure that's probably separate from this PR.)",
+              "createdAt": "2026-05-08T14:16:01Z",
+              "updatedAt": "2026-05-08T14:30:24Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc79f7tu",
+          "commit": {
+            "abbreviatedOid": "e8abccd"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-08T14:33:42Z",
+          "updatedAt": "2026-05-08T14:33:42Z",
+          "comments": [
+            {
+              "originalPosition": 169,
+              "body": "Cool, yep definitely separate from this PR",
+              "createdAt": "2026-05-08T14:33:42Z",
+              "updatedAt": "2026-05-08T14:33:42Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
