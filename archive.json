@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-10T04:02:38.373085+00:00",
+  "timestamp": "2026-05-12T03:57:18.932989+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -1333,7 +1333,7 @@
       "labels": [],
       "body": "There has always been a significant gap between (chosen prefix) collision and (second) preimage attacks on hashes. It would be neat if we do not have to assume (chosen prefix) collision resistance of our hash to prevent certain classes of attacks. I'd say it's a nice-to-have, but not a must.\r\n\r\nIncomplete list of changes:\r\n\r\n1. For each batch, the CA generates a 16 byte randomizer `R` which is used as input to `Hash`{`Assertion`,`Node`,`Empty`}. We can either put the randomizer in the proof (in the bikeshed certificate) or pass it along in the signed window.",
       "createdAt": "2023-06-06T22:04:02Z",
-      "updatedAt": "2025-06-21T14:24:52Z",
+      "updatedAt": "2026-05-11T21:08:48Z",
       "closedAt": "2025-06-21T14:24:52Z",
       "comments": [
         {
@@ -1356,6 +1356,13 @@
           "body": "Post-Photosynthesis triage: eh, I guess we've decided to just import a CT/tlog-style tree structure. Probably can close this.",
           "createdAt": "2025-06-21T14:24:52Z",
           "updatedAt": "2025-06-21T14:24:52Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Let's [reopen](https://mailarchive.ietf.org/arch/msg/plants/FN8L2-C2AjN7QxpX6RC7b3tnxi8/) this.",
+          "createdAt": "2026-05-11T21:08:48Z",
+          "updatedAt": "2026-05-11T21:08:48Z"
         }
       ]
     },
