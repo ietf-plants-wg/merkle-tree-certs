@@ -909,9 +909,9 @@ Each issuance log is identified by a *log ID*, which is a trust anchor ID {{!I-D
 
 When allocating log IDs, the entire object identifier (OID) arc is allocated for use with the issuance log. OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a log ID whose OID representation is `logID`, this document allocates the following OIDs:
 
-* For each non-negative integer `L`, the OID `{logID landmarks(0) L}` represents the landmark ({{landmark-tree-sizes}}) with number `L`. This OID may used as a trust anchor ID, as described in {{landmark-relative-certificates-tls}}.
+* For each non-negative integer `L`, the OID `{logID landmarks(0) L}` represents the landmark ({{landmark-tree-sizes}}) with number `L`. These OIDs may used as a trust anchor ID, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
 
-* For each non-negative integer `L`, the OID `{logID landmarkGroups(1) L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark number `L` and earlier landmarks, as defined in {{single-log-landmark-groups}}.
+* For each non-negative integer `L`, the OID `{logID landmarkGroups(1) L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark number `L` and earlier landmarks, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
 Future extensions to this protocol MAY define further allocations.
 
@@ -1527,7 +1527,9 @@ A standalone certificate MAY also be sent without explicit relying party trust s
 
 An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
 
-TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate, defined against landmark number `L`, has a trust anchor ID constructed by appending components 0 and L to the issuing log ID ({{log-ids}}). For example, the trust anchor ID for landmark 42 of log `32473.1` is `32473.1.0.42`. These trust anchor IDs are additionally contained in trust anchor groups defined in {{single-log-landmark-groups}}.
+TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate, defined against landmark number `L`, has a trust anchor ID constructed by appending components 0 and L to the issuing log ID ({{log-ids}}). For example, the trust anchor ID for landmark 42 of log `32473.1` is `32473.1.0.42`.
+
+These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in {{single-log-landmark-groups}}, which allow relying paries to express their landmark state with a single ID.
 
 If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.
 
@@ -1570,7 +1572,7 @@ The relying party can mitigate this in a number of ways:
 
 This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
@@ -1654,7 +1656,7 @@ If the service is rotating keys in response to a key compromise, this option is 
 
 # Privacy Considerations
 
-The Privacy Considerations described in {{Section 8 of !I-D.ietf-tls-trust-anchor-ids}} apply to their use with Merkle Tree Certificates.
+The Privacy Considerations described in {{Section 9 of !I-D.ietf-tls-trust-anchor-ids}} apply to their use with Merkle Tree Certificates.
 
 In particular, relying parties that share an update process for trusted subtrees ({{trusted-subtrees}}) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.
 
