@@ -1474,11 +1474,11 @@ Table of Contents
    usage extension, which are out of scope for this document.  See
    Section 12.8 for a discussion of domain separation.
 
-   If the CA operator additionally operates a directly-signing, non-MTC
-   X.509 CA, that CA key MUST be distinct from any Merkle Tree CA
-   cosigner keys.  In particular, a CA cosigner key MUST NOT be used to
-   directly sign TBSCertificate structures.  A CA cosigner key issues
-   certificates by signing subtrees.
+   If the CA operator additionally operates a directly-signing X.509 CA,
+   that CA key MUST be distinct from any Merkle Tree CA cosigner keys.
+   In particular, a CA cosigner key MUST NOT be used to directly sign
+   TBSCertificate structures.  A CA cosigner key issues certificates by
+   signing subtrees.
 
 5.6.  Publishing Logs
 
