@@ -202,7 +202,7 @@ informative:
 
 --- abstract
 
-This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.
+This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to existing X.509 constructions and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.
 
 --- middle
 
@@ -310,6 +310,9 @@ Standalone certificate:
 
 Landmark-relative certificate:
 : An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.
+
+Directly-signed certificate:
+: A certificate issued using the existing, non-MTC construction, where the TBSCertificate is passed directly to the private key's signing operation.
 
 # Overview
 
@@ -1092,7 +1095,7 @@ Entries are extensible. Future documents MAY define `type` values and what it me
 
 If the CA issues certificate revocation lists (CRLs) {{!RFC5280}} or Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See {{signature-domain-separation}} for a discussion of domain separation.
 
-If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.
+If the CA operator additionally operates a directly-signing X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.
 
 ## Publishing Logs
 
@@ -1457,7 +1460,7 @@ Authenticity:
 Transparency:
 : The relying party only accepts entries that are publicly accessible, so that monitors, particularly the subject of the certificate, can notice any unauthorized certificates
 
-Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a traditional X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}.
+Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a directly-signed X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}.
 
 While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
 
@@ -1465,7 +1468,7 @@ To mitigate this, relying parties SHOULD ensure transparency by requiring a quor
 
 Relying parties MAY accept the same set of additional cosigners across CAs.
 
-In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This is analogous to a traditional X.509 application, where CA information is determined directly from a CA certificate. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.
+In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This fits the pattern of many existing X.509 applications, where CA information is determined directly from a CA certificate, with no additional out-of-band information. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.
 
 Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.
 
@@ -1505,9 +1508,9 @@ The revocation mechanism in this section is complementary to certificate-level r
 
 # Use in TLS
 
-Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in a traditional X.509 certificate. The primary new considerations for use in TLS are:
+Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in any X.509 certificate. The primary new considerations for use in TLS are:
 
-* Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509 CA
+* Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a directly-signing X.509 CA
 * Whether the authenticating party should send a standalone or landmark-relative certificate
 * What the relying party should communicate to the authenticating party to help it make this decision
 
