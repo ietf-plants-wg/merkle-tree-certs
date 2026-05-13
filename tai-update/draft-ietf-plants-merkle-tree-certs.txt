@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 9 November 2026                                      Apple Inc.
+Expires: 14 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                              8 May 2026
+                                                             13 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 November 2026.
+   This Internet-Draft will expire on 14 November 2026.
 
 Copyright Notice
 
@@ -1144,13 +1144,17 @@ Table of Contents
    following OIDs:
 
    *  For each non-negative integer L, the OID {logID landmarks(0) L}
-      represents the landmark (Section 6.3.1) with number L.  This OID
-      may used as a trust anchor ID, as described in Section 8.2.
+      represents the landmark (Section 6.3.1) with number L.  These OIDs
+      may used as a trust anchor ID, as described in Section 8.2.  These
+      OIDs are used when it is necessary to identify an individual
+      landmark, e.g. as in the retry mechanism described Section 4.3 of
+      [I-D.ietf-tls-trust-anchor-ids].
 
    *  For each non-negative integer L, the OID {logID landmarkGroups(1)
       L} represents a trust anchor group (Section 5 of
       [I-D.ietf-tls-trust-anchor-ids]) containing landmark number L and
-      earlier landmarks, as defined in Section 8.2.1.
+      earlier landmarks, as defined in Section 8.2.1.  These OIDs may be
+      used to advertise a series of landmarks at once.
 
    Future extensions to this protocol MAY define further allocations.
 
@@ -2389,8 +2393,14 @@ Table of Contents
    landmark number L, has a trust anchor ID constructed by appending
    components 0 and L to the issuing log ID (Section 5.2).  For example,
    the trust anchor ID for landmark 42 of log 32473.1 is 32473.1.0.42.
-   These trust anchor IDs are additionally contained in trust anchor
-   groups defined in Section 8.2.1.
+
+   These trust anchor IDs are used when it is necessary to identify an
+   individual landmark, e.g. as in the retry mechanism described
+   Section 4.3 of [I-D.ietf-tls-trust-anchor-ids].  To more efficiently
+   express a relying party's complete landmark state, these IDs are
+   contained in trust anchor groups defined in Section 8.2.1, which
+   allow relying paries to express their landmark state with a single
+   ID.
 
    If both a landmark-relative and a standalone certificate are usable,
    an authenticating party SHOULD preferentially use the landmark-
@@ -2494,7 +2504,7 @@ Table of Contents
    pem-certificate-chain-with-properties" in their Accept header
    (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
    certificates SHOULD then respond with that content type and include
-   trust anchor ID information as described in Section 6 of
+   trust anchor ID information as described in Section 7 of
    [I-D.ietf-tls-trust-anchor-ids].  Section 8 decribes the trust anchor
    ID assignments for standalone and landmark-relative certificates.
 
@@ -2736,7 +2746,7 @@ Table of Contents
 
 11.  Privacy Considerations
 
-   The Privacy Considerations described in Section 8 of
+   The Privacy Considerations described in Section 9 of
    [I-D.ietf-tls-trust-anchor-ids] apply to their use with Merkle Tree
    Certificates.
 

@@ -1052,7 +1052,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 9 November 2026</td>
+<td class="center">Expires 14 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,12 +1065,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-08" class="published">8 May 2026</time>
+<time datetime="2026-05-13" class="published">13 May 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-09">9 November 2026</time></dd>
+<dd class="expires"><time datetime="2026-11-14">14 November 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1136,7 +1136,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 14 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3733,10 +3733,10 @@ def find_subtrees(start, end):
 <p id="section-5.2-2">When allocating log IDs, the entire object identifier (OID) arc is allocated for use with the issuance log. OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a log ID whose OID representation is <code>logID</code>, this document allocates the following OIDs:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.2-3.1">
-            <p id="section-5.2-3.1.1">For each non-negative integer <code>L</code>, the OID <code>{logID landmarks(0) L}</code> represents the landmark (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>) with number <code>L</code>. This OID may used as a trust anchor ID, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>.<a href="#section-5.2-3.1.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-3.1.1">For each non-negative integer <code>L</code>, the OID <code>{logID landmarks(0) L}</code> represents the landmark (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>) with number <code>L</code>. These OIDs may used as a trust anchor ID, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.2-3.2">
-            <p id="section-5.2-3.2.1">For each non-negative integer <code>L</code>, the OID <code>{logID landmarkGroups(1) L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark number <code>L</code> and earlier landmarks, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-3.2.1">For each non-negative integer <code>L</code>, the OID <code>{logID landmarkGroups(1) L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark number <code>L</code> and earlier landmarks, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.2-4">Future extensions to this protocol MAY define further allocations.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
@@ -4835,8 +4835,9 @@ MTCCertificationAuthority ::= SEQUENCE {
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-landmark-relative-certificat" class="section-name selfRef">Landmark-Relative Certificates</a>
         </h3>
 <p id="section-8.2-1">An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">TLS implementations SHOULD use the <code>trust_anchors</code> extension to determine this. A landmark-relative certificate, defined against landmark number <code>L</code>, has a trust anchor ID constructed by appending components 0 and L to the issuing log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). For example, the trust anchor ID for landmark 42 of log <code>32473.1</code> is <code>32473.1.0.42</code>. These trust anchor IDs are additionally contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<p id="section-8.2-3">If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">TLS implementations SHOULD use the <code>trust_anchors</code> extension to determine this. A landmark-relative certificate, defined against landmark number <code>L</code>, has a trust anchor ID constructed by appending components 0 and L to the issuing log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). For example, the trust anchor ID for landmark 42 of log <code>32473.1</code> is <code>32473.1.0.42</code>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying paries to express their landmark state with a single ID.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 <div id="single-log-landmark-groups">
 <section id="section-8.2.1">
           <h4 id="name-single-log-landmark-groups">
@@ -4897,7 +4898,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acme-extensions" class="section-name selfRef">ACME Extensions</a>
       </h2>
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
 <p id="section-9-4">The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
@@ -4993,7 +4994,7 @@ MTCCertificationAuthority ::= SEQUENCE {
       <h2 id="name-privacy-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to their use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-9" class="relref">Section 9</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to their use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <p id="section-11-2">In particular, relying parties that share an update process for trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.<a href="#section-11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
