@@ -2354,4 +2354,4 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Update TLS integration now that trust anchor IDs extension has been moved to the base draft
 
-- Added log numbers
+- A single CA now operates a series of issuance logs, instead of a one-to-one correspondence
