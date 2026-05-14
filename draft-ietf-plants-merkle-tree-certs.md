@@ -235,7 +235,11 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
-This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}.
+This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}. It extends the numeric types defined in {{Section 3.3 of !RFC8446}} with a big-endian, 48-bit integer:
+
+~~~tls-presentation
+uint8 uint48[6];
+~~~
 
 `U+` followed by four hexadecimal characters denotes a Unicode codepoint, to be encoded in UTF-8 {{!RFC3629}}. `0x` followed by two hexadecimal characters denotes a byte value in the 0-255 range.
 
@@ -900,7 +904,7 @@ Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A
 
 [[TODO: #232 This sectioning is a bit awkward. Rearrange the top-level section to be about CAs in general and introduce CA parameters there.]]
 
-Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order.
+Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order. Log numbers MUST be at most 2<sup>16</sup>-1.
 
 Each Merkle Tree Certificate CA has a *CA ID* to identify it. This CA ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}, and its entire object identifier (OID) arc is allocated for the issuance logs run by that CA.
 
@@ -1201,7 +1205,7 @@ The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
 The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
-The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{ca-ids}}). The `serialNumber` MUST be equal to `(log_number << 64) | index`.
+The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{ca-ids}}). The `serialNumber` MUST be equal to `(log_number << 48) | index`. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.
 
 The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
@@ -1229,8 +1233,8 @@ struct {
 } MTCSignature;
 
 struct {
-    uint64 start;
-    uint64 end;
+    uint48 start;
+    uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
     MTCSignature signatures<0..2^16-1>;
 } MTCProof;
@@ -1420,11 +1424,11 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}.
 
-1. Let `serial` be the certificate's serial number. If `serial` is negative, abort this process and fail verification.
+1. Let `serial` be the certificate's serial number. If `serial` is negative or greater than 2<sup>64</sup>-1, abort this process and fail verification.
 
 1. If `serial` is contained in one of the relying party's revoked ranges ({{revoked-ranges}}), abort this process and fail verification.
 
-1. Let `index` be the least significant 64 bits of `serial` and let `log_number` be `serial >> 64`. If `log_number` is zero, abort this process and fail verification.
+1. Let `index` be the least significant 48 bits of `serial` and let `log_number` be `serial >> 48`. If `log_number` is zero, abort this process and fail verification.
 
 1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{ca-ids}}).
 
@@ -1513,7 +1517,7 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 ## Revoked Ranges
 
-For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. The serial number combines the log number (in the high bits) and log index (in the lowest 64 bits). A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
+For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
 
 When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
 
