@@ -1535,7 +1535,7 @@ Certificate selection in TLS, described in {{Section 4.4.2.2 and Section 4.4.2.3
 
 Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding CA ID ({{ca-ids}}). This trust anchor ID is additionally contained in the trust anchor groups defined in {{single-log-landmark-groups}}.
 
-Log IDs MAY be incorporated into other trust anchor groups, following the guidance in {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}.
+CA IDs MAY be incorporated into other trust anchor groups, following the guidance in {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 [[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]
 
@@ -1545,7 +1545,14 @@ A standalone certificate MAY also be sent without explicit relying party trust s
 
 An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
 
-TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate, defined against landmark number `L`, has a trust anchor ID constructed from the CA ID, log number, and landmark number ({{ca-ids}}). For example, the trust anchor ID for landmark 42 of CA `32473.1` and log number `8` is `32473.1.1.8.42`.
+TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate's trust anchor ID is the concatenation of the following OID components:
+
+* The CA ID {{ca-ids}} of the CA that issued the certificate
+* The constant 1
+* The log number of the log used to construct the certificate
+* The landmark number of the landmark used to construct the certificate
+
+For example, the trust anchor ID for landmark 42 of CA `32473.1` and log number `8` is `32473.1.1.8.42`.
 
 These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in {{single-log-landmark-groups}}, which allow relying paries to express their landmark state with a single ID.
 
@@ -1555,12 +1562,22 @@ If both a landmark-relative and a standalone certificate are usable, an authenti
 
 Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines series of trust anchor groups ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) called *landmark groups*.
 
-For each non-negative integer `L`, landmark group `L` has a trust anchor ID constructed by appending components 1 and L to the issuing log ID. For example, landmark group 42 of log `32473.1` has ID `32473.1.1.42`. Landmark group `L` indicates the relying party supports the specified log ID, and whose latest trusted subtrees is landmark `L`. Concretely, it contains the following trust anchors:
+For each Merkle Tree Certificates CA, each log number `N`, and each landmark number `L`, a landmark group is defined. The group's ID is the concatenation of the following OID components:
 
-* The log ID itself (see {{standalone-certificates-tls}})
-* Each landmark of the log from `L - max_active_landmarks + 1` to `L`, inclusive
+* The CA ID {{ca-ids}} of the CA
+* The constant 2
+* The log number `N`
+* The landmark number `L`
 
-Landmark-relative certificates SHOULD be configured with this information, as in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party whose latest trusted subtree ({{trusted-subtrees}}) is landmark `L` SHOULD configure the `trust_anchors` extension to advertise landmark group `L`. This signals support for both standalone certificates and supported landmarks.
+This group contains the following trust anchors:
+
+* The CA ID itself (see {{standalone-certificates-tls}})
+* Each landmark of log `N` from `L - max_active_landmarks + 1` to `L`, inclusive
+
+Landmark-relative certificates SHOULD be configured with this information, as in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party whose latest trusted subtree ({{trusted-subtrees}}) in log `N` is landmark `L` SHOULD configure the `trust_anchors` extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks.
+
+For example, a relying party which is up-to-date as of landmark 42 of log 8 of CA `32473.1` would send an ID of `32473.1.2.8.42`.
+
 
 ### Timestamped Landmark Groups
 
