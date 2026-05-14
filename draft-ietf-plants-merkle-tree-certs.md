@@ -1397,8 +1397,6 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * A list of revoked ranges of serial numbers ({{revoked-ranges}})
 
-A relying party MAY be configured on a per-CA basis with a minimum log number, such that it will only trust certificates from logs with a log number greater than or equal to that minimum.
-
 Additionally, a relying party MAY be configured on a per-log basis with the following:
 
 * The log's log number ({{ca-ids}})
@@ -1432,7 +1430,6 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. If any of the following conditions are true, abort this process and fail verification:
    * The `log_number` is zero
-   * The `log_number` is smaller than the minimum log number for that CA ({{relying-party-configuration}})
    * `serial` is contained in one of the relying party's revoked ranges ({{revoked-ranges}})
 
 1. Construct a TBSCertificateLogEntry as follows:
@@ -1514,7 +1511,7 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 ## Revoked Ranges
 
-For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. Since the serial number consists of the log number (in the high bits) and log index (in the lowest 64 bits), this allows a relying party to efficiently revoke entries of an issuance log, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
+For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. The serial number combines the log number (in the high bits) and log index (in the lowest 64 bits). A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
 
 When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
 
