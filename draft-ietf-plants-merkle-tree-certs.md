@@ -1395,12 +1395,8 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 * The hash algorithm used in each log, e.g. SHA-256
 * The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
+* An optional list of trusted subtrees that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
 * A list of revoked ranges of serial numbers ({{revoked-ranges}})
-
-Additionally, a relying party MAY be configured on a per-log basis with the following:
-
-* The log's log number ({{ca-ids}})
-* A list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
 
 This information may be obtained from a CA certificate structure, defined in {{representing-certification-authorities}}:
 
@@ -1424,13 +1420,11 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Let `serial` be the certificate's serial number. If `serial` is negative, abort this process and fail verification.
 
-1. Let `index` be the least significant 64 bits of `serial` and let `log_number` be `serial >> 64`.
+1. If `serial` is contained in one of the relying party's revoked ranges ({{revoked-ranges}}), abort this process and fail verification.
 
-1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{ca-ids}})
+1. Let `index` be the least significant 64 bits of `serial` and let `log_number` be `serial >> 64`. If `log_number` is zero, abort this process and fail verification.
 
-1. If any of the following conditions are true, abort this process and fail verification:
-   * The `log_number` is zero
-   * `serial` is contained in one of the relying party's revoked ranges ({{revoked-ranges}})
+1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{ca-ids}}).
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
@@ -1441,9 +1435,9 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
 
-1. If `[start, end)` matches a trusted subtree ({{trusted-subtrees}}) for the log identified by `log_id` ({{ca-ids}}), check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
+1. If `log_number`, `start`, and `end` matches a trusted subtree ({{trusted-subtrees}}) for the CA, check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, the log ID for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero.
+1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, `log_id` for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
@@ -1491,9 +1485,15 @@ Cosigner roles are extensible without changes to certificate verification itself
 
 ## Trusted Subtrees
 
-As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in {{landmark-tree-sizes}}. The relying party configures these as trusted subtrees, allowing it to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
+As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from one or more of the CA's issuance logs. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
 
-Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
+Each trusted subtree contains:
+
+* The log number of the containing log
+* The `start` and `end` values that define the subtree
+* The hash of the subtree
+
+Trusted subtrees for a given log are determined by its active landmark subtrees, as described in {{landmark-tree-sizes}}. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
 
 This criteria can be checked given:
 
