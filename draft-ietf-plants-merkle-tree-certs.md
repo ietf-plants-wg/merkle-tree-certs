@@ -216,7 +216,7 @@ This increased overhead additionally impacts CT logs themselves. Most of a log's
 
 Additionally, as PKIs transition to shorter-lived certificates {{CABF-153}} {{CABF-SC081}}, the number of entries in the log will grow.
 
-This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
+This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains logs of everything it issues, signing views of its logs to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the logs. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.
 
 This achieves the following:
 
@@ -356,10 +356,10 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 2. The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.
 
-3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this issuance log only contains entries added by the CA:
+3. The CA operates a series of append-only *issuance logs* ({{issuance-logs}}). Unlike a CT log, these logs only contain entries added by the CA:
 
    {: type="a"}
-   1. The CA adds a TBSCertificateLogEntry ({{log-entries}}, abbreviated "tbscert entries" in the diagram) to its log, describing the information it is certifying.
+   1. The CA adds a TBSCertificateLogEntry ({{log-entries}}, abbreviated "tbscert entries" in the diagram) to an issuance log, describing the information it is certifying.
 
    2. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
 
@@ -373,7 +373,7 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
    * An inclusion proof from the TBSCertificate to some subtree
    * Cosignatures from the CA and cosigners on the subtree
 
-6. As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.
+6. As in Certificate Transparency, monitors observe the CA's issuance logs to ensure the CA is operated correctly.
 
 A certificate with cosignatures is known as a *standalone certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures, which do not scale with public key or signature size.
 
@@ -1085,7 +1085,7 @@ Other documents or deployments MAY define other signature schemes and formats. L
 
 ## Certification Authority Cosigners
 
-A *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as its CA ID ({{ca-ids}}). A CA cosigner MUST NOT sign checkpoints or subtrees for logs other than its corresponding issuance log.
+A *CA cosigner* is a cosigner ({{cosigners}}) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as its CA ID ({{ca-ids}}). A CA cosigner MUST NOT sign checkpoints or subtrees for logs not part of this CA instance.
 
 When a CA cosigner signs a subtree, it makes the additional statement that it has certified each entry in the subtree. For example, a domain-validating CA states that it has performed domain validation for each entry, at some time consistent with the entry's validity dates. CAs are held responsible for every entry in every subtree they sign. Proving an entry is included ({{subtree-inclusion-proofs}}) in a CA-signed subtree is sufficient to prove the CA certified it.
 
