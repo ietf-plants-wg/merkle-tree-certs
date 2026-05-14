@@ -1395,7 +1395,7 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 * The hash algorithm used in each log, e.g. SHA-256
 * The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
-* A list of revoked ranges of serial numbers ({{revocation-by-index}})
+* A list of revoked ranges of serial numbers ({{revoked-ranges}})
 
 A relying party MAY be configured on a per-CA basis with a minimum log number, such that it will only trust certificates from logs with a log number greater than or equal to that minimum.
 
@@ -1433,7 +1433,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 1. If any of the following conditions are true, abort this process and fail verification:
    * The `log_number` is zero
    * The `log_number` is smaller than the minimum log number for that CA ({{relying-party-configuration}})
-   * `serial` is contained in one of the relying party's revoked ranges ({{revocation-by-index}})
+   * `serial` is contained in one of the relying party's revoked ranges ({{revoked-ranges}})
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
@@ -1482,7 +1482,7 @@ Relying parties SHOULD ensure authenticity by requiring a signature from the CA 
 
 While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
 
-To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, {{TLOG-WITNESS}} describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. {{revocation-by-index}} discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, {{TLOG-MIRROR}} describes a "mirror" cosigner role.
+To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, {{TLOG-WITNESS}} describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. {{revoked-ranges}} discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, {{TLOG-MIRROR}} describes a "mirror" cosigner role.
 
 Relying parties MAY accept the same set of additional cosigners across CAs.
 
@@ -1512,7 +1512,7 @@ This document does not prescribe how relying parties obtain this information. A 
 
 The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
 
-## Revocation by Index
+## Revoked Ranges
 
 For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. Since the serial number consists of the log number (in the high bits) and log index (in the lowest 64 bits), this allows a relying party to efficiently revoke entries of an issuance log, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
 
@@ -1653,7 +1653,7 @@ Availability policies SHOULD specify how long an entry must be made available, b
 
 Such policies impact monitors. If the retention period is, e.g. 6 months, this means that monitors are expected to check entries of interest within 6 months. It also means that a new monitor may only be aware of a 6 month history of entries issued for a particular domain.
 
-If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in {{revocation-by-index}}: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.
+If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in {{revoked-ranges}}: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.
 
 The log pruning process simply makes some resources unavailable. Availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.
 
@@ -1663,7 +1663,7 @@ However, if a mirror's interface becomes unavailable, monitors may be unable to 
 
 In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs SHOULD set availability requirements on CAs.
 
-In each of these cases, availability failures can be mitigated by revoking the unavailable entries by index, as described in {{revocation-by-index}}, likely as a first step in a broader distrust.
+In each of these cases, the serial numbers of unavailable entries are known. Availability failures can thus be mitigated by revocation, as described in {{revoked-ranges}}, likely as a first step in a broader distrust.
 
 ## Certificate Renewal
 
@@ -1703,9 +1703,13 @@ Compared to Certificate Transparency, some of the responsibilities of a log have
 
 A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.
 
-If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the inconsistent indices ({{revocation-by-index}}), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.
+If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the range of inconsistent serials ({{revoked-ranges}}), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.
 
-A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy ({{log-availability}}). If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it. If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of _some_ entry at that index will be visible, so monitors will know the CA is failing to present an entry. Relying parties can then react by revoking the undisclosed entries by index ({{revocation-by-index}}), and likely removing the CA.
+A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy ({{log-availability}}). The impact depends on the relying party's cosigner policy:
+
+* If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it.
+
+* If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of _some_ entry at that index will be visible, so monitors will know the CA is failing to present an entry. This is sufficient to determine the serial number, so relying parties can then react by revoking the undisclosed entries ({{revoked-ranges}}), and likely removing the CA.
 
 ## Public Key Hashes
 
