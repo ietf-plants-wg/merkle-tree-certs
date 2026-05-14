@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-12T03:57:18.932989+00:00",
+  "timestamp": "2026-05-14T04:04:54.876435+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -2652,15 +2652,15 @@
       "id": "I_kwDOJIBkVc7Ru346",
       "title": "Be more opinionated about ID allocation",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/152",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Right now we have the following IDs, to denote the various different animals:\n\n1. The log has an ID\n2. Each cosigner has an ID, including the cosigner operated by the log (CA) operator\n3. The landmark sequence has an ID arc\n\nFor now, they refer to slightly different things, and we allow for some generality that we may not need:\n\n* A CA can have multiple cosigners for a single log\n* A landmark sequence could be allocated by an entity other than the CA, if the CA finds this difficult\n\nIt is not clear how many of these we need. The first is somewhat related to the question of how best to manage key rotation and log rotation. The second is... almost certainly not needed. I think it just came out of building atop tlog in the most orthogonal ways possible.\n\nAnd then there's the question of whether these IDs are allowed to overlap or must they be different. I think that comes from designs of cosigner negotiation.\n\nOnce the dust settles on the rest of the details, we should take a pass and:\n* Decide if any IDs should overlap\n* If IDs don't overlap, perhaps ask the CA operator to pick an ID arc, and then the protocol determines the substructure for you.",
       "createdAt": "2025-10-15T16:13:39Z",
-      "updatedAt": "2026-04-27T17:20:41Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-13T16:02:34Z",
+      "closedAt": "2026-05-13T16:02:34Z",
       "comments": [
         {
           "author": "davidben",
@@ -3475,6 +3475,22 @@
           "updatedAt": "2026-05-07T18:54:49Z"
         }
       ]
+    },
+    {
+      "number": 228,
+      "id": "I_kwDOJIBkVc8AAAABCDrQmA",
+      "title": "\"Traditional\" X.509 conflicts with RFC 9794",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/228",
+      "state": "CLOSED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft currently uses \"traditional X.509\" to mean \"non-MTC X.509\", but @ounsworth points out that https://www.rfc-editor.org/rfc/rfc9794.html uses \"traditional\" to mean \"not post-quantum\". We may need another phrase.",
+      "createdAt": "2026-05-12T22:23:52Z",
+      "updatedAt": "2026-05-13T22:33:11Z",
+      "closedAt": "2026-05-13T22:33:11Z",
+      "comments": []
     }
   ],
   "pulls": [
@@ -13868,13 +13884,13 @@
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-05-07T23:02:24Z",
+      "updatedAt": "2026-05-13T21:22:08Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7",
+      "baseRefOid": "3dedd9ea724860a2edc105e37652c6db4bad3677",
       "headRepository": "nharper/merkle-tree-certs",
       "headRefName": "log-numbers",
-      "headRefOid": "55671ca4cb15b2bb5abec134de4563adf46af5f7",
+      "headRefOid": "f04c68b3d4332110f3384a809f53ebb2fa781e6c",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -14281,6 +14297,312 @@
               "body": "I think I was mostly thinking that {trusted-subtrees} maybe should say something about how you're not expected to ship subtrees for every log, but I guess that all falls under \"this PR doesn't really say when you use log numbers\".",
               "createdAt": "2026-05-05T18:49:25Z",
               "updatedAt": "2026-05-06T00:11:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7-5Qke",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-12T21:35:47Z",
+          "updatedAt": "2026-05-12T21:53:10Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "This framing reads oddly to me. I suspect we actually want something like a Certification Authorities section that says \"these are the parts of a CA\" and then maybe Issuance Logs is a subsection of that. Maybe moving Representing Certification Authorities too. Dunno how we want to sequence doing that surgery, #227, and sending an email to the list. (I'm inclined to do that last one sooner than later at this point.)",
+              "createdAt": "2026-05-12T21:35:47Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 26,
+              "body": "s/one or more issuance log/one or more issuance logs/\n\nThough \"Each CA that issues Merkle Tree Certificates\" or \"Each Merkle Tree Certificate CA\" might get more to the point.",
+              "createdAt": "2026-05-12T21:37:50Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "The hash really is a parameter of the whole CA. We don't let them switch hashes across their logs (the CA format will go haywire).",
+              "createdAt": "2026-05-12T21:39:18Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 137,
+              "body": "```suggestion\n* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to the CA ID {{ca-ids}}. The CA ID is encoded in its binary representation, as defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}.\n```\n\n(That section doesn't define a binary representation of an OID, just a trust anchor ID.)",
+              "createdAt": "2026-05-12T21:41:01Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 167,
+              "body": "Do we also allow them to be configured with maximum log numbers?\n\nEdit: Ooh, or see the idea about revoked serial ranges instead of revoked index ranges below.",
+              "createdAt": "2026-05-12T21:42:10Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 194,
+              "body": "Nit: A little odd to use `logID` but then `log_number`. (Underscores vs camelCase.)",
+              "createdAt": "2026-05-12T21:44:11Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 199,
+              "body": "A thought: we said `minSerial` for the CA format to kinda get around having a two-level index now... should we do the same here too? That avoids having to deal with this, or answer annoying questions like \"what if I want to cut off all log numbers past a certain point, that's an infinite number of ranges\".\n\n(Cutting off all log numbers past a certain point needed to do SCTNotAfter.)",
+              "createdAt": "2026-05-12T21:45:10Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 169,
+              "body": "For *each* log seems a little wonky. There are infinitely many potential logs, and I can't configure an infinite number of lists. (Even if I have non-zero subtrees for one log, you could read this as saying I need an infinite number of empty `vector<TrustedSubtree>`s.)\n\nWhat if we said, outside of any \"for each log\" bits, that you might have a list of trusted subtrees, and that each trusted subtree told you:\n* Log number\n* `[start, end)` coordinates\n* The hash\n\n(Come to think of it, I don't know if we ever said what was in a single trusted subtree. Whoops.)",
+              "createdAt": "2026-05-12T21:49:52Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 218,
+              "body": "s/startin/starting/ but I think we can actually revert these back to \"1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.\" now that the log number is out of the entry.",
+              "createdAt": "2026-05-12T21:50:40Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 230,
+              "body": "The first sentence is a little goofy because relying parties are configured to trust CAs, not issuance logs. (The above comment about setting the minimum index might help.)",
+              "createdAt": "2026-05-12T21:51:22Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 237,
+              "body": "```suggestion\nThe revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.\n```\n\n(Arguably the _certificates_ are not uniquely identified because you can have multiple forms of the same certificate.)",
+              "createdAt": "2026-05-12T21:52:14Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            },
+            {
+              "originalPosition": 255,
+              "body": "Hopefully we can just delete this section soon via #225 ",
+              "createdAt": "2026-05-12T21:52:56Z",
+              "updatedAt": "2026-05-12T21:53:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XN-i",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:15:47Z",
+          "updatedAt": "2026-05-13T18:15:47Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Yes, we really need a CA section, but let's punt that for a later PR.",
+              "createdAt": "2026-05-13T18:15:47Z",
+              "updatedAt": "2026-05-13T18:15:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XOel",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:16:04Z",
+          "updatedAt": "2026-05-13T18:16:05Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "Reworded to \"Each Merkle Tree Certificate CA\"",
+              "createdAt": "2026-05-13T18:16:04Z",
+              "updatedAt": "2026-05-13T18:16:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XO-y",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:16:20Z",
+          "updatedAt": "2026-05-13T18:16:20Z",
+          "comments": [
+            {
+              "originalPosition": 137,
+              "body": "Done.",
+              "createdAt": "2026-05-13T18:16:20Z",
+              "updatedAt": "2026-05-13T18:16:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XPTV",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:16:32Z",
+          "updatedAt": "2026-05-13T18:16:32Z",
+          "comments": [
+            {
+              "originalPosition": 194,
+              "body": "Switched to `log_id`",
+              "createdAt": "2026-05-13T18:16:32Z",
+              "updatedAt": "2026-05-13T18:16:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XRgF",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:18:02Z",
+          "updatedAt": "2026-05-13T18:18:02Z",
+          "comments": [
+            {
+              "originalPosition": 169,
+              "body": "My intention wasn't that if the relying party chooses to do the MAY that they must do it for every log, but that they might want to be configured with information for some logs. I changed the wording from \"each\" to \"per-log\".",
+              "createdAt": "2026-05-13T18:18:02Z",
+              "updatedAt": "2026-05-13T18:18:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XR0q",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:18:14Z",
+          "updatedAt": "2026-05-13T18:18:14Z",
+          "comments": [
+            {
+              "originalPosition": 218,
+              "body": "Reverted.",
+              "createdAt": "2026-05-13T18:18:14Z",
+              "updatedAt": "2026-05-13T18:18:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XUmD",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:20:04Z",
+          "updatedAt": "2026-05-13T18:20:04Z",
+          "comments": [
+            {
+              "originalPosition": 230,
+              "body": "If the relying party is configured to only trust CAs (i.e. the CA ID and the key, and nothing else), then this doesn't matter. For this to apply, the relying party has to have trusted information about particular logs, hence it's configured to trust an issuance log (as part of its configuration for trusting a CA). I don't think this needs to change as part of this PR.",
+              "createdAt": "2026-05-13T18:20:04Z",
+              "updatedAt": "2026-05-13T18:20:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XU4e",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:20:14Z",
+          "updatedAt": "2026-05-13T18:20:15Z",
+          "comments": [
+            {
+              "originalPosition": 237,
+              "body": "Fixed.",
+              "createdAt": "2026-05-13T18:20:15Z",
+              "updatedAt": "2026-05-13T18:20:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XW7a",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:21:15Z",
+          "updatedAt": "2026-05-13T18:21:16Z",
+          "comments": [
+            {
+              "originalPosition": 69,
+              "body": "This looks like a candidate for moving to the CA section to be written in a future PR. In the meantime, I added a MUST that the same hash function be used for all logs under the same CA ID.",
+              "createdAt": "2026-05-13T18:21:15Z",
+              "updatedAt": "2026-05-13T18:21:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_XaTS",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:23:25Z",
+          "updatedAt": "2026-05-13T18:23:26Z",
+          "comments": [
+            {
+              "originalPosition": 167,
+              "body": "A relying party MAY choose to do all sorts of things not specified in the draft. I don't think we should specify configuring a maximum log number. The purpose of log numbers is to allow (stale) relying parties to trust arbitrarily large log numbers, and we don't want a stale config that has a maximum set for no good reason.",
+              "createdAt": "2026-05-13T18:23:26Z",
+              "updatedAt": "2026-05-13T18:23:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_Xmr0",
+          "commit": {
+            "abbreviatedOid": "55671ca"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T18:31:32Z",
+          "updatedAt": "2026-05-13T18:31:33Z",
+          "comments": [
+            {
+              "originalPosition": 199,
+              "body": "Added a TODO.",
+              "createdAt": "2026-05-13T18:31:32Z",
+              "updatedAt": "2026-05-13T18:31:33Z"
             }
           ]
         }
@@ -15475,7 +15797,7 @@
       "labels": [],
       "body": "Currently, CAs often have managed intermediates to let entities get a \"branded\" issuer. In a root + intermediate PKI hierarchy, this has little cost. In a MTC PKI, adding an issuance log is expensive (e.g. mirrors need to learn about it, clients need to be provided landmarks, etc.).\r\n\r\nThis PR provides a mechanism to attribute cosmetically certificates to \"branded\" issuers using a Name (for equivalence to the Issuer field) in an issuer alternative name extension, without using separate issuance logs.\r\n\r\nI did some light profiling of the Name for implementation sanity (single-entry RDNs, UTF8String AttributeValues), one could do a lot more, but such rules are probably best left to root programs.",
       "createdAt": "2026-05-06T13:27:39Z",
-      "updatedAt": "2026-05-08T02:20:58Z",
+      "updatedAt": "2026-05-13T16:56:11Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
@@ -15513,6 +15835,26 @@
           "createdAt": "2026-05-08T02:20:58Z",
           "updatedAt": "2026-05-08T02:20:58Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_VRRs",
+          "commit": {
+            "abbreviatedOid": "856f949"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T16:56:11Z",
+          "updatedAt": "2026-05-13T16:56:11Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "Re UTF8String, @robstradling that this breaks attributes like countryName that specifically use PrintableString, and also that RFC 5280 already has this text: https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1.2.4:~:text=CAs%0A%20%20%20conforming%20to%20this%20profile%20MUST%20use%20either%20the%20PrintableString%20or%0A%20%20%20UTF8String%20encoding%20of%20DirectoryString%2C%20with%20two%20exceptions.\n\nThat's not _quite_ as strong as this text, but maybe it's good enough.",
+              "createdAt": "2026-05-13T16:56:11Z",
+              "updatedAt": "2026-05-13T16:56:11Z"
+            }
+          ]
         }
       ]
     },
@@ -15828,24 +16170,26 @@
       "id": "PR_kwDOJIBkVc7ZUAZX",
       "title": "Update for new trust-anchor-ids draft",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/227",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The extension to trust-anchor-ids was moved upstream in https://github.com/tlswg/tls-trust-anchor-ids/pull/104. Update this accordingly.\r\n\r\nAs part of this, simplify landmark OIDs. The ability to have multiple landmark sequences per log is an unnecessary flexibility.  Between this and the simplified cosigner IDs, this PR closes #152. A CA need only pick one OID.",
       "createdAt": "2026-05-07T21:20:02Z",
-      "updatedAt": "2026-05-08T14:35:51Z",
+      "updatedAt": "2026-05-13T16:02:34Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "tai-update",
-      "headRefOid": "dc4e9063e87c96876be247a94b81636f087caade",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "4bef0fa6b107f6d8d80be9ee9a7a5680a7cdafd0",
+      "closedAt": "2026-05-13T16:02:32Z",
+      "mergedAt": "2026-05-13T16:02:31Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3dedd9ea724860a2edc105e37652c6db4bad3677"
+      },
       "comments": [
         {
           "author": "lukevalenta",
@@ -15939,6 +16283,101 @@
               "updatedAt": "2026-05-08T14:33:42Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_I6bC",
+          "commit": {
+            "abbreviatedOid": "dc4e906"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T10:12:51Z",
+          "updatedAt": "2026-05-13T10:12:51Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Maybe add for the latter that this is what an RP would typically sent to signal which landmarks it knows about, and for the former that this is used by the AP to tell the RP which landmarks it has in the retry flow.",
+              "createdAt": "2026-05-13T10:12:51Z",
+              "updatedAt": "2026-05-13T10:12:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_I6u1",
+          "commit": {
+            "abbreviatedOid": "dc4e906"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-13T10:13:03Z",
+          "updatedAt": "2026-05-13T10:13:03Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7_RIwn",
+          "commit": {
+            "abbreviatedOid": "dc4e906"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T14:39:35Z",
+          "updatedAt": "2026-05-13T14:39:35Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Good call. Done.",
+              "createdAt": "2026-05-13T14:39:35Z",
+              "updatedAt": "2026-05-13T14:39:35Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 229,
+      "id": "PR_kwDOJIBkVc7bRI0g",
+      "title": "Replace \"traditional X.509\" with \"directly-signed X.509\"",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/229",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "RFC 9794 already uses \"traditional\" to mean what everyone calls \"classical\".\r\n\r\nCloses #228",
+      "createdAt": "2026-05-13T20:09:09Z",
+      "updatedAt": "2026-05-13T22:33:14Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3dedd9ea724860a2edc105e37652c6db4bad3677",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "traditional",
+      "headRefOid": "2f27c80f1e4e9725b2d66d40735a298d270306d2",
+      "closedAt": "2026-05-13T22:33:11Z",
+      "mergedAt": "2026-05-13T22:33:10Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "5301c9dc8846940b1c0c93b2d37f327beae73229"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7_bW3h",
+          "commit": {
+            "abbreviatedOid": "2f27c80"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-13T21:07:01Z",
+          "updatedAt": "2026-05-13T21:07:01Z",
+          "comments": []
         }
       ]
     }
