@@ -1216,6 +1216,9 @@ For initial experimentation, early implementations of this design will use the O
 The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
 
 ~~~tls-presentation
+/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+opaque TrustAnchorID<1..2^8-1>;
+
 opaque HashValue[HASH_SIZE];
 
 struct {
