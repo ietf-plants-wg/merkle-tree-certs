@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 15 November 2026                                     Apple Inc.
+Expires: 16 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             14 May 2026
+                                                             15 May 2026
 
 
                         Merkle Tree Certificates
@@ -24,11 +24,11 @@ Abstract
    the style of Certificate Transparency.  The integrated design reduces
    logging overhead in the face of both shorter-lived certificates and
    large post-quantum signature algorithms, while still achieving
-   comparable security properties to traditional X.509 and Certificate
-   Transparency.  Merkle Tree certificates additionally admit an
-   optional size optimization that avoids signatures altogether, at the
-   cost of only applying to up-to-date relying parties and older
-   certificates.
+   comparable security properties to existing X.509 constructions and
+   Certificate Transparency.  Merkle Tree certificates additionally
+   admit an optional size optimization that avoids signatures
+   altogether, at the cost of only applying to up-to-date relying
+   parties and older certificates.
 
 About This Document
 
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 November 2026.
+   This Internet-Draft will expire on 16 November 2026.
 
 Copyright Notice
 
@@ -361,6 +361,10 @@ Table of Contents
 
    Landmark-relative certificate:  An optimized certificate containing
       an inclusion proof to a landmark subtree, and no signatures.
+
+   Directly-signed certificate:  A certificate issued using the
+      existing, non-MTC construction, where the TBSCertificate is passed
+      directly to the private key's signing operation.
 
 3.  Overview
 
@@ -1294,31 +1298,17 @@ Table of Contents
 
 5.2.2.  Publishing Logs
 
-   _[[NOTE: This section is written to avoid depending on a specific
-   serving protocol.  The current expectation is that a Web PKI
-   deployment would derive from [TLOG-TILES], to match the direction of
-   Certificate Transparency and pick up improvements made there._
+   This protocol aims to enable monitors to detect misissued
+   certificates by observing the issuance log.  See Section 12.2.
 
-   _For now, we avoid a normative reference to [TLOG-TILES] and also
-   capture the fact that the certificate construction is independent of
-   the choice of protocol.  Similar to how the CT ecosystem is migrating
-   to a tiled interface, were someone to improve on [TLOG-TILES], a PKI
-   could migrate to that new protocol without impacting certificate
-   verification._
-
-   _This is purely a starting point for describing the design.  We
-   expect the scope of this document, and other related documents to
-   adapt as the work evolves across the IETF, C2SP, Certificate
-   Transparency, and other communities.]]_
-
-   Issuance logs are intended to be publicly accessible to allow
-   monitors to detect misissued certificates.
-
-   The access method does not affect certificate interoperability, so
-   this document does not prescribe a specific protocol.  An individual
-   issuance log MAY be published in any form, provided other parties in
-   the PKI are able to consume it.  Relying parties SHOULD define log
-   serving requirements, including the allowed protocols and expected
+   This document does not prescribe a particular method of observing the
+   issuance log.  The access protocols do not affect certificate
+   interoperability, and different applications may have different
+   needs.  For example, a PKI that authenticates public services might
+   publicly serve issuance logs, while a PKI that authenticates a single
+   organization's intranet services might keep the log private to the
+   organization.  Relying parties SHOULD define log serving
+   requirements, including the allowed protocols and expected
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
@@ -1637,9 +1627,9 @@ Table of Contents
    usage extension, which are out of scope for this document.  See
    Section 12.8 for a discussion of domain separation.
 
-   If the CA operator additionally operates a traditional X.509 CA, that
-   CA key MUST be distinct from any Merkle Tree CA cosigner keys.  In
-   particular, a CA cosigner key MUST NOT be used to directly sign
+   If the CA operator additionally operates a directly-signing X.509 CA,
+   that CA key MUST be distinct from any Merkle Tree CA cosigner keys.
+   In particular, a CA cosigner key MUST NOT be used to directly sign
    TBSCertificate structures.  A CA cosigner key issues certificates by
    signing subtrees.
 
@@ -1796,6 +1786,9 @@ Table of Contents
 
    The signatureValue contains an MTCProof structure, defined below
    using the TLS presentation language (Section 3 of [RFC8446]):
+
+   /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+   opaque TrustAnchorID<1..2^8-1>;
 
    opaque HashValue[HASH_SIZE];
 
@@ -2241,7 +2234,7 @@ Table of Contents
 
    Relying parties SHOULD ensure authenticity by requiring a signature
    from the CA cosigner key.  This is analogous to the signature in a
-   traditional X.509 certificate.  If the relying party obtains CA
+   directly-signed X.509 certificate.  If the relying party obtains CA
    information from a CA certificate, the CA cosigner key is determined
    as in Section 7.1.
 
@@ -2267,12 +2260,12 @@ Table of Contents
 
    In applications that do not enforce transparency requirements, a
    relying party MAY implement a policy that only checks for a signature
-   from the CA cosigner.  This is analogous to a traditional X.509
-   application, where CA information is determined directly from a CA
-   certificate.  Unrecognized cosignatures are ignored, so such
-   applications can interoperate with certificates issued for
-   transparency-enforcing applications that require additional
-   cosigners.
+   from the CA cosigner.  This fits the pattern of many existing X.509
+   applications, where CA information is determined directly from a CA
+   certificate, with no additional out-of-band information.
+   Unrecognized cosignatures are ignored, so such applications can
+   interoperate with certificates issued for transparency-enforcing
+   applications that require additional cosigners.
 
    Cosigner roles are extensible without changes to certificate
    verification itself.  Future specifications and individual
@@ -2387,12 +2380,12 @@ Table of Contents
 
    Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions
    such as subjectAltName are unmodified in Merkle Tree certificates.
-   They apply to TLS-based applications as in a traditional X.509
-   certificate.  The primary new considerations for use in TLS are:
+   They apply to TLS-based applications as in any X.509 certificate.
+   The primary new considerations for use in TLS are:
 
    *  Whether the authenticating party should send a certificate from
-      one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509
-      CA
+      one Merkle Tree CA, another Merkle Tree CA, or a directly-signing
+      X.509 CA
 
    *  Whether the authenticating party should send a standalone or
       landmark-relative certificate

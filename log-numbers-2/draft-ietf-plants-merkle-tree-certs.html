@@ -11,7 +11,7 @@
 <meta content="Luke Valenta" name="author">
 <meta content="Filippo Valsorda" name="author">
 <meta content="
-       This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
+       This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to existing X.509 constructions and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
     " name="description">
 <meta content="xml2rfc 3.33.0" name="generator">
 <meta content="draft-ietf-plants-merkle-tree-certs-latest" name="ietf.draft">
@@ -1052,7 +1052,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 15 November 2026</td>
+<td class="center">Expires 16 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,12 +1065,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-14" class="published">14 May 2026</time>
+<time datetime="2026-05-15" class="published">15 May 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-15">15 November 2026</time></dd>
+<dd class="expires"><time datetime="2026-11-16">16 November 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1099,7 +1099,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Merkle Tree Certificates</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to existing X.509 constructions and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1136,7 +1136,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 15 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1663,6 +1663,11 @@ uint8 uint48[6];
 <dt id="section-2.1-4.19">Landmark-relative certificate:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.20">
             <p id="section-2.1-4.20.1">An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.<a href="#section-2.1-4.20.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-2.1-4.21">Directly-signed certificate:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-4.22">
+            <p id="section-2.1-4.22.1">A certificate issued using the existing, non-MTC construction, where the TBSCertificate is passed directly to the private key's signing operation.<a href="#section-2.1-4.22.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -3865,12 +3870,9 @@ TBSCertificateLogEntry ::= SEQUENCE {
           <h4 id="name-publishing-logs">
 <a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-publishing-logs" class="section-name selfRef">Publishing Logs</a>
           </h4>
-<p id="section-5.2.2-1"><em>[[NOTE: This section is written to avoid depending on a specific serving protocol. The current expectation is that a Web PKI deployment would derive from <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, to match the direction of Certificate Transparency and pick up improvements made there.</em><a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-2"><em>For now, we avoid a normative reference to <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> and also capture the fact that the certificate construction is independent of the choice of protocol. Similar to how the CT ecosystem is migrating to a tiled interface, were someone to improve on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, a PKI could migrate to that new protocol without impacting certificate verification.</em><a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-3"><em>This is purely a starting point for describing the design. We expect the scope of this document, and other related documents to adapt as the work evolves across the IETF, C2SP, Certificate Transparency, and other communities.]]</em><a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-4">Issuance logs are intended to be publicly accessible to allow monitors to detect misissued certificates.<a href="#section-5.2.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-5">The access method does not affect certificate interoperability, so this document does not prescribe a specific protocol. An individual issuance log MAY be published in any form, provided other parties in the PKI are able to consume it. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-6">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.2.2-6" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-1">This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See <a href="#transparency" class="auto internal xref">Section 12.2</a>.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="log-pruning">
@@ -4344,7 +4346,7 @@ struct {
         </ul>
 <p id="section-5.4-5">Entries are extensible. Future documents MAY define <code>type</code> values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with <code>type</code> that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined entry format. <a href="#new-log-entry-types" class="auto internal xref">Section 12.5</a> further discusses security implications of new formats.<a href="#section-5.4-5" class="pilcrow">¶</a></p>
 <p id="section-5.4-6">If the CA issues certificate revocation lists (CRLs) <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> or Online Certificate Status Protocol (OCSP) responses <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See <a href="#signature-domain-separation" class="auto internal xref">Section 12.8</a> for a discussion of domain separation.<a href="#section-5.4-6" class="pilcrow">¶</a></p>
-<p id="section-5.4-7">If the CA operator additionally operates a traditional X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.<a href="#section-5.4-7" class="pilcrow">¶</a></p>
+<p id="section-5.4-7">If the CA operator additionally operates a directly-signing X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.<a href="#section-5.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="representing-certification-authorities">
@@ -4461,6 +4463,9 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
 <p id="section-6.1-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-6.1-8" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-6.1-9">
 <pre>
+/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+opaque TrustAnchorID&lt;1..2^8-1&gt;;
+
 opaque HashValue[HASH_SIZE];
 
 struct {
@@ -4800,11 +4805,11 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-7.3-5">Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a traditional X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in <a href="#relying-party-configuration" class="auto internal xref">Section 7.1</a>.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
+<p id="section-7.3-5">Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a directly-signed X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in <a href="#relying-party-configuration" class="auto internal xref">Section 7.1</a>.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
 <p id="section-7.3-6">While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
 <p id="section-7.3-7">To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> describes a "mirror" cosigner role.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
 <p id="section-7.3-8">Relying parties MAY accept the same set of additional cosigners across CAs.<a href="#section-7.3-8" class="pilcrow">¶</a></p>
-<p id="section-7.3-9">In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This is analogous to a traditional X.509 application, where CA information is determined directly from a CA certificate. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.<a href="#section-7.3-9" class="pilcrow">¶</a></p>
+<p id="section-7.3-9">In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This fits the pattern of many existing X.509 applications, where CA information is determined directly from a CA certificate, with no additional out-of-band information. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.<a href="#section-7.3-9" class="pilcrow">¶</a></p>
 <p id="section-7.3-10">Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.<a href="#section-7.3-10" class="pilcrow">¶</a></p>
 <p id="section-7.3-11"><a href="#choosing-cosigners" class="auto internal xref">Section 10.2</a> discusses additional deployment considerations in cosigner selection.<a href="#section-7.3-11" class="pilcrow">¶</a></p>
 </section>
@@ -4872,10 +4877,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
       <h2 id="name-use-in-tls">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-use-in-tls" class="section-name selfRef">Use in TLS</a>
       </h2>
-<p id="section-8-1">Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in a traditional X.509 certificate. The primary new considerations for use in TLS are:<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in any X.509 certificate. The primary new considerations for use in TLS are:<a href="#section-8-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8-2.1">
-          <p id="section-8-2.1.1">Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509 CA<a href="#section-8-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-8-2.1.1">Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a directly-signing X.509 CA<a href="#section-8-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-8-2.2">
           <p id="section-8-2.2.1">Whether the authenticating party should send a standalone or landmark-relative certificate<a href="#section-8-2.2.1" class="pilcrow">¶</a></p>
