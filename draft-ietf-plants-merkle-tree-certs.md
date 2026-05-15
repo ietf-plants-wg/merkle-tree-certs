@@ -1099,15 +1099,9 @@ If the CA operator additionally operates a directly-signing X.509 CA, that CA ke
 
 ## Publishing Logs
 
-*[[NOTE: This section is written to avoid depending on a specific serving protocol. The current expectation is that a Web PKI deployment would derive from {{TLOG-TILES}}, to match the direction of Certificate Transparency and pick up improvements made there.*
+This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
 
-*For now, we avoid a normative reference to {{TLOG-TILES}} and also capture the fact that the certificate construction is independent of the choice of protocol. Similar to how the CT ecosystem is migrating to a tiled interface, were someone to improve on {{TLOG-TILES}}, a PKI could migrate to that new protocol without impacting certificate verification.*
-
-*This is purely a starting point for describing the design. We expect the scope of this document, and other related documents to adapt as the work evolves across the IETF, C2SP, Certificate Transparency, and other communities.]]*
-
-Issuance logs are intended to be publicly accessible to allow monitors to detect misissued certificates.
-
-The access method does not affect certificate interoperability, so this document does not prescribe a specific protocol. An individual issuance log MAY be published in any form, provided other parties in the PKI are able to consume it. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
+This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
 For example, a log ecosystem could use {{TLOG-TILES}} to serve logs. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
 
