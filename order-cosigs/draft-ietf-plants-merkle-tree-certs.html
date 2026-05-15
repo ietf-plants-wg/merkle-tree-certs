@@ -4397,7 +4397,7 @@ struct {
             <p id="section-6.1-12.2.1">Byte strings of the same length are ordered lexicographically<a href="#section-6.1-12.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.1-13">An MTCProof parser MUST reject the input if there are duplicate <code>cosigner_id</code> values, or if they are not ordered correctly. This can be done by checking each <code>cosigner_id</code> value comes strict after the previous one in the above order.<a href="#section-6.1-13" class="pilcrow">¶</a></p>
+<p id="section-6.1-13">An MTCProof parser MUST reject the input if there are duplicate <code>cosigner_id</code> values, or if they are not ordered correctly. This can be done by checking each <code>cosigner_id</code> value comes strictly after the previous one in the above order.<a href="#section-6.1-13" class="pilcrow">¶</a></p>
 <p id="section-6.1-14">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.<a href="#section-6.1-14" class="pilcrow">¶</a></p>
 </section>
 </div>

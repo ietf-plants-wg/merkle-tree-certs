@@ -1729,7 +1729,7 @@ Table of Contents
 
    An MTCProof parser MUST reject the input if there are duplicate
    cosigner_id values, or if they are not ordered correctly.  This can
-   be done by checking each cosigner_id value comes strict after the
+   be done by checking each cosigner_id value comes strictly after the
    previous one in the above order.
 
    The MTCProof is encoded into the signatureValue with no additional
