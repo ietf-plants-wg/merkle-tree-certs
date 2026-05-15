@@ -2160,11 +2160,25 @@ Table of Contents
    11.  Otherwise, check that the MTCProof's signatures contain a
         sufficient set of valid signatures from cosigners to satisfy the
         relying party's cosigner requirements (Section 7.3).
-        Unrecognized cosigners MUST be ignored.  Signatures are verified
-        as described in Section 5.4.1.  Reconstruct the CosignedMessage
-        from MTCProof's start and end, the cosigner ID for
-        cosigner_name, log_id for log_origin, expected_subtree_hash for
-        subtree_hash, and timestamp set to zero.
+        Unrecognized cosigners MUST be ignored.
+
+        Signatures are verified as described in Section 5.4.1.  For each
+        signature verification, the CosignedMessage structure is
+        constructed as follows:
+
+        1.  Set the CosignedMessage's cosigner_name based on the
+            cosigner ID as described in Section 5.4.1.
+
+        2.  Set the CosignedMessage's timestamp to zero.
+
+        3.  Set the CosignedMessage's log_origin based on log_id as
+            described in Section 5.4.1.
+
+        4.  Set the CosignedMessage's start and end to the MTCProof's
+            start and end, respectively.
+
+        5.  Set the CosignedMessage's subtree_hash to
+            expected_subtree_hash.
 
    This procedure only replaces the signature verification portion of
    X.509 path validation.  The relying party MUST continue to perform

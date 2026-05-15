@@ -4713,7 +4713,26 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.2-2.10.1">If <code>log_number</code>, <code>start</code>, and <code>end</code> matches a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) for the CA, check that <code>expected_subtree_hash</code> is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.<a href="#section-7.2-2.10.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.11">
-            <p id="section-7.2-2.11.1">Otherwise, check that the MTCProof's <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. Reconstruct the CosignedMessage from MTCProof's <code>start</code> and <code>end</code>, the cosigner ID for <code>cosigner_name</code>, <code>log_id</code> for <code>log_origin</code>, <code>expected_subtree_hash</code> for <code>subtree_hash</code>, and <code>timestamp</code> set to zero.<a href="#section-7.2-2.11.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.11.1">Otherwise, check that the MTCProof's <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored.<a href="#section-7.2-2.11.1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2.11.2">
+Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. For each signature verification, the CosignedMessage structure is constructed as follows:<a href="#section-7.2-2.11.2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.2-2.11.3">
+<li id="section-7.2-2.11.3.1">
+                <p id="section-7.2-2.11.3.1.1">Set the CosignedMessage's <code>cosigner_name</code> based on the cosigner ID as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-7.2-2.11.3.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.11.3.2">
+                <p id="section-7.2-2.11.3.2.1">Set the CosignedMessage's <code>timestamp</code> to zero.<a href="#section-7.2-2.11.3.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.11.3.3">
+                <p id="section-7.2-2.11.3.3.1">Set the CosignedMessage's <code>log_origin</code> based on <code>log_id</code> as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-7.2-2.11.3.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.11.3.4">
+                <p id="section-7.2-2.11.3.4.1">Set the CosignedMessage's <code>start</code> and <code>end</code> to the MTCProof's <code>start</code> and <code>end</code>, respectively.<a href="#section-7.2-2.11.3.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.11.3.5">
+                <p id="section-7.2-2.11.3.5.1">Set the CosignedMessage's <code>subtree_hash</code> to <code>expected_subtree_hash</code>.<a href="#section-7.2-2.11.3.5.1" class="pilcrow">¶</a></p>
+</li>
+            </ol>
 </li>
         </ol>
 <p id="section-7.2-3">This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
