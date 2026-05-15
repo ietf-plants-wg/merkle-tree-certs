@@ -1241,7 +1241,7 @@ Each element of the `signatures` field MUST have a unique `cosigner_id`. Element
 * Shorter byte strings are ordered before longer byte strings
 * Byte strings of the same length are ordered lexicographically
 
-An MTCProof parser MUST reject the input if there are duplicate `cosigner_id` values, or if they are not ordered correctly. This can be done by checking each `cosigner_id` value comes strict after the previous one in the above order.
+An MTCProof parser MUST reject the input if there are duplicate `cosigner_id` values, or if they are not ordered correctly. This can be done by checking each `cosigner_id` value comes strictly after the previous one in the above order.
 
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
 
