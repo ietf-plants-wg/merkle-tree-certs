@@ -1099,7 +1099,7 @@ If the CA operator additionally operates a directly-signing X.509 CA, that CA ke
 
 ## Publishing Logs
 
-This protocol aims to enables monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
+This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
 
 This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI used to authenticate public services may be best served with publicly visible issuance logs, while a PKI operated on behalf of a single organization's intranet services may keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
