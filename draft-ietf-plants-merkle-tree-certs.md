@@ -895,6 +895,8 @@ Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A
 
 ## Relationship with Certification Authorities {#ca-ids}
 
+[[TODO: #232 This sectioning is a bit awkward. Rearrange the top-level section to be about CAs in general and introduce CA parameters there.]]
+
 Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order.
 
 Each Merkle Tree Certificate CA has a *CA ID* to identify it. This CA ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}, and its entire object identifier (OID) arc is allocated for the issuance logs run by that CA.
