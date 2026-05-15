@@ -1225,10 +1225,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-issuance-logs" class="internal xref">Issuance Logs</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-log-parameters" class="internal xref">Log Parameters</a></p>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-relationship-with-certifica" class="internal xref">Relationship with Certification Authorities</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-log-ids" class="internal xref">Log IDs</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-log-parameters" class="internal xref">Log Parameters</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
                 <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-log-entries" class="internal xref">Log Entries</a></p>
@@ -1310,7 +1310,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-trusted-subtrees" class="internal xref">Trusted Subtrees</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-revocation-by-index" class="internal xref">Revocation by Index</a></p>
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-revoked-ranges" class="internal xref">Revoked Ranges</a></p>
 </li>
             </ul>
 </li>
@@ -1524,7 +1524,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <p id="section-1-2">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature adds 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">Additionally, as PKIs transition to shorter-lived certificates <span>[<a href="#CABF-153" class="cite xref">CABF-153</a>]</span> <span>[<a href="#CABF-SC081" class="cite xref">CABF-SC081</a>]</span>, the number of entries in the log will grow.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-5">This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains logs of everything it issues, signing views of its logs to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the logs. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">This achieves the following:<a href="#section-1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-7.1">
@@ -1599,7 +1599,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <dd class="break"></dd>
 <dt id="section-2.1-2.9">Issuance log:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-2.10">
-            <p id="section-2.1-2.10.1">A log, maintained by the CA, of everything issued by that CA.<a href="#section-2.1-2.10.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-2.10.1">A log, maintained by the CA, containing certification statements issued by that CA. A CA operates some number of issuance logs, which together contain all statements issued by that CA.<a href="#section-2.1-2.10.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-2.11">Cosigner:</dt>
@@ -1818,10 +1818,10 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <p id="section-3-4.2.1">The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.<a href="#section-3-4.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-4.3">
-          <p id="section-3-4.3.1">The CA operates an append-only <em>issuance log</em> (<a href="#issuance-logs" class="auto internal xref">Section 5</a>). Unlike a CT log, this issuance log only contains entries added by the CA:<a href="#section-3-4.3.1" class="pilcrow">¶</a></p>
+          <p id="section-3-4.3.1">The CA operates a series of append-only <em>issuance logs</em> (<a href="#issuance-logs" class="auto internal xref">Section 5</a>). Unlike a CT log, these logs only contain entries added by the CA:<a href="#section-3-4.3.1" class="pilcrow">¶</a></p>
 <ol start="1" type="a" class="normal type-a" id="section-3-4.3.2">
 <li id="section-3-4.3.2.1">
-              <p id="section-3-4.3.2.1.1">The CA adds a TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>, abbreviated "tbscert entries" in the diagram) to its log, describing the information it is certifying.<a href="#section-3-4.3.2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-3-4.3.2.1.1">The CA adds a TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>, abbreviated "tbscert entries" in the diagram) to an issuance log, describing the information it is certifying.<a href="#section-3-4.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-3-4.3.2.2">
               <p id="section-3-4.3.2.2.1">The CA signs a <em>checkpoint</em>, which describes the current state of the log. A signed checkpoint certifies that the CA issued <em>every</em> entry in the Merkle Tree (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>).<a href="#section-3-4.3.2.2.1" class="pilcrow">¶</a></p>
@@ -1849,7 +1849,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           </ul>
 </li>
         <li id="section-3-4.6">
-          <p id="section-3-4.6.1">As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.<a href="#section-3-4.6.1" class="pilcrow">¶</a></p>
+          <p id="section-3-4.6.1">As in Certificate Transparency, monitors observe the CA's issuance logs to ensure the CA is operated correctly.<a href="#section-3-4.6.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-3-5">A certificate with cosignatures is known as a <em>standalone certificate</em>. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) structures, which do not scale with public key or signature size.<a href="#section-3-5" class="pilcrow">¶</a></p>
@@ -3709,71 +3709,77 @@ def find_subtrees(start, end):
 <p id="section-5-3">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5-3" class="pilcrow">¶</a></p>
 <p id="section-5-4">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5-4" class="pilcrow">¶</a></p>
 <p id="section-5-5">Cosigners (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>) that authenticates the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>).<a href="#section-5-5" class="pilcrow">¶</a></p>
-<div id="log-parameters">
+<div id="ca-ids">
 <section id="section-5.1">
-        <h3 id="name-log-parameters">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-log-parameters" class="section-name selfRef">Log Parameters</a>
+        <h3 id="name-relationship-with-certifica">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-relationship-with-certifica" class="section-name selfRef">Relationship with Certification Authorities</a>
         </h3>
-<p id="section-5.1-1">An issuance log has the following parameters:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">[[TODO: #232 This sectioning is a bit awkward. Rearrange the top-level section to be about CAs in general and introduce CA parameters there.]]<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">Each Merkle Tree Certificate CA has a <em>CA ID</em> to identify it. This CA ID is a trust anchor ID <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>, and its entire object identifier (OID) arc is allocated for the issuance logs run by that CA.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">An individual issuance log run by a CA can be identified by a <em>log ID</em> constructed from the <em>CA ID</em> and log number. The log ID is also a trust anchor ID.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a CA ID whose OID representation is <code>caID</code> and a log operated by that CA with log number <code>N</code>, this document allocates the following OIDs:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1-2.1">
-            <p id="section-5.1-2.1.1">A log ID, which uniquely identifies the log. See <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-5.1-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.1-6.1">
+            <p id="section-5.1-6.1.1">The OID <code>{caID log(0) N}</code> represents the log ID for log number <code>N</code>.<a href="#section-5.1-6.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-2.2">
-            <p id="section-5.1-2.2.1">A collision-resistant cryptographic hash function. SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span> is RECOMMENDED.<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-6.2">
+            <p id="section-5.1-6.2.1">For each non-negative integer <code>L</code>, the OID <code>{caID landmarks(1) N L}</code> represents the landmark (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>) with number <code>L</code>. These OIDs may used as a trust anchor ID, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.1-6.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-2.3">
-            <p id="section-5.1-2.3.1">A minimum index, which is the index of the first log entry which is available. See <a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>. This value changes over the lifetime of the log.<a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-6.3">
+            <p id="section-5.1-6.3.1">For each non-negative integer <code>L</code>, the OID <code>{caID landmarkGroups(2) N L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark number <code>L</code> and earlier landmarks, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.1-6.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.1-3">Throughout this document, the hash algorithm in use is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="log-ids">
-<section id="section-5.2">
-        <h3 id="name-log-ids">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-log-ids" class="section-name selfRef">Log IDs</a>
-        </h3>
-<p id="section-5.2-1">Each issuance log is identified by a <em>log ID</em>, which is a trust anchor ID <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">When allocating log IDs, the entire object identifier (OID) arc is allocated for use with the issuance log. OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a log ID whose OID representation is <code>logID</code>, this document allocates the following OIDs:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-5.2-3.1">
-            <p id="section-5.2-3.1.1">For each non-negative integer <code>L</code>, the OID <code>{logID landmarks(0) L}</code> represents the landmark (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>) with number <code>L</code>. These OIDs may used as a trust anchor ID, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.2-3.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-5.2-3.2">
-            <p id="section-5.2-3.2.1">For each non-negative integer <code>L</code>, the OID <code>{logID landmarkGroups(1) L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark number <code>L</code> and earlier landmarks, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-5.2-4">Future extensions to this protocol MAY define further allocations.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">An issuance log's log ID determines a PKIX distinguished name (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.4" class="relref">Section 4.1.2.4</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>). The distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type <code>id-rdna-trustAnchorID</code>, defined below:<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<div class="lang-asn.1 sourcecode" id="section-5.2-6">
+<p id="section-5.1-7">Future extensions to this protocol MAY define further allocations.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
+<p id="section-5.1-8">A CA ID determines a PKIX distinguished name (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.4" class="relref">Section 4.1.2.4</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) that can be used in the issuer or subject field of an X.509 TBSCertificate. This distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type <code>id-rdna-trustAnchorID</code>, defined below:<a href="#section-5.1-8" class="pilcrow">¶</a></p>
+<div class="lang-asn.1 sourcecode" id="section-5.1-9">
 <pre>
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) rdna(25) TBD }
-</pre><a href="#section-5.2-6" class="pilcrow">¶</a>
+</pre><a href="#section-5.1-9" class="pilcrow">¶</a>
 </div>
-<p id="section-5.2-7">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.2-7" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.2-8">
+<p id="section-5.1-10">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a CA with ID <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.1-10" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-11">
 <pre>
 1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
-</pre><a href="#section-5.2-8" class="pilcrow">¶</a>
+</pre><a href="#section-5.1-11" class="pilcrow">¶</a>
 </div>
-<p id="section-5.2-9">For initial experimentation, early implementations of this design will:<a href="#section-5.2-9" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.2-10">
-<li id="section-5.2-10.1">
-            <p id="section-5.2-10.1.1">Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. <code>324731.1</code>.<a href="#section-5.2-10.1.1" class="pilcrow">¶</a></p>
+<p id="section-5.1-12">For initial experimentation, early implementations of this design will:<a href="#section-5.1-12" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-5.1-13">
+<li id="section-5.1-13.1">
+            <p id="section-5.1-13.1.1">Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. <code>32473.1</code>.<a href="#section-5.1-13.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.2-10.2">
-            <p id="section-5.2-10.2.1">Use the OID 1.3.6.1.4.1.44363.47.1 instead of <code>id-rdna-trustAnchorID</code>.<a href="#section-5.2-10.2.1" class="pilcrow">¶</a></p>
+          <li id="section-5.1-13.2">
+            <p id="section-5.1-13.2.1">Use the OID 1.3.6.1.4.1.44363.47.1 instead of <code>id-rdna-trustAnchorID</code>.<a href="#section-5.1-13.2.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-5.2-11">For example, the distinguished name for a log named <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.2-11" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.2-12">
+<p id="section-5.1-14">For example, the distinguished name for a CA with ID <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.1-14" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-15">
 <pre>
 1.3.6.1.4.1.44363.47.1=#0c0733323437332e31
-</pre><a href="#section-5.2-12" class="pilcrow">¶</a>
+</pre><a href="#section-5.1-15" class="pilcrow">¶</a>
 </div>
+</section>
+</div>
+<div id="log-parameters">
+<section id="section-5.2">
+        <h3 id="name-log-parameters">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-log-parameters" class="section-name selfRef">Log Parameters</a>
+        </h3>
+<p id="section-5.2-1">An issuance log has the following parameters:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2-2.1">
+            <p id="section-5.2-2.1.1">A log ID, constructed from the CA ID and log number, which uniquely identifies the log. See <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-5.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.2-2.2">
+            <p id="section-5.2-2.2.1">A collision-resistant cryptographic hash function. SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span> is RECOMMENDED. The same hash function MUST be used for all logs under the same CA ID.<a href="#section-5.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.2-2.3">
+            <p id="section-5.2-2.3.1">A minimum index, which is the index of the first log entry which is available. See <a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>. This value changes over the lifetime of the log.<a href="#section-5.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.2-3">Throughout this document, the hash algorithm in use is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="log-entries">
@@ -3800,7 +3806,7 @@ struct {
 } MerkleTreeCertEntry;
 </pre><a href="#section-5.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-5.3-3">When <code>type</code> is <code>null_entry</code>, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type <code>null_entry</code>. This avoids zero serial numbers in the certificate format (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>). Other entries MAY have type <code>null_entry</code>.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.3-3">When <code>type</code> is <code>null_entry</code>, the entry does not represent any information. Entries at any index in the log MAY have type <code>null_entry</code>.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 <p id="section-5.3-4">When <code>type</code> is <code>tbs_cert_entry</code>, <code>N</code> is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
 <p id="section-5.3-5"><code>tbs_cert_entry_data</code> contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding of a TBSCertificateLogEntry, defined below. Equivalently, <code>tbs_cert_entry_data</code> contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-5.3-6">
@@ -3826,13 +3832,13 @@ TBSCertificateLogEntry ::= SEQUENCE {
             <p id="section-5.3-8.1.1"><code>version</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> have the same semantics as the corresponding TBSCertificate fields, defined in <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.<a href="#section-5.3-8.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.3-8.2">
-            <p id="section-5.3-8.2.1"><code>issuer</code> is the issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-5.3-8.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.3-8.2.1"><code>issuer</code> is the CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-5.3-8.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.3-8.3">
             <p id="section-5.3-8.3.1"><code>subjectPublicKeyAlgorithm</code> describes the algorithm of the subject's public key. It is constructed identically to the <code>algorithm</code> field of a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>).<a href="#section-5.3-8.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.3-8.4">
-            <p id="section-5.3-8.4.1"><code>subjectPublicKeyInfoHash</code> contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function (<a href="#log-parameters" class="auto internal xref">Section 5.1</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding.<a href="#section-5.3-8.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.3-8.4.1"><code>subjectPublicKeyInfoHash</code> contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function (<a href="#log-parameters" class="auto internal xref">Section 5.2</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding.<a href="#section-5.3-8.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.3-9">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.3-9" class="pilcrow">¶</a></p>
@@ -3873,7 +3879,7 @@ struct {
 </div>
 <p id="section-5.4.1-3">This signature format is designed to be compatible with the ML-DSA-44 signature construction in <span>[<a href="#TLOG-COSIGNATURE" class="cite xref">TLOG-COSIGNATURE</a>]</span>, but it supports signature algorithms other than ML-DSA-44 and tree hashes other than SHA-256.<a href="#section-5.4.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.4.1-4"><code>label</code> is a fixed prefix for domain separation. Its value MUST be the string <code>subtree/v1</code>, followed by a newline (U+000A), followed by a zero byte (U+0000).<a href="#section-5.4.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.4.1-5"><code>cosigner_name</code> and <code>log_origin</code> are computed from the cosigner ID and the issuance log's ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>), respectively. They contain the concatenation of:<a href="#section-5.4.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.4.1-5"><code>cosigner_name</code> and <code>log_origin</code> are computed from the cosigner ID and the issuance log's ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>), respectively. They contain the concatenation of:<a href="#section-5.4.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.4.1-6.1">
               <p id="section-5.4.1-6.1.1">The 16-byte ASCII string <code>oid/1.3.6.1.4.1.</code><a href="#section-5.4.1-6.1.1" class="pilcrow">¶</a></p>
@@ -3941,7 +3947,7 @@ struct {
         <h3 id="name-certification-authority-cos">
 <a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-certification-authority-cos" class="section-name selfRef">Certification Authority Cosigners</a>
         </h3>
-<p id="section-5.5-1">A <em>CA cosigner</em> is a cosigner (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as the log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). A CA cosigner MUST NOT sign checkpoints or subtrees for logs other than its corresponding issuance log.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">A <em>CA cosigner</em> is a cosigner (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) that certifies the contents of a log. Each CA MUST operate a CA cosigner whose cosigner ID is the same as its CA ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>). A CA cosigner MUST NOT sign checkpoints or subtrees for logs not part of this CA instance.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <p id="section-5.5-2">When a CA cosigner signs a subtree, it makes the additional statement that it has certified each entry in the subtree. For example, a domain-validating CA states that it has performed domain validation for each entry, at some time consistent with the entry's validity dates. CAs are held responsible for every entry in every subtree they sign. Proving an entry is included (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) in a CA-signed subtree is sufficient to prove the CA certified it.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
 <p id="section-5.5-3">What it means to certify an entry depends on the entry type:<a href="#section-5.5-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -3972,7 +3978,7 @@ struct {
           </h4>
 <p id="section-5.6.1-1">Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be <em>pruned</em>, as described in this section.<a href="#section-5.6.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-2">Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. <a href="#log-availability" class="auto internal xref">Section 10.3</a> discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.<a href="#section-5.6.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.6.1-3">An issuance log is pruned by updating its <em>minimum index</em> parameter (<a href="#log-parameters" class="auto internal xref">Section 5.1</a>). The minimum index is the index of the first log entry that the log publishes. (See <a href="#publishing-logs" class="auto internal xref">Section 5.6</a>.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.<a href="#section-5.6.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.6.1-3">An issuance log is pruned by updating its <em>minimum index</em> parameter (<a href="#log-parameters" class="auto internal xref">Section 5.2</a>). The minimum index is the index of the first log entry that the log publishes. (See <a href="#publishing-logs" class="auto internal xref">Section 5.6</a>.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.<a href="#section-5.6.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-4">An entry is said to be <em>available</em> if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree <code>[start, end)</code> is said to be available if <code>end</code> is greater than the minimum index.<a href="#section-5.6.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-5">Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:<a href="#section-5.6.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -4351,8 +4357,8 @@ struct {
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-certificate-format" class="section-name selfRef">Certificate Format</a>
         </h3>
 <p id="section-6.1-1">The information is encoded in an X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> as follows:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.3</a>, this means <code>issuer</code> MUST be the issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> MUST contain the zero-based index of the TBSCertificateLogEntry in the log. <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.2" class="relref">Section 4.1.2.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> forbids zero as a serial number, but <a href="#log-entries" class="auto internal xref">Section 5.3</a> reserves entry zero with a <code>null_entry</code> type, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.3</a>, this means <code>issuer</code> MUST be the issuance log's CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>). The <code>serialNumber</code> MUST be equal to <code>(log_number &lt;&lt; 64) | index</code>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.1-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its <code>algorithm</code> field MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyAlgorithm</code>. Its hash MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.1-5">The TBSCertificate's <code>signature</code> and the Certificate's <code>signatureAlgorithm</code> MUST contain an AlgorithmIdentifier whose <code>algorithm</code> is id-alg-mtcProof, defined below, and whose <code>parameters</code> is omitted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-6.1-6">
@@ -4534,10 +4540,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-representing-certification-">
 <a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-representing-certification-" class="section-name selfRef">Representing Certification Authorities</a>
         </h3>
-<p id="section-6.5-1">This section defines the X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> representation of a Merkle Tree Certificate CA. It identifies the issuance log (<a href="#issuance-logs" class="auto internal xref">Section 5</a>) and the associated CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>). This information is encoded as follows:<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-1">This section defines the X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> representation of a Merkle Tree Certificate CA. It identifies the CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>) and associated issuance logs. This information is encoded as follows:<a href="#section-6.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.5-2.1">
-            <p id="section-6.5-2.1.1">The <code>subject</code> field MUST be the CA issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-6.5-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.5-2.1.1">The <code>subject</code> field MUST be the CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-6.5-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.5-2.2">
             <p id="section-6.5-2.2.1">The <code>subjectPublicKeyInfo</code> field MUST be the public key of the CA cosigner <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>.<a href="#section-6.5-2.2.1" class="pilcrow">¶</a></p>
@@ -4546,7 +4552,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-6.5-2.3.1">The <code>extensions</code> field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.<a href="#section-6.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.5-2.4">
-            <p id="section-6.5-2.4.1">The subject key identifier extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.2" class="relref">Section 4.2.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>), if present, SHOULD be set to CA's log ID <a href="#log-ids" class="auto internal xref">Section 5.2</a>. The log ID is encoded in its binary representation, as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-6.5-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-6.5-2.4.1">The subject key identifier extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.2" class="relref">Section 4.2.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>), if present, SHOULD be set to the CA ID <a href="#ca-ids" class="auto internal xref">Section 5.1</a>. The CA ID is encoded in its binary representation, as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-6.5-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-6.5-3">Other fields and extensions in <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> apply unmodified. In particular:<a href="#section-6.5-3" class="pilcrow">¶</a></p>
@@ -4585,13 +4591,13 @@ MTCCertificationAuthority ::= SEQUENCE {
 <p id="section-6.5-8">The fields of a MTCCertificationAuthority structure are defined as follows:<a href="#section-6.5-8" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.5-9.1">
-            <p id="section-6.5-9.1.1"><code>logHash</code> describes the hash algorithm used in the log. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-6.5-9.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.5-9.1.1"><code>logHash</code> describes the hash algorithm used by all logs operated by this CA. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-6.5-9.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.5-9.2">
             <p id="section-6.5-9.2.1"><code>sigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.4.3</a>).<a href="#section-6.5-9.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.5-9.3">
-            <p id="section-6.5-9.3.1"><code>minSerial</code> is an integer describing the minimum allowed serial number (entry index) in the issuance log (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>).<a href="#section-6.5-9.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.5-9.3.1"><code>minSerial</code> is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>).<a href="#section-6.5-9.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-6.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>. In particular, it MUST NOT be used to directly sign TBSCertificate structures.<a href="#section-6.5-10" class="pilcrow">¶</a></p>
@@ -4615,10 +4621,10 @@ MTCCertificationAuthority ::= SEQUENCE {
 <p id="section-7.1-1">In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-2.1">
-            <p id="section-7.1-2.1.1">The log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>)<a href="#section-7.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.1.1">The CA's ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>)<a href="#section-7.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.2">
-            <p id="section-7.1-2.2.1">The log hash algorithm, e.g. SHA-256<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.2.1">The hash algorithm used in each log, e.g. SHA-256<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.3">
             <p id="section-7.1-2.3.1">The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key<a href="#section-7.1-2.3.1" class="pilcrow">¶</a></p>
@@ -4627,28 +4633,28 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.1-2.4.1">A policy on which combinations of cosigners to accept in a certificate (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.5">
-            <p id="section-7.1-2.5.1">An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>)<a href="#section-7.1-2.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.5.1">An optional list of trusted subtrees that are known to be consistent with the relying party's cosigner requirements (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>)<a href="#section-7.1-2.5.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.6">
-            <p id="section-7.1-2.6.1">A list of revoked ranges of indices (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>)<a href="#section-7.1-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.6.1">A list of revoked ranges of serial numbers (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>)<a href="#section-7.1-2.6.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-7.1-3">This information may be obtained from a CA certificate structure, defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 6.5</a>:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-4.1">
-            <p id="section-7.1-4.1.1">The log ID is determined from the certificate's subject.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.1.1">The CA ID is determined from the certificate's subject.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.2">
             <p id="section-7.1-4.2.1">The log hash algorithm is determined from the id-pe-mtcCertificationAuthority extension.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.3">
-            <p id="section-7.1-4.3.1">The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The CA's cosigner ID is the log ID, determined above. The relying party incorporates this cosigner into its cosigner policy based on the guidance in <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.3.1">The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The CA's cosigner ID is the same as its CA ID. The relying party incorporates this cosigner into its cosigner policy based on the guidance in <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.4">
             <p id="section-7.1-4.4.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.5">
-            <p id="section-7.1-4.5.1">The revoked index ranges include the half-open range <code>[0, minSerial)</code>, but the relying party MAY incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.5.1">The revoked serial number ranges include the half-open range <code>[0, minSerial)</code>, but the relying party MAY incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -4667,33 +4673,42 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.2-2.2.1">Decode the <code>signatureValue</code> as an MTCProof, as described in <a href="#certificate-format" class="auto internal xref">Section 6.1</a>.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.3">
-            <p id="section-7.2-2.3.1">Let <code>index</code> be the certificate's serial number. If <code>index</code> is contained in one of the relying party's revoked ranges (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.3.1">Let <code>serial</code> be the certificate's serial number. If <code>serial</code> is negative, abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.4">
-            <p id="section-7.2-2.4.1">Construct a TBSCertificateLogEntry as follows:<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.2-2.4.2">
-<li id="section-7.2-2.4.2.1">
-                <p id="section-7.2-2.4.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.4.1">If <code>serial</code> is contained in one of the relying party's revoked ranges (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.2-2.4.2.2">
-                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyAlgorithm</code> to the <code>algorithm</code> field of the <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-2.5">
+            <p id="section-7.2-2.5.1">Let <code>index</code> be the least significant 64 bits of <code>serial</code> and let <code>log_number</code> be <code>serial &gt;&gt; 64</code>. If <code>log_number</code> is zero, abort this process and fail verification.<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.2-2.4.2.3">
-                <p id="section-7.2-2.4.2.3.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.3.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-2.6">
+            <p id="section-7.2-2.6.1">Let <code>log_id</code> be the log ID constructed from the CA ID in <code>issuer</code> and the <code>log_number</code> (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>).<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-2.7">
+            <p id="section-7.2-2.7.1">Construct a TBSCertificateLogEntry as follows:<a href="#section-7.2-2.7.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.2-2.7.2">
+<li id="section-7.2-2.7.2.1">
+                <p id="section-7.2-2.7.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.7.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.7.2.2">
+                <p id="section-7.2-2.7.2.2.1">Set <code>subjectPublicKeyAlgorithm</code> to the <code>algorithm</code> field of the <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.7.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.7.2.3">
+                <p id="section-7.2-2.7.2.3.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.7.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ol>
 </li>
-          <li id="section-7.2-2.5">
-            <p id="section-7.2-2.5.1">Construct a MerkleTreeCertEntry of type <code>tbs_cert_entry</code> with contents the TBSCertificateLogEntry. Let <code>entry_hash</code> be the hash of the entry, <code>MTH({entry}) = HASH(0x00 || entry)</code>, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-2.6">
-            <p id="section-7.2-2.6.1">Let <code>expected_subtree_hash</code> be the result of evaluating the MTCProof's <code>inclusion_proof</code> for entry <code>index</code>, with hash <code>entry_hash</code>, of the subtree described by the MTCProof's <code>start</code> and <code>end</code>, following the procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a>. If evaluation fails, abort this process and fail verification.<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-2.7">
-            <p id="section-7.2-2.7.1">If <code>[start, end)</code> matches a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>), check that <code>expected_subtree_hash</code> is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.<a href="#section-7.2-2.7.1" class="pilcrow">¶</a></p>
-</li>
           <li id="section-7.2-2.8">
-            <p id="section-7.2-2.8.1">Otherwise, check that the MTCProof's <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. Reconstruct the CosignedMessage from MTCProof's <code>start</code> and <code>end</code>, the cosigner ID for <code>cosigner_name</code>, the log ID for <code>log_origin</code>, <code>expected_subtree_hash</code> for <code>subtree_hash</code>, and <code>timestamp</code> set to zero.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.8.1">Construct a MerkleTreeCertEntry of type <code>tbs_cert_entry</code> with contents the TBSCertificateLogEntry. Let <code>entry_hash</code> be the hash of the entry, <code>MTH({entry}) = HASH(0x00 || entry)</code>, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-2.9">
+            <p id="section-7.2-2.9.1">Let <code>expected_subtree_hash</code> be the result of evaluating the MTCProof's <code>inclusion_proof</code> for entry <code>index</code>, with hash <code>entry_hash</code>, of the subtree described by the MTCProof's <code>start</code> and <code>end</code>, following the procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a>. If evaluation fails, abort this process and fail verification.<a href="#section-7.2-2.9.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-2.10">
+            <p id="section-7.2-2.10.1">If <code>log_number</code>, <code>start</code>, and <code>end</code> matches a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) for the CA, check that <code>expected_subtree_hash</code> is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.<a href="#section-7.2-2.10.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-2.11">
+            <p id="section-7.2-2.11.1">Otherwise, check that the MTCProof's <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. Reconstruct the CosignedMessage from MTCProof's <code>start</code> and <code>end</code>, the cosigner ID for <code>cosigner_name</code>, <code>log_id</code> for <code>log_origin</code>, <code>expected_subtree_hash</code> for <code>subtree_hash</code>, and <code>timestamp</code> set to zero.<a href="#section-7.2-2.11.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-7.2-3">This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
@@ -4752,7 +4767,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 </dl>
 <p id="section-7.3-5">Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a directly-signed X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in <a href="#relying-party-configuration" class="auto internal xref">Section 7.1</a>.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
 <p id="section-7.3-6">While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
-<p id="section-7.3-7">To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a> discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> describes a "mirror" cosigner role.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
+<p id="section-7.3-7">To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> describes a "mirror" cosigner role.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
 <p id="section-7.3-8">Relying parties MAY accept the same set of additional cosigners across CAs.<a href="#section-7.3-8" class="pilcrow">¶</a></p>
 <p id="section-7.3-9">In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This fits the pattern of many existing X.509 applications, where CA information is determined directly from a CA certificate, with no additional out-of-band information. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.<a href="#section-7.3-9" class="pilcrow">¶</a></p>
 <p id="section-7.3-10">Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.<a href="#section-7.3-10" class="pilcrow">¶</a></p>
@@ -4764,43 +4779,55 @@ MTCCertificationAuthority ::= SEQUENCE {
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
-<p id="section-7.4-2">Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.4</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
-<p id="section-7.4-3">This criteria can be checked given:<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from one or more of the CA's issuance logs. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">Each trusted subtree contains:<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.4-4.1">
-            <p id="section-7.4-4.1.1">Some <em>reference checkpoint</em> that contains the latest landmark<a href="#section-7.4-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.4-3.1">
+            <p id="section-7.4-3.1.1">The log number of the containing log<a href="#section-7.4-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-4.2">
-            <p id="section-7.4-4.2.1">For each cosigner, either:<a href="#section-7.4-4.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.4-3.2">
+            <p id="section-7.4-3.2.1">The <code>start</code> and <code>end</code> values that define the subtree<a href="#section-7.4-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.4-3.3">
+            <p id="section-7.4-3.3.1">The hash of the subtree<a href="#section-7.4-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.4-4">Trusted subtrees for a given log are determined by its active landmark subtrees, as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.4</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
+<p id="section-7.4-5">This criteria can be checked given:<a href="#section-7.4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.4-4.2.2.1">
-                <p id="section-7.4-4.2.2.1.1">A cosignature on the reference checkpoint<a href="#section-7.4-4.2.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.4-6.1">
+            <p id="section-7.4-6.1.1">Some <em>reference checkpoint</em> that contains the latest landmark<a href="#section-7.4-6.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.4-4.2.2.2">
-                <p id="section-7.4-4.2.2.2.1">A cosigned checkpoint containing the referenced checkpoint and a valid Merkle consistency proof (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) between the two<a href="#section-7.4-4.2.2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.4-6.2">
+            <p id="section-7.4-6.2.1">For each cosigner, either:<a href="#section-7.4-6.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.4-6.2.2.1">
+                <p id="section-7.4-6.2.2.1.1">A cosignature on the reference checkpoint<a href="#section-7.4-6.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-7.4-6.2.2.2">
+                <p id="section-7.4-6.2.2.2.1">A cosigned checkpoint containing the referenced checkpoint and a valid Merkle consistency proof (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) between the two<a href="#section-7.4-6.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
-          <li class="normal" id="section-7.4-4.3">
-            <p id="section-7.4-4.3.1">For each subtree, a valid subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>) between the subtree and the reference checkpoint<a href="#section-7.4-4.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.4-6.3">
+            <p id="section-7.4-6.3.1">For each subtree, a valid subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>) between the subtree and the reference checkpoint<a href="#section-7.4-6.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.4-5">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-5" class="pilcrow">¶</a></p>
-<p id="section-7.4-6">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-6" class="pilcrow">¶</a></p>
-<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.4-7">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.4-8">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-8" class="pilcrow">¶</a></p>
+<p id="section-7.4-9">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="revocation-by-index">
+<div id="revoked-ranges">
 <section id="section-7.5">
-        <h3 id="name-revocation-by-index">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-revocation-by-index" class="section-name selfRef">Revocation by Index</a>
+        <h3 id="name-revoked-ranges">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-revoked-ranges" class="section-name selfRef">Revoked Ranges</a>
         </h3>
-<p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of indices. This allows a relying party to efficiently revoke entries of an issuance log, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">When a relying party is first configured to trust a CA, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. The serial number combines the log number (in the high bits) and log index (in the lowest 64 bits). A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
 <p id="section-7.5-3">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
 <p id="section-7.5-4">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
-<p id="section-7.5-5">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because Merkle Tree certificates use log indices as serial numbers, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
+<p id="section-7.5-5">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4828,8 +4855,8 @@ MTCCertificationAuthority ::= SEQUENCE {
         <h3 id="name-standalone-certificates-2">
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-standalone-certificates-2" class="section-name selfRef">Standalone Certificates</a>
         </h3>
-<p id="section-8.1-1">Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). This trust anchor ID is additionally contained in the trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">Log IDs MAY be incorporated into other trust anchor groups, following the guidance in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.1-1">Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding CA ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>). This trust anchor ID is additionally contained in the trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">CA IDs MAY be incorporated into other trust anchor groups, following the guidance in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
 <p id="section-8.1-3">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8.1-3" class="pilcrow">¶</a></p>
 <p id="section-8.1-4">A standalone certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.1-4" class="pilcrow">¶</a></p>
 </section>
@@ -4840,25 +4867,56 @@ MTCCertificationAuthority ::= SEQUENCE {
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-landmark-relative-certificat" class="section-name selfRef">Landmark-Relative Certificates</a>
         </h3>
 <p id="section-8.2-1">An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">TLS implementations SHOULD use the <code>trust_anchors</code> extension to determine this. A landmark-relative certificate, defined against landmark number <code>L</code>, has a trust anchor ID constructed by appending components 0 and L to the issuing log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). For example, the trust anchor ID for landmark 42 of log <code>32473.1</code> is <code>32473.1.0.42</code>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<p id="section-8.2-3">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying paries to express their landmark state with a single ID.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">TLS implementations SHOULD use the <code>trust_anchors</code> extension to determine this. A landmark-relative certificate's trust anchor ID is the concatenation of the following OID components:<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.2-3.1">
+            <p id="section-8.2-3.1.1">The CA ID <a href="#ca-ids" class="auto internal xref">Section 5.1</a> of the CA that issued the certificate<a href="#section-8.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-3.2">
+            <p id="section-8.2-3.2.1">The constant 1<a href="#section-8.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-3.3">
+            <p id="section-8.2-3.3.1">The log number of the log used to construct the certificate<a href="#section-8.2-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-3.4">
+            <p id="section-8.2-3.4.1">The landmark number of the landmark used to construct the certificate<a href="#section-8.2-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-8.2-4">For example, the trust anchor ID for landmark 42 of CA <code>32473.1</code> and log number <code>8</code> is <code>32473.1.1.8.42</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-5">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying paries to express their landmark state with a single ID.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+<p id="section-8.2-6">If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 <div id="single-log-landmark-groups">
 <section id="section-8.2.1">
           <h4 id="name-single-log-landmark-groups">
 <a href="#section-8.2.1" class="section-number selfRef">8.2.1. </a><a href="#name-single-log-landmark-groups" class="section-name selfRef">Single-Log Landmark Groups</a>
           </h4>
 <p id="section-8.2.1-1">Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines series of trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) called <em>landmark groups</em>.<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.2.1-2">For each non-negative integer <code>L</code>, landmark group <code>L</code> has a trust anchor ID constructed by appending components 1 and L to the issuing log ID. For example, landmark group 42 of log <code>32473.1</code> has ID <code>32473.1.1.42</code>. Landmark group <code>L</code> indicates the relying party supports the specified log ID, and whose latest trusted subtrees is landmark <code>L</code>. Concretely, it contains the following trust anchors:<a href="#section-8.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-2">For each Merkle Tree Certificates CA, each log number <code>N</code>, and each landmark number <code>L</code>, a landmark group is defined. The group's ID is the concatenation of the following OID components:<a href="#section-8.2.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.1-3.1">
-              <p id="section-8.2.1-3.1.1">The log ID itself (see <a href="#standalone-certificates-tls" class="auto internal xref">Section 8.1</a>)<a href="#section-8.2.1-3.1.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-3.1.1">The CA ID <a href="#ca-ids" class="auto internal xref">Section 5.1</a> of the CA<a href="#section-8.2.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-3.2">
-              <p id="section-8.2.1-3.2.1">Each landmark of the log from <code>L - max_active_landmarks + 1</code> to <code>L</code>, inclusive<a href="#section-8.2.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-3.2.1">The constant 2<a href="#section-8.2.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-8.2.1-3.3">
+              <p id="section-8.2.1-3.3.1">The log number <code>N</code><a href="#section-8.2.1-3.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-8.2.1-3.4">
+              <p id="section-8.2.1-3.4.1">The landmark number <code>L</code><a href="#section-8.2.1-3.4.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-8.2.1-4">Landmark-relative certificates SHOULD be configured with this information, as in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party whose latest trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) is landmark <code>L</code> SHOULD configure the <code>trust_anchors</code> extension to advertise landmark group <code>L</code>. This signals support for both standalone certificates and supported landmarks.<a href="#section-8.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-4">This group contains the following trust anchors:<a href="#section-8.2.1-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.2.1-5.1">
+              <p id="section-8.2.1-5.1.1">The CA ID itself (see <a href="#standalone-certificates-tls" class="auto internal xref">Section 8.1</a>)<a href="#section-8.2.1-5.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-8.2.1-5.2">
+              <p id="section-8.2.1-5.2.1">Each landmark of log <code>N</code> from <code>L - max_active_landmarks + 1</code> to <code>L</code>, inclusive<a href="#section-8.2.1-5.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-8.2.1-6">Landmark-relative certificates SHOULD be configured with this information, as in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party whose latest trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) in log <code>N</code> is landmark <code>L</code> SHOULD configure the <code>trust_anchors</code> extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks.<a href="#section-8.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-7">For example, a relying party which is up-to-date as of landmark 42 of log 8 of CA <code>32473.1</code> would send an ID of <code>32473.1.2.8.42</code>.<a href="#section-8.2.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="timestamped-landmark-groups">
@@ -4973,12 +5031,12 @@ MTCCertificationAuthority ::= SEQUENCE {
 <p id="section-10.3-2">As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish availability policies. These policies SHOULD be adhered to by trusted CAs and mirrors, and enforced by relying party vendors as a condition of trust. Exact availability policies for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
 <p id="section-10.3-3">Availability policies SHOULD specify how long an entry must be made available, before a CA or mirror is permitted to prune the entry. It is RECOMMENDED to define this using a <em>retention period</em>, which is some time after the entry has expired. In such a policy, an entry could only be pruned if it, and all preceding entries, have already expired for the retention period. Policies MAY opt to set different retention periods between CAs and mirrors. Permitting limited log retention is analogous to the CT practice of temporal sharding <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, except that a pruned issuance log remains compatible with older, unupdated relying parties.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
 <p id="section-10.3-4">Such policies impact monitors. If the retention period is, e.g. 6 months, this means that monitors are expected to check entries of interest within 6 months. It also means that a new monitor may only be aware of a 6 month history of entries issued for a particular domain.<a href="#section-10.3-4" class="pilcrow">¶</a></p>
-<p id="section-10.3-5">If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.<a href="#section-10.3-5" class="pilcrow">¶</a></p>
+<p id="section-10.3-5">If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.<a href="#section-10.3-5" class="pilcrow">¶</a></p>
 <p id="section-10.3-6">The log pruning process simply makes some resources unavailable. Availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
 <p id="section-10.3-7">PKIs that require mirror cosignatures (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 <p id="section-10.3-8">However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized issuance, if the entries are not available in another mirror. This does compromise transparency goals. As such, availability policies SHOULD set availability expectations on mirrors. This can also be mitigated by using multiple mirrors, either directly enforced in cosigner requirements, or by keeping mirrors up-to-date with each other.<a href="#section-10.3-8" class="pilcrow">¶</a></p>
 <p id="section-10.3-9">In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs SHOULD set availability requirements on CAs.<a href="#section-10.3-9" class="pilcrow">¶</a></p>
-<p id="section-10.3-10">In each of these cases, availability failures can be mitigated by revoking the unavailable entries by index, as described in <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>, likely as a first step in a broader distrust.<a href="#section-10.3-10" class="pilcrow">¶</a></p>
+<p id="section-10.3-10">In each of these cases, the serial numbers of unavailable entries are known. Availability failures can thus be mitigated by revocation, as described in <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>, likely as a first step in a broader distrust.<a href="#section-10.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="certificate-renewal">
@@ -5034,8 +5092,16 @@ MTCCertificationAuthority ::= SEQUENCE {
 <p id="section-12.2-1">The transparency mechanisms in this document do not prevent a CA from issuing an unauthorized certificate. Rather, they provide comparable security properties as Certificate Transparency <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> in ensuring that all certificates are either rejected by relying parties, or visible to monitors and, in particular, the subject of the certificate.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
 <p id="section-12.2-2">Compared to Certificate Transparency, some of the responsibilities of a log have moved to the CA. All signatures generated by the CA in this system are assertions about some view of the CA's issuance log. However, a CA does not need to function correctly to ensure transparency properties. Relying parties are expected to require a quorum of additional cosigners, which together enforce properties of the log (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) and prevent or detect CA misbehavior:<a href="#section-12.2-2" class="pilcrow">¶</a></p>
 <p id="section-12.2-3">A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.<a href="#section-12.2-3" class="pilcrow">¶</a></p>
-<p id="section-12.2-4">If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the inconsistent indices (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
-<p id="section-12.2-5">A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy (<a href="#log-availability" class="auto internal xref">Section 10.3</a>). If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it. If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of <em>some</em> entry at that index will be visible, so monitors will know the CA is failing to present an entry. Relying parties can then react by revoking the undisclosed entries by index (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), and likely removing the CA.<a href="#section-12.2-5" class="pilcrow">¶</a></p>
+<p id="section-12.2-4">If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the range of inconsistent serials (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
+<p id="section-12.2-5">A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy (<a href="#log-availability" class="auto internal xref">Section 10.3</a>). The impact depends on the relying party's cosigner policy:<a href="#section-12.2-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-12.2-6.1">
+            <p id="section-12.2-6.1.1">If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it.<a href="#section-12.2-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-12.2-6.2">
+            <p id="section-12.2-6.2.1">If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of <em>some</em> entry at that index will be visible, so monitors will know the CA is failing to present an entry. This is sufficient to determine the serial number, so relying parties can then react by revoking the undisclosed entries (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>), and likely removing the CA.<a href="#section-12.2-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
 </section>
 </div>
 <div id="public-key-hashes">
@@ -6352,7 +6418,7 @@ END
         <h3 id="name-subtree-signed-note-format">
 <a href="#appendix-C.1" class="section-number selfRef">C.1. </a><a href="#name-subtree-signed-note-format" class="section-name selfRef">Subtree Signed Note Format</a>
         </h3>
-<p id="appendix-C.1-1">A subtree, with signatures, can be represented as a signed note <span>[<a href="#SIGNED-NOTE" class="cite xref">SIGNED-NOTE</a>]</span>. Trust anchor IDs can be converted into log origins and cosigner names by concatenating the ASCII string <code>oid/1.3.6.1.4.1.</code> and the ASCII representation of the trust anchor ID. For example, the checkpoint origin for a log named <code>32473.1</code> would be <code>oid/1.3.6.1.4.1.32473.1</code>.<a href="#appendix-C.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-C.1-1">A subtree, with signatures, can be represented as a signed note <span>[<a href="#SIGNED-NOTE" class="cite xref">SIGNED-NOTE</a>]</span>. Trust anchor IDs can be converted into log origins and cosigner names by concatenating the ASCII string <code>oid/1.3.6.1.4.1.</code> and the ASCII representation of the trust anchor ID. For example, the log ID from a CA with ID <code>32473.1</code> and log number 8 is <code>32473.1.0.8</code> and its checkpoint origin is <code>oid/1.3.6.1.4.1.32473.1.0.8</code>.<a href="#appendix-C.1-1" class="pilcrow">¶</a></p>
 <p id="appendix-C.1-2">The note body is a sequence of the following lines, each terminated by a newline character (U+000A):<a href="#appendix-C.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-C.1-3.1">
@@ -6745,6 +6811,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.15-1.7">
             <p id="appendix-E.15-1.7.1">Update TLS integration now that trust anchor IDs extension has been moved to the base draft<a href="#appendix-E.15-1.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.15-1.8">
+            <p id="appendix-E.15-1.8.1">A single CA now operates a series of issuance logs, instead of a one-to-one correspondence<a href="#appendix-E.15-1.8.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
