@@ -254,7 +254,10 @@ Table of Contents
 
    This document additionally uses the TLS presentation language defined
    in Section 3 of [RFC8446], as well as the notation defined in
-   Section 2.1.1 of [RFC9162].
+   Section 2.1.1 of [RFC9162].  It extends the numeric types defined in
+   Section 3.3 of [RFC8446] with a big-endian, 48-bit integer:
+
+   uint8 uint48[6];
 
    U+ followed by four hexadecimal characters denotes a Unicode
    codepoint, to be encoded in UTF-8 [RFC3629]. 0x followed by two
@@ -1130,7 +1133,7 @@ Table of Contents
    Each issuance log is run by a Certification Authority.  A CA can run
    multiple related issuance logs.  Each log is assigned a positive
    integer to identify it, and these log numbers MUST be assigned in
-   increasing order.
+   increasing order.  Log numbers MUST be at most 2^16-1.
 
    Each Merkle Tree Certificate CA has a _CA ID_ to identify it.  This
    CA ID is a trust anchor ID [I-D.ietf-tls-trust-anchor-ids], and its
@@ -1674,7 +1677,8 @@ Table of Contents
    The TBSCertificate's serialNumber is constructed from the zero-based
    index of the TBSCertificateLogEntry in the log and the log's number
    (Section 5.1).  The serialNumber MUST be equal to (log_number <<
-   64) | index.
+   48) | index.  All serial numbers constructed in this way will be
+   positive and at most 2^64-1.
 
    The TBSCertificate's subjectPublicKeyInfo contains the specified
    public key.  Its algorithm field MUST match the
@@ -1707,8 +1711,8 @@ Table of Contents
    } MTCSignature;
 
    struct {
-       uint64 start;
-       uint64 end;
+       uint48 start;
+       uint48 end;
        HashValue inclusion_proof<0..2^16-1>;
        MTCSignature signatures<0..2^16-1>;
    } MTCProof;
@@ -2112,13 +2116,14 @@ Table of Contents
         Section 6.1.
 
    3.   Let serial be the certificate's serial number.  If serial is
-        negative, abort this process and fail verification.
+        negative or greater than 2^64-1, abort this process and fail
+        verification.
 
    4.   If serial is contained in one of the relying party's revoked
         ranges (Section 7.5), abort this process and fail verification.
 
-   5.   Let index be the least significant 64 bits of serial and let
-        log_number be serial >> 64.  If log_number is zero, abort this
+   5.   Let index be the least significant 48 bits of serial and let
+        log_number be serial >> 48.  If log_number is zero, abort this
         process and fail verification.
 
    6.   Let log_id be the log ID constructed from the CA ID in issuer
@@ -2319,13 +2324,12 @@ Table of Contents
 7.5.  Revoked Ranges
 
    For each supported Merkle Tree CA, the relying party maintains a list
-   of revoked ranges of serial numbers.  The serial number combines the
-   log number (in the high bits) and log index (in the lowest 64 bits).
-   A relying party can thus efficiently revoke both ranges of entries of
-   an issuance log, and ranges of issuance logs, even if the contents
-   are not necessarily known.  This may be used to mitigate the security
-   consequences of misbehavior by a CA, or other parties in the
-   ecosystem.
+   of revoked ranges of serial numbers.  A serial number combines a log
+   number and a log index.  A relying party can thus efficiently revoke
+   both ranges of entries of an issuance log, and ranges of issuance
+   logs, even if the contents are not necessarily known.  This may be
+   used to mitigate the security consequences of misbehavior by a CA, or
+   other parties in the ecosystem.
 
    When a relying party is first configured to trust an issuance log, it
    SHOULD be configured to revoke all entries from zero up to but not

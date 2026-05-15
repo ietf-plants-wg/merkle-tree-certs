@@ -1549,27 +1549,32 @@ svg :is([fill="white"], [fill^="#fff"]) {
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span>
 when, and only when, they appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">This document additionally uses the TLS presentation language defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, as well as the notation defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3"><code>U+</code> followed by four hexadecimal characters denotes a Unicode codepoint, to be encoded in UTF-8 <span>[<a href="#RFC3629" class="cite xref">RFC3629</a>]</span>. <code>0x</code> followed by two hexadecimal characters denotes a byte value in the 0-255 range.<a href="#section-2-3" class="pilcrow">¶</a></p>
-<p id="section-2-4"><code>[start, end)</code>, where <code>start &lt;= end</code>, denotes the half-open interval containing integers <code>x</code> such that <code>start &lt;= x &lt; end</code>.<a href="#section-2-4" class="pilcrow">¶</a></p>
-<p id="section-2-5">Given a non-negative integer <code>n</code>,<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document additionally uses the TLS presentation language defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, as well as the notation defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. It extends the numeric types defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> with a big-endian, 48-bit integer:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-2-3">
+<pre>
+uint8 uint48[6];
+</pre><a href="#section-2-3" class="pilcrow">¶</a>
+</div>
+<p id="section-2-4"><code>U+</code> followed by four hexadecimal characters denotes a Unicode codepoint, to be encoded in UTF-8 <span>[<a href="#RFC3629" class="cite xref">RFC3629</a>]</span>. <code>0x</code> followed by two hexadecimal characters denotes a byte value in the 0-255 range.<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5"><code>[start, end)</code>, where <code>start &lt;= end</code>, denotes the half-open interval containing integers <code>x</code> such that <code>start &lt;= x &lt; end</code>.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6">Given a non-negative integer <code>n</code>,<a href="#section-2-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-2-6.1">
-          <p id="section-2-6.1.1"><code>LSB(n)</code> refers to the least-significant bit of <code>n</code>'s binary representation. Equivalently, it is the remainder when <code>n</code> is divided by 2.<a href="#section-2-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-2-7.1">
+          <p id="section-2-7.1.1"><code>LSB(n)</code> refers to the least-significant bit of <code>n</code>'s binary representation. Equivalently, it is the remainder when <code>n</code> is divided by 2.<a href="#section-2-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-6.2">
-          <p id="section-2-6.2.1"><code>BIT_WIDTH(n)</code> refers to the smallest number of bits needed to represent <code>n</code>. <code>BIT_WIDTH(0)</code> is zero.<a href="#section-2-6.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-7.2">
+          <p id="section-2-7.2.1"><code>BIT_WIDTH(n)</code> refers to the smallest number of bits needed to represent <code>n</code>. <code>BIT_WIDTH(0)</code> is zero.<a href="#section-2-7.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-6.3">
-          <p id="section-2-6.3.1"><code>POPCOUNT(n)</code> refers to the number of set bits in <code>n</code>'s binary representation.<a href="#section-2-6.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-7.3">
+          <p id="section-2-7.3.1"><code>POPCOUNT(n)</code> refers to the number of set bits in <code>n</code>'s binary representation.<a href="#section-2-7.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-6.4">
-          <p id="section-2-6.4.1"><code>BIT_CEIL(n)</code> refers to the smallest power of 2 that is greater or equal to <code>n</code>.<a href="#section-2-6.4.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-7.4">
+          <p id="section-2-7.4.1"><code>BIT_CEIL(n)</code> refers to the smallest power of 2 that is greater or equal to <code>n</code>.<a href="#section-2-7.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-2-7">To <em>left-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one upper position. Equivalently, it is <code>n</code> times 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &lt;&lt; b</code> refers to <code>a</code> left-shifted <code>b</code> times.<a href="#section-2-7" class="pilcrow">¶</a></p>
-<p id="section-2-8">To <em>right-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of <code>n</code> divided by 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &gt;&gt; b</code> refers to <code>a</code> right-shifted <code>b</code> times.<a href="#section-2-8" class="pilcrow">¶</a></p>
-<p id="section-2-9">Given two non-negative integers <code>a</code> and <code>b</code>, <code>a &amp; b</code> refers to the non-negative integer such that each bit position is set if the corresponding bit is set in both <code>a</code> and <code>b</code>, and unset otherwise. This is commonly referred to as the bitwise AND operator.<a href="#section-2-9" class="pilcrow">¶</a></p>
+<p id="section-2-8">To <em>left-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one upper position. Equivalently, it is <code>n</code> times 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &lt;&lt; b</code> refers to <code>a</code> left-shifted <code>b</code> times.<a href="#section-2-8" class="pilcrow">¶</a></p>
+<p id="section-2-9">To <em>right-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of <code>n</code> divided by 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &gt;&gt; b</code> refers to <code>a</code> right-shifted <code>b</code> times.<a href="#section-2-9" class="pilcrow">¶</a></p>
+<p id="section-2-10">Given two non-negative integers <code>a</code> and <code>b</code>, <code>a &amp; b</code> refers to the non-negative integer such that each bit position is set if the corresponding bit is set in both <code>a</code> and <code>b</code>, and unset otherwise. This is commonly referred to as the bitwise AND operator.<a href="#section-2-10" class="pilcrow">¶</a></p>
 <div id="terminology-and-roles">
 <section id="section-2.1">
         <h3 id="name-terminology-and-roles">
@@ -3715,7 +3720,7 @@ def find_subtrees(start, end):
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-relationship-with-certifica" class="section-name selfRef">Relationship with Certification Authorities</a>
         </h3>
 <p id="section-5.1-1">[[TODO: #232 This sectioning is a bit awkward. Rearrange the top-level section to be about CAs in general and introduce CA parameters there.]]<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order. Log numbers MUST be at most 2<sup>16</sup>-1.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.1-3">Each Merkle Tree Certificate CA has a <em>CA ID</em> to identify it. This CA ID is a trust anchor ID <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>, and its entire object identifier (OID) arc is allocated for the issuance logs run by that CA.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.1-4">An individual issuance log run by a CA can be identified by a <em>log ID</em> constructed from the <em>CA ID</em> and log number. The log ID is also a trust anchor ID.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.1-5">OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a CA ID whose OID representation is <code>caID</code> and a log operated by that CA with log number <code>N</code>, this document allocates the following OIDs:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
@@ -4358,7 +4363,7 @@ struct {
         </h3>
 <p id="section-6.1-1">The information is encoded in an X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> as follows:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.3</a>, this means <code>issuer</code> MUST be the issuance log's CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>). The <code>serialNumber</code> MUST be equal to <code>(log_number &lt;&lt; 64) | index</code>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>). The <code>serialNumber</code> MUST be equal to <code>(log_number &lt;&lt; 48) | index</code>. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.1-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its <code>algorithm</code> field MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyAlgorithm</code>. Its hash MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.1-5">The TBSCertificate's <code>signature</code> and the Certificate's <code>signatureAlgorithm</code> MUST contain an AlgorithmIdentifier whose <code>algorithm</code> is id-alg-mtcProof, defined below, and whose <code>parameters</code> is omitted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-6.1-6">
@@ -4383,8 +4388,8 @@ struct {
 } MTCSignature;
 
 struct {
-    uint64 start;
-    uint64 end;
+    uint48 start;
+    uint48 end;
     HashValue inclusion_proof&lt;0..2^16-1&gt;;
     MTCSignature signatures&lt;0..2^16-1&gt;;
 } MTCProof;
@@ -4673,13 +4678,13 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-7.2-2.2.1">Decode the <code>signatureValue</code> as an MTCProof, as described in <a href="#certificate-format" class="auto internal xref">Section 6.1</a>.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.3">
-            <p id="section-7.2-2.3.1">Let <code>serial</code> be the certificate's serial number. If <code>serial</code> is negative, abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.3.1">Let <code>serial</code> be the certificate's serial number. If <code>serial</code> is negative or greater than 2<sup>64</sup>-1, abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.4">
             <p id="section-7.2-2.4.1">If <code>serial</code> is contained in one of the relying party's revoked ranges (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.5">
-            <p id="section-7.2-2.5.1">Let <code>index</code> be the least significant 64 bits of <code>serial</code> and let <code>log_number</code> be <code>serial &gt;&gt; 64</code>. If <code>log_number</code> is zero, abort this process and fail verification.<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.5.1">Let <code>index</code> be the least significant 48 bits of <code>serial</code> and let <code>log_number</code> be <code>serial &gt;&gt; 48</code>. If <code>log_number</code> is zero, abort this process and fail verification.<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.6">
             <p id="section-7.2-2.6.1">Let <code>log_id</code> be the log ID constructed from the CA ID in <code>issuer</code> and the <code>log_number</code> (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>).<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
@@ -4823,7 +4828,7 @@ MTCCertificationAuthority ::= SEQUENCE {
         <h3 id="name-revoked-ranges">
 <a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-revoked-ranges" class="section-name selfRef">Revoked Ranges</a>
         </h3>
-<p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. The serial number combines the log number (in the high bits) and log index (in the lowest 64 bits). A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
 <p id="section-7.5-2">When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
 <p id="section-7.5-3">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
 <p id="section-7.5-4">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
