@@ -1482,31 +1482,17 @@ Table of Contents
 
 5.6.  Publishing Logs
 
-   _[[NOTE: This section is written to avoid depending on a specific
-   serving protocol.  The current expectation is that a Web PKI
-   deployment would derive from [TLOG-TILES], to match the direction of
-   Certificate Transparency and pick up improvements made there._
+   This protocol aims to enable monitors to detect misissued
+   certificates by observing the issuance log.  See Section 12.2.
 
-   _For now, we avoid a normative reference to [TLOG-TILES] and also
-   capture the fact that the certificate construction is independent of
-   the choice of protocol.  Similar to how the CT ecosystem is migrating
-   to a tiled interface, were someone to improve on [TLOG-TILES], a PKI
-   could migrate to that new protocol without impacting certificate
-   verification._
-
-   _This is purely a starting point for describing the design.  We
-   expect the scope of this document, and other related documents to
-   adapt as the work evolves across the IETF, C2SP, Certificate
-   Transparency, and other communities.]]_
-
-   Issuance logs are intended to be publicly accessible to allow
-   monitors to detect misissued certificates.
-
-   The access method does not affect certificate interoperability, so
-   this document does not prescribe a specific protocol.  An individual
-   issuance log MAY be published in any form, provided other parties in
-   the PKI are able to consume it.  Relying parties SHOULD define log
-   serving requirements, including the allowed protocols and expected
+   This document does not prescribe a particular method of observing the
+   issuance log.  The access protocols do not affect certificate
+   interoperability, and different applications may have different
+   needs.  For example, a PKI that authenticates public services might
+   publicly serve issuance logs, while a PKI that authenticates a single
+   organization's intranet services might keep the log private to the
+   organization.  Relying parties SHOULD define log serving
+   requirements, including the allowed protocols and expected
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
