@@ -1236,6 +1236,13 @@ struct {
 
 `start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
+Each element of the `signatures` field MUST have a unique `cosigner_id`. Elements MUST be ordered by `cosigner_id` as follows:
+
+* Shorter byte strings are ordered before longer byte strings
+* Byte strings of the same length are ordered lexicographically
+
+An MTCProof parser MUST reject the input if there are duplicate `cosigner_id` values, or if they are not ordered correctly. This can be done by checking each `cosigner_id` value comes strict after the previous one in the above order.
+
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
 
 ## Standalone Certificates
@@ -2334,3 +2341,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Prescribe landmark OID allocation
 
 - Update TLS integration now that trust anchor IDs extension has been moved to the base draft
+
+- Canonicalize the order of cosignatures in MTCProofs
