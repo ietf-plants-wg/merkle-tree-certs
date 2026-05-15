@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 14 November 2026                                     Apple Inc.
+Expires: 16 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             13 May 2026
+                                                             15 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 November 2026.
+   This Internet-Draft will expire on 16 November 2026.
 
 Copyright Notice
 
@@ -1693,6 +1693,9 @@ Table of Contents
 
    The signatureValue contains an MTCProof structure, defined below
    using the TLS presentation language (Section 3 of [RFC8446]):
+
+   /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+   opaque TrustAnchorID<1..2^8-1>;
 
    opaque HashValue[HASH_SIZE];
 
