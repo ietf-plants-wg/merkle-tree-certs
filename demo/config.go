@@ -23,6 +23,7 @@ const (
 	VersionDavidben10
 	VersionPlants01
 	VersionPlants02
+	VersionPlants04
 )
 
 func (v DraftVersion) String() string {
@@ -35,6 +36,8 @@ func (v DraftVersion) String() string {
 		return "plants-01"
 	case VersionPlants02:
 		return "plants-02"
+	case VersionPlants04:
+		return "plants-04"
 	}
 	panic(fmt.Sprintf("unknown version %d", v))
 }
@@ -62,6 +65,12 @@ func DraftVersionFromString(s string) (v DraftVersion, ok bool) {
 		return VersionPlants01, true
 	case "plants-02":
 		return VersionPlants02, true
+	case "plants-04":
+		// TODO: not fully up-to-date with draft-04 yet. Still missing:
+		//   - CA cosigner's ID should now be the log ID (fix in provided config file).
+		//   - Signature scheme has been updated.
+		//   - Add code to synthesize the CA certs.
+		return VersionPlants04, true
 
 	default:
 		return 0, false

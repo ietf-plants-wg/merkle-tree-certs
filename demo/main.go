@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
 	"encoding/pem"
 	"flag"
@@ -65,6 +66,19 @@ func tlogCheckpointKeyID(id TrustAnchorID) [4]byte {
 	return *(*[4]byte)(h[:])
 }
 
+// demoRandomizer returns SHA-256(index) for draft-plants-04 and later, or 32
+// zero bytes otherwise. A real CA would use a CSPRNG; the demo derives the
+// randomizer deterministically for reproducibility.
+func demoRandomizer(version DraftVersion, index int) []byte {
+	if version < VersionPlants04 {
+		return make([]byte, 32)
+	}
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], uint64(index))
+	h := sha256.Sum256(buf[:])
+	return h[:]
+}
+
 func do() error {
 	// Load the config.
 	configBytes, err := os.ReadFile(*flagConfig)
@@ -76,8 +90,15 @@ func do() error {
 		return err
 	}
 
+	// The demo derives the per-entry randomizer (draft-plants-04 and later)
+	// deterministically from the entry index using demoRandomizer. A real CA
+	// would use a CSPRNG.
+	nullEntry, err := MarshalNullEntry(config.Version, demoRandomizer(config.Version, 0))
+	if err != nil {
+		return err
+	}
 	// Entries in the issuance log.
-	entries := [][]byte{MarshalNullEntry()}
+	entries := [][]byte{nullEntry}
 	// Certificates to be constructed.
 	var certInfos []certificateInfo
 	// Maps checkpoint sequence name to a list of certInfos indices that are
@@ -99,7 +120,7 @@ func do() error {
 			repeat = entryConfig.Repeat
 		}
 		for range repeat {
-			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.LogID, entryConfig)
+			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.LogID, demoRandomizer(config.Version, len(entries)), entryConfig)
 			if err != nil {
 				return err
 			}
@@ -178,7 +199,7 @@ func do() error {
 		// certificate. Rather it cosign subtrees as it checkpoints. This tool
 		// is less opinionated about subtrees, so we would need to make a
 		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
+		cert, err := CreateCertificate(config.Version, issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, demoRandomizer(config.Version, info.index), info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}
