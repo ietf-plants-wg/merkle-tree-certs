@@ -4482,7 +4482,17 @@ struct {
 </pre><a href="#section-6.1-9" class="pilcrow">¶</a>
 </div>
 <p id="section-6.1-10"><code>start</code> and <code>end</code> MUST contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> MUST contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for the log entry and the subtree. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. The <code>timestamp</code> field used when computing the signature MUST be zero.<a href="#section-6.1-10" class="pilcrow">¶</a></p>
-<p id="section-6.1-11">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.<a href="#section-6.1-11" class="pilcrow">¶</a></p>
+<p id="section-6.1-11">Each element of the <code>signatures</code> field MUST have a unique <code>cosigner_id</code>. Elements MUST be ordered by <code>cosigner_id</code> as follows:<a href="#section-6.1-11" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1-12.1">
+            <p id="section-6.1-12.1.1">Shorter byte strings are ordered before longer byte strings<a href="#section-6.1-12.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-12.2">
+            <p id="section-6.1-12.2.1">Byte strings of the same length are ordered lexicographically<a href="#section-6.1-12.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-6.1-13">An MTCProof parser MUST reject the input if there are duplicate <code>cosigner_id</code> values, or if they are not ordered correctly. This can be done by checking each <code>cosigner_id</code> value comes strictly after the previous one in the above order.<a href="#section-6.1-13" class="pilcrow">¶</a></p>
+<p id="section-6.1-14">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.<a href="#section-6.1-14" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="standalone-certificates">
@@ -6857,6 +6867,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.15-1.9">
             <p id="appendix-E.15-1.9.1">Group components of a CA into a CA-specific section that enumerates the parts of a CA<a href="#appendix-E.15-1.9.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.15-1.10">
+            <p id="appendix-E.15-1.10.1">Canonicalize the order of cosignatures in MTCProofs<a href="#appendix-E.15-1.10.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
