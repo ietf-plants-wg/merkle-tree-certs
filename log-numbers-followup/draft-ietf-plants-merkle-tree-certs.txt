@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 16 November 2026                                     Apple Inc.
+Expires: 17 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             15 May 2026
+                                                             16 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 November 2026.
+   This Internet-Draft will expire on 17 November 2026.
 
 Copyright Notice
 
@@ -1124,22 +1124,22 @@ Table of Contents
    CA ID is a trust anchor ID [I-D.ietf-tls-trust-anchor-ids].
 
    Once allocated, the ID's entire object identifier (OID) arc is
-   reserved for by this protocol.  Given a CA ID whose OID
-   representation is caID, this document allocates the following OIDs:
+   reserved by this protocol.  Given a CA ID whose OID representation is
+   caID, this document allocates the following OIDs:
 
-   *  For each non-negative integer N, the OID {caID logs(0) N}
-      represents the issuance log N (Section 5.2).
+   *  For each positive integer N, the OID {caID logs(0) N} represents
+      the issuance log N (Section 5.2).
 
-   *  For each non-negative integers N and L, the OID {caID landmarks(1)
-      N L} represents landmark L (Section 6.3.1) of issuance log N.
-      These OIDs may used as a trust anchor ID, as described in
-      Section 8.2.  These OIDs are used when it is necessary to identify
-      an individual landmark, e.g. as in the retry mechanism described
-      Section 4.3 of [I-D.ietf-tls-trust-anchor-ids].
+   *  For each positive integer N and L, the OID {caID landmarks(1) N L}
+      represents landmark L (Section 6.3.1) of issuance log N.  These
+      OIDs may be used as trust anchor IDs, as described in Section 8.2.
+      These OIDs are used when it is necessary to identify an individual
+      landmark, e.g. as in the retry mechanism described Section 4.3 of
+      [I-D.ietf-tls-trust-anchor-ids].
 
-   *  For each non-negative integer N and L, the OID {caID
-      landmarkGroups(2) N L} represents a trust anchor group (Section 5
-      of [I-D.ietf-tls-trust-anchor-ids]) containing landmark L of log N
+   *  For each positive integer N and L, the OID {caID landmarkGroups(2)
+      N L} represents a trust anchor group (Section 5 of
+      [I-D.ietf-tls-trust-anchor-ids]) containing landmark L of log N
       and earlier landmarks of that log, as defined in Section 8.2.1.
       These OIDs may be used to advertise a series of landmarks at once.
 
@@ -1702,7 +1702,7 @@ Table of Contents
 
    *  minSerial is an integer describing the minimum allowed serial
       number from this CA.  Since the serial number encodes both the log
-      number (Section 5.1) and the entry index into a specific log, it
+      number (Section 5.2) and the entry index into a specific log, it
       can be used to set a minimum allowed log number or a minimum
       allowed index in a particular log (Section 5.2.3).
 
@@ -1763,7 +1763,7 @@ Table of Contents
 
    The TBSCertificate's serialNumber is constructed from the zero-based
    index of the TBSCertificateLogEntry in the log and the log's number
-   (Section 5.1).  The serialNumber MUST be equal to (log_number <<
+   (Section 5.2).  The serialNumber MUST be equal to (log_number <<
    48) | index.  All serial numbers constructed in this way will be
    positive and at most 2^64-1.
 
@@ -2125,7 +2125,7 @@ Table of Contents
         process and fail verification.
 
    6.   Let log_id be the log ID constructed from the CA ID in issuer
-        and the log_number (Section 5.1).
+        and the log_number (Section 5.2).
 
    7.   Construct a TBSCertificateLogEntry as follows:
 
