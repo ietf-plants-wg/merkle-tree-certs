@@ -894,7 +894,7 @@ A CA consists of the following components:
 
 * A CA ID ({{ca-ids}}), which uniquely identifies the CA.
 
-* A collision-resistant cryptographic hash function. SHA-256 {{!SHS=DOI.10.6028/NIST.FIPS.180-4}} is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.
+* A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 {{!SHS=DOI.10.6028/NIST.FIPS.180-4}} is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.
 
 * A series of issuance logs ({{issuance-logs}}), which contain all statements the CA has certified.
 
@@ -1406,7 +1406,7 @@ This section discusses how relying parties verify Merkle Tree Certificates.
 In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:
 
 * The CA's ID ({{ca-ids}})
-* The hash algorithm used in each log, e.g. SHA-256
+* The CA's log hash algorithm, e.g. SHA-256
 * The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
