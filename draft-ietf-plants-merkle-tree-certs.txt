@@ -4104,6 +4104,9 @@ Since draft-ietf-plants-merkle-tree-certs-03
    *  A single CA now operates a series of issuance logs, instead of a
       one-to-one correspondence
 
+   *  Group components of a CA into a CA-specific section that
+      enumerates the parts of a CA
+
 Authors' Addresses
 
    David Benjamin
