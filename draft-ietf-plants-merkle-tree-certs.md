@@ -908,13 +908,13 @@ A CA consists of the following components:
 
 Each Merkle Tree Certificate CA has a *CA ID* to identify it. This CA ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}.
 
-Once allocated, the ID's entire object identifier (OID) arc is reserved for by this protocol. Given a CA ID whose OID representation is `caID`, this document allocates the following OIDs:
+Once allocated, the ID's entire object identifier (OID) arc is reserved by this protocol. Given a CA ID whose OID representation is `caID`, this document allocates the following OIDs:
 
-* For each non-negative integer `N`, the OID `{caID logs(0) N}` represents the issuance log `N` ({{issuance-logs}}).
+* For each positive integer `N`, the OID `{caID logs(0) N}` represents the issuance log `N` ({{issuance-logs}}).
 
-* For each non-negative integers `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may used as a trust anchor ID, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
+* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
 
-* For each non-negative integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
+* For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
 Future extensions to this protocol MAY define further allocations.
 
@@ -1245,7 +1245,7 @@ The fields of a MTCCertificationAuthority structure are defined as follows:
 
 * `sigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
 
-* `minSerial` is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number ({{ca-ids}}) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log ({{log-pruning}}).
+* `minSerial` is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number ({{issuance-logs}}) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log ({{log-pruning}}).
 
 If this extension is present, the key described in `subjectPublicKeyInfo` is a CA cosigner key and subject to the usage restrictions described in {{certification-authority-cosigners}}. In particular, it MUST NOT be used to directly sign TBSCertificate structures.
 
@@ -1270,7 +1270,7 @@ The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
 The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
-The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{ca-ids}}). The `serialNumber` MUST be equal to `(log_number << 48) | index`. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.
+The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{issuance-logs}}). The `serialNumber` MUST be equal to `(log_number << 48) | index`. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.
 
 The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
@@ -1438,7 +1438,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Let `index` be the least significant 48 bits of `serial` and let `log_number` be `serial >> 48`. If `log_number` is zero, abort this process and fail verification.
 
-1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{ca-ids}}).
+1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{issuance-logs}}).
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
