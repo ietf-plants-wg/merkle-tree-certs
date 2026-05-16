@@ -3715,7 +3715,7 @@ def find_subtrees(start, end):
           <p id="section-5-2.1.1">A CA ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>), which uniquely identifies the CA.<a href="#section-5-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.2">
-          <p id="section-5-2.2.1">A collision-resistant cryptographic hash function. SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span> is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.2.1">A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span> is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.3">
           <p id="section-5-2.3.1">A series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>), which contain all statements the CA has certified.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
@@ -4645,7 +4645,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-7.1-2.1.1">The CA's ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>)<a href="#section-7.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.2">
-            <p id="section-7.1-2.2.1">The hash algorithm used in each log, e.g. SHA-256<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.2.1">The CA's log hash algorithm, e.g. SHA-256<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.3">
             <p id="section-7.1-2.3.1">The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key<a href="#section-7.1-2.3.1" class="pilcrow">¶</a></p>

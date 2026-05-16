@@ -1102,10 +1102,10 @@ Table of Contents
 
    *  A CA ID (Section 5.1), which uniquely identifies the CA.
 
-   *  A collision-resistant cryptographic hash function.  SHA-256 [SHS]
-      is RECOMMENDED.  Throughout this document, this hash function is
-      referred to as HASH, and the size of its output in bytes is
-      referred to as HASH_SIZE.
+   *  A collision-resistant cryptographic hash function, used by the
+      CA's issuance logs.  SHA-256 [SHS] is RECOMMENDED.  Throughout
+      this document, this hash function is referred to as HASH, and the
+      size of its output in bytes is referred to as HASH_SIZE.
 
    *  A series of issuance logs (Section 5.2), which contain all
       statements the CA has certified.
@@ -2064,7 +2064,7 @@ Table of Contents
 
    *  The CA's ID (Section 5.1)
 
-   *  The hash algorithm used in each log, e.g. SHA-256
+   *  The CA's log hash algorithm, e.g. SHA-256
 
    *  The CA cosigner, and any other supported cosigners, as pairs of
       cosigner ID and public key
