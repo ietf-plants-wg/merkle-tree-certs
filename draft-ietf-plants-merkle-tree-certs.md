@@ -235,7 +235,11 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
-This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}.
+This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}. It extends the numeric types defined in {{Section 3.3 of !RFC8446}} with a big-endian, 48-bit integer:
+
+~~~tls-presentation
+uint8 uint48[6];
+~~~
 
 `U+` followed by four hexadecimal characters denotes a Unicode codepoint, to be encoded in UTF-8 {{!RFC3629}}. `0x` followed by two hexadecimal characters denotes a byte value in the 0-255 range.
 
@@ -884,35 +888,33 @@ Two subtrees are needed because a single subtree may not be able to efficiently 
 ~~~
 {: #fig-subtree-counterexample title="An example showing an inefficient choice of a single subtree"}
 
-# Issuance Logs
+# Certification Authorities
 
-This section defines the structure of an *issuance log*.
+A CA consists of the following components:
 
-An issuance log describes an append-only sequence of *entries* ({{log-entries}}), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+* A CA ID ({{ca-ids}}), which uniquely identifies the CA.
 
-Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
+* A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 {{!SHS=DOI.10.6028/NIST.FIPS.180-4}} is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.
 
-A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
+* A series of issuance logs ({{issuance-logs}}), which contain all statements the CA has certified.
 
-Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and CA cosigner ({{certification-authority-cosigners}}) that authenticates the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
+* A CA cosigner ({{certification-authority-cosigners}}), which signs subtrees of issuance logs to certify their contents.
 
-## Relationship with Certification Authorities {#ca-ids}
+* Optionally, a landmark sequence per log ({{landmark-tree-sizes}}), to support optimized landmark-relative certificates.
 
-[[TODO: #232 This sectioning is a bit awkward. Rearrange the top-level section to be about CAs in general and introduce CA parameters there.]]
+{{representing-certification-authorities}} defines an X.509 certificate representation of a CA.
 
-Each issuance log is run by a Certification Authority. A CA can run multiple related issuance logs. Each log is assigned a positive integer to identify it, and these log numbers MUST be assigned in increasing order.
+## Certification Authority Identifiers {#ca-ids}
 
-Each Merkle Tree Certificate CA has a *CA ID* to identify it. This CA ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}, and its entire object identifier (OID) arc is allocated for the issuance logs run by that CA.
+Each Merkle Tree Certificate CA has a *CA ID* to identify it. This CA ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}.
 
-An individual issuance log run by a CA can be identified by a *log ID* constructed from the *CA ID* and log number. The log ID is also a trust anchor ID.
+Once allocated, the ID's entire object identifier (OID) arc is reserved by this protocol. Given a CA ID whose OID representation is `caID`, this document allocates the following OIDs:
 
-OIDs under this arc are allocated by the Merkle Tree Certificates protocol. Given a CA ID whose OID representation is `caID` and a log operated by that CA with log number `N`, this document allocates the following OIDs:
+* For each positive integer `N`, the OID `{caID logs(0) N}` represents the issuance log `N` ({{issuance-logs}}).
 
-* The OID `{caID log(0) N}` represents the log ID for log number `N`.
+* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
 
-* For each non-negative integer `L`, the OID `{caID landmarks(1) N L}` represents the landmark ({{landmark-tree-sizes}}) with number `L`. These OIDs may used as a trust anchor ID, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
-
-* For each non-negative integer `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark number `L` and earlier landmarks, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
+* For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
 Future extensions to this protocol MAY define further allocations.
 
@@ -942,17 +944,27 @@ For example, the distinguished name for a CA with ID `32473.1` would be represen
 1.3.6.1.4.1.44363.47.1=#0c0733323437332e31
 ~~~
 
-## Log Parameters
+## Issuance Logs
 
-An issuance log has the following parameters:
+A CA operates a series of issuance logs, each identified by a positive integer *log number*. Log numbers are numbered consecutively starting from 1. Each log number MUST be at most 65535 (2<sup>16</sup>-1).
 
-* A log ID, constructed from the CA ID and log number, which uniquely identifies the log. See {{ca-ids}}.
-* A collision-resistant cryptographic hash function. SHA-256 {{!SHS=DOI.10.6028/NIST.FIPS.180-4}} is RECOMMENDED. The same hash function MUST be used for all logs under the same CA ID.
-* A minimum index, which is the index of the first log entry which is available. See {{log-pruning}}. This value changes over the lifetime of the log.
+Each issuance log has a *log ID*, which is a trust anchor ID constructed by concatenating the following OID components:
 
-Throughout this document, the hash algorithm in use is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.
+* The CA ID ({{ca-ids}})
+* The constant 0
+* The log number of the log
 
-## Log Entries
+A log ID specifies both the CA and the log number in a single ID.
+
+Each issuance log describes an append-only sequence of *entries* ({{log-entries}}), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+
+Each log additionally maintains a *minimum index* value, which is the index of the first log entry which is available. See {{log-pruning}}. This value changes over the lifetime of the log.
+
+Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
+
+A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
+
+### Log Entries
 
 Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentation syntax below. A MerkleTreeCertEntry describes certificate information that the CA has validated and certified.
 
@@ -1003,13 +1015,92 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `subjectPublicKeyAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
 
-* `subjectPublicKeyInfoHash` contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding.
+* `subjectPublicKeyInfoHash` contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the CA's hash function ({{certification-authorities}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding.
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
 MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
 
 A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
+
+### Publishing Logs
+
+This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
+
+This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
+
+For example, a log ecosystem could use {{TLOG-TILES}} to serve logs. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
+
+### Log Pruning
+
+Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be *pruned*, as described in this section.
+
+Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. {{log-availability}} discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.
+
+An issuance log is pruned by updating its *minimum index* parameter ({{issuance-logs}}). The minimum index is the index of the first log entry that the log publishes. (See {{publishing-logs}}.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.
+
+An entry is said to be *available* if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree `[start, end)` is said to be available if `end` is greater than the minimum index.
+
+Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:
+
+* Signatures over the latest checkpoint by the CA's cosigners ({{certification-authority-cosigners}})
+* Any individual available log entry ({{log-entries}})
+* The hash value of any available checkpoint
+* An inclusion proof ({{Section 2.1.3 of !RFC9162}}) for any available entry to any containing checkpoint
+* A consistency proof ({{Section 2.1.4 of !RFC9162}}) between any two available checkpoints
+* The hash value of any available subtree ({{subtrees}})
+* A subtree inclusion proof ({{subtree-inclusion-proofs}}) for any available entry in any containing subtree
+* A subtree consistency proof ({{subtree-consistency-proofs}}) between any available subtree to any containing checkpoint
+
+Meeting these requirements requires a log to retain some information about pruned entries. Given a node `[start, end)` in the Merkle Tree, if `end` is less than or equal to the minimum index, the node's children MAY be discarded in favor of the node's hash.
+
+{{fig-prune-tree}} shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.
+
+~~~aasvg
+                +-----------------------------+
+                |            [0, 13)          |
+                +-----------------------------+
+                   /                       \
+       +----------------+             +----------------+
+       |     [0, 8)     |             |     [8, 13)    |
+       +----------------+             +----------------+
+        /              \                 /          |
+   +--------+      +--------+      +---------+      |
+   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
+   +--------+      +--------+      +---------+      |
+    /      \        /      \         /      \       |
++-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
+|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
++-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
+  / \     / \     / \     / \     / \      / \      |
++=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
+|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
++=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
+
+
+                +-----------------------------+
+                |            [0, 13)          |
+                +-----------------------------+
+                   /                       \
+       +----------------+             +----------------+
+       |     [0, 8)     |             |     [8, 13)    |
+       +----------------+             +----------------+
+        /              \                 /          |
+   +--------+      +--------+      +---------+      |
+   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
+   +--------+      +--------+      +---------+      |
+                    /      \         /      \       |
+                +-----+ +-----+ +------+ +-------+  |
+                |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
+                +-----+ +-----+ +------+ +-------+  |
+                          / \     / \      / \      |
+                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
+                        |6| |7| |8| |9| |10| |11| |12|
+                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
+~~~
+{: #fig-prune-tree title="An example showing the minimum nodes that must be available after pruning"}
+
+Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in {{fig-prune-tree}}, the log's serving protocol MAY instead serve `[0, 2)` and `[2, 4)`, with the log client computing `[0, 4)` from those values.
 
 ## Cosigners
 
@@ -1105,84 +1196,62 @@ If the CA issues certificate revocation lists (CRLs) {{!RFC5280}} or Online Cert
 
 If the CA operator additionally operates a directly-signing X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.
 
-## Publishing Logs
+## Representing Certification Authorities
 
-This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
+This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the CA cosigner ({{certification-authority-cosigners}}) and associated issuance logs. This information is encoded as follows:
 
-This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
+* The `subject` field MUST be the CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
-For example, a log ecosystem could use {{TLOG-TILES}} to serve logs. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
+* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}.
 
-### Log Pruning
+* The `extensions` field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.
 
-Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be *pruned*, as described in this section.
+* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to the CA ID {{ca-ids}}. The CA ID is encoded in its binary representation, as defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}.
 
-Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. {{log-availability}} discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.
+Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
 
-An issuance log is pruned by updating its *minimum index* parameter ({{log-parameters}}). The minimum index is the index of the first log entry that the log publishes. (See {{publishing-logs}}.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.
+* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert at least the `keyCertSign` bit.
 
-An entry is said to be *available* if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree `[start, end)` is said to be available if `end` is greater than the minimum index.
+* The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
 
-Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:
+The id-pe-mtcCertificationAuthority extension is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.
 
-* Signatures over the latest checkpoint by the CA's cosigners ({{certification-authority-cosigners}})
-* Any individual available log entry ({{log-entries}})
-* The hash value of any available checkpoint
-* An inclusion proof ({{Section 2.1.3 of !RFC9162}}) for any available entry to any containing checkpoint
-* A consistency proof ({{Section 2.1.4 of !RFC9162}}) between any two available checkpoints
-* The hash value of any available subtree ({{subtrees}})
-* A subtree inclusion proof ({{subtree-inclusion-proofs}}) for any available entry in any containing subtree
-* A subtree consistency proof ({{subtree-consistency-proofs}}) between any available subtree to any containing checkpoint
+~~~asn.1
+id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) pe(1) TBD }
 
-Meeting these requirements requires a log to retain some information about pruned entries. Given a node `[start, end)` in the Merkle Tree, if `end` is less than or equal to the minimum index, the node's children MAY be discarded in favor of the node's hash.
+ext-mtcCertificationAuthority EXTENSION ::= {
+    SYNTAX MTCCertificationAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    CRITICALITY TRUE
+}
 
-{{fig-prune-tree}} shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.
+-- From draft-ietf-tls-trust-anchor-ids
+TrustAnchorID ::= RELATIVE-OID
 
-~~~aasvg
-                +-----------------------------+
-                |            [0, 13)          |
-                +-----------------------------+
-                   /                       \
-       +----------------+             +----------------+
-       |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +----------------+
-        /              \                 /          |
-   +--------+      +--------+      +---------+      |
-   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +--------+      +---------+      |
-    /      \        /      \         /      \       |
-+-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-+-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-  / \     / \     / \     / \     / \      / \      |
-+=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
-+=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-
-
-                +-----------------------------+
-                |            [0, 13)          |
-                +-----------------------------+
-                   /                       \
-       +----------------+             +----------------+
-       |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +----------------+
-        /              \                 /          |
-   +--------+      +--------+      +---------+      |
-   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +--------+      +---------+      |
-                    /      \         /      \       |
-                +-----+ +-----+ +------+ +-------+  |
-                |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-                +-----+ +-----+ +------+ +-------+  |
-                          / \     / \      / \      |
-                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
-                        |6| |7| |8| |9| |10| |11| |12|
-                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
+MTCCertificationAuthority ::= SEQUENCE {
+    logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
+    sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
+    minSerial INTEGER
+}
 ~~~
-{: #fig-prune-tree title="An example showing the minimum nodes that must be available after pruning"}
 
-Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in {{fig-prune-tree}}, the log's serving protocol MAY instead serve `[0, 2)` and `[2, 4)`, with the log client computing `[0, 4)` from those values.
+For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`.
+
+The fields of a MTCCertificationAuthority structure are defined as follows:
+
+* `logHash` describes the hash algorithm used by all logs operated by this CA. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
+
+* `sigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
+
+* `minSerial` is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number ({{issuance-logs}}) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log ({{log-pruning}}).
+
+If this extension is present, the key described in `subjectPublicKeyInfo` is a CA cosigner key and subject to the usage restrictions described in {{certification-authority-cosigners}}. In particular, it MUST NOT be used to directly sign TBSCertificate structures.
+
+This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
+
+A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
 
 # Certificates
 
@@ -1201,7 +1270,7 @@ The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
 The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
-The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{ca-ids}}). The `serialNumber` MUST be equal to `(log_number << 64) | index`.
+The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{issuance-logs}}). The `serialNumber` MUST be equal to `(log_number << 48) | index`. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.
 
 The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
@@ -1229,8 +1298,8 @@ struct {
 } MTCSignature;
 
 struct {
-    uint64 start;
-    uint64 end;
+    uint48 start;
+    uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
     MTCSignature signatures<0..2^16-1>;
 } MTCProof;
@@ -1335,63 +1404,6 @@ If a new landmark is allocated every hour, landmark-relative certificate subtree
 
 Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
 
-## Representing Certification Authorities
-
-This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree Certificate CA. It identifies the CA cosigner ({{certification-authority-cosigners}}) and associated issuance logs. This information is encoded as follows:
-
-* The `subject` field MUST be the CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
-
-* The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}.
-
-* The `extensions` field MUST contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.
-
-* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to the CA ID {{ca-ids}}. The CA ID is encoded in its binary representation, as defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}.
-
-Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
-
-* The key usage extension ({{Section 4.2.1.3 of !RFC5280}}) MUST be present and assert at least the `keyCertSign` bit.
-
-* The basic constraints extension ({{Section 4.2.1.9 of !RFC5280}}) MUST be present and set the `cA` field to TRUE.
-
-The id-pe-mtcCertificationAuthority extension is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it MUST be marked as critical.
-
-~~~asn.1
-id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) pe(1) TBD }
-
-ext-mtcCertificationAuthority EXTENSION ::= {
-    SYNTAX MTCCertificationAuthority
-    IDENTIFIED BY id-pe-mtcCertificationAuthority
-    CRITICALITY TRUE
-}
-
--- From draft-ietf-tls-trust-anchor-ids
-TrustAnchorID ::= RELATIVE-OID
-
-MTCCertificationAuthority ::= SEQUENCE {
-    logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
-    sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER
-}
-~~~
-
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`.
-
-The fields of a MTCCertificationAuthority structure are defined as follows:
-
-* `logHash` describes the hash algorithm used by all logs operated by this CA. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
-
-* `sigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
-
-* `minSerial` is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number ({{ca-ids}}) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log ({{log-pruning}}).
-
-If this extension is present, the key described in `subjectPublicKeyInfo` is a CA cosigner key and subject to the usage restrictions described in {{certification-authority-cosigners}}. In particular, it MUST NOT be used to directly sign TBSCertificate structures.
-
-This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
-
-A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
-
 # Relying Parties
 
 This section discusses how relying parties verify Merkle Tree Certificates.
@@ -1401,7 +1413,7 @@ This section discusses how relying parties verify Merkle Tree Certificates.
 In order to accept certificates from a Merkle Tree CA, a relying party MUST be configured with:
 
 * The CA's ID ({{ca-ids}})
-* The hash algorithm used in each log, e.g. SHA-256
+* The CA's log hash algorithm, e.g. SHA-256
 * The CA cosigner, and any other supported cosigners, as pairs of cosigner ID and public key
 * A policy on which combinations of cosigners to accept in a certificate ({{trusted-cosigners}})
 * An optional list of trusted subtrees that are known to be consistent with the relying party's cosigner requirements ({{trusted-subtrees}})
@@ -1427,13 +1439,13 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}.
 
-1. Let `serial` be the certificate's serial number. If `serial` is negative, abort this process and fail verification.
+1. Let `serial` be the certificate's serial number. If `serial` is negative or greater than 2<sup>64</sup>-1, abort this process and fail verification.
 
 1. If `serial` is contained in one of the relying party's revoked ranges ({{revoked-ranges}}), abort this process and fail verification.
 
-1. Let `index` be the least significant 64 bits of `serial` and let `log_number` be `serial >> 64`. If `log_number` is zero, abort this process and fail verification.
+1. Let `index` be the least significant 48 bits of `serial` and let `log_number` be `serial >> 48`. If `log_number` is zero, abort this process and fail verification.
 
-1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{ca-ids}}).
+1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{issuance-logs}}).
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
@@ -1446,7 +1458,15 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. If `log_number`, `start`, and `end` matches a trusted subtree ({{trusted-subtrees}}) for the CA, check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. Reconstruct the CosignedMessage from MTCProof's `start` and `end`, the cosigner ID for `cosigner_name`, `log_id` for `log_origin`, `expected_subtree_hash` for `subtree_hash`, and `timestamp` set to zero.
+1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored.
+
+   Signatures are verified as described in {{signature-format}}. For each signature verification, the CosignedMessage structure is constructed as follows:
+
+   1. Set the CosignedMessage's `cosigner_name` based on the cosigner ID as described in {{signature-format}}.
+   1. Set the CosignedMessage's `timestamp` to zero.
+   1. Set the CosignedMessage's `log_origin` based on `log_id` as described in {{signature-format}}.
+   1. Set the CosignedMessage's `start` and `end` to the MTCProof's `start` and `end`, respectively.
+   1. Set the CosignedMessage's `subtree_hash` to `expected_subtree_hash`.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
@@ -1520,7 +1540,7 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 ## Revoked Ranges
 
-For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. The serial number combines the log number (in the high bits) and log index (in the lowest 64 bits). A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
+For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
 
 When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
 
@@ -2378,5 +2398,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Update TLS integration now that trust anchor IDs extension has been moved to the base draft
 
 - A single CA now operates a series of issuance logs, instead of a one-to-one correspondence
+
+- Group components of a CA into a CA-specific section that enumerates the parts of a CA
 
 - Canonicalize the order of cosignatures in MTCProofs
