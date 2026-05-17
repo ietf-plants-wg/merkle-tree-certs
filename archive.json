@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-14T04:04:54.876435+00:00",
+  "timestamp": "2026-05-17T04:10:35.880846+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3241,15 +3241,15 @@
       "id": "I_kwDOJIBkVc79PetD",
       "title": "Is the \"alternate\" link relation correct for parallel certificates",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/206",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "@ilaril in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/203#discussion_r3067963799 thinks the existing ACME \"alternate\" link relation is not a good fit for when the CA wants to hand you two certificates to dispatch between. It seems we're not reading the ACME text in the same way. Moving this to a separate issue to discuss as this is orthogonal to what that PR is addressing.\n\n(CC @aarongable)",
       "createdAt": "2026-04-12T15:49:32Z",
-      "updatedAt": "2026-04-13T18:05:25Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-16T05:09:22Z",
+      "closedAt": "2026-05-16T05:09:22Z",
       "comments": [
         {
           "author": "aarongable",
@@ -3271,6 +3271,13 @@
           "body": "If an ACME client / webserver does not understand what standalone and landmark-relative certs are, its heuristic should say \"No idea what that is or when to use it!\" and ignore the alternate. It will use the default (i.e. standalone) certificate for all connections, which is the desired result.\n\nIf an ACME client / webserver _does_ understand what they are, then it will install them side-by-side tagged with their respective Trust Anchor IDs. This is the exact same thing that an updated ACME client / webserver (i.e. one that understands Trust Anchor IDs) would do when offered classical alternates that chain to different roots.\n\nI don't understand how a standalone or landmark-relative cert would be installed in a \"different way\" from each other.",
           "createdAt": "2026-04-13T18:04:54Z",
           "updatedAt": "2026-04-13T18:05:25Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Going to close this since it sounds like the answer is \"yes\". :-) Doesn't mean we necessarily have to use alternates (e.g. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207 proposes a different model), but it sounds like we don't think the alternates are inherently inappropriate.",
+          "createdAt": "2026-05-16T05:09:22Z",
+          "updatedAt": "2026-05-16T05:09:22Z"
         }
       ]
     },
@@ -3436,15 +3443,15 @@
       "id": "I_kwDOJIBkVc8AAAABBXk5gQ",
       "title": "Fix the order of cosignatures?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/221",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Cosignatures are an unordered set right now. Should we insist on a particular order, like sorting the IDs lexicographically? That way a receiver doesn't need to sort to detect duplicates, and we generally limit unnecessary variation. (On the other hand, it's one more thing a CA might mess up.)\n\nSee discussion here https://github.com/ietf-plants-wg/merkle-tree-certs/pull/220#issuecomment-4376952323\n\n(CC @ilaril)",
       "createdAt": "2026-05-05T20:06:08Z",
-      "updatedAt": "2026-05-07T18:54:49Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-16T05:03:28Z",
+      "closedAt": "2026-05-16T05:03:28Z",
       "comments": [
         {
           "author": "ilaril",
@@ -3490,6 +3497,24 @@
       "createdAt": "2026-05-12T22:23:52Z",
       "updatedAt": "2026-05-13T22:33:11Z",
       "closedAt": "2026-05-13T22:33:11Z",
+      "comments": []
+    },
+    {
+      "number": 232,
+      "id": "I_kwDOJIBkVc8AAAABCaLv1A",
+      "title": "Log numbers follow-up work",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/232",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "davidben"
+      ],
+      "labels": [],
+      "body": "Filing some follow-up work for myself after we merge https://github.com/ietf-plants-wg/merkle-tree-certs/pull/213. Filing this so I can reference this in TODOs\n\n- [x] Make the serial numbers fit in 64 bits again\n- [x] Fix up the slightly awkward sectioning\n- [ ] Some text discussing how you use multiple logs, like how CAs should only be appending to the latest and other considerations",
+      "createdAt": "2026-05-15T20:04:19Z",
+      "updatedAt": "2026-05-16T05:09:59Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -11105,7 +11130,7 @@
       "labels": [],
       "body": "Strictly speaking, if you \"send\" the entire certificate, the log might only retain a part of the certificate, but the subsequent paragraph clarifies that the \"log entry\" contains the entire certificate, so I think that's fine.\r\n\r\n@debcooley, how's this look?",
       "createdAt": "2025-12-12T17:28:49Z",
-      "updatedAt": "2025-12-18T17:54:54Z",
+      "updatedAt": "2026-05-16T05:10:56Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "4e2d3f557f79e30685e9029569a541159c10cb40",
@@ -11418,7 +11443,7 @@
       "labels": [],
       "body": "Since draft-davidben-09 is what some prototypes are targetting, keep support in there by adding a \"Version\" field to the config file.",
       "createdAt": "2026-01-30T15:32:20Z",
-      "updatedAt": "2026-01-31T11:32:33Z",
+      "updatedAt": "2026-05-16T05:11:24Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "217ad1697b7bf53ae14ea40f5cd06c4617005625",
@@ -13784,7 +13809,7 @@
       "labels": [],
       "body": "The previous language said a subtree \"is\" an interior node. It seemed clearer to say that it is an interior node plus all of its children.\r\n\r\nI wound up defining three named kinds of subtrees, which I think are helpful in conceptualizing what's going on: Full Subtree, Right Subtree, and Partial Subtree. Then we can say early on that we'll be using a Full Subtree combined with a Right Subtree to cover arbitrary ranges.\r\n\r\nAlso, I defined a Right Subtree `[start, n)` to only be contained in the Merkle Tree of size `n`. In the tree of size `n+1`, at least one of the nodes has a different hash, so the Right Subtree `[start, n)` isn't really contained in it. This allows us to remove some language around \"directly contained,\" which I found confusing. Note: I haven't yet updated the consistency proof section, since I wanted to first see if folks found this tweak compelling.",
       "createdAt": "2026-04-17T00:12:46Z",
-      "updatedAt": "2026-05-09T16:06:41Z",
+      "updatedAt": "2026-05-14T18:43:32Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13809,6 +13834,13 @@
           "body": "Good points that this introduces more concepts than are really needed. I do like the improved intro in #216.\r\n\r\nMy goals here are:\r\n\r\n 1. Build a better mental model of what subtrees look like and what their shape is, particularly the shape of a pair of them.\r\n 2. Justify the constraints on subtree `start`.\r\n 3. Be more crisp about the \"contained\" relation (and remove \"directly contained\", which I found confusing).\r\n\r\nFor (3), my feeling is that a Merkle Tree \"containing\" a subtree means that not only the entries are the same but also the interior node hash values. That implies that a Partial Right Subtree is only \"contained\" in the Merkle Tree where `n == end`. Of course, we don't expect logs to store older hash values as they evolve their tree, but it seems useful conceptually.\r\n\r\nI'm happy to do another round of thinking and writing on this if it seems useful. I feel like I understand things a bit better now than when I wrote it.",
           "createdAt": "2026-05-09T16:06:41Z",
           "updatedAt": "2026-05-09T16:06:41Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hmm, yeah, the \"contained\" business is not great. It's especially awkward given that RFC 9162 formally defines a \"tree\" as a recursive function. The \"tree\" just comes out of drawing the call tree out. But that is very unhelpful for getting an intuition.\r\n\r\nYeah, if we can make it more understandable, that sounds useful! Mostly my worry with spending a ton of time on defining new concepts is that it reads as if you have to understand all these extra concepts to work with subtrees, but this spec doesn't really care as much.\r\n\r\n(For that matter, even the existing \"full\" and \"partial\" subtrees aren't strictly necessary concepts. I don't think we actually use them, except to give some color on how the \"Arbitrary Intervals\" procedure behaves.)",
+          "createdAt": "2026-05-14T18:43:32Z",
+          "updatedAt": "2026-05-14T18:43:32Z"
         }
       ],
       "reviews": [
@@ -13877,24 +13909,26 @@
       "id": "PR_kwDOJIBkVc7UHGx3",
       "title": "Add log numbers to certificates and log entries",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/213",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "nharper",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-05-13T21:22:08Z",
+      "updatedAt": "2026-05-15T20:06:32Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "3dedd9ea724860a2edc105e37652c6db4bad3677",
       "headRepository": "nharper/merkle-tree-certs",
       "headRefName": "log-numbers",
       "headRefOid": "f04c68b3d4332110f3384a809f53ebb2fa781e6c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-05-15T20:06:32Z",
+      "mergedAt": "2026-05-15T20:06:32Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f04c68b3d4332110f3384a809f53ebb2fa781e6c"
+      },
       "comments": [
         {
           "author": "Bren2010",
@@ -13933,7 +13967,7 @@
         },
         {
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Rebased; \"CA issuer ID\" is no more (it's now \"CA ID\").",
           "createdAt": "2026-05-07T23:02:24Z",
           "updatedAt": "2026-05-07T23:02:24Z"
@@ -14008,7 +14042,7 @@
             "abbreviatedOid": "7f63aa6"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:13Z",
@@ -14028,7 +14062,7 @@
             "abbreviatedOid": "7f63aa6"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:18Z",
@@ -14048,7 +14082,7 @@
             "abbreviatedOid": "73234d8"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:26Z",
@@ -14068,7 +14102,7 @@
             "abbreviatedOid": "73234d8"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:33Z",
@@ -14088,7 +14122,7 @@
             "abbreviatedOid": "73234d8"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:37Z",
@@ -14108,7 +14142,7 @@
             "abbreviatedOid": "73234d8"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:44Z",
@@ -14128,7 +14162,7 @@
             "abbreviatedOid": "73234d8"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-20T23:36:48Z",
@@ -14224,7 +14258,7 @@
             "abbreviatedOid": "254edfd"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-04-27T20:32:27Z",
@@ -14392,7 +14426,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:15:47Z",
@@ -14412,7 +14446,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:16:04Z",
@@ -14432,7 +14466,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:16:20Z",
@@ -14452,7 +14486,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:16:32Z",
@@ -14472,7 +14506,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:18:02Z",
@@ -14492,7 +14526,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:18:14Z",
@@ -14512,7 +14546,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:20:04Z",
@@ -14532,7 +14566,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:20:14Z",
@@ -14552,7 +14586,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:21:15Z",
@@ -14572,7 +14606,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:23:25Z",
@@ -14592,7 +14626,7 @@
             "abbreviatedOid": "55671ca"
           },
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-05-13T18:31:32Z",
@@ -15945,25 +15979,35 @@
       "id": "PR_kwDOJIBkVc7Y5cA6",
       "title": "Remove provisional subtree signature protocol",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/225",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This was a provisional sketch for until the protocol was added to tlog-witness. This has now[*] been done, so we can remove this from the core MTC document.\r\n\r\n[*] As of writing, it has not yet been done. The upstream PR is https://github.com/C2SP/C2SP/pull/245. I'm just getting things lined up.",
       "createdAt": "2026-05-06T19:40:34Z",
-      "updatedAt": "2026-05-07T14:56:08Z",
+      "updatedAt": "2026-05-16T05:07:17Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "baseRefOid": "7131dc1597ceffa9110bdc112c6d5efc9debf3c0",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "remove-subtree-signer",
-      "headRefOid": "c73267f1c0facd6e2b2fa8b7c2fea5fd252f666d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "c5a2556c09a62a5a1de30d46dcd012b19929a3c9",
+      "closedAt": "2026-05-16T05:07:13Z",
+      "mergedAt": "2026-05-16T05:07:13Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "23f1603f78a6951585621c08a22435288f88be6d"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "C2SP PR isn't merged yet, but going ahead and merging this so we can get this further along. Since the PR has already diverged from the version in the appendix, the one in the appendix is misleading anyway.",
+          "createdAt": "2026-05-16T05:07:07Z",
+          "updatedAt": "2026-05-16T05:07:07Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc79Ai_T",
@@ -16377,6 +16421,351 @@
           "body": "",
           "createdAt": "2026-05-13T21:07:01Z",
           "updatedAt": "2026-05-13T21:07:01Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 230,
+      "id": "PR_kwDOJIBkVc7bsXVd",
+      "title": "Take another pass at the publishing section",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/230",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We seem to have settled on this as the IETF/tlog split, so no need for the giant disclaimer anymore. Also wordsmith it a bit.",
+      "createdAt": "2026-05-14T21:40:55Z",
+      "updatedAt": "2026-05-15T11:43:56Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "5301c9dc8846940b1c0c93b2d37f327beae73229",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "publishing",
+      "headRefOid": "99b41e7ef59c40c8053f65a25587fad1f084d648",
+      "closedAt": "2026-05-15T11:43:52Z",
+      "mergedAt": "2026-05-15T11:43:52Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "68a6826e18a3791b1107b33fc96a45c4544bb472"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABACrAoA",
+          "commit": {
+            "abbreviatedOid": "d3b2860"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-15T11:35:12Z",
+          "updatedAt": "2026-05-15T11:35:12Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\nThis protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.\n```",
+              "createdAt": "2026-05-15T11:35:12Z",
+              "updatedAt": "2026-05-15T11:35:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABACr54A",
+          "commit": {
+            "abbreviatedOid": "d3b2860"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-15T11:37:13Z",
+          "updatedAt": "2026-05-15T11:37:13Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABACudfA",
+          "commit": {
+            "abbreviatedOid": "1797d06"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-15T11:42:57Z",
+          "updatedAt": "2026-05-15T11:42:58Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Self-review: make the language a little more parallel and shorter.\n\n\n```suggestion\nThis document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.\n```",
+              "createdAt": "2026-05-15T11:42:58Z",
+              "updatedAt": "2026-05-15T11:42:58Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 231,
+      "id": "PR_kwDOJIBkVc7bwtDM",
+      "title": "Canonicalize the order of cosignatures in MTCProofs",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/231",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #221.",
+      "createdAt": "2026-05-15T02:55:28Z",
+      "updatedAt": "2026-05-16T05:03:30Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2be92848946e4533b130194545ab23d0bc99d462",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "order-cosigs",
+      "headRefOid": "97d08617b5409b730e2d9a99bdf59b03cceb20f4",
+      "closedAt": "2026-05-16T05:03:27Z",
+      "mergedAt": "2026-05-16T05:03:27Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7131dc1597ceffa9110bdc112c6d5efc9debf3c0"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABACuaUw",
+          "commit": {
+            "abbreviatedOid": "ae86a42"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-15T11:42:49Z",
+          "updatedAt": "2026-05-15T11:42:50Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "```suggestion\nAn MTCProof parser MUST reject the input if there are duplicate `cosigner_id` values, or if they are not ordered correctly. This can be done by checking each `cosigner_id` value comes strictly after the previous one in the above order.\n```",
+              "createdAt": "2026-05-15T11:42:49Z",
+              "updatedAt": "2026-05-15T11:42:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABACus8Q",
+          "commit": {
+            "abbreviatedOid": "ae86a42"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-15T11:43:30Z",
+          "updatedAt": "2026-05-15T11:43:30Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 233,
+      "id": "PR_kwDOJIBkVc7cDeeR",
+      "title": "Use a 16/48 split, rather than an inf/64 split",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/233",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This way serial numbers fit in 64-bit integers. See #232.",
+      "createdAt": "2026-05-15T20:11:54Z",
+      "updatedAt": "2026-05-15T20:41:02Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "18ef28f046aad14deac35ca04519c1d0d338c7ca",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "log-numbers-16-48",
+      "headRefOid": "6d2364a57ee3558e5db610a97b63df874a6bbf6c",
+      "closedAt": "2026-05-15T20:40:59Z",
+      "mergedAt": "2026-05-15T20:40:59Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a040daab814a06dc1b9f016b968bc55a3f37672c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAF-PXg",
+          "commit": {
+            "abbreviatedOid": "6d2364a"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-15T20:36:31Z",
+          "updatedAt": "2026-05-15T20:36:31Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 234,
+      "id": "PR_kwDOJIBkVc7cDgk4",
+      "title": "Add a section for CAs",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/234",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This was honestly needed before, but the log numbers stuff has really strained the old organization. See https://github.com/ietf-plants-wg/merkle-tree-certs/issues/232.\r\n\r\nNB: This currently sits on top of https://github.com/ietf-plants-wg/merkle-tree-certs/pull/233, look at the top commit only.",
+      "createdAt": "2026-05-15T20:13:54Z",
+      "updatedAt": "2026-05-16T05:00:09Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "18ef28f046aad14deac35ca04519c1d0d338c7ca",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "log-numbers-followup",
+      "headRefOid": "7e6ba9acae3fe4f164b15d4e864183ecabe44161",
+      "closedAt": "2026-05-16T05:00:06Z",
+      "mergedAt": "2026-05-16T05:00:06Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "1127062844dc496488b71e9fe732f43d45237d0f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAHD8Lw",
+          "commit": {
+            "abbreviatedOid": "29407c8"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Nice reorganization!",
+          "createdAt": "2026-05-16T01:31:14Z",
+          "updatedAt": "2026-05-16T02:29:50Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "Not sure if 'for' or 'by' fits better, but definitely not both \ud83d\ude43 \n```suggestion\nOnce allocated, the ID's entire object identifier (OID) arc is reserved by this protocol. Given a CA ID whose OID representation is `caID`, this document allocates the following OIDs:\n```",
+              "createdAt": "2026-05-16T01:31:14Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 53,
+              "body": "These are always non-zero, right?\n```suggestion\n* For each positive integer `N`, the OID `{caID logs(0) N}` represents the issuance log `N` ({{issuance-logs}}).\n```",
+              "createdAt": "2026-05-16T01:59:04Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "```suggestion\n* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.\n```",
+              "createdAt": "2026-05-16T02:01:00Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 59,
+              "body": "```suggestion\n* For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.\n```",
+              "createdAt": "2026-05-16T02:01:20Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 308,
+              "body": "Log numbers now defined in {{issuance-logs}}\n```suggestion\n* `minSerial` is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number ({{issuance-logs}}) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log ({{log-pruning}}).\n```",
+              "createdAt": "2026-05-16T02:05:22Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 323,
+              "body": "```suggestion\nThe TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{issuance-logs}}). The `serialNumber` MUST be equal to `(log_number << 48) | index`. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.\n```",
+              "createdAt": "2026-05-16T02:06:40Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 414,
+              "body": "```suggestion\n1. Let `log_id` be the log ID constructed from the CA ID in `issuer` and the `log_number` ({{issuance-logs}}).\n```",
+              "createdAt": "2026-05-16T02:07:15Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "```suggestion\n* The CA's hash algorithm, e.g. SHA-256\n```",
+              "createdAt": "2026-05-16T02:15:21Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            },
+            {
+              "originalPosition": 303,
+              "body": "Worth renaming to `caHash`? (no strong pref either way)",
+              "createdAt": "2026-05-16T02:25:47Z",
+              "updatedAt": "2026-05-16T02:29:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAHi2jw",
+          "commit": {
+            "abbreviatedOid": "b54c443"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-16T04:57:00Z",
+          "updatedAt": "2026-05-16T04:57:00Z",
+          "comments": [
+            {
+              "originalPosition": 303,
+              "body": "Hmm. I guess if it's `caHash` it should be just `hash` since this is already a CA. Tried that but then it's kinda confusing with `hash` and `sigAlg` when they're used in different ways. `logHash` seems maybe still OK in that it means \"the hash used to construct the CA's logs\". Don't feel very strongly. \ud83e\udd37 ",
+              "createdAt": "2026-05-16T04:57:00Z",
+              "updatedAt": "2026-05-16T04:57:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 235,
+      "id": "PR_kwDOJIBkVc7cDimf",
+      "title": "Expand on how to fill in the CosignedMessage",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/235",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It was getting a bit wordy, especially now that we actually need to do some transforms to go from ID to tlog-style name.",
+      "createdAt": "2026-05-15T20:15:50Z",
+      "updatedAt": "2026-05-15T20:41:20Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "18ef28f046aad14deac35ca04519c1d0d338c7ca",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "cosigned-message-verify",
+      "headRefOid": "4061d1c8300a1dc3d54e44d2c74d5a91f3081c58",
+      "closedAt": "2026-05-15T20:41:17Z",
+      "mergedAt": "2026-05-15T20:41:17Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0c53e8cf4b94ae49049c82d0f79a643382386db5"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAF-72A",
+          "commit": {
+            "abbreviatedOid": "4061d1c"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-15T20:38:18Z",
+          "updatedAt": "2026-05-15T20:38:18Z",
           "comments": []
         }
       ]
