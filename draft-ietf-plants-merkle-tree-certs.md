@@ -957,11 +957,19 @@ Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentatio
 ~~~tls-presentation
 struct {} Empty;
 
+enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
+
+struct {
+    ExtensionType extension_type;
+    opaque extension_data<0..2^16-1>;
+} MerkleTreeCertEntryExtension;
+
 enum {
     null_entry(0), tbs_cert_entry(1), (2^16-1)
 } MerkleTreeCertEntryType;
 
 struct {
+    MerkleTreeCertEntryExtension extensions<0..2^16-1>;
     MerkleTreeCertEntryType type;
     select (type) {
        case null_entry: Empty;
@@ -970,6 +978,8 @@ struct {
     }
 } MerkleTreeCertEntry;
 ~~~
+
+Field `extensions` is the list of tag-length-value extensions associated with the log entry. The extensions list MUST be appear in ascending order by `extension_type` and MUST NOT contain two extensions with the same `extension_type`.
 
 When `type` is `null_entry`, the entry does not represent any information. Entries at any index in the log MAY have type `null_entry`.
 
@@ -1005,7 +1015,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
-MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
+MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType or MerkleTreeCertEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
 
 A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
@@ -1176,7 +1186,7 @@ What it means to certify an entry depends on the entry type:
 * To certify an entry of type `null_entry` is a no-op. A CA MAY freely certify `null_entry` without being held responsible for any validation.
 * To certify an entry of type `tbs_cert_entry` is to certify the TBSCertificateLogEntry, as defined in {{log-entries}}.
 
-Entries are extensible. Future documents MAY define `type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined entry format. {{new-log-entry-types}} further discusses security implications of new formats.
+Entries are extensible. Future documents MAY define `type` and `extension_type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` or `extension_type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. {{new-log-entry-types}} further discusses security implications of such extensions.
 
 If the CA issues certificate revocation lists (CRLs) {{!RFC5280}} or Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See {{signature-domain-separation}} for a discussion of domain separation.
 
@@ -1284,12 +1294,15 @@ struct {
 } MTCSignature;
 
 struct {
+    MerkleTreeCertEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
     MTCSignature signatures<0..2^16-1>;
 } MTCProof;
 ~~~
+
+`extensions` MUST contain the log entry's `extensions` value ({{log-entries}}).
 
 `start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
@@ -1438,7 +1451,12 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
    1. Set `subjectPublicKeyAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
    1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
-1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
+1. Construct a MerkleTreeCertEntry as follows:
+   1. Set `type` to `tbs_cert_entry`.
+   1. Set `extensions` to the MTCProof's `extensions` value.
+   1. Set `tbs_cert_entry_data` to the TBSCertificateLogEntry, encoded as described in {{log-entries}}.
+
+1. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
 
 1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
 
@@ -1459,6 +1477,7 @@ This procedure only replaces the signature verification portion of X.509 path va
 In this procedure, `entry_hash` can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
 
 1. Initialize a hash instance.
+1. Write the `extensions` field from the MTCProof to the hash.
 1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
 1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.
 1. Write the `subjectPublicKeyInfo`'s `algorithm` field to the hash.
