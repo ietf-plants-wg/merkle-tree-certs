@@ -1866,14 +1866,6 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 |---------|-----------------------|------------|
 | TBD     | id-rdna-trustAnchorID | [this-RFC] |
 
-## Log Entry Extensions Registry
-
-IANA is requested to create a new registry called "Merkle Tree Certificate Log Entry Extensions" with the following initial contents:
-
-| Value  | Description | References |
-|--------|-------------|------------|
-| 0x0000 | reserved    | [this-RFC] |
-
 --- back
 
 # ASN.1 Module
