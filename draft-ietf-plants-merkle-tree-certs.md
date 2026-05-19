@@ -1758,7 +1758,7 @@ The transparency ecosystem does not retain unhashed public keys, so it also may 
 
 MerkleTreeCertEntry ({{log-entries}}) is extensible and permits protocol extensions to define new formats for the CA to certify. This means older CAs, cosigners, relying parties, and monitors might interact with new entries:
 
-{{log-entries}} and {{certification-authority-cosigners}} forbid a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 CA can never sign an unrecognized X.509 extension.
+{{certification-authority-cosigners}} forbids a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 CA can never sign an unrecognized X.509 extension.
 
 External cosigners may or may not interact with the unrecognized entries. {{TLOG-MIRROR}} and {{TLOG-WITNESS}} describe cosigners whose roles do not interpret the contents of log entries. New entry types MAY be added without updating them. If a cosigner role does interpret a log entry, it MUST define how it interacts with unknown ones.
 
