@@ -190,8 +190,25 @@ func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial int, 
 	})
 }
 
-func MarshalNullEntry() []byte {
-	return []byte{byte(entryTypeNull >> 8), byte(entryTypeNull)}
+// addEmptyMTCEntryExtensions adds an empty extensions field to b if the
+// version is at least draft-plants-04.
+func addEmptyMTCEntryExtensions(b *cryptobyte.Builder, version DraftVersion) {
+	if version >= VersionPlants04 {
+		b.AddUint16LengthPrefixed(func(_ *cryptobyte.Builder) {})
+	}
+}
+
+func MarshalNullEntry(version DraftVersion) []byte {
+	b := cryptobyte.NewBuilder(nil)
+	// Starting in draft 04, MerkleTreeCertEntry is prefixed with a
+	// MerkleTreeCertEntryExtension vector.
+	addEmptyMTCEntryExtensions(b, version)
+	b.AddUint16(entryTypeNull)
+	out, err := b.Bytes()
+	if err != nil {
+		panic(err)
+	}
+	return out
 }
 
 func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, entry *EntryConfig) ([]byte, error) {
@@ -220,6 +237,7 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 		addExtensions(tbs, entry)
 	}
 	b := cryptobyte.NewBuilder(nil)
+	addEmptyMTCEntryExtensions(b, version)
 	b.AddUint16(entryTypeTBSCert)
 	// Starting draft-davidben-10, the SEQUENCE wrapper is omitted.
 	if version >= VersionDavidben10 {
@@ -230,7 +248,7 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 	return b.Bytes()
 }
 
-func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		AddTBSCertificate(cert, issuer, index, entry)
@@ -259,6 +277,7 @@ func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners 
 			} else {
 				certSig.AddBytes([]byte{0})
 			}
+			addEmptyMTCEntryExtensions(certSig, version)
 			certSig.AddUint64(uint64(start))
 			certSig.AddUint64(uint64(end))
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })

@@ -77,7 +77,7 @@ func do() error {
 	}
 
 	// Entries in the issuance log.
-	entries := [][]byte{MarshalNullEntry()}
+	entries := [][]byte{MarshalNullEntry(config.Version)}
 	// Certificates to be constructed.
 	var certInfos []certificateInfo
 	// Maps checkpoint sequence name to a list of certInfos indices that are
@@ -178,7 +178,7 @@ func do() error {
 		// certificate. Rather it cosign subtrees as it checkpoints. This tool
 		// is less opinionated about subtrees, so we would need to make a
 		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
+		cert, err := CreateCertificate(config.Version, issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}
