@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-17T04:10:35.880846+00:00",
+  "timestamp": "2026-05-19T04:18:22.257836+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -16767,6 +16767,97 @@
           "createdAt": "2026-05-15T20:38:18Z",
           "updatedAt": "2026-05-15T20:38:18Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 236,
+      "id": "PR_kwDOJIBkVc7c2PAz",
+      "title": "Add an extension field to MerkleTreeCertEntry and MTCProof",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/236",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Define an extensions field for the MerkleTreeCertEntry structure. Repeated extensions are disallowed, but unrecognized extensions are ignored. The extensions are duplicated in the MTCProof.\r\n\r\nThis change accommodates two previously requested features for MTC:\r\n\r\n1. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172: The accumulated count for the accumulated log entry type\r\n\r\n2. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/226: The log entry randomizer",
+      "createdAt": "2026-05-18T22:30:37Z",
+      "updatedAt": "2026-05-19T00:16:39Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "23f1603f78a6951585621c08a22435288f88be6d",
+      "headRepository": "cjpatton/merkle-tree-certs",
+      "headRefName": "log-entry-extensions",
+      "headRefOid": "3a43593fbeadfbfe8e07ba9c42cbb7c12b950e5b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABASkG9g",
+          "commit": {
+            "abbreviatedOid": "cc2ab21"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-18T22:31:56Z",
+          "updatedAt": "2026-05-18T22:31:56Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "Reviewer note: Since the extensions are duplicated between the cert signature and the log entry, we might want to nudge implementations towards not storing the extensions in the log entry explicitly and just parse them from the signature when they need to compute the hash.",
+              "createdAt": "2026-05-18T22:31:56Z",
+              "updatedAt": "2026-05-18T22:31:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAS4EBQ",
+          "commit": {
+            "abbreviatedOid": "3a43593"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-18T23:59:27Z",
+          "updatedAt": "2026-05-19T00:16:39Z",
+          "comments": [
+            {
+              "originalPosition": 3,
+              "body": "Since plants-04 isn't done yet and we don't even implement all of what's in git, maybe let's leave the default at `plants-02` for now.",
+              "createdAt": "2026-05-18T23:59:28Z",
+              "updatedAt": "2026-05-19T00:16:39Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "Probably don't even need to reserve 0, I don't think.",
+              "createdAt": "2026-05-18T23:59:58Z",
+              "updatedAt": "2026-05-19T00:16:39Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "Nits:\n\n> Extensions are used to override the logic for processing an entry without modifying the entry itself (e.g., by adding an extension to the TBSCertificateLogEntry).\n\nIf they _override_ the logic, it suggests that unrecognized extensions should be an error, but we want the RP to tolerate unknown extensions.\n\n> the CA MUST reject entries with an extension field containing more than one instance of a given extension type.\n\nCAs are the ones constructing these, rather than consuming these. Though checking duplicates is actually kinda annoying, unless we enforce that they're ordered numerically. (We could do that!)\n\nProbably also something about not allowing unknown extension types. I think the existing text for entry types is in:\n* Certification Authority Cosigners\n* New Log Entry Types\nWe can probably extend those sections?",
+              "createdAt": "2026-05-19T00:07:21Z",
+              "updatedAt": "2026-05-19T00:16:39Z"
+            },
+            {
+              "originalPosition": 45,
+              "body": "Which implementations? The logs don't store MTCProof structures.",
+              "createdAt": "2026-05-19T00:15:28Z",
+              "updatedAt": "2026-05-19T00:16:39Z"
+            },
+            {
+              "originalPosition": 64,
+              "body": "I suspect setting up a registry might need a bit since we have to define how new codepoints are assigned and everything. If we're not defining any codepoints yet, maybe we can get away with punting the registry to the first document that needs to do it?",
+              "createdAt": "2026-05-19T00:16:30Z",
+              "updatedAt": "2026-05-19T00:16:39Z"
+            }
+          ]
         }
       ]
     }
