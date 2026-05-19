@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 17 November 2026                                     Apple Inc.
+Expires: 20 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             16 May 2026
+                                                             19 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 November 2026.
+   This Internet-Draft will expire on 20 November 2026.
 
 Copyright Notice
 
@@ -2969,11 +2969,10 @@ Table of Contents
    This means older CAs, cosigners, relying parties, and monitors might
    interact with new entries:
 
-   Section 5.2.1 and Section 5.4 forbid a CA from logging or signing
-   entries that it does not recognize.  A CA cannot faithfully claim to
-   certify information if it does not understand it.  This is analogous
-   to how a correctly-operated X.509 CA can never sign an unrecognized
-   X.509 extension.
+   Section 5.4 forbids a CA from logging or signing entries that it does
+   not recognize.  A CA cannot faithfully claim to certify information
+   if it does not understand it.  This is analogous to how a correctly-
+   operated X.509 CA can never sign an unrecognized X.509 extension.
 
    External cosigners may or may not interact with the unrecognized
    entries.  [TLOG-MIRROR] and [TLOG-WITNESS] describe cosigners whose
