@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-19T04:18:22.257836+00:00",
+  "timestamp": "2026-05-21T04:36:22.300577+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -16782,13 +16782,13 @@
       "labels": [],
       "body": "Define an extensions field for the MerkleTreeCertEntry structure. Repeated extensions are disallowed, but unrecognized extensions are ignored. The extensions are duplicated in the MTCProof.\r\n\r\nThis change accommodates two previously requested features for MTC:\r\n\r\n1. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172: The accumulated count for the accumulated log entry type\r\n\r\n2. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/226: The log entry randomizer",
       "createdAt": "2026-05-18T22:30:37Z",
-      "updatedAt": "2026-05-19T00:16:39Z",
+      "updatedAt": "2026-05-20T19:08:00Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "23f1603f78a6951585621c08a22435288f88be6d",
       "headRepository": "cjpatton/merkle-tree-certs",
       "headRefName": "log-entry-extensions",
-      "headRefOid": "3a43593fbeadfbfe8e07ba9c42cbb7c12b950e5b",
+      "headRefOid": "5ceaea97977f18a6d79c1969b27fc2f63e31eb35",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -16856,6 +16856,96 @@
               "body": "I suspect setting up a registry might need a bit since we have to define how new codepoints are assigned and everything. If we're not defining any codepoints yet, maybe we can get away with punting the registry to the first document that needs to do it?",
               "createdAt": "2026-05-19T00:16:30Z",
               "updatedAt": "2026-05-19T00:16:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAX3Uiw",
+          "commit": {
+            "abbreviatedOid": "cc2ab21"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-19T14:38:05Z",
+          "updatedAt": "2026-05-19T14:38:05Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "ahhh yes of course :)",
+              "createdAt": "2026-05-19T14:38:05Z",
+              "updatedAt": "2026-05-19T14:38:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAX4OOg",
+          "commit": {
+            "abbreviatedOid": "3a43593"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-19T14:39:54Z",
+          "updatedAt": "2026-05-19T14:53:59Z",
+          "comments": [
+            {
+              "originalPosition": 3,
+              "body": "Done.",
+              "createdAt": "2026-05-19T14:39:54Z",
+              "updatedAt": "2026-05-19T14:53:59Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "Sure. How should we spell `MerkleTreeCertEntryExtensionType` if we don't have an initial variant?  This doesn't look syntactically correct to me:\n\n```tls-presentation\nenum {\n    (2^16-1)\n} MerkleTreeCertEntryExtensionType;\n```\n\nWe could just do\n```tls-presentation\nuint16 MerkleTreeCertEntryExtensionType;\n```",
+              "createdAt": "2026-05-19T14:44:19Z",
+              "updatedAt": "2026-05-19T14:53:59Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "> If they _override_ the logic, it suggests that unrecognized extensions should be an error, but we want the RP to tolerate unknown extensions.\n\nAgreed. How would you write this instead? Hows about \"extends the logic with optional behavior\"?\n\n> CAs are the ones constructing these, rather than consuming these. Though checking duplicates is actually kinda annoying, unless we enforce that they're ordered numerically. (We could do that!)\n\nAh, you mean that the CA would add the extensions instead of the party requesting the cert? That makes sense.\n\nI'd be fine with allowing duplicates, but what should we tell RPs to do when they encounter them? Should we leave it up to the extension to specify their behavior?\n\n> Probably also something about not allowing unknown extension types.\n\nDo you mean the CA shouldn't add extensions to an entry of a type it doesn't recognize?",
+              "createdAt": "2026-05-19T14:51:53Z",
+              "updatedAt": "2026-05-19T14:53:59Z"
+            },
+            {
+              "originalPosition": 64,
+              "body": "Done.",
+              "createdAt": "2026-05-19T14:52:40Z",
+              "updatedAt": "2026-05-19T14:53:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAitJKQ",
+          "commit": {
+            "abbreviatedOid": "5ceaea9"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-20T18:52:49Z",
+          "updatedAt": "2026-05-20T19:08:00Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "It is quite unusual, but I think `enum { (2^16-1) } MerkleTreeCertEntryExtensionType` is fine? I don't know if I've ever seen it used, but eh. The TLS presentation language isn't really a formal language that anyone tries to parse, so let's ask for forgiveness later if anyone thinks this is wrong. :-)",
+              "createdAt": "2026-05-20T18:52:49Z",
+              "updatedAt": "2026-05-20T19:08:00Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "> Agreed. How would you write this instead? Hows about \"extends the logic with optional behavior\"?\n\nThis is a cop-out, but we could just not say anything. They're additional values associated with the entry, but the extension has to define the semantics. We can even explicitly say something like \"This document does not define any extensions, but future documents MAY define extensions.\"\n\n> Ah, you mean that the CA would add the extensions instead of the party requesting the cert? That makes sense.\n\nYeah. For both examples we have (randomizer and accumulator count), it's the CA constructing this as well.\n\nI mean, maybe someone will define an extension that includes some value that the subscriber requests, but I think that still counts as the CA adding the extension, even if it's decided, for this one field, it's supposed to copy the value from the certificate request. (But I doubt that'll happen.)\n\n> I'd be fine with allowing duplicates, but what should we tell RPs to do when they encounter them? Should we leave it up to the extension to specify their behavior?\n\nOh, I don't think we should allow duplicates, so we don't have to think about it. It's just that detecting duplications is mildly annoying if you have to copy the list somewhere and then sort, rather than just iterating through the data in-place. I've seen TLS stacks that look at the first or last value if there's a duplicate, and I've seen ones that only detect duplicates of known extensions and don't notice duplicates of unknown ones.\n\nMirroring #231, I'm inclined to say they have to be ordered numerically, which makes checking for duplicates easy. WDYT?\n\n> Do you mean the CA shouldn't add extensions to an entry of a type it doesn't recognize?\n\nYeah. Perhaps update these sections:\n* https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-log-entries:~:text=MerkleTreeCertEntry%20is%20an%20extensible%20structure.%20Future%20documents%20may%20define%20new%20values%20for%20MerkleTreeCertEntryType%2C%20with%20corresponding%20semantics.%20See%20Section%205.4%20and%20Section%2012.5%20for%20additional%20discussion.\n* https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#section-5.4-5:~:text=Entries%20are%20extensible,of%20new%20formats.\n* https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-new-log-entry-types (rename to Log Entry Extensions?)",
+              "createdAt": "2026-05-20T19:07:01Z",
+              "updatedAt": "2026-05-20T19:08:00Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "Oh, the step that begins \"Construct a MerkleTreeCertEntry of type `tbs_cert_entry`\" above also needs to be updated. (GitHub doesn't let me anchor a review comment to text you didn't change, unhelpfully.)",
+              "createdAt": "2026-05-20T19:07:54Z",
+              "updatedAt": "2026-05-20T19:08:00Z"
             }
           ]
         }
