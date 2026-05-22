@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 20 November 2026                                     Apple Inc.
+Expires: 23 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             19 May 2026
+                                                             22 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 November 2026.
+   This Internet-Draft will expire on 23 November 2026.
 
 Copyright Notice
 
@@ -1219,11 +1219,19 @@ Table of Contents
 
    struct {} Empty;
 
+   enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
+
+   struct {
+       ExtensionType extension_type;
+       opaque extension_data<0..2^16-1>;
+   } MerkleTreeCertEntryExtension;
+
    enum {
        null_entry(0), tbs_cert_entry(1), (2^16-1)
    } MerkleTreeCertEntryType;
 
    struct {
+       MerkleTreeCertEntryExtension extensions<0..2^16-1>;
        MerkleTreeCertEntryType type;
        select (type) {
           case null_entry: Empty;
@@ -1231,6 +1239,11 @@ Table of Contents
           /* May be extended with future types. */
        }
    } MerkleTreeCertEntry;
+
+   Field extensions is the list of tag-length-value extensions
+   associated with the log entry.  The extensions list MUST be appear in
+   ascending order by extension_type and MUST NOT contain two extensions
+   with the same extension_type.
 
    When type is null_entry, the entry does not represent any
    information.  Entries at any index in the log MAY have type
@@ -1283,9 +1296,9 @@ Table of Contents
    subjectPublicKeyAlgorithm and subjectPublicKeyInfoHash.
 
    MerkleTreeCertEntry is an extensible structure.  Future documents may
-   define new values for MerkleTreeCertEntryType, with corresponding
-   semantics.  See Section 5.4 and Section 12.5 for additional
-   discussion.
+   define new values for MerkleTreeCertEntryType or
+   MerkleTreeCertEntryExtensionType, with corresponding semantics.  See
+   Section 5.4 and Section 12.5 for additional discussion.
 
    A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2^16-1) bytes.
    Doing so may exceed size limits in common log-serving protocols, such
@@ -1609,12 +1622,13 @@ Table of Contents
    *  To certify an entry of type tbs_cert_entry is to certify the
       TBSCertificateLogEntry, as defined in Section 5.2.1.
 
-   Entries are extensible.  Future documents MAY define type values and
-   what it means to certify them.  A CA MUST NOT sign a subtree if it
-   contains an entry with type that it does not recognize.  Doing so
-   would certify that the CA has validated the information in some not-
-   yet-defined entry format.  Section 12.5 further discusses security
-   implications of new formats.
+   Entries are extensible.  Future documents MAY define type and
+   extension_type values and what it means to certify them.  A CA MUST
+   NOT sign a subtree if it contains an entry with type or
+   extension_type that it does not recognize.  Doing so would certify
+   that the CA has validated the information in some not-yet-defined
+   format.  Section 12.5 further discusses security implications of such
+   extensions.
 
    If the CA issues certificate revocation lists (CRLs) [RFC5280] or
    Online Certificate Status Protocol (OCSP) responses [RFC6960], the
@@ -1795,11 +1809,15 @@ Table of Contents
    } MTCSignature;
 
    struct {
+       MerkleTreeCertEntryExtension extensions<0..2^16-1>;
        uint48 start;
        uint48 end;
        HashValue inclusion_proof<0..2^16-1>;
        MTCSignature signatures<0..2^16-1>;
    } MTCProof;
+
+   extensions MUST contain the log entry's extensions value
+   (Section 5.2.1).
 
    start and end MUST contain the corresponding parameters of the chosen
    subtree. inclusion_proof MUST contain a subtree inclusion proof
@@ -2147,23 +2165,30 @@ Table of Contents
         3.  Set subjectPublicKeyInfoHash to the hash of the DER encoding
             of subjectPublicKeyInfo.
 
-   8.   Construct a MerkleTreeCertEntry of type tbs_cert_entry with
-        contents the TBSCertificateLogEntry.  Let entry_hash be the hash
-        of the entry, MTH({entry}) = HASH(0x00 || entry), as defined in
-        Section 2.1.1 of [RFC9162].
+   8.   Construct a MerkleTreeCertEntry as follows:
 
-   9.   Let expected_subtree_hash be the result of evaluating the
+        1.  Set type to tbs_cert_entry.
+
+        2.  Set extensions to the MTCProof's extensions value.
+
+        3.  Set tbs_cert_entry_data to the TBSCertificateLogEntry,
+            encoded as described in Section 5.2.1.
+
+   9.   Let entry_hash be the hash of the entry, MTH({entry}) =
+        HASH(0x00 || entry), as defined in Section 2.1.1 of [RFC9162].
+
+   10.  Let expected_subtree_hash be the result of evaluating the
         MTCProof's inclusion_proof for entry index, with hash
         entry_hash, of the subtree described by the MTCProof's start and
         end, following the procedure in Section 4.3.2.  If evaluation
         fails, abort this process and fail verification.
 
-   10.  If log_number, start, and end matches a trusted subtree
+   11.  If log_number, start, and end matches a trusted subtree
         (Section 7.4) for the CA, check that expected_subtree_hash is
         equal to the trusted subtree's hash.  Return success if it
         matches and failure if it does not.
 
-   11.  Otherwise, check that the MTCProof's signatures contain a
+   12.  Otherwise, check that the MTCProof's signatures contain a
         sufficient set of valid signatures from cosigners to satisfy the
         relying party's cosigner requirements (Section 7.3).
         Unrecognized cosigners MUST be ignored.
@@ -2194,28 +2219,30 @@ Table of Contents
    single pass from the DER-encoded TBSCertificate, without storing the
    full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
 
-   1.  Initialize a hash instance.
+   1.   Initialize a hash instance.
 
-   2.  Write the big-endian, two-byte tbs_cert_entry value to the hash.
+   2.   Write the extensions field from the MTCProof to the hash.
 
-   3.  Write the TBSCertificate contents octets to the hash, up to the
-       subjectPublicKeyInfo field.
+   3.   Write the big-endian, two-byte tbs_cert_entry value to the hash.
 
-   4.  Write the subjectPublicKeyInfo's algorithm field to the hash.
+   4.   Write the TBSCertificate contents octets to the hash, up to the
+        subjectPublicKeyInfo field.
 
-   5.  Write the octet 0x04 to the hash.  This is an OCTET STRING
-       identifer.
+   5.   Write the subjectPublicKeyInfo's algorithm field to the hash.
 
-   6.  Write the octet L to the hash, where L is the hash length.  (This
-       assumes L is at most 127.)
+   6.   Write the octet 0x04 to the hash.  This is an OCTET STRING
+        identifer.
 
-   7.  Write H to the hash, where H is the hash of the entire
-       subjectPublicKeyInfo field.
+   7.   Write the octet L to the hash, where L is the hash length.
+        (This assumes L is at most 127.)
 
-   8.  Write the remainder of the TBSCertificate contents octets to the
-       hash, starting just after the subjectPublicKeyInfo field.
+   8.   Write H to the hash, where H is the hash of the entire
+        subjectPublicKeyInfo field.
 
-   9.  Finalize the hash and set entry_hash to the result.
+   9.   Write the remainder of the TBSCertificate contents octets to the
+        hash, starting just after the subjectPublicKeyInfo field.
+
+   10.  Finalize the hash and set entry_hash to the result.
 
    This is possible because the structure in Section 5.2.1 omits the
    TBSCertificateLogEntry's identifier and length octets.
