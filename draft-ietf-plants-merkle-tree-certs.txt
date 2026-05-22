@@ -4022,6 +4022,8 @@ Since draft-ietf-plants-merkle-tree-certs-03
    *  Remove subtree signer API in favor of
       https://github.com/C2SP/C2SP/pull/245 in [TLOG-WITNESS]
 
+   *  Add an extensions block to log entries
+
 Authors' Addresses
 
    David Benjamin
