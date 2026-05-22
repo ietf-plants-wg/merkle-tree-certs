@@ -430,15 +430,13 @@ A *subtree* of this Merkle Tree is itself a Merkle Tree, defined by `MTH(D[start
 *  `0 <= start < end <= n`
 * `start` is a multiple of `BIT_CEIL(end - start)`
 
-Note that, if `start` is zero, the second condition is always true.
+The second condition ensures that `MTH(D[start:end])`, built over `D[start:end]` as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See {{subtrees-explain}} for more details. Note that, if `start` is zero, this second condition is always true.
 
-In the context of a single Merkle Tree, the subtree defined by `start` and `end` is denoted by half-open interval `[start, end)`. It contains the entries whose indices are in that half-open interval.
+The *size* of the subtree is `end - start`.
 
-The *size* of the subtree is `end - start`. If the subtree's size is a power of two, it is said to be *full*, otherwise it is said to be *partial*.
+In the context of a single Merkle Tree, this document denotes subtree `MTH(D[start:end])` by half-open interval `[start, end)`. It contains the entries whose indices are in that half-open interval.
 
-If a subtree is full, then it is directly contained in the tree of hash operations in `MTH(D_n)` for `n >= end`.
-
-If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end`.
+As a Merkle Tree grows, its subtrees remain unchanged. That is, if `end <= m <= n`, the subtree `[start, end)` of `MTH(D[0:m])` and the subtree `[start, end)` of `MTH(D_n)` are both valid and identical.
 
 ## Example Subtrees
 
@@ -473,9 +471,9 @@ If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end
 |8| |9| |10| |11| |12|
 +-+ +-+ +--+ +--+ +--+
 ~~~
-{: #fig-subtree-example title="Two example subtrees, one full and one partial"}
+{: #fig-subtree-example title="Two example subtrees"}
 
-Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained (marked with double lines) because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained (marked with wavy lines) because `n` (13) is `end` (13).
+Both can be viewed as subtrees of a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. Nodes in common with `[4, 8)` and `[8, 13)` are marked with doubled and wavy lines, respectively.
 
 ~~~aasvg
                 +-----------------------------+
@@ -500,7 +498,7 @@ Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{
 ~~~
 {: #fig-subtree-containment-example title="A Merkle Tree of size 13"}
 
-In contrast, `[8, 13)` is not directly contained in a Merkle Tree of size 14, depicted in {{fig-subtree-containment-example-2}}. However, the subtree is still computed over consistent elements.
+In some cases, not every node of a subtree will appear in the larger Merkle Tree. {{fig-subtree-containment-example-2}} depicts a Merkle Tree of size 14. Nodes in common with `[4, 8)` and `[8, 13)` are marked as above. While all nodes of `[4, 8)` appear in the tree, non-leaf nodes on `[8, 13)`'s right edge do not. However, there is still sufficient overlap to construct subtree consistency proofs ({{subtree-consistency-proofs}}).
 
 ~~~aasvg
                 +-----------------------------+
@@ -511,19 +509,21 @@ In contrast, `[8, 13)` is not directly contained in a Merkle Tree of size 14, de
        |     [0, 8)     |             |     [8, 14)    |
        +----------------+             +----------------+
         /              \                 /           |
-   +--------+      +--------+      +~~~~~~~~~+       |
+   +--------+      +========+      +~~~~~~~~~+       |
    | [0, 4) |      | [4, 8) |      | [8, 12) |       |
-   +--------+      +--------+      +~~~~~~~~~+       |
+   +--------+      +========+      +~~~~~~~~~+       |
     /      \        /      \         /      \        |
-+-----+ +-----+ +-----+ +-----+ +~~~~~~+ +~~~~~~~+ +-------+
++-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+ +-------+
 |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
-+-----+ +-----+ +-----+ +-----+ +~~~~~~+ +~~~~~~~+ +-------+
++-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+ +-------+
   / \     / \     / \     / \     / \      / \       / \
-+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
++-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+ +--+
 |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
-+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
++-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+ +--+
 ~~~
 {: #fig-subtree-containment-example-2 title="A Merkle Tree of size 14"}
+
+{{subtrees-explain}} discusses subtrees in more detail.
 
 ## Subtree Inclusion Proofs
 
@@ -602,7 +602,7 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 
 A subtree `[start, end)` can be efficiently proven to be consistent with the full Merkle Tree. That is, given `MTH(D[start:end])` and `MTH(D_n)`, the proof demonstrates that the input `D[start:end]` to the subtree hash was equal to the corresponding elements of the input `D_n` to the Merkle Tree hash.
 
-Subtree consistency proofs contain sufficient nodes to reconstruct both the subtree hash, `MTH(D[start:end])`, and the full tree hash, `MTH(D_n)`, in such a way that every input to the subtree hash was also incorporated into the full tree hash.
+Subtree consistency proofs contain sufficient nodes to reconstruct both the subtree hash, `MTH(D[start:end])`, and the original tree hash, `MTH(D_n)`, in such a way that every input to the subtree hash was also incorporated into the original tree hash.
 
 ### Generating a Subtree Consistency Proof
 
@@ -659,7 +659,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 
 ### Example Subtree Consistency Proofs
 
-The subtree consistency proof for `[4, 8)` and a tree of size 14 contains `MTH(D[0:4])` and `MTH(D[8:14])`, depicted in {{fig-subtree-consistency-example-1}}. The verifier is assumed to know the subtree hash, so there is no need to include `MTH(D[4:8])` itself in the consistency proof.
+The subtree consistency proof for `[4, 8)` and a tree of size 14 contains `MTH(D[0:4])` and `MTH(D[8:14])`, depicted in {{fig-subtree-consistency-example-1}} with doubled lines. The verifier is assumed to know the subtree hash, so there is no need to include `MTH(D[4:8])`, depicted with wavy lines, in the consistency proof.
 
 ~~~aasvg
    +~~~~~~~~+
@@ -694,9 +694,9 @@ The subtree consistency proof for `[4, 8)` and a tree of size 14 contains `MTH(D
 |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
 +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +--+ +--+
 ~~~
-{: #fig-subtree-consistency-example-1 title="An example subtree consistency proof for a subtree that is directly contained in the full tree"}
+{: #fig-subtree-consistency-example-1 title="An example subtree consistency proof that begins at the root of the subtree"}
 
-The subtree consistency proof for `[8, 13)` and a tree of size 14 contains `MTH({d[12]})`, `MTH({d[13]})`, `MTH(D[8:12])`, and `MTH(D[0:8])`, depicted in {{fig-subtree-consistency-example-2}}. `[8, 13)` is not directly contained in the tree, so the proof must include sufficient nodes to reconstruct both hashes.
+The subtree consistency proof for `[8, 13)` and a tree of size 14 contains `MTH({d[12]})`, `MTH({d[13]})`, `MTH(D[8:12])`, and `MTH(D[0:8])`, depicted in {{fig-subtree-consistency-example-2}} with doubled lines. Not every node in `[8, 13)` is also in the overall tree, so the proof must include sufficient nodes to reconstruct both hashes. However, there is enough overlap for the proof to be possible.
 
 ~~~aasvg
       +----------------+
@@ -735,7 +735,7 @@ The subtree consistency proof for `[8, 13)` and a tree of size 14 contains `MTH(
 |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
 +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +==+ +==+
 ~~~
-{: #fig-subtree-consistency-example-2 title="An example subtree consistency proof for a subtree that is not directly contained in the full tree"}
+{: #fig-subtree-consistency-example-2 title="An example subtree consistency proof that decomposes the subtree"}
 
 ### Verifying a Subtree Consistency Proof
 
@@ -768,9 +768,46 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 {{consistency-proof-verification-explain}} explains this procedure in more detail.
 
-## Arbitrary Intervals
+## Efficiently Covering Arbitrary Intervals {#arbitrary-intervals}
 
-Not all `[start, end)` intervals of a Merkle Tree are valid subtrees. This section describes how, for any `start < end`, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following procedure:
+This document uses subtrees to sign over arbitrary intervals, `[start, end)`, of a Merkle Tree. However, not all intervals are valid subtrees. While subtrees containing the intervals would suffice, the smallest subtree containing `[start, end)` may be much larger than `[start, end)`.
+
+For example, {{fig-subtree-counterexample}} shows the smallest subtree that contains `[7, 9)` in a 9-element tree. The smallest single subtree that contains the interval is `[0, 9)`, but this is the entire tree.
+
+~~~aasvg
+                +~~~~~~~~~~~~~~~~~~~+
+                |      [0, 9)       |
+                +~~~~~~~~~~~~~~~~~~~+
+                   /             |
+       +----------------+        |
+       |     [0, 8)     |        |
+       +----------------+        |
+        /              \         |
+   +--------+      +--------+    |
+   | [0, 4) |      | [4, 8) |    |
+   +--------+      +--------+    |
+    /      \        /      \     |
++-----+ +-----+ +-----+ +-----+  |
+|[0,2)| |[2,4)| |[4,6)| |[6,8)|  |
++-----+ +-----+ +-----+ +-----+  |
+  / \     / \     / \     / \    |
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
+|0| |1| |2| |3| |4| |5| |6| |7| |8|
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
+~~~
+{: #fig-subtree-counterexample title="An example showing an inefficient choice of a single subtree"}
+
+While one subtree can be inefficient, two subtrees are sufficient to efficiently cover any interval, as described below.
+
+### Selecting Two Subtrees
+
+This section defines a procedure for selecting up to two subtrees, given any non-empty interval (`start < end`). Combined, the subtrees contain `[start, end)` with bounded excess elements. The procedure either returns `[start, end)` as a subtree, or two subtrees, `left` and `right`, that satisfy the following properties:
+
+* The two subtrees cover adjacent intervals. That is, `left.end = right.start`.
+* The two subtrees together contain the entire interval `[start, end)`. There are no extra entries after `end`, but there may be extra entries before `start`. That is, `left.start <= start` and `end = right.end`.
+* The extra entries before `start` are less than half of `left`. That is, `start - left.start < left.end - start`.
+
+The subtrees are selected as follows:
 
 1. If `end - start` is one, return a single subtree, `[start, end)`.
 
@@ -793,12 +830,7 @@ Not all `[start, end)` intervals of a Merkle Tree are valid subtrees. This secti
 
    6. Return the subtrees `[left_start, mid)` and `[mid, end)`.
 
-When the procedure returns a single subtree, the subtree is `[start, start+1)`. When it returns two subtrees, `left` and `right`, the subtrees satisfy the following properties:
-
-* `left.end = right.start`. That is, the two subtrees cover adjacent intervals.
-* `left.start <= start` and `end = right.end`. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before `start` left, but not after `end`.
-* `left.end - left.start < 2 * (end - start)` and `right.end - right.start <= end - start`. That is, the two subtrees efficiently cover the interval.
-* `left` is full, while `right` may be partial.
+Intuitively, this procedure considers the tree `MTH(D[0:end])` and finds the lowest common ancestor of the elements in `[start, end)`. It splits the interval by that ancestor's left and right children and returns the lowest common ancestor of each half.
 
 The following Python code implements this procedure:
 
@@ -822,7 +854,7 @@ def find_subtrees(start, end):
     return [(left_start, mid), (mid, end)]
 ~~~
 
-{{fig-subtree-pair-example}} shows the subtrees which cover `[5, 13)` in a Merkle Tree of 13 elements. The two subtrees selected are `[4, 8)` and `[8, 13)`. Note that the subtrees cover a slightly larger interval than `[5, 13)`.
+{{fig-subtree-pair-example}} shows the subtrees which cover `[5, 13)` in a Merkle Tree of 13 elements in wavy lines. The two subtrees selected are `[4, 8)` and `[8, 13)`. Note that the subtrees cover a slightly larger interval than `[5, 13)`.
 
 <!-- Ideally we'd use the Unicode box-drawing characters for the text form, but aasvg doesn't support them: https://github.com/martinthomson/aasvg/issues/9 -->
 
@@ -831,13 +863,13 @@ def find_subtrees(start, end):
                 |            [0, 13)          |
                 +-----------------------------+
                    /                       \
-       +----------------+             +================+
+       +----------------+             +~~~~~~~~~~~~~~~~+
        |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +================+
+       +----------------+             +~~~~~~~~~~~~~~~~+
         /              \                 /          |
-   +--------+      +========+      +---------+      |
+   +--------+      +~~~~~~~~+      +---------+      |
    | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +========+      +---------+      |
+   +--------+      +~~~~~~~~+      +---------+      |
     /      \        /      \         /      \       |
 +-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
 |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
@@ -848,31 +880,6 @@ def find_subtrees(start, end):
 +-+ +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
 ~~~
 {: #fig-subtree-pair-example title="An example selection of subtrees to cover an interval"}
-
-Two subtrees are needed because a single subtree may not be able to efficiently cover an interval. {{fig-subtree-counterexample}} shows the smallest subtree that contains `[7, 9)` in a 9-element tree. The smallest single subtree that contains the interval is `[0, 9)` but this is the entire tree. Using two subtrees, the interval can be described by `[7, 8)` and `[8, 9)`.
-
-~~~aasvg
-                +===================+
-                |      [0, 9)       |
-                +===================+
-                   /             |
-       +----------------+        |
-       |     [0, 8)     |        |
-       +----------------+        |
-        /              \         |
-   +--------+      +--------+    |
-   | [0, 4) |      | [4, 8) |    |
-   +--------+      +--------+    |
-    /      \        /      \     |
-+-----+ +-----+ +-----+ +-----+  |
-|[0,2)| |[2,4)| |[4,6)| |[6,8)|  |
-+-----+ +-----+ +-----+ +-----+  |
-  / \     / \     / \     / \    |
-+-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
-|0| |1| |2| |3| |4| |5| |6| |7| |8|
-+-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
-~~~
-{: #fig-subtree-counterexample title="An example showing an inefficient choice of a single subtree"}
 
 # Certification Authorities
 
@@ -2047,6 +2054,58 @@ In a tree of the next power of two size, the skipped nodes in this path are wher
 
 Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a left child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
 
+## Subtrees {#subtrees-explain}
+
+Given a list of elements and Merkle Tree over them, it is possible to construct a smaller Merkle Tree over any interval of elements. However, those smaller trees may not have the same structure as the original tree.
+
+{{fig-misaligned-tree}} shows a Merkle Tree of size 8, and a tree built over elements `[1, 5)`. When `[1, 5)` is considered as an independent, 4-element sequence, it does not align with the portion of the overall tree that covers `[1, 5)`. The two trees do not share any intermediate nodes. This prevents constructing subtree consistency proofs ({{subtree-consistency-proofs}}).
+
+~~~aasvg
+       +----------------+
+       |     [0, 8)     |        level 3
+       +----------------+
+        /              \
+   +--------+      +--------+
+   | [0, 4) |      | [4, 8) |    level 2
+   +--------+      +--------+
+    /      \        /      \
++-----+ +-----+ +-----+ +-----+
+|[0,2)| |[2,4)| |[4,6)| |[6,8)|  level 1
++-----+ +-----+ +-----+ +-----+
+  / \     / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5| |6| |7|  level 0
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+
+       +--------+
+       | [1, 5) |                level 2
+       +--------+
+        /      \
+    +-----+ +-----+
+    |[1,3)| |[3,5)|              level 1
+    +-----+ +-----+
+      / \     / \
+    +-+ +-+ +-+ +-+
+    |1| |2| |3| |4|              level 0
+    +-+ +-+ +-+ +-+
+~~~
+{: #fig-misaligned-tree title="An example misaligned tree"}
+
+The numerical constraints on `start` and `end` in {{definition-of-a-subtree}} restrict subtrees to avoid this. A Merkle Tree built over `[start, end)` has size `end - start`, and is constructed as if `start` were the first element of the sequence at index zero. To be aligned, `start` must be the leftmost leaf of the lowest common ancestor of `start` and `end` in the original tree:
+
+* Numerically, this means the least significant `BIT_WIDTH(end - start - 1)` bits of `start` must be zero. Equivalently, `start` must be divisible by `BIT_CEIL(end - start)`.
+
+* In the tree, this means subtrees are constructed by taking any node in the tree, setting `start` to the leftmost leaf under the node, and `end` to one past any other leaf under the node.
+
+Though most nodes overlap, not every node of the subtree is necessarily in the larger Merkle Tree, as shown in {{fig-subtree-containment-example-2}}. In general:
+
+* Subtrees whose sizes are a power of two are called *full subtrees*. A full subtree's root node will always be in the original tree.
+
+* Subtree whose sizes are not a power of two are called *partial subtrees*. A partial subtree's root node will be in the original tree of size `n`, if and only if `n = end`. Otherwise, non-leaf nodes along the partial subtree's right edge will not be part of the original tree.
+
+The difference between full and partial subtrees do not impact their usage, but they can help in understanding the proof constructions below.
+
 ## Inclusion Proof Evaluation {#inclusion-proof-evaluation-explain}
 
 The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree hash in `r` by starting from `entry_hash` and iteratively hashing elements of `inclusion_proof` on the left or right. That means this procedure, when successful, must return *some* hash that contains `entry_hash`.
@@ -2065,7 +2124,7 @@ Inclusion proofs can also be evaluated by considering these two stages separatel
 
 A subtree consistency proof for `[start, end)` and the tree of `n` elements is similar to an inclusion proof for element `end - 1`. If one starts from `end - 1`'s hash, incorporating the whole inclusion proof should reconstruct `root_hash` and incorporating a subset of the inclusion proof should reconstruct `node_hash`. Thus `end - 1`'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:
 
-1. Instead of starting at level 0 with `end - 1`, the proof can start at a higher level. Any ancestor of `end - 1` shared by both the subtree and the overall tree is a valid starting node to reconstruct `node_hash` and `root_hash`. Use the highest level with a commmon ancestor. This truncates the inclusion proof portion of the consistency proof.
+1. Instead of starting at level 0 with `end - 1`, the proof can start at a higher level. Any ancestor of `end - 1` shared by both the subtree and the overall tree is a valid starting node to reconstruct `node_hash` and `root_hash`. Use the highest level with a commmon ancestor. This truncates the inclusion proof.
 
 2. If this starting node is the entire subtree, omit its hash from the consistency proof. The verifier is assumed to already know `node_hash`.
 
@@ -2155,7 +2214,7 @@ Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third nu
 
 Steps 3 and 4 then skip to the starting node, described in {{consistency-proof-structure}}. The starting node may be:
 
-* The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n` (step 3), or if `[start, end)` is full (exiting step 4 because `fn` is `sn`).
+* The entire subtree `[start, end)` if the subtree root is in the tree. This will occur if `end` is `n` (step 3), or if `[start, end)` is a full subtree (exiting step 4 because `fn` is `sn`).
 
 * Otherwise, the highest full subtree along the right edge of `[start, end)`. This corresponds to the process exiting step 4 because `LSB(sn)` is not set.
 
@@ -2171,7 +2230,7 @@ Step 7 incorporates the remainder of the consistency proof into `fr` and `sr`:
 
 * A subset of the hashes are incorporated into `fr`. It skips any hash on the right because those contain elements greater than `end - 1`. It also stops incorporating when `fn` and `sn` have converged.
 
-This reconstructs the hashes of the subtree and full tree, which are then compared to expected values in step 8.
+This reconstructs the hashes of the subtree and original tree, which are then compared to expected values in step 8.
 
 In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always false, and `fr` is always equal to `node_hash` in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree `[fn, sn + 1)` and truncated tree `tn + 1`.
 
