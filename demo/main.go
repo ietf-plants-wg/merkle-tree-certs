@@ -56,10 +56,6 @@ func tlogIndex(n int, partial bool) string {
 	return s
 }
 
-func tlogOrigin(id TrustAnchorID) string {
-	return fmt.Sprintf("oid/1.3.6.1.4.1.%s", id)
-}
-
 func tlogCheckpointKeyID(id TrustAnchorID) [4]byte {
 	h := sha256.Sum256([]byte(tlogOrigin(id) + "\n\xffmtc-checkpoint/v1"))
 	return *(*[4]byte)(h[:])
@@ -255,7 +251,7 @@ func do() error {
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for i := range config.Cosigners {
 		cosigner := &config.Cosigners[i]
-		cosig, err := Cosign(cosigner, config.LogID, 0, len(entries), &checkpointHash)
+		cosig, err := Cosign(config.Version, cosigner, config.LogID, 0, len(entries), &checkpointHash)
 		if err != nil {
 			return err
 		}

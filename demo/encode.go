@@ -283,7 +283,7 @@ func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer Tru
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
 				for _, cosigner := range cosigners {
-					cosig, err := Cosign(cosigner, issuer, start, end, &subtree)
+					cosig, err := Cosign(version, cosigner, issuer, start, end, &subtree)
 					if err != nil {
 						cosigs.SetError(err)
 						return
