@@ -135,7 +135,10 @@ type CosignerConfig struct {
 
 type EntryConfig struct {
 	// A number of times to repeat this entry.
-	Repeat              int
+	Repeat int
+	// Null, if true, causes this to be a null entry. The certificate fields
+	// below are ignored.
+	Null                bool
 	Subject             SubjectConfig
 	PublicKey           []byte
 	NotBefore, NotAfter time.Time

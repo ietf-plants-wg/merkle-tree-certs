@@ -35,6 +35,12 @@ func TestMarshalTBSCertificate(t *testing.T) {
 		expectedTBSHex      string
 		expectedLogEntryHex string
 	}{
+		// A null entry.
+		{
+			version:             VersionPlants02,
+			entry:               &EntryConfig{Null: true},
+			expectedLogEntryHex: "0000",
+		},
 		// A minimal TBSCertificate
 		{
 			version: VersionPlants02,
@@ -129,13 +135,15 @@ func TestMarshalTBSCertificate(t *testing.T) {
 		},
 	}
 	for i, tt := range tests {
-		b := cryptobyte.NewBuilder(nil)
-		AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry)
-		tbs, err := b.Bytes()
-		if err != nil {
-			t.Errorf("%d. AddTBSCertificate() failed: %s", i, err)
-		} else if got := hex.EncodeToString(tbs); got != tt.expectedTBSHex {
-			t.Errorf("%d. AddTBSCertificate() gave %s, wanted %s", i, got, tt.expectedTBSHex)
+		if !tt.entry.Null {
+			b := cryptobyte.NewBuilder(nil)
+			AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry)
+			tbs, err := b.Bytes()
+			if err != nil {
+				t.Errorf("%d. AddTBSCertificate() failed: %s", i, err)
+			} else if got := hex.EncodeToString(tbs); got != tt.expectedTBSHex {
+				t.Errorf("%d. AddTBSCertificate() gave %s, wanted %s", i, got, tt.expectedTBSHex)
+			}
 		}
 
 		log, err := MarshalTBSCertificateLogEntry(tt.version, tt.issuer, tt.entry)

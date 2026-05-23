@@ -215,6 +215,10 @@ func MarshalNullEntry(version DraftVersion) []byte {
 }
 
 func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, entry *EntryConfig) ([]byte, error) {
+	if entry.Null {
+		return MarshalNullEntry(version), nil
+	}
+
 	marshalContents := func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
 		addIssuer(tbs, issuer)
@@ -252,6 +256,10 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 }
 
 func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+	if entry.Null {
+		return nil, errors.New("cannot construct certificate for null entry")
+	}
+
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		AddTBSCertificate(cert, issuer, index, entry)

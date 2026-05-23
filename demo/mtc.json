@@ -48,6 +48,9 @@
       ]
     },
     {
+      "Null": true
+    },
+    {
       "Repeat": 10,
       "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
       "NotBefore": "2020-01-01T00:00:00Z",
@@ -55,6 +58,10 @@
       "DNSNames": ["c.example"],
       "KeyUsage": ["DigitalSignature"],
       "ExtKeyUsage": ["ServerAuth"]
+    },
+    {
+      "Repeat": 10,
+      "Null": true
     },
     {
       "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
