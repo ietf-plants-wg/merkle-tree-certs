@@ -123,6 +123,7 @@ func (s *SignatureAlgorithm) UnmarshalJSON(data []byte) error {
 type CAConfig struct {
 	Version   DraftVersion
 	ID        TrustAnchorID
+	LogNumber uint16
 	Cosigners []CosignerConfig
 	Entries   []EntryConfig
 }

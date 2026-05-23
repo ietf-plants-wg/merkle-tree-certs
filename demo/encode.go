@@ -7,6 +7,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
+	"fmt"
 	"math/bits"
 	"slices"
 	"time"
@@ -180,10 +181,10 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 	})
 }
 
-func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial int, entry *EntryConfig) {
+func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial uint64, entry *EntryConfig) {
 	b.AddASN1(cbasn1.SEQUENCE, func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
-		tbs.AddASN1Int64(int64(serial))
+		tbs.AddASN1Uint64(serial)
 		addMTCProofSigAlg(tbs)
 		addIssuer(tbs, issuer)
 		addValidity(tbs, entry)
@@ -255,14 +256,33 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 	return b.Bytes()
 }
 
-func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+func LogID(config *CAConfig) TrustAnchorID {
+	if config.Version < VersionPlants04 {
+		// Prior to plants-04, each CA only had one log.
+		return config.ID
+	}
+	logID := appendBase128(slices.Clip(config.ID), 0)
+	logID = appendBase128(logID, uint32(config.LogNumber))
+	return logID
+}
+
+func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
 	if entry.Null {
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
 
+	logID := LogID(config)
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
-		AddTBSCertificate(cert, issuer, index, entry)
+		serial := uint64(index)
+		if config.Version >= VersionPlants04 {
+			if serial > 1<<48-1 {
+				cert.SetError(fmt.Errorf("invalid serial: %d", index))
+				return
+			}
+			serial |= uint64(config.LogNumber) << 48
+		}
+		AddTBSCertificate(cert, config.ID, serial, entry)
 		addMTCProofSigAlg(cert)
 		cert.AddASN1(cbasn1.BIT_STRING, func(certSig *cryptobyte.Builder) {
 			proof, err := issuanceLog.SubtreeInclusionProof(index, start, end)
@@ -288,13 +308,13 @@ func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer Tru
 			} else {
 				certSig.AddBytes([]byte{0})
 			}
-			addEmptyMTCEntryExtensions(certSig, version)
+			addEmptyMTCEntryExtensions(certSig, config.Version)
 			certSig.AddUint64(uint64(start))
 			certSig.AddUint64(uint64(end))
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
 				// plants-04 canonicalizes the cosigner order.
-				if !certConfig.DontSortCosigners && version >= VersionPlants04 {
+				if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
 					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *CosignerConfig) int {
 						return cmp.Or(
 							cmp.Compare(len(a.CosignerID), len(b.CosignerID)),
@@ -303,7 +323,7 @@ func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer Tru
 					})
 				}
 				for _, cosigner := range cosigners {
-					cosig, err := Cosign(version, cosigner, issuer, start, end, &subtree)
+					cosig, err := Cosign(config.Version, cosigner, logID, start, end, &subtree)
 					if err != nil {
 						cosigs.SetError(err)
 						return

@@ -30,7 +30,7 @@ func TestMarshalTBSCertificate(t *testing.T) {
 	var tests = []struct {
 		version             DraftVersion
 		issuer              TrustAnchorID
-		serial              int
+		serial              uint64
 		entry               *EntryConfig
 		expectedTBSHex      string
 		expectedLogEntryHex string

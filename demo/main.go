@@ -73,7 +73,14 @@ func do() error {
 	}
 
 	// Entries in the issuance log.
-	entries := [][]byte{MarshalNullEntry(config.Version)}
+	var entries [][]byte
+	if config.Version < VersionPlants04 {
+		// Prior to plants-04, the log began with a null entry.
+		entries = append(entries, MarshalNullEntry(config.Version))
+	} else if config.LogNumber == 0 {
+		// Starting plants-04, non-zero serials come from the log number.
+		return fmt.Errorf("invalid log number: %d", config.LogNumber)
+	}
 	// Certificates to be constructed.
 	var certInfos []certificateInfo
 	// Maps checkpoint sequence name to a list of certInfos indices that are
@@ -174,7 +181,7 @@ func do() error {
 		// certificate. Rather it cosign subtrees as it checkpoints. This tool
 		// is less opinionated about subtrees, so we would need to make a
 		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(config.Version, issuanceLog, config.ID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
+		cert, err := CreateCertificate(&config, issuanceLog, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}
@@ -246,7 +253,7 @@ func do() error {
 		panic(err)
 	}
 	var signedNote bytes.Buffer
-	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(config.ID))
+	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogID(&config)))
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for i := range config.Cosigners {
