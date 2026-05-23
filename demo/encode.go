@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"cmp"
 	"crypto/sha256"
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
 	"math/bits"
+	"slices"
 	"time"
 
 	"golang.org/x/crypto/cryptobyte"
@@ -282,6 +285,15 @@ func CreateCertificate(version DraftVersion, issuanceLog *MerkleTree, issuer Tru
 			certSig.AddUint64(uint64(end))
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
+				// plants-04 canonicalizes the cosigner order.
+				if !certConfig.DontSortCosigners && version >= VersionPlants04 {
+					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *CosignerConfig) int {
+						return cmp.Or(
+							cmp.Compare(len(a.CosignerID), len(b.CosignerID)),
+							bytes.Compare(a.CosignerID, b.CosignerID),
+						)
+					})
+				}
 				for _, cosigner := range cosigners {
 					cosig, err := Cosign(version, cosigner, issuer, start, end, &subtree)
 					if err != nil {

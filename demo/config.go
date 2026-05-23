@@ -174,6 +174,9 @@ type CertificateConfig struct {
 	// must be zero, as unused. This makes the signatureValue a non-whole
 	// number of bytes.
 	UnusedBit bool
+	// DontSortCosigners, if true, skips sorting the cosigners and includes
+	// signatures in the specified order.
+	DontSortCosigners bool
 }
 
 func parseBase128(in []byte) (ret uint32, rest []byte, ok bool) {
