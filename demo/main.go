@@ -95,7 +95,7 @@ func do() error {
 			repeat = entryConfig.Repeat
 		}
 		for range repeat {
-			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.LogID, entryConfig)
+			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.ID, entryConfig)
 			if err != nil {
 				return err
 			}
@@ -174,7 +174,7 @@ func do() error {
 		// certificate. Rather it cosign subtrees as it checkpoints. This tool
 		// is less opinionated about subtrees, so we would need to make a
 		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(config.Version, issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
+		cert, err := CreateCertificate(config.Version, issuanceLog, config.ID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}
@@ -246,12 +246,12 @@ func do() error {
 		panic(err)
 	}
 	var signedNote bytes.Buffer
-	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(config.LogID))
+	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(config.ID))
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for i := range config.Cosigners {
 		cosigner := &config.Cosigners[i]
-		cosig, err := Cosign(config.Version, cosigner, config.LogID, 0, len(entries), &checkpointHash)
+		cosig, err := Cosign(config.Version, cosigner, config.ID, 0, len(entries), &checkpointHash)
 		if err != nil {
 			return err
 		}
