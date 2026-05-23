@@ -3,6 +3,11 @@
   "LogID": "32473.1",
   "Cosigners": [
     {
+      "CosignerID": "32473.1",
+      "SignatureAlgorithm": "ecdsa_p256_sha256",
+      "PrivateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgthrguld6LZNJw6UMbhyTkML7u3BMcdEyomQIwB+N2o6hRANCAAR6nKeTu+M2OxL7HCjH/i0+lnIx7OE0b3DnXWVue+5TBVDq8aG6KqFq+xprV5ll6QtPJb+TTBp+Kv1IRpDxMpxt"
+    },
+    {
       "CosignerID": "32473.2.1",
       "SignatureAlgorithm": "ecdsa_p256_sha256",
       "PrivateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgthrguld6LZNJw6UMbhyTkML7u3BMcdEyomQIwB+N2o6hRANCAAR6nKeTu+M2OxL7HCjH/i0+lnIx7OE0b3DnXWVue+5TBVDq8aG6KqFq+xprV5ll6QtPJb+TTBp+Kv1IRpDxMpxt"
@@ -37,8 +42,8 @@
       "ExtKeyUsage": ["ServerAuth"],
       "Checkpoints": ["fast"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.2"]},
-        {"SubtreeStart": 8, "SubtreeEnd": 16, "Cosigners": ["32473.2.3"]},
+        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"]},
+        {"SubtreeStart": 8, "SubtreeEnd": 16, "Cosigners": ["32473.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -57,7 +62,7 @@
       "NotBefore": "2020-01-01T00:00:00Z",
       "NotAfter": "2030-12-31T23:59:59Z",
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -70,7 +75,7 @@
       "ExtKeyUsage": ["ServerAuth"],
       "Checkpoints": ["fast", "landmark"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -93,7 +98,7 @@
       "IsCA": true,
       "MaxPathLen": 5,
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -106,7 +111,7 @@
       "ExtKeyUsage": ["ServerAuth"],
       "Checkpoints": ["fast", "landmark"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"},
         {"Checkpoint": "landmark", "BitFlipProof": true}
       ]
