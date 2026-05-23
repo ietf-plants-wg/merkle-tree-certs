@@ -1015,7 +1015,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
-MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType or MerkleTreeCertEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
+MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType or MerkleTreeCertEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
 A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
@@ -1186,7 +1186,7 @@ What it means to certify an entry depends on the entry type:
 * To certify an entry of type `null_entry` is a no-op. A CA MAY freely certify `null_entry` without being held responsible for any validation.
 * To certify an entry of type `tbs_cert_entry` is to certify the TBSCertificateLogEntry, as defined in {{log-entries}}.
 
-Entries are extensible. Future documents MAY define `type` and `extension_type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` or `extension_type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. {{new-log-entry-types}} further discusses security implications of such extensions.
+Entries are extensible. Future documents MAY define `type` and `extension_type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` or `extension_type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. {{extensibility}} further discusses security implications of such extensions.
 
 If the CA issues certificate revocation lists (CRLs) {{!RFC5280}} or Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See {{signature-domain-separation}} for a discussion of domain separation.
 
@@ -1773,17 +1773,25 @@ However, per {{certification-authority-cosigners}}, any subtree signature is a b
 
 The transparency ecosystem does not retain unhashed public keys, so it also may not be possible to construct a complete certificate from the signed checkpoint and inclusion proof. However, if the log entry's `subjectPublicKeyInfoHash` does not correspond to an authorized key for the subject of the certificate, the entry is still unauthorized. A Merkle Tree CA is held responsible for all log entries it certifies, whether or not the preimage of the hash is known.
 
-## New Log Entry Types
+## Extensibility
 
-MerkleTreeCertEntry ({{log-entries}}) is extensible and permits protocol extensions to define new formats for the CA to certify. This means older CAs, cosigners, relying parties, and monitors might interact with new entries:
+MerkleTreeCertEntry ({{log-entries}}) contain several extension points:
+
+* New X.509 extensions can be added to TBSCertificateLogEntry.
+* New MerkleTreeCertEntryType values define new formats for the entry contents.
+* New MerkleTreeCertEntryExtensionType values define new entry extension fields.
+
+X.509 extensions apply to Merkle Tree Certificates without any modifications. The two entry-level extension points are new to this protocol. Older CAs, cosigners, relying parties, and monitors may encounter unrecognized entries:
+
+Different cosigner roles interact with extensions differently. Some roles, e.g. {{TLOG-MIRROR}} and {{TLOG-WITNESS}}, do not interpret entry contents. Unrecognized extensions do not impact these roles. Other roles, such as CA cosigners, have semantics that depend on the entry contents. If a cosigner role interprets log entry contents, it MUST define how it interacts with unrecognized types and extensions.
 
 {{certification-authority-cosigners}} forbids a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 CA can never sign an unrecognized X.509 extension.
 
-External cosigners may or may not interact with the unrecognized entries. {{TLOG-MIRROR}} and {{TLOG-WITNESS}} describe cosigners whose roles do not interpret the contents of log entries. New entry types MAY be added without updating them. If a cosigner role does interpret a log entry, it MUST define how it interacts with unknown ones.
+Unrecognized entry types do not impact older relying parties. In {{verifying-certificate-signatures}}, the relying party constructs the MerkleTreeCertEntry that it expects. The unrecognized entry will have a different `type` value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.
 
-If a relying party trusts an issuance log, but the issuance log contains an unrecognized entry, the entry will not cause it to accept an unexpected certificate. In {{verifying-certificate-signatures}}, the relying party constructs the MerkleTreeCertEntry that it expects. The unrecognized entry will have a different `type` value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.
+However, unrecognized entry extensions will be ignored by relying parties, analogously to a non-critical X.509 extension. Entry extensions thus SHOULD be defined so that this is safe.
 
-If a monitor observes an entry with unknown type, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.
+If a monitor observes an entry with unknown type or entry extension, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.
 
 This situation is analogous to the addition of a new X.509 extension. When relying parties add support for log entry types or new X.509 extensions, they SHOULD coordinate with monitors to ensure the transparency ecosystem is able to monitor the new formats.
 
