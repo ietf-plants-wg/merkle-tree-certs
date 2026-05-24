@@ -258,7 +258,7 @@ func do() error {
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for i := range config.Cosigners {
 		cosigner := &config.Cosigners[i]
-		cosig, err := Cosign(config.Version, cosigner, config.ID, 0, len(entries), &checkpointHash)
+		cosig, err := Cosign(config.Version, cosigner, LogID(&config), 0, len(entries), &checkpointHash)
 		if err != nil {
 			return err
 		}
