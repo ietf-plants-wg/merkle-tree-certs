@@ -5,7 +5,6 @@ import (
 	"cmp"
 	"crypto"
 	"crypto/sha256"
-	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
@@ -41,6 +40,9 @@ var (
 	oidECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
 	oidECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
 	oidEd25519         = asn1.ObjectIdentifier{1, 3, 101, 112}
+	oidMLDSA44         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 17}
+	oidMLDSA65         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 18}
+	oidMLDSA87         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 19}
 )
 
 func addASN1ImplicitString(bb *cryptobyte.Builder, tag cbasn1.Tag, b []byte) {
@@ -230,6 +232,12 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA384)
 							case SignatureAlgorithmEd25519:
 								sigAlg.AddASN1ObjectIdentifier(oidEd25519)
+							case SignatureAlgorithmMLDSA44:
+								sigAlg.AddASN1ObjectIdentifier(oidMLDSA44)
+							case SignatureAlgorithmMLDSA65:
+								sigAlg.AddASN1ObjectIdentifier(oidMLDSA65)
+							case SignatureAlgorithmMLDSA87:
+								sigAlg.AddASN1ObjectIdentifier(oidMLDSA87)
 							default:
 								panic(fmt.Errorf("unknown signature algorithm %s", mtcCA.cosigner.SignatureAlgorithm))
 							}
@@ -420,7 +428,7 @@ func CreateCACertificate(config *CAConfig) ([]byte, error) {
 	cosigner := &config.Cosigners[idx]
 
 	// Extract the SPKI from the cosigner.
-	priv, err := x509.ParsePKCS8PrivateKey(cosigner.PrivateKey)
+	priv, err := parsePKCS8PrivateKey(cosigner.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -429,7 +437,7 @@ func CreateCACertificate(config *CAConfig) ([]byte, error) {
 		return nil, fmt.Errorf("unknown private key type: %T", priv)
 	}
 	pub := signer.Public()
-	spki, err := x509.MarshalPKIXPublicKey(pub)
+	spki, err := marshalPKIXPublicKey(pub)
 	if err != nil {
 		return nil, err
 	}

@@ -79,7 +79,9 @@ const (
 	SignatureAlgorithmP256WithSHA256 SignatureAlgorithm = iota
 	SignatureAlgorithmP384WithSHA384
 	SignatureAlgorithmEd25519
-	// TODO: Add ML-DSA once Go's standard library supports it.
+	SignatureAlgorithmMLDSA44
+	SignatureAlgorithmMLDSA65
+	SignatureAlgorithmMLDSA87
 )
 
 func SignatureAlgorithmFromString(s string) (SignatureAlgorithm, bool) {
@@ -90,6 +92,13 @@ func SignatureAlgorithmFromString(s string) (SignatureAlgorithm, bool) {
 		return SignatureAlgorithmP384WithSHA384, true
 	case "ed25519":
 		return SignatureAlgorithmEd25519, true
+	case "mldsa44":
+		return SignatureAlgorithmMLDSA44, true
+	case "mldsa65":
+		return SignatureAlgorithmMLDSA65, true
+	case "mldsa87":
+		return SignatureAlgorithmMLDSA87, true
+
 	}
 	return 0, false
 }
@@ -102,6 +111,12 @@ func (s SignatureAlgorithm) String() string {
 		return "ecdsa_p384_sha384"
 	case SignatureAlgorithmEd25519:
 		return "ed25519"
+	case SignatureAlgorithmMLDSA44:
+		return "mldsa44"
+	case SignatureAlgorithmMLDSA65:
+		return "mldsa65"
+	case SignatureAlgorithmMLDSA87:
+		return "mldsa87"
 	default:
 		panic(fmt.Sprintf("unexpected SignatureAlgorithm: %#v", s))
 	}

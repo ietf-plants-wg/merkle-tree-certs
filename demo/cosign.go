@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/ed25519"
@@ -10,7 +11,9 @@ import (
 	_ "crypto/sha512"
 	"crypto/x509"
 	"fmt"
+	"slices"
 
+	"filippo.io/mldsa"
 	"golang.org/x/crypto/cryptobyte"
 )
 
@@ -22,6 +25,47 @@ func addTrustAnchorID(b *cryptobyte.Builder, id TrustAnchorID) {
 
 func tlogOrigin(id TrustAnchorID) string {
 	return fmt.Sprintf("oid/1.3.6.1.4.1.%s", id)
+}
+
+// When ML-DSA is added to the Go standard library, these wrappers can be
+// removed.
+
+var (
+	mldsa44PKCS8Prefix = []byte{0x30, 0x34, 0x02, 0x01, 0x00, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11, 0x04, 0x22, 0x80, 0x20}
+	mldsa65PKCS8Prefix = []byte{0x30, 0x34, 0x02, 0x01, 0x00, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12, 0x04, 0x22, 0x80, 0x20}
+	mldsa87PKCS8Prefix = []byte{0x30, 0x34, 0x02, 0x01, 0x00, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x13, 0x04, 0x22, 0x80, 0x20}
+
+	mldsa44SPKIPrefix = []byte{0x30, 0x82, 0x05, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11, 0x03, 0x82, 0x05, 0x21, 0x00}
+	mldsa65SPKIPrefix = []byte{0x30, 0x82, 0x05, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12, 0x03, 0x82, 0x05, 0x21, 0x00}
+	mldsa87SPKIPrefix = []byte{0x30, 0x82, 0x05, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x13, 0x03, 0x82, 0x05, 0x21, 0x00}
+)
+
+func parsePKCS8PrivateKey(der []byte) (key any, err error) {
+	if seed, ok := bytes.CutPrefix(der, mldsa44PKCS8Prefix); ok && len(seed) == mldsa.PrivateKeySize {
+		return mldsa.NewPrivateKey(mldsa.MLDSA44(), seed)
+	}
+	if seed, ok := bytes.CutPrefix(der, mldsa65PKCS8Prefix); ok && len(seed) == mldsa.PrivateKeySize {
+		return mldsa.NewPrivateKey(mldsa.MLDSA65(), seed)
+	}
+	if seed, ok := bytes.CutPrefix(der, mldsa87PKCS8Prefix); ok && len(seed) == mldsa.PrivateKeySize {
+		return mldsa.NewPrivateKey(mldsa.MLDSA87(), seed)
+	}
+	return x509.ParsePKCS8PrivateKey(der)
+}
+
+func marshalPKIXPublicKey(pub any) ([]byte, error) {
+	if ml, ok := pub.(*mldsa.PublicKey); ok {
+		switch ml.Parameters() {
+		case mldsa.MLDSA44():
+			return append(slices.Clip(mldsa44SPKIPrefix), ml.Bytes()...), nil
+		case mldsa.MLDSA65():
+			return append(slices.Clip(mldsa65SPKIPrefix), ml.Bytes()...), nil
+		case mldsa.MLDSA87():
+			return append(slices.Clip(mldsa87SPKIPrefix), ml.Bytes()...), nil
+		}
+		panic("unknown ML-DSA parameters")
+	}
+	return x509.MarshalPKIXPublicKey(pub)
 }
 
 func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start, end int, hash *HashValue) ([]byte, error) {
@@ -51,7 +95,7 @@ func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start,
 		return nil, err
 	}
 
-	priv, err := x509.ParsePKCS8PrivateKey(c.PrivateKey)
+	priv, err := parsePKCS8PrivateKey(c.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -86,6 +130,23 @@ func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start,
 			return nil, fmt.Errorf("not an Ed25519 key")
 		}
 		signer = ed
+		opts = crypto.Hash(0)
+	case SignatureAlgorithmMLDSA44, SignatureAlgorithmMLDSA65, SignatureAlgorithmMLDSA87:
+		var params *mldsa.Parameters
+		switch c.SignatureAlgorithm {
+		case SignatureAlgorithmMLDSA44:
+			params = mldsa.MLDSA44()
+		case SignatureAlgorithmMLDSA65:
+			params = mldsa.MLDSA65()
+		case SignatureAlgorithmMLDSA87:
+			params = mldsa.MLDSA87()
+		}
+		ml, ok := priv.(*mldsa.PrivateKey)
+		if !ok || ml.PublicKey().Parameters() != params {
+			return nil, fmt.Errorf("not a %s key", params)
+		}
+		signer = ml
+		opts = crypto.Hash(0)
 	default:
 		return nil, fmt.Errorf("unexpected signature algorithm %s", c.SignatureAlgorithm)
 	}

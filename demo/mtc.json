@@ -5,8 +5,8 @@
   "Cosigners": [
     {
       "CosignerID": "32473.1",
-      "SignatureAlgorithm": "ecdsa_p256_sha256",
-      "PrivateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgthrguld6LZNJw6UMbhyTkML7u3BMcdEyomQIwB+N2o6hRANCAAR6nKeTu+M2OxL7HCjH/i0+lnIx7OE0b3DnXWVue+5TBVDq8aG6KqFq+xprV5ll6QtPJb+TTBp+Kv1IRpDxMpxt"
+      "SignatureAlgorithm": "mldsa44",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMRBCKAIAABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4f"
     },
     {
       "CosignerID": "32473.2.1",
@@ -15,13 +15,13 @@
     },
     {
       "CosignerID": "32473.2.2",
-      "SignatureAlgorithm": "ecdsa_p256_sha256",
-      "PrivateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQguwTmV5j7fNNBeOlQJ84+nMp9QKmKHKw8BSCUIML5a7qhRANCAATLJQap3z6wY0EXu1UYDduND1PqxVpXRInzgG1p99duaQNIH+LITruII2PyjLSH81Lsc86d2t7nPcNB6/UN3LE2"
+      "SignatureAlgorithm": "mldsa65",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMSBCKAIAABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4f"
     },
     {
       "CosignerID": "32473.2.3",
-      "SignatureAlgorithm": "ecdsa_p384_sha384",
-      "PrivateKey": "MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDBGY6nOlcHI2PcJVuqj0EpP7zTpKDQl/s/uDaoG9JrHF6cgiomDWjHjQ+QkSUbeKrGhZANiAAT/fxIL8CQ8I2ZK9Bekd9cEZEc42iyWlha2GpeJ5YUOjU2CqWJQMooUKZdVXDFF3c1M0BsLQ2nL5GYqEgqXHFeFtGg8vBleU4XmNmpv+03VodXZgKA49xV6LPFdTisa6vE="
+      "SignatureAlgorithm": "mldsa87",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMTBCKAIAABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4f"
     }
   ],
   "CACert": {
