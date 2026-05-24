@@ -20,11 +20,26 @@ func addTrustAnchorID(b *cryptobyte.Builder, id TrustAnchorID) {
 	})
 }
 
-func Cosign(c *CosignerConfig, logID TrustAnchorID, start, end int, hash *HashValue) ([]byte, error) {
+func tlogOrigin(id TrustAnchorID) string {
+	return fmt.Sprintf("oid/1.3.6.1.4.1.%s", id)
+}
+
+func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start, end int, hash *HashValue) ([]byte, error) {
 	b := cryptobyte.NewBuilder(nil)
-	b.AddBytes([]byte("mtc-subtree/v1\n\x00"))
-	addTrustAnchorID(b, c.CosignerID)
-	addTrustAnchorID(b, logID)
+	if version >= VersionPlants04 {
+		b.AddBytes([]byte("subtree/v1\n\x00"))
+		b.AddUint8LengthPrefixed(func(cosignerName *cryptobyte.Builder) {
+			cosignerName.AddBytes([]byte(tlogOrigin(c.CosignerID)))
+		})
+		b.AddUint64(0) // timestamp
+		b.AddUint8LengthPrefixed(func(logOrigin *cryptobyte.Builder) {
+			logOrigin.AddBytes([]byte(tlogOrigin(logID)))
+		})
+	} else {
+		b.AddBytes([]byte("mtc-subtree/v1\n\x00"))
+		addTrustAnchorID(b, c.CosignerID)
+		addTrustAnchorID(b, logID)
+	}
 	if !IsValidSubtree(start, end) {
 		return nil, fmt.Errorf("invalid subtree")
 	}

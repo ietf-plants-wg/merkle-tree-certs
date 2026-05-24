@@ -56,10 +56,6 @@ func tlogIndex(n int, partial bool) string {
 	return s
 }
 
-func tlogOrigin(id TrustAnchorID) string {
-	return fmt.Sprintf("oid/1.3.6.1.4.1.%s", id)
-}
-
 func tlogCheckpointKeyID(id TrustAnchorID) [4]byte {
 	h := sha256.Sum256([]byte(tlogOrigin(id) + "\n\xffmtc-checkpoint/v1"))
 	return *(*[4]byte)(h[:])
@@ -76,8 +72,31 @@ func do() error {
 		return err
 	}
 
+	if config.Version >= VersionPlants04 {
+		// Generate an a CA certificate.
+		caCert, err := CreateCACertificate(&config)
+		if err != nil {
+			return err
+		}
+		certPath := filepath.Join(*flagOutDir, "ca_cert.pem")
+		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert})
+		if err := os.WriteFile(certPath, certPEM, 0644); err != nil {
+			return err
+		}
+
+		fmt.Printf("Wrote CA certificate %q.\n", certPath)
+		fmt.Printf("\n")
+	}
+
 	// Entries in the issuance log.
-	entries := [][]byte{MarshalNullEntry(config.Version)}
+	var entries [][]byte
+	if config.Version < VersionPlants04 {
+		// Prior to plants-04, the log began with a null entry.
+		entries = append(entries, MarshalNullEntry(config.Version))
+	} else if config.LogNumber == 0 {
+		// Starting plants-04, non-zero serials come from the log number.
+		return fmt.Errorf("invalid log number: %d", config.LogNumber)
+	}
 	// Certificates to be constructed.
 	var certInfos []certificateInfo
 	// Maps checkpoint sequence name to a list of certInfos indices that are
@@ -99,7 +118,7 @@ func do() error {
 			repeat = entryConfig.Repeat
 		}
 		for range repeat {
-			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.LogID, entryConfig)
+			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.ID, entryConfig)
 			if err != nil {
 				return err
 			}
@@ -178,7 +197,7 @@ func do() error {
 		// certificate. Rather it cosign subtrees as it checkpoints. This tool
 		// is less opinionated about subtrees, so we would need to make a
 		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(config.Version, issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
+		cert, err := CreateCertificate(&config, issuanceLog, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}
@@ -250,12 +269,12 @@ func do() error {
 		panic(err)
 	}
 	var signedNote bytes.Buffer
-	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(config.LogID))
+	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogID(&config)))
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for i := range config.Cosigners {
 		cosigner := &config.Cosigners[i]
-		cosig, err := Cosign(cosigner, config.LogID, 0, len(entries), &checkpointHash)
+		cosig, err := Cosign(config.Version, cosigner, LogID(&config), 0, len(entries), &checkpointHash)
 		if err != nil {
 			return err
 		}

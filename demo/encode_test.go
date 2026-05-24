@@ -30,11 +30,17 @@ func TestMarshalTBSCertificate(t *testing.T) {
 	var tests = []struct {
 		version             DraftVersion
 		issuer              TrustAnchorID
-		serial              int
+		serial              uint64
 		entry               *EntryConfig
 		expectedTBSHex      string
 		expectedLogEntryHex string
 	}{
+		// A null entry.
+		{
+			version:             VersionPlants02,
+			entry:               &EntryConfig{Null: true},
+			expectedLogEntryHex: "0000",
+		},
 		// A minimal TBSCertificate
 		{
 			version: VersionPlants02,
@@ -42,8 +48,10 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			serial:  1234,
 			entry: &EntryConfig{
 				PublicKey: publicKey,
-				NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
-				NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				CertConfigBase: CertConfigBase{
+					NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				},
 			},
 			expectedTBSHex:      "3081afa003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
 			expectedLogEntryHex: "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3000301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
@@ -57,12 +65,14 @@ func TestMarshalTBSCertificate(t *testing.T) {
 				Subject: SubjectConfig{
 					CommonName: "example.com",
 				},
-				PublicKey:   publicKey,
-				NotBefore:   time.Unix(1577836800, 0), // 2020-01-01 00:00:00
-				NotAfter:    time.Unix(1609459199, 0), // 2020-12-31 23:59:59
-				DNSNames:    []string{"example.com", "a.example", "*.b.example"},
-				KeyUsage:    KeyUsageConfig(x509.KeyUsageDigitalSignature),
-				ExtKeyUsage: []ExtKeyUsageConfig{ExtKeyUsageConfig(oidServerAuth)},
+				PublicKey: publicKey,
+				CertConfigBase: CertConfigBase{
+					NotBefore:   time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:    time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+					DNSNames:    []string{"example.com", "a.example", "*.b.example"},
+					KeyUsage:    KeyUsageConfig(x509.KeyUsageDigitalSignature),
+					ExtKeyUsage: []ExtKeyUsageConfig{ExtKeyUsageConfig(oidServerAuth)},
+				},
 			},
 			expectedTBSHex:      "30820124a003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3016311430120603550403130b6578616d706c652e636f6d3059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1a35d305b300e0603551d0f0101ff04040302078030160603551d250101ff040c300a06082b0601050507030130310603551d110101ff04273025820b6578616d706c652e636f6d8209612e6578616d706c65820b2a2e622e6578616d706c65",
 			expectedLogEntryHex: "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3016311430120603550403130b6578616d706c652e636f6d301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5a35d305b300e0603551d0f0101ff04040302078030160603551d250101ff040c300a06082b0601050507030130310603551d110101ff04273025820b6578616d706c652e636f6d8209612e6578616d706c65820b2a2e622e6578616d706c65",
@@ -77,12 +87,14 @@ func TestMarshalTBSCertificate(t *testing.T) {
 				Subject: SubjectConfig{
 					CommonName: "A CA?",
 				},
-				PublicKey:  publicKey,
-				NotBefore:  time.Unix(1577836800, 0), // 2020-01-01 00:00:00
-				NotAfter:   time.Unix(1609459199, 0), // 2020-12-31 23:59:59
-				KeyUsage:   KeyUsageConfig(x509.KeyUsageCertSign),
-				IsCA:       ptrOf(true),
-				MaxPathLen: ptrOf(int64(5)),
+				PublicKey: publicKey,
+				CertConfigBase: CertConfigBase{
+					NotBefore:  time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:   time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+					KeyUsage:   KeyUsageConfig(x509.KeyUsageCertSign),
+					IsCA:       ptrOf(true),
+					MaxPathLen: ptrOf(int64(5)),
+				},
 			},
 			expectedTBSHex:      "3081e7a003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3010310e300c06035504031305412043413f3059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1a3263024300e0603551d0f0101ff04040302020430120603551d130101ff040830060101ff020105",
 			expectedLogEntryHex: "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3010310e300c06035504031305412043413f301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5a3263024300e0603551d0f0101ff04040302020430120603551d130101ff040830060101ff020105",
@@ -95,8 +107,10 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			serial:  1234,
 			entry: &EntryConfig{
 				PublicKey: publicKey,
-				NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
-				NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				CertConfigBase: CertConfigBase{
+					NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				},
 			},
 			expectedTBSHex:      "3081afa003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
 			expectedLogEntryHex: "00000001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3000301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
@@ -108,8 +122,10 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			serial:  1234,
 			entry: &EntryConfig{
 				PublicKey: publicKey,
-				NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
-				NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				CertConfigBase: CertConfigBase{
+					NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				},
 			},
 			expectedTBSHex:      "3081afa003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
 			expectedLogEntryHex: "00013064a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30000420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
@@ -121,21 +137,25 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			serial:  1234,
 			entry: &EntryConfig{
 				PublicKey: publicKey,
-				NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
-				NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				CertConfigBase: CertConfigBase{
+					NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				},
 			},
 			expectedTBSHex:      "3081afa003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
 			expectedLogEntryHex: "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a30000420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
 		},
 	}
 	for i, tt := range tests {
-		b := cryptobyte.NewBuilder(nil)
-		AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry)
-		tbs, err := b.Bytes()
-		if err != nil {
-			t.Errorf("%d. AddTBSCertificate() failed: %s", i, err)
-		} else if got := hex.EncodeToString(tbs); got != tt.expectedTBSHex {
-			t.Errorf("%d. AddTBSCertificate() gave %s, wanted %s", i, got, tt.expectedTBSHex)
+		if !tt.entry.Null {
+			b := cryptobyte.NewBuilder(nil)
+			AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry)
+			tbs, err := b.Bytes()
+			if err != nil {
+				t.Errorf("%d. AddTBSCertificate() failed: %s", i, err)
+			} else if got := hex.EncodeToString(tbs); got != tt.expectedTBSHex {
+				t.Errorf("%d. AddTBSCertificate() gave %s, wanted %s", i, got, tt.expectedTBSHex)
+			}
 		}
 
 		log, err := MarshalTBSCertificateLogEntry(tt.version, tt.issuer, tt.entry)
