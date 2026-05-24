@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-21T04:36:22.300577+00:00",
+  "timestamp": "2026-05-24T04:20:43.328839+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3514,6 +3514,22 @@
       "body": "Filing some follow-up work for myself after we merge https://github.com/ietf-plants-wg/merkle-tree-certs/pull/213. Filing this so I can reference this in TODOs\n\n- [x] Make the serial numbers fit in 64 bits again\n- [x] Fix up the slightly awkward sectioning\n- [ ] Some text discussing how you use multiple logs, like how CAs should only be appending to the latest and other considerations",
       "createdAt": "2026-05-15T20:04:19Z",
       "updatedAt": "2026-05-16T05:09:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 238,
+      "id": "I_kwDOJIBkVc8AAAABDJY2oQ",
+      "title": "Catch demo tool up to git",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/238",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We've got a bunch of things queued up for draft-04 that aren't yet reflected in demo. From the changelog so far:\n\n- [ ] Use a tlog-compatible signature scheme for ease of deployment\n- [ ] Define a CA certificate representation\n- [ ] Remove the one-to-many relationship between MTC CAs and CA cosigners\n- [ ] A single CA now operates a series of issuance logs, instead of a one-to-one correspondence\n- [ ] Canonicalize the order of cosignatures in MTCProofs\n- [x] Add an extensions block to log entries",
+      "createdAt": "2026-05-22T23:45:37Z",
+      "updatedAt": "2026-05-22T23:45:37Z",
       "closedAt": null,
       "comments": []
     }
@@ -11269,21 +11285,21 @@
       "id": "PR_kwDOJIBkVc68khPD",
       "title": "Add accumulated log entry type",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-04-30T15:30:18Z",
+      "updatedAt": "2026-05-23T22:20:05Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
       "headRepository": "Bren2010/merkle-tree-certs",
       "headRefName": "brendan/accumulated",
       "headRefOid": "1e5968a97065a390281eff18ea72c7203c20a4e5",
-      "closedAt": null,
+      "closedAt": "2026-05-23T22:20:05Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -13530,7 +13546,7 @@
       "labels": [],
       "body": "An ACME client polls landmarkURL (which may be shared across many certificates) to determine when a landmark-relative certificate is possible. Once a landmark-relative certificate is possible, the ACME client POSTs to newRelativeCertificate (from the directory).\r\n\r\nAdvantages:\r\n\r\n - No new states in the Order state machine.\r\n - No new polling semantics for certificate download URLs.\r\n - CAs do no extra work for clients that don't want relative certificates (or: clients can defer getting relative certificates until they see that traffic justifies it).\r\n - Order lifetime does not depend on landmarking period.\r\n - All HTTP requests are expected to serve 200 in the happy case.\r\n - The new field in the directory serves as a signal that the ACME server supports Merkle Tree Certificates.\r\n\r\nDisadvantages:\r\n\r\n - ACME clients will tend to rush in and request relative certificates as soon as a landmark is minted. Options:\r\n   - CA returns 503 if load is too high and clients backoff and retry.\r\n   - Some mechanism for clients to decide how long to wait after a landmark is minted before requesting a relative certificate. Perhaps interpolation based on size of landmarks?\r\n\r\nClaude drafted the IANA Considerations section, which I reviewed and reference checked. All other words are mine.",
       "createdAt": "2026-04-13T19:42:08Z",
-      "updatedAt": "2026-04-13T19:42:08Z",
+      "updatedAt": "2026-05-22T19:23:42Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf",
@@ -13542,7 +13558,34 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAyjkEQ",
+          "commit": {
+            "abbreviatedOid": "d4ddd21"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-22T18:18:54Z",
+          "updatedAt": "2026-05-22T19:23:42Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "I'd go with the full name here.\n```suggestion\n - In the directory, a \"newLandmarkRelativeCertificate\" field.\n```",
+              "createdAt": "2026-05-22T18:18:54Z",
+              "updatedAt": "2026-05-22T19:23:42Z"
+            },
+            {
+              "originalPosition": 12,
+              "body": "If the client is `landmarkURL`-aware, another direction we could go is to make clients fully [tlog-tiles](c2sp.org/tlog-tiles)-aware and have them reconstruct their landmark-relative inclusion proofs by directly fetching the needed tiles from the CA issuance log (or its mirrors). So instead of `landmarkURL` we'd pass `issuanceLogURL` (`<prefix>` from tlog-tiles), and maybe some of its mirrors.\n\nPros:\n1) No ACME server API is needed for processing landmark-relative certs and serving them to clients. This cuts the ACME server out of the landmark-relative certificate reconstruction process entirely, and removes the need for the `newRelativeCertificate` field in the directory. Now we can just use vanilla RFC 8555 plus the directory field.\n2) Clients fetch what they need themselves from the static, cacheable tiles, thus solving the \"thundering herd\" problem mentioned in the PR description. Everything can be served from a CDN.\n3) ACME clients that want landmark-anchored standalone certs would need to be tile-aware anyway.\n\nCons (that I can think of):\n1) ACME clients now need to be aware of the tlog-tiles serving infrastructure, and we were trying to keep these things decoupled. We could perhaps solve this by saying that ACME is _only_ concerned with standalone certificates, and for everything else the client needs to interact with the CA issuance log.\n2) Fetching individual tiles to reconstruct an inclusion proof to a landmark subtree will be a little more complex on the ACME client side (but there are existing tlog-tiles libraries that could be reused), and would require issuing multiple requests and downloading some extraneous data.\n3) For ecosystems without transparency, the CA issuance log might not serve tiles publicly so you may want to fetch things from an authenticated CA API. This is also a problem for this PR's proposal, since `landmarkURL` probably points to the CA issuance log's S3-compatible storage bucket anyway (at least in our implementation, it does). This isn't a problem for the WebPKI, at least.\n4) Clients that want landmark-anchored standalone certs will need to find a way to fetch the necessary CA and cosigner signatures on the landmark subtrees separately (the same as the other proposals).\n",
+              "createdAt": "2026-05-22T18:48:43Z",
+              "updatedAt": "2026-05-22T19:23:42Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 209,
@@ -16775,24 +16818,26 @@
       "id": "PR_kwDOJIBkVc7c2PAz",
       "title": "Add an extension field to MerkleTreeCertEntry and MTCProof",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/236",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "cjpatton",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Define an extensions field for the MerkleTreeCertEntry structure. Repeated extensions are disallowed, but unrecognized extensions are ignored. The extensions are duplicated in the MTCProof.\r\n\r\nThis change accommodates two previously requested features for MTC:\r\n\r\n1. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172: The accumulated count for the accumulated log entry type\r\n\r\n2. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/226: The log entry randomizer",
       "createdAt": "2026-05-18T22:30:37Z",
-      "updatedAt": "2026-05-20T19:08:00Z",
+      "updatedAt": "2026-05-22T22:21:32Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "23f1603f78a6951585621c08a22435288f88be6d",
+      "baseRefOid": "9d2b4f2a672645507ed7c3df0d219cb66184d700",
       "headRepository": "cjpatton/merkle-tree-certs",
       "headRefName": "log-entry-extensions",
-      "headRefOid": "5ceaea97977f18a6d79c1969b27fc2f63e31eb35",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "4228ef763bca26449ed2f48a61edd320dd68b3be",
+      "closedAt": "2026-05-22T22:21:31Z",
+      "mergedAt": "2026-05-22T22:21:31Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "40dfe67cb87c0b95ddf06801cd83cf715d23a7c9"
+      },
       "comments": [],
       "reviews": [
         {
@@ -16946,6 +16991,230 @@
               "body": "Oh, the step that begins \"Construct a MerkleTreeCertEntry of type `tbs_cert_entry`\" above also needs to be updated. (GitHub doesn't let me anchor a review comment to text you didn't change, unhelpfully.)",
               "createdAt": "2026-05-20T19:07:54Z",
               "updatedAt": "2026-05-20T19:08:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAy6SpA",
+          "commit": {
+            "abbreviatedOid": "5ceaea9"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-22T19:23:10Z",
+          "updatedAt": "2026-05-22T19:48:12Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Done!",
+              "createdAt": "2026-05-22T19:23:10Z",
+              "updatedAt": "2026-05-22T19:48:12Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "> > Agreed. How would you write this instead? Hows about \"extends the logic with optional behavior\"?\n> \n> This is a cop-out, but we could just not say anything. They're additional values associated with the entry, but the extension has to define the semantics. We can even explicitly say something like \"This document does not define any extensions, but future documents MAY define extensions.\"\n\nDone. Trimmed to just \"`extensions` is the list of tag-length-value extensions associated with the log entry.\" and moved this paragraph to follow the tls-presentation block defining `MerkleTreeLogEntry`.\n\n\n> > I'd be fine with allowing duplicates, but what should we tell RPs to do when they encounter them? Should we leave it up to the extension to specify their behavior?\n> \n> Oh, I don't think we should allow duplicates, so we don't have to think about it. It's just that detecting duplications is mildly annoying if you have to copy the list somewhere and then sort, rather than just iterating through the data in-place. I've seen TLS stacks that look at the first or last value if there's a duplicate, and I've seen ones that only detect duplicates of known extensions and don't notice duplicates of unknown ones.\n> \n> Mirroring [#231](https://github.com/ietf-plants-wg/merkle-tree-certs/pull/231), I'm inclined to say they have to be ordered numerically, which makes checking for duplicates easy. WDYT?\n\nWorks for me, done. Added MUST be sorted and MUST NOT contain duplicates. Removed text about enforcement, since here we're specifying how to construct entries.\n\n> > Do you mean the CA shouldn't add extensions to an entry of a type it doesn't recognize?\n> \n> Yeah. Perhaps update these sections:\n> \n>     * https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-log-entries:~:text=MerkleTreeCertEntry%20is%20an%20extensible%20structure.%20Future%20documents%20may%20define%20new%20values%20for%20MerkleTreeCertEntryType%2C%20with%20corresponding%20semantics.%20See%20Section%205.4%20and%20Section%2012.5%20for%20additional%20discussion.\n\nDone.\n\n>     * https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#section-5.4-5:~:text=Entries%20are%20extensible,of%20new%20formats.\n\nDone.\n\n>     * https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-new-log-entry-types (rename to Log Entry Extensions?)\n\nQuestion here: Should an RP accept an entry with unrecognized extensions? It seems like the intent of both use cases (randomizer and accumlator) is that the RP can safely ignore these. In other words, I don't think we actually want any changes here?",
+              "createdAt": "2026-05-22T19:45:14Z",
+              "updatedAt": "2026-05-22T19:48:12Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "Good catch, done.",
+              "createdAt": "2026-05-22T19:46:39Z",
+              "updatedAt": "2026-05-22T19:48:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAzPmQA",
+          "commit": {
+            "abbreviatedOid": "c88928b"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-22T20:38:03Z",
+          "updatedAt": "2026-05-22T20:46:45Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "Maybe this so it's clear what we mean by \"tag\".\n\n```suggestion\nField `extensions` is the list of tag-length-value extensions associated with the log entry. The extensions list MUST be appear in ascending order by `extension_type` and MUST NOT contain two extensions with the same `extension_type`.\n```",
+              "createdAt": "2026-05-22T20:38:03Z",
+              "updatedAt": "2026-05-22T20:46:45Z"
+            },
+            {
+              "originalPosition": 43,
+              "body": "```suggestion\nEntries are extensible. Future documents MAY define `type` and `extension_type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` or `extension_type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. {{new-log-entry-types}} further discusses security implications of such extensions.\n```",
+              "createdAt": "2026-05-22T20:39:46Z",
+              "updatedAt": "2026-05-22T20:46:45Z"
+            },
+            {
+              "originalPosition": 59,
+              "body": "I guess we've already constrained the order, so we can probably just say.\n\n```suggestion\n`extensions` MUST contain the log entry's `extensions` value ({{log-entries}}).\n```",
+              "createdAt": "2026-05-22T20:41:09Z",
+              "updatedAt": "2026-05-22T20:46:45Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "Nit: Now that we have two fields, maybe \"contents\" is ambiguous. Also I see that saying the contents are the TBSCertificateLogEntry is a bit ambiguous because we encode it funny. How about...\n\n```suggestion\n1. Construct a MerkleTreeCertEntry as follows:\n   1. Set `type` to `tbs_cert_entry`.\n   2. Set `extensions` to the MTCProof's `extensions` value.\n   3. Set `tbs_cert_entry_data` to the TBSCertificateLogEntry, encoded as described in {{log-entries}}.\n   \n1. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.\n```",
+              "createdAt": "2026-05-22T20:44:17Z",
+              "updatedAt": "2026-05-22T20:46:45Z"
+            },
+            {
+              "originalPosition": 43,
+              "body": "I think we need to rename and revise New Log Entry Types. (If you prefer, feel free to leave a TODO and I can take a pass. This PR has already been very helpful!)",
+              "createdAt": "2026-05-22T20:46:31Z",
+              "updatedAt": "2026-05-22T20:46:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAzT6AQ",
+          "commit": {
+            "abbreviatedOid": "3a43593"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-22T20:55:12Z",
+          "updatedAt": "2026-05-22T20:55:13Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "> Question here: Should an RP accept an entry with unrecognized extensions? It seems like the intent of both use cases (randomizer and accumlator) is that the RP can safely ignore these.\r\n\r\nThat's right.\r\n\r\n> In other words, I don't think we actually want any changes here [in https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-new-log-entry-types]?\r\n\r\nOh, I just meant tweaking the text a bit to talk about it at all.",
+              "createdAt": "2026-05-22T20:55:13Z",
+              "updatedAt": "2026-05-22T20:55:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAzXQyg",
+          "commit": {
+            "abbreviatedOid": "c88928b"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-22T21:06:55Z",
+          "updatedAt": "2026-05-22T21:06:55Z",
+          "comments": [
+            {
+              "originalPosition": 43,
+              "body": "Up to you, I'm happy to take a stab at it first.\r\n\r\nI don't have the merge button. Feel free to merge whenever.",
+              "createdAt": "2026-05-22T21:06:55Z",
+              "updatedAt": "2026-05-22T21:06:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABAznsOw",
+          "commit": {
+            "abbreviatedOid": "4228ef7"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-22T22:21:14Z",
+          "updatedAt": "2026-05-22T22:21:14Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 237,
+      "id": "PR_kwDOJIBkVc7ehTL9",
+      "title": "Discuss log entry extensions a bit more",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/237",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The \"New Log Entry Types\" section only talked about one extension point, but we now have two.",
+      "createdAt": "2026-05-22T23:36:32Z",
+      "updatedAt": "2026-05-23T03:27:41Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a319c5b9ec43cdacce7f7c34d3cf9f4186121b21",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "entry-ext-discuss",
+      "headRefOid": "3fc1d9ad178d8d7a2fba940604df91f531478255",
+      "closedAt": "2026-05-23T03:27:38Z",
+      "mergedAt": "2026-05-23T03:27:38Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "034990910f8a623cf187e9215d01fb5b57218fdb"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABA0I2PA",
+          "commit": {
+            "abbreviatedOid": "3fc1d9a"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-23T02:41:40Z",
+          "updatedAt": "2026-05-23T02:41:40Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 239,
+      "id": "PR_kwDOJIBkVc7ehw6Z",
+      "title": "Catch demo's plants-04 mode up to GitHub",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/239",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I think this is everything? Only thing that's missing is we should write out the CA too. I made the changes in separate commits, so recommend looking at commits individually.",
+      "createdAt": "2026-05-23T00:35:47Z",
+      "updatedAt": "2026-05-24T00:26:47Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a319c5b9ec43cdacce7f7c34d3cf9f4186121b21",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "demo-draft-04",
+      "headRefOid": "ee21c8abb5ab36ec8943c7872a6cf14de8878202",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABA1-oUg",
+          "commit": {
+            "abbreviatedOid": "ee21c8a"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-24T00:04:42Z",
+          "updatedAt": "2026-05-24T00:26:47Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "Should be log ID, not CA ID here (matches https://github.com/ietf-plants-wg/merkle-tree-certs/pull/239/changes#diff-675ee652d306e2f15db1b2424699d9c0de5ae55b9a86d3c954c349ab8748580fR326):\n```suggestion\n\t\tcosig, err := Cosign(config.Version, cosigner, LogID(&config), 0, len(entries), &checkpointHash)\n```",
+              "createdAt": "2026-05-24T00:04:42Z",
+              "updatedAt": "2026-05-24T00:26:47Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "Ah I hadn't realized that log numbers removed the need for the initial entry. Nice. Currently the spec doesn't give any reason for `null_entry` to exist. No harm in keeping it, but maybe we could list some potential uses for it.",
+              "createdAt": "2026-05-24T00:10:58Z",
+              "updatedAt": "2026-05-24T00:27:26Z"
             }
           ]
         }
