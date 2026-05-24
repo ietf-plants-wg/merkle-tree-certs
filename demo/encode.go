@@ -370,8 +370,13 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 				certSig.AddBytes([]byte{0})
 			}
 			addEmptyMTCEntryExtensions(certSig, config.Version)
-			certSig.AddUint64(uint64(start))
-			certSig.AddUint64(uint64(end))
+			if config.Version >= VersionPlants04 {
+				certSig.AddUint48(uint64(start))
+				certSig.AddUint48(uint64(end))
+			} else {
+				certSig.AddUint64(uint64(start))
+				certSig.AddUint64(uint64(end))
+			}
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
 				// plants-04 canonicalizes the cosigner order.
