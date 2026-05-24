@@ -2357,6 +2357,6 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Canonicalize the order of cosignatures in MTCProofs
 
-- Remove subtree signer API in favor of https://github.com/C2SP/C2SP/pull/245 in {{TLOG-WITNESS}}
+- Remove sketch of tlog subtree signer API in favor of https://github.com/C2SP/C2SP/pull/245 in {{TLOG-WITNESS}}
 
 - Add an extensions block to log entries
