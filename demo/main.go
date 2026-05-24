@@ -72,6 +72,22 @@ func do() error {
 		return err
 	}
 
+	if config.Version >= VersionPlants04 {
+		// Generate an a CA certificate.
+		caCert, err := CreateCACertificate(&config)
+		if err != nil {
+			return err
+		}
+		certPath := filepath.Join(*flagOutDir, "ca_cert.pem")
+		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert})
+		if err := os.WriteFile(certPath, certPEM, 0644); err != nil {
+			return err
+		}
+
+		fmt.Printf("Wrote CA certificate %q.\n", certPath)
+		fmt.Printf("\n")
+	}
+
 	// Entries in the issuance log.
 	var entries [][]byte
 	if config.Version < VersionPlants04 {

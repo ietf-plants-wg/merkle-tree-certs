@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"cmp"
+	"crypto"
 	"crypto/sha256"
+	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
@@ -27,8 +29,18 @@ var (
 	oidBasicConstraints = asn1.ObjectIdentifier{2, 5, 29, 19}
 	oidExtKeyUsage      = asn1.ObjectIdentifier{2, 5, 29, 37}
 
-	oidMTCProofExperimental        = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
+	oidMTCProofExperiment          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
 	oidRDNATrustAnchorIDExperiment = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}
+	oidMTCCAExperiment             = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 2}
+
+	oidAlgUnsigned  = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 6, 36}
+	oidRDNAUnsigned = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 25, 1}
+
+	oidSHA256 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 1}
+
+	oidECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
+	oidECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
+	oidEd25519         = asn1.ObjectIdentifier{1, 3, 101, 112}
 )
 
 func addASN1ImplicitString(bb *cryptobyte.Builder, tag cbasn1.Tag, b []byte) {
@@ -49,18 +61,35 @@ func addX509V3Version(b *cryptobyte.Builder) {
 
 func addMTCProofSigAlg(b *cryptobyte.Builder) {
 	b.AddASN1(cbasn1.SEQUENCE, func(alg *cryptobyte.Builder) {
-		alg.AddASN1ObjectIdentifier(oidMTCProofExperimental)
+		alg.AddASN1ObjectIdentifier(oidMTCProofExperiment)
 	})
 }
 
-func addIssuer(b *cryptobyte.Builder, issuer TrustAnchorID) {
+func addUnsignedSigAlg(b *cryptobyte.Builder) {
+	b.AddASN1(cbasn1.SEQUENCE, func(alg *cryptobyte.Builder) {
+		alg.AddASN1ObjectIdentifier(oidAlgUnsigned)
+	})
+}
+
+func addX509Name(b *cryptobyte.Builder, id TrustAnchorID) {
 	b.AddASN1(cbasn1.SEQUENCE, func(dn *cryptobyte.Builder) {
 		dn.AddASN1(cbasn1.SET, func(rdn *cryptobyte.Builder) {
 			rdn.AddASN1(cbasn1.SEQUENCE, func(attr *cryptobyte.Builder) {
 				attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorIDExperiment)
 				attr.AddASN1(cbasn1.UTF8String, func(val *cryptobyte.Builder) {
-					val.AddBytes([]byte(issuer.String()))
+					val.AddBytes([]byte(id.String()))
 				})
+			})
+		})
+	})
+}
+
+func addUnsignedX509NamePlaceholder(b *cryptobyte.Builder) {
+	b.AddASN1(cbasn1.SEQUENCE, func(dn *cryptobyte.Builder) {
+		dn.AddASN1(cbasn1.SET, func(rdn *cryptobyte.Builder) {
+			rdn.AddASN1(cbasn1.SEQUENCE, func(attr *cryptobyte.Builder) {
+				attr.AddASN1ObjectIdentifier(oidRDNAUnsigned)
+				attr.AddASN1(cbasn1.UTF8String, func(val *cryptobyte.Builder) {})
 			})
 		})
 	})
@@ -75,10 +104,10 @@ func addX509Time(b *cryptobyte.Builder, t time.Time) {
 	}
 }
 
-func addValidity(b *cryptobyte.Builder, entry *EntryConfig) {
+func addValidity(b *cryptobyte.Builder, config *CertConfigBase) {
 	b.AddASN1(cbasn1.SEQUENCE, func(val *cryptobyte.Builder) {
-		addX509Time(val, entry.NotBefore)
-		addX509Time(val, entry.NotAfter)
+		addX509Time(val, config.NotBefore)
+		addX509Time(val, config.NotAfter)
 	})
 }
 
@@ -97,12 +126,17 @@ func addSubject(b *cryptobyte.Builder, entry *EntryConfig) {
 	b.MarshalASN1(p.ToRDNSequence())
 }
 
-func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
-	hasKeyUsage := entry.KeyUsage != 0
-	hasExtKeyUsage := len(entry.ExtKeyUsage) != 0
-	hasSubjectAltName := len(entry.DNSNames) != 0
-	hasBasicConstraints := entry.IsCA != nil || entry.MaxPathLen != nil
-	if !hasKeyUsage && !hasExtKeyUsage && !hasSubjectAltName && !hasBasicConstraints {
+type mtcCAInfo struct {
+	cosigner  *CosignerConfig
+	minSerial uint64
+}
+
+func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAInfo) {
+	hasKeyUsage := config.KeyUsage != 0
+	hasExtKeyUsage := len(config.ExtKeyUsage) != 0
+	hasSubjectAltName := len(config.DNSNames) != 0
+	hasBasicConstraints := config.IsCA != nil || config.MaxPathLen != nil
+	if !hasKeyUsage && !hasExtKeyUsage && !hasSubjectAltName && !hasBasicConstraints && mtcCA == nil {
 		return
 	}
 
@@ -114,8 +148,8 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
 					var b [2]byte
 					// DER orders the bits from most to least significant.
-					b[0] = bits.Reverse8(byte(entry.KeyUsage))
-					b[1] = bits.Reverse8(byte(entry.KeyUsage >> 8))
+					b[0] = bits.Reverse8(byte(config.KeyUsage))
+					b[1] = bits.Reverse8(byte(config.KeyUsage >> 8))
 					// If the final byte is all zeros, skip it.
 					var ku asn1.BitString
 					if b[1] == 0 {
@@ -123,7 +157,7 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 					} else {
 						ku.Bytes = b[:]
 					}
-					ku.BitLength = bits.Len16(uint16(entry.KeyUsage))
+					ku.BitLength = bits.Len16(uint16(config.KeyUsage))
 					der, err := asn1.Marshal(ku)
 					if err != nil {
 						extVal.SetError(err)
@@ -140,7 +174,7 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 				ext.AddASN1Boolean(true) // critical
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
 					extVal.AddASN1(cbasn1.SEQUENCE, func(ekus *cryptobyte.Builder) {
-						for _, eku := range entry.ExtKeyUsage {
+						for _, eku := range config.ExtKeyUsage {
 							ekus.AddASN1ObjectIdentifier(asn1.ObjectIdentifier(eku))
 						}
 					})
@@ -154,7 +188,7 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 				ext.AddASN1Boolean(true) // critical, needed if the subject is empty
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
 					extVal.AddASN1(cbasn1.SEQUENCE, func(names *cryptobyte.Builder) {
-						for _, dns := range entry.DNSNames {
+						for _, dns := range config.DNSNames {
 							addASN1ImplicitString(names, cbasn1.Tag(2).ContextSpecific(), []byte(dns))
 						}
 					})
@@ -168,12 +202,39 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 				ext.AddASN1Boolean(true)
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
 					extVal.AddASN1(cbasn1.SEQUENCE, func(bc *cryptobyte.Builder) {
-						if entry.IsCA != nil && *entry.IsCA {
+						if config.IsCA != nil && *config.IsCA {
 							bc.AddASN1Boolean(true)
 						}
-						if entry.MaxPathLen != nil {
-							bc.AddASN1Int64(int64(*entry.MaxPathLen))
+						if config.MaxPathLen != nil {
+							bc.AddASN1Int64(int64(*config.MaxPathLen))
 						}
+					})
+				})
+			})
+		}
+
+		if mtcCA != nil {
+			exts.AddASN1(cbasn1.SEQUENCE, func(ext *cryptobyte.Builder) {
+				ext.AddASN1ObjectIdentifier(oidMTCCAExperiment)
+				ext.AddASN1Boolean(true)
+				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
+					extVal.AddASN1(cbasn1.SEQUENCE, func(seq *cryptobyte.Builder) {
+						seq.AddASN1(cbasn1.SEQUENCE, func(logHash *cryptobyte.Builder) {
+							logHash.AddASN1ObjectIdentifier(oidSHA256)
+						})
+						seq.AddASN1(cbasn1.SEQUENCE, func(sigAlg *cryptobyte.Builder) {
+							switch mtcCA.cosigner.SignatureAlgorithm {
+							case SignatureAlgorithmP256WithSHA256:
+								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA256)
+							case SignatureAlgorithmP384WithSHA384:
+								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA384)
+							case SignatureAlgorithmEd25519:
+								sigAlg.AddASN1ObjectIdentifier(oidEd25519)
+							default:
+								panic(fmt.Errorf("unknown signature algorithm %s", mtcCA.cosigner.SignatureAlgorithm))
+							}
+						})
+						seq.AddASN1Uint64(mtcCA.minSerial)
 					})
 				})
 			})
@@ -186,11 +247,11 @@ func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial uint6
 		addX509V3Version(tbs)
 		tbs.AddASN1Uint64(serial)
 		addMTCProofSigAlg(tbs)
-		addIssuer(tbs, issuer)
-		addValidity(tbs, entry)
+		addX509Name(tbs, issuer)
+		addValidity(tbs, &entry.CertConfigBase)
 		addSubject(tbs, entry)
 		tbs.AddBytes(entry.PublicKey)
-		addExtensions(tbs, entry)
+		addExtensions(tbs, &entry.CertConfigBase, nil)
 	})
 }
 
@@ -222,8 +283,8 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 
 	marshalContents := func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
-		addIssuer(tbs, issuer)
-		addValidity(tbs, entry)
+		addX509Name(tbs, issuer)
+		addValidity(tbs, &entry.CertConfigBase)
 		addSubject(tbs, entry)
 		// Starting draft-plants-02, the public key algorithm is included in
 		// the entry.
@@ -242,7 +303,7 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 			h := sha256.Sum256(entry.PublicKey)
 			spkiHash.AddBytes(h[:])
 		})
-		addExtensions(tbs, entry)
+		addExtensions(tbs, &entry.CertConfigBase, nil)
 	}
 	b := cryptobyte.NewBuilder(nil)
 	addEmptyMTCEntryExtensions(b, version)
@@ -339,6 +400,52 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 				}
 			}
 		})
+	})
+	return b.Bytes()
+}
+
+func CreateCACertificate(config *CAConfig) ([]byte, error) {
+	// Find the CA's cosigner.
+	idx := slices.IndexFunc(config.Cosigners, func(cosigner CosignerConfig) bool {
+		return bytes.Equal(config.ID, cosigner.CosignerID)
+	})
+	if idx < 0 {
+		return nil, fmt.Errorf("could not find CA cosigner %s", config.ID)
+	}
+	cosigner := &config.Cosigners[idx]
+
+	// Extract the SPKI from the cosigner.
+	priv, err := x509.ParsePKCS8PrivateKey(cosigner.PrivateKey)
+	if err != nil {
+		return nil, err
+	}
+	signer, ok := priv.(crypto.Signer)
+	if !ok {
+		return nil, fmt.Errorf("unknown private key type: %T", priv)
+	}
+	pub := signer.Public()
+	spki, err := x509.MarshalPKIXPublicKey(pub)
+	if err != nil {
+		return nil, err
+	}
+
+	b := cryptobyte.NewBuilder(nil)
+	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
+		cert.AddASN1(cbasn1.SEQUENCE, func(tbs *cryptobyte.Builder) {
+			addX509V3Version(tbs)
+			tbs.AddASN1Uint64(1)
+			addUnsignedSigAlg(tbs)
+			addUnsignedX509NamePlaceholder(tbs) // No issuer
+			addValidity(tbs, &config.CACert.CertConfigBase)
+			addX509Name(tbs, config.ID) // Subject
+			tbs.AddBytes(spki)
+			addExtensions(tbs, &config.CACert.CertConfigBase, &mtcCAInfo{
+				cosigner:  cosigner,
+				minSerial: config.CACert.MinSerial,
+			})
+		})
+		addUnsignedSigAlg(cert)
+		cert.AddASN1BitString(nil)
 	})
 	return b.Bytes()
 }

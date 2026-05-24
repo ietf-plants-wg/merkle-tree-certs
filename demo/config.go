@@ -125,6 +125,7 @@ type CAConfig struct {
 	ID        TrustAnchorID
 	LogNumber uint16
 	Cosigners []CosignerConfig
+	CACert    CACertConfig
 	Entries   []EntryConfig
 }
 
@@ -134,20 +135,29 @@ type CosignerConfig struct {
 	PrivateKey         []byte
 }
 
-type EntryConfig struct {
-	// A number of times to repeat this entry.
-	Repeat int
-	// Null, if true, causes this to be a null entry. The certificate fields
-	// below are ignored.
-	Null                bool
-	Subject             SubjectConfig
-	PublicKey           []byte
+type CACertConfig struct {
+	CertConfigBase
+	MinSerial uint64
+}
+
+type CertConfigBase struct {
 	NotBefore, NotAfter time.Time
 	DNSNames            []string
 	KeyUsage            KeyUsageConfig
 	ExtKeyUsage         []ExtKeyUsageConfig
 	IsCA                *bool
 	MaxPathLen          *int64
+}
+
+type EntryConfig struct {
+	// A number of times to repeat this entry.
+	Repeat int
+	// Null, if true, causes this to be a null entry. The certificate fields
+	// below are ignored.
+	Null      bool
+	Subject   SubjectConfig
+	PublicKey []byte
+	CertConfigBase
 	// A list of checkpoint sequence names that end at this entry. Every
 	// checkpoint sequence implicitly starts at 0.
 	Checkpoints []string
