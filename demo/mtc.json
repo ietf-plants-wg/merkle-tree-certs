@@ -1,6 +1,7 @@
 {
-  "Version": "plants-02",
+  "Version": "plants-04",
   "ID": "32473.1",
+  "LogNumber": 1,
   "Cosigners": [
     {
       "CosignerID": "32473.1",
@@ -23,6 +24,12 @@
       "PrivateKey": "MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDBGY6nOlcHI2PcJVuqj0EpP7zTpKDQl/s/uDaoG9JrHF6cgiomDWjHjQ+QkSUbeKrGhZANiAAT/fxIL8CQ8I2ZK9Bekd9cEZEc42iyWlha2GpeJ5YUOjU2CqWJQMooUKZdVXDFF3c1M0BsLQ2nL5GYqEgqXHFeFtGg8vBleU4XmNmpv+03VodXZgKA49xV6LPFdTisa6vE="
     }
   ],
+  "CACert": {
+    "NotBefore": "2020-01-01T00:00:00Z",
+    "NotAfter": "2030-12-31T23:59:59Z",
+    "IsCA": true,
+    "KeyUsage": ["CertSign"]
+  },
   "Entries": [
     {
       "Repeat": 10,
