@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"cmp"
-	"crypto"
 	"crypto/sha256"
 	"crypto/x509/pkix"
 	"encoding/asn1"
@@ -129,7 +128,7 @@ func addSubject(b *cryptobyte.Builder, entry *EntryConfig) {
 }
 
 type mtcCAInfo struct {
-	cosigner  *CosignerConfig
+	cosigner  *Cosigner
 	minSerial uint64
 }
 
@@ -335,7 +334,7 @@ func LogID(config *CAConfig) TrustAnchorID {
 	return logID
 }
 
-func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
 	if entry.Null {
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
@@ -389,20 +388,20 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
 				// plants-04 canonicalizes the cosigner order.
 				if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
-					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *CosignerConfig) int {
+					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *Cosigner) int {
 						return cmp.Or(
-							cmp.Compare(len(a.CosignerID), len(b.CosignerID)),
-							bytes.Compare(a.CosignerID, b.CosignerID),
+							cmp.Compare(len(a.ID), len(b.ID)),
+							bytes.Compare(a.ID, b.ID),
 						)
 					})
 				}
 				for _, cosigner := range cosigners {
-					cosig, err := Cosign(config.Version, cosigner, logID, start, end, &subtree)
+					cosig, err := cosigner.Sign(logID, start, end, &subtree)
 					if err != nil {
 						cosigs.SetError(err)
 						return
 					}
-					addTrustAnchorID(cosigs, cosigner.CosignerID)
+					addTrustAnchorID(cosigs, cosigner.ID)
 					cosigs.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(cosig) })
 				}
 			})
@@ -417,26 +416,8 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 	return b.Bytes()
 }
 
-func CreateCACertificate(config *CAConfig) ([]byte, error) {
-	// Find the CA's cosigner.
-	idx := slices.IndexFunc(config.Cosigners, func(cosigner CosignerConfig) bool {
-		return bytes.Equal(config.ID, cosigner.CosignerID)
-	})
-	if idx < 0 {
-		return nil, fmt.Errorf("could not find CA cosigner %s", config.ID)
-	}
-	cosigner := &config.Cosigners[idx]
-
-	// Extract the SPKI from the cosigner.
-	priv, err := parsePKCS8PrivateKey(cosigner.PrivateKey)
-	if err != nil {
-		return nil, err
-	}
-	signer, ok := priv.(crypto.Signer)
-	if !ok {
-		return nil, fmt.Errorf("unknown private key type: %T", priv)
-	}
-	pub := signer.Public()
+func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
+	pub := cosigner.Signer.Public()
 	spki, err := marshalPKIXPublicKey(pub)
 	if err != nil {
 		return nil, err

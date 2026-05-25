@@ -7,10 +7,12 @@ import (
 	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/sha256"
 	_ "crypto/sha256"
 	_ "crypto/sha512"
 	"crypto/x509"
 	"fmt"
+	"io"
 	"slices"
 
 	"filippo.io/mldsa"
@@ -68,41 +70,24 @@ func marshalPKIXPublicKey(pub any) ([]byte, error) {
 	return x509.MarshalPKIXPublicKey(pub)
 }
 
-func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start, end int, hash *HashValue) ([]byte, error) {
-	b := cryptobyte.NewBuilder(nil)
-	if version >= VersionPlants04 {
-		b.AddBytes([]byte("subtree/v1\n\x00"))
-		b.AddUint8LengthPrefixed(func(cosignerName *cryptobyte.Builder) {
-			cosignerName.AddBytes([]byte(tlogOrigin(c.CosignerID)))
-		})
-		b.AddUint64(0) // timestamp
-		b.AddUint8LengthPrefixed(func(logOrigin *cryptobyte.Builder) {
-			logOrigin.AddBytes([]byte(tlogOrigin(logID)))
-		})
-	} else {
-		b.AddBytes([]byte("mtc-subtree/v1\n\x00"))
-		addTrustAnchorID(b, c.CosignerID)
-		addTrustAnchorID(b, logID)
-	}
-	if !IsValidSubtree(start, end) {
-		return nil, fmt.Errorf("invalid subtree")
-	}
-	b.AddUint64(uint64(start))
-	b.AddUint64(uint64(end))
-	b.AddBytes((*hash)[:])
-	inp, err := b.Bytes()
-	if err != nil {
-		return nil, err
-	}
+type Cosigner struct {
+	Version            DraftVersion
+	ID                 TrustAnchorID
+	KeyID              [4]byte
+	SignatureAlgorithm SignatureAlgorithm
+	Signer             crypto.Signer
+	SignerOpts         crypto.SignerOpts
+}
 
-	priv, err := parsePKCS8PrivateKey(c.PrivateKey)
+func NewCosignerFromConfig(version DraftVersion, config *CosignerConfig) (*Cosigner, error) {
+	priv, err := parsePKCS8PrivateKey(config.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var signer crypto.Signer
 	var opts crypto.SignerOpts
-	switch c.SignatureAlgorithm {
+	switch config.SignatureAlgorithm {
 	case SignatureAlgorithmP256WithSHA256:
 		ec, ok := priv.(*ecdsa.PrivateKey)
 		if !ok {
@@ -133,7 +118,7 @@ func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start,
 		opts = crypto.Hash(0)
 	case SignatureAlgorithmMLDSA44, SignatureAlgorithmMLDSA65, SignatureAlgorithmMLDSA87:
 		var params *mldsa.Parameters
-		switch c.SignatureAlgorithm {
+		switch config.SignatureAlgorithm {
 		case SignatureAlgorithmMLDSA44:
 			params = mldsa.MLDSA44()
 		case SignatureAlgorithmMLDSA65:
@@ -148,8 +133,59 @@ func Cosign(version DraftVersion, c *CosignerConfig, logID TrustAnchorID, start,
 		signer = ml
 		opts = crypto.Hash(0)
 	default:
-		return nil, fmt.Errorf("unexpected signature algorithm %s", c.SignatureAlgorithm)
+		return nil, fmt.Errorf("unexpected signature algorithm %s", config.SignatureAlgorithm)
 	}
 
-	return crypto.SignMessage(signer, rand.Reader, inp, opts)
+	// Compute a tlog key ID.
+	h := sha256.New()
+	io.WriteString(h, tlogOrigin(config.CosignerID))
+	if version >= VersionPlants04 && config.SignatureAlgorithm == SignatureAlgorithmMLDSA44 {
+		// plants-04 uses a signature scheme compatible with tlog-cosignature's
+		// ML-DSA-44 scheme.
+		io.WriteString(h, "\n\x06")
+		h.Write(signer.Public().(*mldsa.PublicKey).Bytes())
+	} else {
+		// Use some placeholder value until a signature scheme is defined.
+		io.WriteString(h, "\n\xffmtc-checkpoint/v1")
+	}
+	keyID := *(*[4]byte)(h.Sum(nil)[:4])
+
+	return &Cosigner{
+		Version:            version,
+		ID:                 config.CosignerID,
+		KeyID:              keyID,
+		SignatureAlgorithm: config.SignatureAlgorithm,
+		Signer:             signer,
+		SignerOpts:         opts,
+	}, nil
+}
+
+func (c *Cosigner) Sign(logID TrustAnchorID, start, end int, hash *HashValue) ([]byte, error) {
+	b := cryptobyte.NewBuilder(nil)
+	if c.Version >= VersionPlants04 {
+		b.AddBytes([]byte("subtree/v1\n\x00"))
+		b.AddUint8LengthPrefixed(func(cosignerName *cryptobyte.Builder) {
+			cosignerName.AddBytes([]byte(tlogOrigin(c.ID)))
+		})
+		b.AddUint64(0) // timestamp
+		b.AddUint8LengthPrefixed(func(logOrigin *cryptobyte.Builder) {
+			logOrigin.AddBytes([]byte(tlogOrigin(logID)))
+		})
+	} else {
+		b.AddBytes([]byte("mtc-subtree/v1\n\x00"))
+		addTrustAnchorID(b, c.ID)
+		addTrustAnchorID(b, logID)
+	}
+	if !IsValidSubtree(start, end) {
+		return nil, fmt.Errorf("invalid subtree")
+	}
+	b.AddUint64(uint64(start))
+	b.AddUint64(uint64(end))
+	b.AddBytes((*hash)[:])
+	inp, err := b.Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	return crypto.SignMessage(c.Signer, rand.Reader, inp, c.SignerOpts)
 }
