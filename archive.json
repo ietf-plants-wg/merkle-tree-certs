@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-24T04:20:43.328839+00:00",
+  "timestamp": "2026-05-26T04:18:07.740529+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3522,16 +3522,56 @@
       "id": "I_kwDOJIBkVc8AAAABDJY2oQ",
       "title": "Catch demo tool up to git",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/238",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We've got a bunch of things queued up for draft-04 that aren't yet reflected in demo. From the changelog so far:\n\n- [ ] Use a tlog-compatible signature scheme for ease of deployment\n- [ ] Define a CA certificate representation\n- [ ] Remove the one-to-many relationship between MTC CAs and CA cosigners\n- [ ] A single CA now operates a series of issuance logs, instead of a one-to-one correspondence\n- [ ] Canonicalize the order of cosignatures in MTCProofs\n- [x] Add an extensions block to log entries",
       "createdAt": "2026-05-22T23:45:37Z",
-      "updatedAt": "2026-05-22T23:45:37Z",
+      "updatedAt": "2026-05-24T22:08:10Z",
+      "closedAt": "2026-05-24T22:08:10Z",
+      "comments": []
+    },
+    {
+      "number": 240,
+      "id": "I_kwDOJIBkVc8AAAABDO7H2Q",
+      "title": "Support ML-DSA in demo tool",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/240",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Ideally Go's standard library would support it, but we can use https://filippo.io/mldsa in the meantime.",
+      "createdAt": "2026-05-24T14:44:43Z",
+      "updatedAt": "2026-05-24T14:44:43Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 241,
+      "id": "I_kwDOJIBkVc8AAAABDO_lNQ",
+      "title": "Whither null_entry?",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/241",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "After #213, null_entry is no longer needed for avoiding the zero serial. Should we still have it?\n\nBenefits:\n* Exercises the entry type extension point ahead of time\n* Maybe useful for liveness checks?\n* Maaaybe useful if someone wants to pad out the tree to some multiple of a power of 2 and avoid partial subtrees????\n\nDownsides:\n* Doesn't _really_ do anything. :-)\n* The spec text right now doesn't particularly motivate it so maybe we should fix that if we keep it",
+      "createdAt": "2026-05-24T15:13:53Z",
+      "updatedAt": "2026-05-25T11:50:20Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I like it for liveness checks.",
+          "createdAt": "2026-05-25T11:50:20Z",
+          "updatedAt": "2026-05-25T11:50:20Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -16112,25 +16152,33 @@
       "id": "PR_kwDOJIBkVc7ZJknT",
       "title": "Add randomizer to leafs",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/226",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "MTC provides 128-bit security for its transparency goals: a CA needs to find a SHA-256 colission to hide a certificate from monitors.\r\n\r\nBefore this commit, an outside attacker can do something similar: find a hash colission to get a benign and malicious entry with the same hash. The attacker would then ask the CA to publish the benign entry with which it'll also get the malicious one certified. Thus forgery resistance is also capped at 128 bit.\r\n\r\nThis commit adds a CA-chosen randomizer to each leaf. This does not change transparency security: that's still 128-bit, but it does bump the forgery resistance to at least the multi-target second-preimage resistance of the hash. So that's 192+ bits with less than 2^63 leafs in the tree.",
       "createdAt": "2026-05-07T12:54:00Z",
-      "updatedAt": "2026-05-09T11:26:51Z",
+      "updatedAt": "2026-05-24T15:02:03Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "8f0f56a3392e94790ecdcfde15c65283e4f886d7",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "bas/randomizer",
       "headRefOid": "e10767059b9f80e0c93998dda8c33fb30fdbc14a",
-      "closedAt": null,
+      "closedAt": "2026-05-24T15:02:03Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closing this in favor of the extension block.",
+          "createdAt": "2026-05-24T15:02:03Z",
+          "updatedAt": "2026-05-24T15:02:03Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc78-moy",
@@ -17172,25 +17220,35 @@
       "id": "PR_kwDOJIBkVc7ehw6Z",
       "title": "Catch demo's plants-04 mode up to GitHub",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/239",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "I think this is everything? Only thing that's missing is we should write out the CA too. I made the changes in separate commits, so recommend looking at commits individually.",
       "createdAt": "2026-05-23T00:35:47Z",
-      "updatedAt": "2026-05-24T00:26:47Z",
+      "updatedAt": "2026-05-24T22:08:12Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "a319c5b9ec43cdacce7f7c34d3cf9f4186121b21",
+      "baseRefOid": "9c00ef091683f980daa666db782b5c6f340052ab",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "demo-draft-04",
-      "headRefOid": "ee21c8abb5ab36ec8943c7872a6cf14de8878202",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "69ea6dd8d88ce93855a7ada19e57a9d9b3a43d1f",
+      "closedAt": "2026-05-24T22:08:09Z",
+      "mergedAt": "2026-05-24T22:08:09Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b57b490f94bbfd900c1c4f03a891d60c58c8e398"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Updated to also output a CA certificate, which I think does the last of it?",
+          "createdAt": "2026-05-24T15:10:11Z",
+          "updatedAt": "2026-05-24T15:10:11Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABA1-oUg",
@@ -17217,6 +17275,79 @@
               "updatedAt": "2026-05-24T00:27:26Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABA3XJBw",
+          "commit": {
+            "abbreviatedOid": "ee21c8a"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-24T15:14:02Z",
+          "updatedAt": "2026-05-24T15:14:02Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "Ah yeah. Filed https://github.com/ietf-plants-wg/merkle-tree-certs/issues/241",
+              "createdAt": "2026-05-24T15:14:02Z",
+              "updatedAt": "2026-05-24T15:14:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABA3wcmQ",
+          "commit": {
+            "abbreviatedOid": "69ea6dd"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-24T21:42:14Z",
+          "updatedAt": "2026-05-24T21:42:14Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 242,
+      "id": "PR_kwDOJIBkVc7e3L6H",
+      "title": "demo: Add ML-DSA support",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/242",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #240",
+      "createdAt": "2026-05-25T00:09:44Z",
+      "updatedAt": "2026-05-25T11:47:27Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b57b490f94bbfd900c1c4f03a891d60c58c8e398",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "demo-mldsa",
+      "headRefOid": "7314105a431c5d5958728e6420a8655fe634de88",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABA6nTMw",
+          "commit": {
+            "abbreviatedOid": "7314105"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-25T11:47:27Z",
+          "updatedAt": "2026-05-25T11:47:27Z",
+          "comments": []
         }
       ]
     }
