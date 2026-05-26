@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
@@ -26,7 +25,7 @@ type certificateInfo struct {
 	entryConfig       *EntryConfig
 	certConfig        *CertificateConfig
 	index, start, end int
-	cosigners         []*CosignerConfig
+	cosigners         []*Cosigner
 	// The number of certificate for the given index.
 	num int
 }
@@ -56,11 +55,6 @@ func tlogIndex(n int, partial bool) string {
 	return s
 }
 
-func tlogCheckpointKeyID(id TrustAnchorID) [4]byte {
-	h := sha256.Sum256([]byte(tlogOrigin(id) + "\n\xffmtc-checkpoint/v1"))
-	return *(*[4]byte)(h[:])
-}
-
 func do() error {
 	// Load the config.
 	configBytes, err := os.ReadFile(*flagConfig)
@@ -72,9 +66,25 @@ func do() error {
 		return err
 	}
 
+	var cosigners []*Cosigner
+	var caCosigner *Cosigner
+	for _, cosignerConfig := range config.Cosigners {
+		cosigner, err := NewCosignerFromConfig(config.Version, &cosignerConfig)
+		if err != nil {
+			return fmt.Errorf("error in cosigner %s: %s", cosignerConfig.CosignerID, err)
+		}
+		cosigners = append(cosigners, cosigner)
+		if bytes.Equal(cosigner.ID, config.ID) {
+			caCosigner = cosigner
+		}
+	}
+
 	if config.Version >= VersionPlants04 {
 		// Generate an a CA certificate.
-		caCert, err := CreateCACertificate(&config)
+		if caCosigner == nil {
+			return fmt.Errorf("CA cosigner %s not found", config.ID)
+		}
+		caCert, err := CreateCACertificate(&config, caCosigner)
 		if err != nil {
 			return err
 		}
@@ -142,10 +152,10 @@ func do() error {
 					return fmt.Errorf("neither Checkpoint nor SubtreeEnd specified in a certificate")
 				}
 				for _, cosignerID := range certConfig.Cosigners {
-					var cosigner *CosignerConfig
-					for i := range config.Cosigners {
-						if bytes.Equal(config.Cosigners[i].CosignerID, cosignerID) {
-							cosigner = &config.Cosigners[i]
+					var cosigner *Cosigner
+					for _, c := range cosigners {
+						if bytes.Equal(c.ID, cosignerID) {
+							cosigner = c
 							break
 						}
 					}
@@ -216,7 +226,7 @@ func do() error {
 		fmt.Printf("Wrote certificate for entry %d at %q.\n", info.index, certPath)
 		fmt.Printf("  Subtree [%d, %d) with hash %s\n", info.start, info.end, base64.StdEncoding.EncodeToString(subtree[:]))
 		for _, cosigner := range info.cosigners {
-			fmt.Printf("  Cosigned by %s\n", cosigner.CosignerID)
+			fmt.Printf("  Cosigned by %s\n", cosigner.ID)
 		}
 		fmt.Printf("\n")
 	}
@@ -272,14 +282,12 @@ func do() error {
 	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogID(&config)))
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
-	for i := range config.Cosigners {
-		cosigner := &config.Cosigners[i]
-		cosig, err := Cosign(config.Version, cosigner, LogID(&config), 0, len(entries), &checkpointHash)
+	for _, cosigner := range cosigners {
+		cosig, err := cosigner.Sign(LogID(&config), 0, len(entries), &checkpointHash)
 		if err != nil {
 			return err
 		}
-		keyID := tlogCheckpointKeyID(cosigner.CosignerID)
-		fmt.Fprintf(&signedNote, "\u2014 %s %s\n", tlogOrigin(cosigner.CosignerID), base64.StdEncoding.EncodeToString(slices.Concat(keyID[:], cosig)))
+		fmt.Fprintf(&signedNote, "\u2014 %s %s\n", tlogOrigin(cosigner.ID), base64.StdEncoding.EncodeToString(slices.Concat(cosigner.KeyID[:], cosig)))
 	}
 	if err := os.WriteFile(filepath.Join(*flagOutDir, "checkpoint"), signedNote.Bytes(), 0644); err != nil {
 		return err

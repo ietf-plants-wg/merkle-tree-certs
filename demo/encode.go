@@ -3,9 +3,7 @@ package main
 import (
 	"bytes"
 	"cmp"
-	"crypto"
 	"crypto/sha256"
-	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
@@ -41,6 +39,9 @@ var (
 	oidECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
 	oidECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
 	oidEd25519         = asn1.ObjectIdentifier{1, 3, 101, 112}
+	oidMLDSA44         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 17}
+	oidMLDSA65         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 18}
+	oidMLDSA87         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 19}
 )
 
 func addASN1ImplicitString(bb *cryptobyte.Builder, tag cbasn1.Tag, b []byte) {
@@ -127,7 +128,7 @@ func addSubject(b *cryptobyte.Builder, entry *EntryConfig) {
 }
 
 type mtcCAInfo struct {
-	cosigner  *CosignerConfig
+	cosigner  *Cosigner
 	minSerial uint64
 }
 
@@ -230,6 +231,12 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA384)
 							case SignatureAlgorithmEd25519:
 								sigAlg.AddASN1ObjectIdentifier(oidEd25519)
+							case SignatureAlgorithmMLDSA44:
+								sigAlg.AddASN1ObjectIdentifier(oidMLDSA44)
+							case SignatureAlgorithmMLDSA65:
+								sigAlg.AddASN1ObjectIdentifier(oidMLDSA65)
+							case SignatureAlgorithmMLDSA87:
+								sigAlg.AddASN1ObjectIdentifier(oidMLDSA87)
 							default:
 								panic(fmt.Errorf("unknown signature algorithm %s", mtcCA.cosigner.SignatureAlgorithm))
 							}
@@ -327,7 +334,7 @@ func LogID(config *CAConfig) TrustAnchorID {
 	return logID
 }
 
-func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
 	if entry.Null {
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
@@ -381,20 +388,20 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
 				// plants-04 canonicalizes the cosigner order.
 				if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
-					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *CosignerConfig) int {
+					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *Cosigner) int {
 						return cmp.Or(
-							cmp.Compare(len(a.CosignerID), len(b.CosignerID)),
-							bytes.Compare(a.CosignerID, b.CosignerID),
+							cmp.Compare(len(a.ID), len(b.ID)),
+							bytes.Compare(a.ID, b.ID),
 						)
 					})
 				}
 				for _, cosigner := range cosigners {
-					cosig, err := Cosign(config.Version, cosigner, logID, start, end, &subtree)
+					cosig, err := cosigner.Sign(logID, start, end, &subtree)
 					if err != nil {
 						cosigs.SetError(err)
 						return
 					}
-					addTrustAnchorID(cosigs, cosigner.CosignerID)
+					addTrustAnchorID(cosigs, cosigner.ID)
 					cosigs.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(cosig) })
 				}
 			})
@@ -409,27 +416,9 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 	return b.Bytes()
 }
 
-func CreateCACertificate(config *CAConfig) ([]byte, error) {
-	// Find the CA's cosigner.
-	idx := slices.IndexFunc(config.Cosigners, func(cosigner CosignerConfig) bool {
-		return bytes.Equal(config.ID, cosigner.CosignerID)
-	})
-	if idx < 0 {
-		return nil, fmt.Errorf("could not find CA cosigner %s", config.ID)
-	}
-	cosigner := &config.Cosigners[idx]
-
-	// Extract the SPKI from the cosigner.
-	priv, err := x509.ParsePKCS8PrivateKey(cosigner.PrivateKey)
-	if err != nil {
-		return nil, err
-	}
-	signer, ok := priv.(crypto.Signer)
-	if !ok {
-		return nil, fmt.Errorf("unknown private key type: %T", priv)
-	}
-	pub := signer.Public()
-	spki, err := x509.MarshalPKIXPublicKey(pub)
+func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
+	pub := cosigner.Signer.Public()
+	spki, err := marshalPKIXPublicKey(pub)
 	if err != nil {
 		return nil, err
 	}
