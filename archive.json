@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-26T04:18:07.740529+00:00",
+  "timestamp": "2026-05-28T04:20:46.708952+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3538,15 +3538,15 @@
       "id": "I_kwDOJIBkVc8AAAABDO7H2Q",
       "title": "Support ML-DSA in demo tool",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/240",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Ideally Go's standard library would support it, but we can use https://filippo.io/mldsa in the meantime.",
       "createdAt": "2026-05-24T14:44:43Z",
-      "updatedAt": "2026-05-24T14:44:43Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-26T18:46:37Z",
+      "closedAt": "2026-05-26T18:46:37Z",
       "comments": []
     },
     {
@@ -17316,24 +17316,26 @@
       "id": "PR_kwDOJIBkVc7e3L6H",
       "title": "demo: Add ML-DSA support",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/242",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #240",
       "createdAt": "2026-05-25T00:09:44Z",
-      "updatedAt": "2026-05-25T11:47:27Z",
+      "updatedAt": "2026-05-26T18:46:39Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "b57b490f94bbfd900c1c4f03a891d60c58c8e398",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "demo-mldsa",
-      "headRefOid": "7314105a431c5d5958728e6420a8655fe634de88",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "40f61a7b2a361217556b30acca1152596a61f87f",
+      "closedAt": "2026-05-26T18:46:36Z",
+      "mergedAt": "2026-05-26T18:46:36Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "95da74c7bf797bb8effe064cd9058e4e9669ae0d"
+      },
       "comments": [],
       "reviews": [
         {
@@ -17347,6 +17349,111 @@
           "body": "",
           "createdAt": "2026-05-25T11:47:27Z",
           "updatedAt": "2026-05-25T11:47:27Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBDEBrg",
+          "commit": {
+            "abbreviatedOid": "7314105"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-05-26T15:52:35Z",
+          "updatedAt": "2026-05-26T15:54:19Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "AI review flagged these incorrect ASN.1 length bytes:\n```suggestion\n\tmldsa65SPKIPrefix = []byte{0x30, 0x82, 0x07, 0xB2, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12, 0x03, 0x82, 0x07, 0xA1, 0x00}\n```",
+              "createdAt": "2026-05-26T15:52:35Z",
+              "updatedAt": "2026-05-26T15:54:19Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "```suggestion\n\tmldsa87SPKIPrefix = []byte{0x30, 0x82, 0x0A, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x13, 0x03, 0x82, 0x0A, 0x21, 0x00}\n```",
+              "createdAt": "2026-05-26T15:53:12Z",
+              "updatedAt": "2026-05-26T15:54:19Z"
+            },
+            {
+              "originalPosition": 11,
+              "body": "redundant import\n```suggestion\n```",
+              "createdAt": "2026-05-26T15:53:41Z",
+              "updatedAt": "2026-05-26T15:54:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBDzLpQ",
+          "commit": {
+            "abbreviatedOid": "7314105"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-26T17:34:00Z",
+          "updatedAt": "2026-05-26T17:34:00Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "Whoops, yes, I manually fixed the others up and wasn't thinking very hard. Nice going, linear algebra. :-) I'll go double-check these against sample keys I have...",
+              "createdAt": "2026-05-26T17:34:00Z",
+              "updatedAt": "2026-05-26T17:34:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBDzz3Q",
+          "commit": {
+            "abbreviatedOid": "7314105"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-26T17:35:26Z",
+          "updatedAt": "2026-05-26T17:35:26Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "Looks right, just redoing them to make the casing consistent...\r\n\r\n```suggestion\r\n\tmldsa65SPKIPrefix = []byte{0x30, 0x82, 0x07, 0xb2, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12, 0x03, 0x82, 0x07, 0xa1, 0x00}\r\n```",
+              "createdAt": "2026-05-26T17:35:26Z",
+              "updatedAt": "2026-05-26T17:35:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBD0BNg",
+          "commit": {
+            "abbreviatedOid": "7314105"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-26T17:35:58Z",
+          "updatedAt": "2026-05-26T17:35:58Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "(Version with consistent casing.)\r\n\r\n```suggestion\r\n\tmldsa87SPKIPrefix = []byte{0x30, 0x82, 0x0a, 0x32, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x13, 0x03, 0x82, 0x0a, 0x21, 0x00}\r\n```",
+              "createdAt": "2026-05-26T17:35:58Z",
+              "updatedAt": "2026-05-26T17:35:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBD5lvQ",
+          "commit": {
+            "abbreviatedOid": "40f61a7"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-26T17:50:02Z",
+          "updatedAt": "2026-05-26T17:50:02Z",
           "comments": []
         }
       ]
