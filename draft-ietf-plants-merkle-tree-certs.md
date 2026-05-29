@@ -1477,6 +1477,7 @@ This procedure only replaces the signature verification portion of X.509 path va
 In this procedure, `entry_hash` can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
 
 1. Initialize a hash instance.
+1. Write the octet 0x00 to the hash. This is the domain separator for leaf nodes.
 1. Write the `extensions` field from the MTCProof to the hash.
 1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
 1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.
