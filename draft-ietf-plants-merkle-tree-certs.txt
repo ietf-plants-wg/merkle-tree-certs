@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 27 November 2026                                     Apple Inc.
+Expires: 30 November 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             26 May 2026
+                                                             29 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 November 2026.
+   This Internet-Draft will expire on 30 November 2026.
 
 Copyright Notice
 
@@ -2221,28 +2221,31 @@ Table of Contents
 
    1.   Initialize a hash instance.
 
-   2.   Write the extensions field from the MTCProof to the hash.
+   2.   Write the octet 0x00 to the hash.  This is the domain separator
+        for leaf nodes.
 
-   3.   Write the big-endian, two-byte tbs_cert_entry value to the hash.
+   3.   Write the extensions field from the MTCProof to the hash.
 
-   4.   Write the TBSCertificate contents octets to the hash, up to the
+   4.   Write the big-endian, two-byte tbs_cert_entry value to the hash.
+
+   5.   Write the TBSCertificate contents octets to the hash, up to the
         subjectPublicKeyInfo field.
 
-   5.   Write the subjectPublicKeyInfo's algorithm field to the hash.
+   6.   Write the subjectPublicKeyInfo's algorithm field to the hash.
 
-   6.   Write the octet 0x04 to the hash.  This is an OCTET STRING
+   7.   Write the octet 0x04 to the hash.  This is an OCTET STRING
         identifer.
 
-   7.   Write the octet L to the hash, where L is the hash length.
+   8.   Write the octet L to the hash, where L is the hash length.
         (This assumes L is at most 127.)
 
-   8.   Write H to the hash, where H is the hash of the entire
+   9.   Write H to the hash, where H is the hash of the entire
         subjectPublicKeyInfo field.
 
-   9.   Write the remainder of the TBSCertificate contents octets to the
+   10.  Write the remainder of the TBSCertificate contents octets to the
         hash, starting just after the subjectPublicKeyInfo field.
 
-   10.  Finalize the hash and set entry_hash to the result.
+   11.  Finalize the hash and set entry_hash to the result.
 
    This is possible because the structure in Section 5.2.1 omits the
    TBSCertificateLogEntry's identifier and length octets.
