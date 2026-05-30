@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 30 November 2026                                     Apple Inc.
+Expires: 1 December 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             29 May 2026
+                                                             30 May 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 November 2026.
+   This Internet-Draft will expire on 1 December 2026.
 
 Copyright Notice
 
@@ -2228,8 +2228,8 @@ Table of Contents
 
    4.   Write the big-endian, two-byte tbs_cert_entry value to the hash.
 
-   5.   Write the TBSCertificate contents octets to the hash, up to the
-        subjectPublicKeyInfo field.
+   5.   Write the TBSCertificate's version, issuer, validity, and
+        subject fields to the hash.
 
    6.   Write the subjectPublicKeyInfo's algorithm field to the hash.
 
