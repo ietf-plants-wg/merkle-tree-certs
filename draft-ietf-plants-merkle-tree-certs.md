@@ -1480,7 +1480,7 @@ In this procedure, `entry_hash` can equivalently be computed in a single pass fr
 1. Write the octet 0x00 to the hash. This is the domain separator for leaf nodes.
 1. Write the `extensions` field from the MTCProof to the hash.
 1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
-1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.
+1. Write the TBSCertificate's `version`, `issuer`, `validity`, and `subject` fields to the hash.
 1. Write the `subjectPublicKeyInfo`'s `algorithm` field to the hash.
 1. Write the octet 0x04 to the hash. This is an OCTET STRING identifer.
 1. Write the octet L to the hash, where L is the hash length. (This assumes L is at most 127.)
