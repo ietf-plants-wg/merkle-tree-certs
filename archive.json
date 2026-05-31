@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-28T04:20:46.708952+00:00",
+  "timestamp": "2026-05-31T04:43:22.026483+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -17454,6 +17454,157 @@
           "body": "",
           "createdAt": "2026-05-26T17:50:02Z",
           "updatedAt": "2026-05-26T17:50:02Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 243,
+      "id": "PR_kwDOJIBkVc7gxPNi",
+      "title": "Include domain separator in single pass entry_hash calculation",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/243",
+      "state": "MERGED",
+      "author": "matt-mueller",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-05-29T18:57:45Z",
+      "updatedAt": "2026-05-30T00:47:48Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "95da74c7bf797bb8effe064cd9058e4e9669ae0d",
+      "headRepository": "matt-mueller/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "13629778147373930117fadd70d4063e29fc0a7b",
+      "closedAt": "2026-05-29T19:00:38Z",
+      "mergedAt": "2026-05-29T19:00:38Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "9029a99bcfa4e91b8b8e9ba646ac386a6e1c208f"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks!",
+          "createdAt": "2026-05-29T19:00:18Z",
+          "updatedAt": "2026-05-29T19:00:18Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBcp4AA",
+          "commit": {
+            "abbreviatedOid": "1362977"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-29T19:00:06Z",
+          "updatedAt": "2026-05-29T19:00:06Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 244,
+      "id": "PR_kwDOJIBkVc7gx4RE",
+      "title": "Take another pass at describing subtrees",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/244",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Punt all unused properties into the explanations section (full vs partial, directly contained), and add a section explaining what the numerical property is about.\r\n\r\nWe still mention full/partial in the explanation section, just because the subtree consistency proof evaluation talks about it. To that end, replace \"full tree\" with \"original tree\" when we're talking about the big tree that you used to pull a subtree out.",
+      "createdAt": "2026-05-29T19:32:17Z",
+      "updatedAt": "2026-05-30T01:19:50Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "9029a99bcfa4e91b8b8e9ba646ac386a6e1c208f",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "subtree-explain",
+      "headRefOid": "cbd6f6f9285e6534204105215bc6fa9e35fd4891",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBeKoRQ",
+          "commit": {
+            "abbreviatedOid": "cbd6f6f"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Looks good!",
+          "createdAt": "2026-05-30T00:24:36Z",
+          "updatedAt": "2026-05-30T01:19:50Z",
+          "comments": [
+            {
+              "originalPosition": 281,
+              "body": "First edit is just to make it clear what \"avoid this\" refers to, since there's a diagram between this paragraph and the previous one (but feel free to keep as-is).\n\nSecond edit is because `end - 1` is the last leaf node in the tree.\n\n```suggestion\nThe numerical constraints on `start` and `end` in {{definition-of-a-subtree}} restrict subtrees to ensure that they are properly aligned with the original tree as to permit subtree consistency proofs. A Merkle Tree built over `[start, end)` has size `end - start`, and is constructed as if `start` were the first element of the sequence at index zero. To be aligned, `start` must be the leftmost leaf of the lowest common ancestor of `start` and `end - 1` in the original tree:\n```",
+              "createdAt": "2026-05-30T00:24:36Z",
+              "updatedAt": "2026-05-30T01:19:50Z"
+            },
+            {
+              "originalPosition": 291,
+              "body": "```suggestion\n* Subtrees whose sizes are not a power of two are called *partial subtrees*. A partial subtree's root node will be in the original tree of size `n`, if and only if `n = end`. Otherwise, non-leaf nodes along the partial subtree's right edge will not be part of the original tree.\n```",
+              "createdAt": "2026-05-30T00:25:18Z",
+              "updatedAt": "2026-05-30T01:19:50Z"
+            },
+            {
+              "originalPosition": 293,
+              "body": "```suggestion\nThe difference between full and partial subtrees does not impact their usage, but they can help in understanding the proof constructions below.\n```",
+              "createdAt": "2026-05-30T00:25:47Z",
+              "updatedAt": "2026-05-30T01:19:50Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 245,
+      "id": "PR_kwDOJIBkVc7g2xzK",
+      "title": "Fix TBSCertificateLogEntry construction in single-pass calculation",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/245",
+      "state": "MERGED",
+      "author": "matt-mueller",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The instructions to include TBSCertificate contents up to the SPKI would include serialNumber and signature fields, which aren't part of TBSCertificateLogEntry. Change it to explicitly list the fields to include.",
+      "createdAt": "2026-05-30T01:01:13Z",
+      "updatedAt": "2026-05-30T01:29:41Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "9029a99bcfa4e91b8b8e9ba646ac386a6e1c208f",
+      "headRepository": "matt-mueller/merkle-tree-certs",
+      "headRefName": "matt-mueller-patch-1",
+      "headRefOid": "9c27e46c4d6495409570c1af17b9241396aed6af",
+      "closedAt": "2026-05-30T01:29:40Z",
+      "mergedAt": "2026-05-30T01:29:40Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "99b82fe52501dd6825afceeec44b3f7acf2999f7"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBebgmw",
+          "commit": {
+            "abbreviatedOid": "9c27e46"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-30T01:29:36Z",
+          "updatedAt": "2026-05-30T01:29:36Z",
           "comments": []
         }
       ]
