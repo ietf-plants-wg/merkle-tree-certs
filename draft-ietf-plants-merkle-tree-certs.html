@@ -1046,11 +1046,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">May 2026</td>
+<td class="right">June 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 1 December 2026</td>
+<td class="center">Expires 3 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-30" class="published">30 May 2026</time>
+<time datetime="2026-06-01" class="published">1 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-01">1 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-03">3 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1215,7 +1215,12 @@ svg {
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
-                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-arbitrary-intervals" class="internal xref">Arbitrary Intervals</a></p>
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-efficiently-covering-arbitr" class="internal xref">Efficiently Covering Arbitrary Intervals</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5.2.1">
+                    <p id="section-toc.1-1.4.2.5.2.1.1"><a href="#section-4.5.1" class="auto internal xref">4.5.1</a>.  <a href="#name-selecting-two-subtrees" class="internal xref">Selecting Two Subtrees</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -1432,13 +1437,16 @@ svg {
                 <p id="section-toc.1-1.16.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-binary-representations" class="internal xref">Binary Representations</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.2">
-                <p id="section-toc.1-1.16.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-inclusion-proof-evaluation" class="internal xref">Inclusion Proof Evaluation</a></p>
+                <p id="section-toc.1-1.16.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-subtrees-2" class="internal xref">Subtrees</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.3">
-                <p id="section-toc.1-1.16.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-consistency-proof-structure" class="internal xref">Consistency Proof Structure</a></p>
+                <p id="section-toc.1-1.16.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-inclusion-proof-evaluation" class="internal xref">Inclusion Proof Evaluation</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.4">
-                <p id="section-toc.1-1.16.2.4.1"><a href="#appendix-B.4" class="auto internal xref">B.4</a>.  <a href="#name-consistency-proof-verificat" class="internal xref">Consistency Proof Verification</a></p>
+                <p id="section-toc.1-1.16.2.4.1"><a href="#appendix-B.4" class="auto internal xref">B.4</a>.  <a href="#name-consistency-proof-structure" class="internal xref">Consistency Proof Structure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.5">
+                <p id="section-toc.1-1.16.2.5.1"><a href="#appendix-B.5" class="auto internal xref">B.5</a>.  <a href="#name-consistency-proof-verificat" class="internal xref">Consistency Proof Verification</a></p>
 </li>
             </ul>
 </li>
@@ -1993,11 +2001,10 @@ uint8 uint48[6];
             <p id="section-4.1-3.2.1"><code>start</code> is a multiple of <code>BIT_CEIL(end - start)</code><a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-4.1-4">Note that, if <code>start</code> is zero, the second condition is always true.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
-<p id="section-4.1-5">In the context of a single Merkle Tree, the subtree defined by <code>start</code> and <code>end</code> is denoted by half-open interval <code>[start, end)</code>. It contains the entries whose indices are in that half-open interval.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
-<p id="section-4.1-6">The <em>size</em> of the subtree is <code>end - start</code>. If the subtree's size is a power of two, it is said to be <em>full</em>, otherwise it is said to be <em>partial</em>.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
-<p id="section-4.1-7">If a subtree is full, then it is directly contained in the tree of hash operations in <code>MTH(D_n)</code> for <code>n &gt;= end</code>.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
-<p id="section-4.1-8">If a subtree is partial, it is directly contained in <code>MTH(D_n)</code> only if <code>n = end</code>.<a href="#section-4.1-8" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">The second condition ensures that <code>MTH(D[start:end])</code>, built over <code>D[start:end]</code> as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See <a href="#subtrees-explain" class="auto internal xref">Appendix B.2</a> for more details. Note that, if <code>start</code> is zero, this second condition is always true.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">The <em>size</em> of the subtree is <code>end - start</code>.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1-6">In the context of a single Merkle Tree, this document denotes subtree <code>MTH(D[start:end])</code> by half-open interval <code>[start, end)</code>. It contains the entries whose indices are in that half-open interval.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
+<p id="section-4.1-7">As a Merkle Tree grows, its subtrees remain unchanged. That is, if <code>end &lt;= m &lt;= n</code>, the subtree <code>[start, end)</code> of <code>MTH(D[0:m])</code> and the subtree <code>[start, end)</code> of <code>MTH(D_n)</code> are both valid and identical.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-subtrees">
@@ -2006,7 +2013,7 @@ uint8 uint48[6];
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-example-subtrees" class="section-name selfRef">Example Subtrees</a>
         </h3>
 <p id="section-4.2-1"><a href="#fig-subtree-example" class="auto internal xref">Figure 3</a> shows the subtrees <code>[4, 8)</code> and <code>[8, 13)</code>:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<span id="name-two-example-subtrees-one-fu"></span><div id="fig-subtree-example">
+<span id="name-two-example-subtrees"></span><div id="fig-subtree-example">
 <figure id="figure-3">
           <div id="section-4.2-2.1">
             <div class="alignLeft art-svg artwork" id="section-4.2-2.1.1">
@@ -2114,10 +2121,10 @@ uint8 uint48[6];
 </div>
 </div>
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
-<a href="#name-two-example-subtrees-one-fu" class="selfRef">Two example subtrees, one full and one partial</a>
+<a href="#name-two-example-subtrees" class="selfRef">Two example subtrees</a>
           </figcaption></figure>
 </div>
-<p id="section-4.2-3">Both subtrees are directly contained in a Merkle Tree of size 13, depicted in <a href="#fig-subtree-containment-example" class="auto internal xref">Figure 4</a>. <code>[4, 8)</code> is contained (marked with double lines) because, although <code>n</code> (13) is not <code>end</code> (8), the subtree is full. <code>[8, 13)</code> is contained (marked with wavy lines) because <code>n</code> (13) is <code>end</code> (13).<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">Both can be viewed as subtrees of a Merkle Tree of size 13, depicted in <a href="#fig-subtree-containment-example" class="auto internal xref">Figure 4</a>. Nodes in common with <code>[4, 8)</code> and <code>[8, 13)</code> are marked with doubled and wavy lines, respectively.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 <span id="name-a-merkle-tree-of-size-13"></span><div id="fig-subtree-containment-example">
 <figure id="figure-4">
           <div id="section-4.2-4.1">
@@ -2301,7 +2308,7 @@ uint8 uint48[6];
 <a href="#name-a-merkle-tree-of-size-13" class="selfRef">A Merkle Tree of size 13</a>
           </figcaption></figure>
 </div>
-<p id="section-4.2-5">In contrast, <code>[8, 13)</code> is not directly contained in a Merkle Tree of size 14, depicted in <a href="#fig-subtree-containment-example-2" class="auto internal xref">Figure 5</a>. However, the subtree is still computed over consistent elements.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+<p id="section-4.2-5">In some cases, not every node of a subtree will appear in the larger Merkle Tree. <a href="#fig-subtree-containment-example-2" class="auto internal xref">Figure 5</a> depicts a Merkle Tree of size 14. Nodes in common with <code>[4, 8)</code> and <code>[8, 13)</code> are marked as above. While all nodes of <code>[4, 8)</code> appear in the tree, non-leaf nodes on <code>[8, 13)</code>'s right edge do not. However, there is still sufficient overlap to construct subtree consistency proofs (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>).<a href="#section-4.2-5" class="pilcrow">¶</a></p>
 <span id="name-a-merkle-tree-of-size-14"></span><div id="fig-subtree-containment-example-2">
 <figure id="figure-5">
           <div id="section-4.2-6.1">
@@ -2369,22 +2376,28 @@ uint8 uint48[6];
                 <path d="M 64,128 L 200,128" fill="none" stroke="black"></path>
                 <path d="M 312,128 L 448,128" fill="none" stroke="black"></path>
                 <path d="M 32,160 L 104,160" fill="none" stroke="black"></path>
-                <path d="M 160,160 L 232,160" fill="none" stroke="black"></path>
+                <path d="M 160,158 L 232,158" fill="none" stroke="black"></path>
+                <path d="M 160,162 L 232,162" fill="none" stroke="black"></path>
                 <path d="M 288,160 Q 290,156.8 292,160 Q 294,163.2 296,160 Q 298,156.8 300,160 Q 302,163.2 304,160 Q 306,156.8 308,160 Q 310,163.2 312,160 Q 314,156.8 316,160 Q 318,163.2 320,160 Q 322,156.8 324,160 Q 326,163.2 328,160 Q 330,156.8 332,160 Q 334,163.2 336,160 Q 338,156.8 340,160 Q 342,163.2 344,160 Q 346,156.8 348,160 Q 350,163.2 352,160 Q 354,156.8 356,160 Q 358,163.2 360,160 Q 362,156.8 364,160 Q 366,163.2 368,160" fill="none" stroke="black"></path>
                 <path d="M 32,192 L 104,192" fill="none" stroke="black"></path>
-                <path d="M 160,192 L 232,192" fill="none" stroke="black"></path>
+                <path d="M 160,190 L 232,190" fill="none" stroke="black"></path>
+                <path d="M 160,194 L 232,194" fill="none" stroke="black"></path>
                 <path d="M 288,192 Q 290,188.8 292,192 Q 294,195.2 296,192 Q 298,188.8 300,192 Q 302,195.2 304,192 Q 306,188.8 308,192 Q 310,195.2 312,192 Q 314,188.8 316,192 Q 318,195.2 320,192 Q 322,188.8 324,192 Q 326,195.2 328,192 Q 330,188.8 332,192 Q 334,195.2 336,192 Q 338,188.8 340,192 Q 342,195.2 344,192 Q 346,188.8 348,192 Q 350,195.2 352,192 Q 354,188.8 356,192 Q 358,195.2 360,192 Q 362,188.8 364,192 Q 366,195.2 368,192" fill="none" stroke="black"></path>
                 <path d="M 8,224 L 56,224" fill="none" stroke="black"></path>
                 <path d="M 72,224 L 120,224" fill="none" stroke="black"></path>
-                <path d="M 136,224 L 184,224" fill="none" stroke="black"></path>
-                <path d="M 200,224 L 248,224" fill="none" stroke="black"></path>
+                <path d="M 136,222 L 184,222" fill="none" stroke="black"></path>
+                <path d="M 136,226 L 184,226" fill="none" stroke="black"></path>
+                <path d="M 200,222 L 248,222" fill="none" stroke="black"></path>
+                <path d="M 200,226 L 248,226" fill="none" stroke="black"></path>
                 <path d="M 264,224 Q 266,220.8 268,224 Q 270,227.2 272,224 Q 274,220.8 276,224 Q 278,227.2 280,224 Q 282,220.8 284,224 Q 286,227.2 288,224 Q 290,220.8 292,224 Q 294,227.2 296,224 Q 298,220.8 300,224 Q 302,227.2 304,224 Q 306,220.8 308,224 Q 310,227.2 312,224 Q 314,220.8 316,224 Q 318,227.2 320,224" fill="none" stroke="black"></path>
                 <path d="M 336,224 Q 338,220.8 340,224 Q 342,227.2 344,224 Q 346,220.8 348,224 Q 350,227.2 352,224 Q 354,220.8 356,224 Q 358,227.2 360,224 Q 362,220.8 364,224 Q 366,227.2 368,224 Q 370,220.8 372,224 Q 374,227.2 376,224 Q 378,220.8 380,224 Q 382,227.2 384,224 Q 386,220.8 388,224 Q 390,227.2 392,224 Q 394,220.8 396,224 Q 398,227.2 400,224" fill="none" stroke="black"></path>
                 <path d="M 416,224 L 480,224" fill="none" stroke="black"></path>
                 <path d="M 8,256 L 56,256" fill="none" stroke="black"></path>
                 <path d="M 72,256 L 120,256" fill="none" stroke="black"></path>
-                <path d="M 136,256 L 184,256" fill="none" stroke="black"></path>
-                <path d="M 200,256 L 248,256" fill="none" stroke="black"></path>
+                <path d="M 136,254 L 184,254" fill="none" stroke="black"></path>
+                <path d="M 136,258 L 184,258" fill="none" stroke="black"></path>
+                <path d="M 200,254 L 248,254" fill="none" stroke="black"></path>
+                <path d="M 200,258 L 248,258" fill="none" stroke="black"></path>
                 <path d="M 264,256 Q 266,252.8 268,256 Q 270,259.2 272,256 Q 274,252.8 276,256 Q 278,259.2 280,256 Q 282,252.8 284,256 Q 286,259.2 288,256 Q 290,252.8 292,256 Q 294,259.2 296,256 Q 298,252.8 300,256 Q 302,259.2 304,256 Q 306,252.8 308,256 Q 310,259.2 312,256 Q 314,252.8 316,256 Q 318,259.2 320,256" fill="none" stroke="black"></path>
                 <path d="M 336,256 Q 338,252.8 340,256 Q 342,259.2 344,256 Q 346,252.8 348,256 Q 350,259.2 352,256 Q 354,252.8 356,256 Q 358,259.2 360,256 Q 362,252.8 364,256 Q 366,259.2 368,256 Q 370,252.8 372,256 Q 374,259.2 376,256 Q 378,252.8 380,256 Q 382,259.2 384,256 Q 386,252.8 388,256 Q 390,259.2 392,256 Q 394,252.8 396,256 Q 398,259.2 400,256" fill="none" stroke="black"></path>
                 <path d="M 416,256 L 480,256" fill="none" stroke="black"></path>
@@ -2392,10 +2405,14 @@ uint8 uint48[6];
                 <path d="M 40,288 L 56,288" fill="none" stroke="black"></path>
                 <path d="M 72,288 L 88,288" fill="none" stroke="black"></path>
                 <path d="M 104,288 L 120,288" fill="none" stroke="black"></path>
-                <path d="M 136,288 L 152,288" fill="none" stroke="black"></path>
-                <path d="M 168,288 L 184,288" fill="none" stroke="black"></path>
-                <path d="M 200,288 L 216,288" fill="none" stroke="black"></path>
-                <path d="M 232,288 L 248,288" fill="none" stroke="black"></path>
+                <path d="M 136,286 L 152,286" fill="none" stroke="black"></path>
+                <path d="M 136,290 L 152,290" fill="none" stroke="black"></path>
+                <path d="M 168,286 L 184,286" fill="none" stroke="black"></path>
+                <path d="M 168,290 L 184,290" fill="none" stroke="black"></path>
+                <path d="M 200,286 L 216,286" fill="none" stroke="black"></path>
+                <path d="M 200,290 L 216,290" fill="none" stroke="black"></path>
+                <path d="M 232,286 L 248,286" fill="none" stroke="black"></path>
+                <path d="M 232,290 L 248,290" fill="none" stroke="black"></path>
                 <path d="M 264,288 Q 266,284.8 268,288 Q 270,291.2 272,288 Q 274,284.8 276,288 Q 278,291.2 280,288" fill="none" stroke="black"></path>
                 <path d="M 296,288 Q 298,284.8 300,288 Q 302,291.2 304,288 Q 306,284.8 308,288 Q 310,291.2 312,288" fill="none" stroke="black"></path>
                 <path d="M 328,288 Q 330,284.8 332,288 Q 334,291.2 336,288 Q 338,284.8 340,288 Q 342,291.2 344,288 Q 346,284.8 348,288 Q 350,291.2 352,288" fill="none" stroke="black"></path>
@@ -2406,10 +2423,14 @@ uint8 uint48[6];
                 <path d="M 40,320 L 56,320" fill="none" stroke="black"></path>
                 <path d="M 72,320 L 88,320" fill="none" stroke="black"></path>
                 <path d="M 104,320 L 120,320" fill="none" stroke="black"></path>
-                <path d="M 136,320 L 152,320" fill="none" stroke="black"></path>
-                <path d="M 168,320 L 184,320" fill="none" stroke="black"></path>
-                <path d="M 200,320 L 216,320" fill="none" stroke="black"></path>
-                <path d="M 232,320 L 248,320" fill="none" stroke="black"></path>
+                <path d="M 136,318 L 152,318" fill="none" stroke="black"></path>
+                <path d="M 136,322 L 152,322" fill="none" stroke="black"></path>
+                <path d="M 168,318 L 184,318" fill="none" stroke="black"></path>
+                <path d="M 168,322 L 184,322" fill="none" stroke="black"></path>
+                <path d="M 200,318 L 216,318" fill="none" stroke="black"></path>
+                <path d="M 200,322 L 216,322" fill="none" stroke="black"></path>
+                <path d="M 232,318 L 248,318" fill="none" stroke="black"></path>
+                <path d="M 232,322 L 248,322" fill="none" stroke="black"></path>
                 <path d="M 264,320 Q 266,316.8 268,320 Q 270,323.2 272,320 Q 274,316.8 276,320 Q 278,323.2 280,320" fill="none" stroke="black"></path>
                 <path d="M 296,320 Q 298,316.8 300,320 Q 302,323.2 304,320 Q 306,316.8 308,320 Q 310,323.2 312,320" fill="none" stroke="black"></path>
                 <path d="M 328,320 Q 330,316.8 332,320 Q 334,323.2 336,320 Q 338,316.8 340,320 Q 342,323.2 344,320 Q 346,316.8 348,320 Q 350,323.2 352,320" fill="none" stroke="black"></path>
@@ -2483,6 +2504,7 @@ uint8 uint48[6];
 <a href="#name-a-merkle-tree-of-size-14" class="selfRef">A Merkle Tree of size 14</a>
           </figcaption></figure>
 </div>
+<p id="section-4.2-7"><a href="#subtrees-explain" class="auto internal xref">Appendix B.2</a> discusses subtrees in more detail.<a href="#section-4.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="subtree-inclusion-proofs">
@@ -2628,7 +2650,7 @@ Otherwise:<a href="#section-4.3.2-2.4.2.2.3" class="pilcrow">¶</a></p>
 </li>
           </ol>
 <p id="section-4.3.2-3">This is the same as the procedure in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3.2" class="relref">Section 2.1.3.2</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, where <code>leaf_index</code> is <code>index - start</code>, <code>tree_size</code> is <code>end - start</code>, and <code>r</code> is returned instead of compared with <code>root_hash</code>.<a href="#section-4.3.2-3" class="pilcrow">¶</a></p>
-<p id="section-4.3.2-4"><a href="#inclusion-proof-evaluation-explain" class="auto internal xref">Appendix B.2</a> explains this procedure in more detail.<a href="#section-4.3.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.3.2-4"><a href="#inclusion-proof-evaluation-explain" class="auto internal xref">Appendix B.3</a> explains this procedure in more detail.<a href="#section-4.3.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="verifying-a-subtree-inclusion-proof">
@@ -2655,7 +2677,7 @@ Otherwise:<a href="#section-4.3.2-2.4.2.2.3" class="pilcrow">¶</a></p>
 <a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-subtree-consistency-proofs" class="section-name selfRef">Subtree Consistency Proofs</a>
         </h3>
 <p id="section-4.4-1">A subtree <code>[start, end)</code> can be efficiently proven to be consistent with the full Merkle Tree. That is, given <code>MTH(D[start:end])</code> and <code>MTH(D_n)</code>, the proof demonstrates that the input <code>D[start:end]</code> to the subtree hash was equal to the corresponding elements of the input <code>D_n</code> to the Merkle Tree hash.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2">Subtree consistency proofs contain sufficient nodes to reconstruct both the subtree hash, <code>MTH(D[start:end])</code>, and the full tree hash, <code>MTH(D_n)</code>, in such a way that every input to the subtree hash was also incorporated into the full tree hash.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">Subtree consistency proofs contain sufficient nodes to reconstruct both the subtree hash, <code>MTH(D[start:end])</code>, and the original tree hash, <code>MTH(D_n)</code>, in such a way that every input to the subtree hash was also incorporated into the original tree hash.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
 <div id="generating-a-subtree-consistency-proof">
 <section id="section-4.4.1">
           <h4 id="name-generating-a-subtree-consis">
@@ -2717,7 +2739,7 @@ SUBTREE_PROOF(0, end, D_n) = PROOF(end, D_n)
 SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 </pre><a href="#section-4.4.1-10" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4.1-11"><a href="#consistency-proof-structure" class="auto internal xref">Appendix B.3</a> explains the structure of a subtree consistency proof in more detail.<a href="#section-4.4.1-11" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-11"><a href="#consistency-proof-structure" class="auto internal xref">Appendix B.4</a> explains the structure of a subtree consistency proof in more detail.<a href="#section-4.4.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-subtree-consistency-proofs">
@@ -2725,7 +2747,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
           <h4 id="name-example-subtree-consistency">
 <a href="#section-4.4.2" class="section-number selfRef">4.4.2. </a><a href="#name-example-subtree-consistency" class="section-name selfRef">Example Subtree Consistency Proofs</a>
           </h4>
-<p id="section-4.4.2-1">The subtree consistency proof for <code>[4, 8)</code> and a tree of size 14 contains <code>MTH(D[0:4])</code> and <code>MTH(D[8:14])</code>, depicted in <a href="#fig-subtree-consistency-example-1" class="auto internal xref">Figure 7</a>. The verifier is assumed to know the subtree hash, so there is no need to include <code>MTH(D[4:8])</code> itself in the consistency proof.<a href="#section-4.4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.2-1">The subtree consistency proof for <code>[4, 8)</code> and a tree of size 14 contains <code>MTH(D[0:4])</code> and <code>MTH(D[8:14])</code>, depicted in <a href="#fig-subtree-consistency-example-1" class="auto internal xref">Figure 7</a> with doubled lines. The verifier is assumed to know the subtree hash, so there is no need to include <code>MTH(D[4:8])</code>, depicted with wavy lines, in the consistency proof.<a href="#section-4.4.2-1" class="pilcrow">¶</a></p>
 <span id="name-an-example-subtree-consiste"></span><div id="fig-subtree-consistency-example-1">
 <figure id="figure-7">
             <div id="section-4.4.2-2.1">
@@ -2950,10 +2972,10 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 </div>
 </div>
 <figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
-<a href="#name-an-example-subtree-consiste" class="selfRef">An example subtree consistency proof for a subtree that is directly contained in the full tree</a>
+<a href="#name-an-example-subtree-consiste" class="selfRef">An example subtree consistency proof that begins at the root of the subtree</a>
             </figcaption></figure>
 </div>
-<p id="section-4.4.2-3">The subtree consistency proof for <code>[8, 13)</code> and a tree of size 14 contains <code>MTH({d[12]})</code>, <code>MTH({d[13]})</code>, <code>MTH(D[8:12])</code>, and <code>MTH(D[0:8])</code>, depicted in <a href="#fig-subtree-consistency-example-2" class="auto internal xref">Figure 8</a>. <code>[8, 13)</code> is not directly contained in the tree, so the proof must include sufficient nodes to reconstruct both hashes.<a href="#section-4.4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.4.2-3">The subtree consistency proof for <code>[8, 13)</code> and a tree of size 14 contains <code>MTH({d[12]})</code>, <code>MTH({d[13]})</code>, <code>MTH(D[8:12])</code>, and <code>MTH(D[0:8])</code>, depicted in <a href="#fig-subtree-consistency-example-2" class="auto internal xref">Figure 8</a> with doubled lines. Not every node in <code>[8, 13)</code> is also in the overall tree, so the proof must include sufficient nodes to reconstruct both hashes. However, there is enough overlap for the proof to be possible.<a href="#section-4.4.2-3" class="pilcrow">¶</a></p>
 <span id="name-an-example-subtree-consisten"></span><div id="fig-subtree-consistency-example-2">
 <figure id="figure-8">
             <div id="section-4.4.2-4.1">
@@ -3199,7 +3221,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 </div>
 </div>
 <figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
-<a href="#name-an-example-subtree-consisten" class="selfRef">An example subtree consistency proof for a subtree that is not directly contained in the full tree</a>
+<a href="#name-an-example-subtree-consisten" class="selfRef">An example subtree consistency proof that decomposes the subtree</a>
             </figcaption></figure>
 </div>
 </section>
@@ -3285,287 +3307,22 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
               <p id="section-4.4.3-3.8.1">Compare <code>tn</code> to <code>0</code>, <code>fr</code> to <code>node_hash</code>, and <code>sr</code> to <code>root_hash</code>. If any are not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.4.3-3.8.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-4.4.3-4"><a href="#consistency-proof-verification-explain" class="auto internal xref">Appendix B.4</a> explains this procedure in more detail.<a href="#section-4.4.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.4.3-4"><a href="#consistency-proof-verification-explain" class="auto internal xref">Appendix B.5</a> explains this procedure in more detail.<a href="#section-4.4.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="arbitrary-intervals">
 <section id="section-4.5">
-        <h3 id="name-arbitrary-intervals">
-<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-arbitrary-intervals" class="section-name selfRef">Arbitrary Intervals</a>
+        <h3 id="name-efficiently-covering-arbitr">
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-efficiently-covering-arbitr" class="section-name selfRef">Efficiently Covering Arbitrary Intervals</a>
         </h3>
-<p id="section-4.5-1">Not all <code>[start, end)</code> intervals of a Merkle Tree are valid subtrees. This section describes how, for any <code>start &lt; end</code>, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following procedure:<a href="#section-4.5-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5-2">
-<li id="section-4.5-2.1">
-            <p id="section-4.5-2.1.1">If <code>end - start</code> is one, return a single subtree, <code>[start, end)</code>.<a href="#section-4.5-2.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-4.5-2.2">
-            <p id="section-4.5-2.2.1">Otherwise, run the following to return a pair of subtrees:<a href="#section-4.5-2.2.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5-2.2.2">
-<li id="section-4.5-2.2.2.1">
-                <p id="section-4.5-2.2.2.1.1">Let <code>last</code> be <code>end - 1</code>, the last index in <code>[start, end)</code>.<a href="#section-4.5-2.2.2.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-4.5-2.2.2.2">
-                <p id="section-4.5-2.2.2.2.1">Let <code>split</code> be the bit index of the most significant bit where <code>start</code> and <code>last</code> differ. Bits are numbered from the least significant bit, starting at zero. <code>split</code> is the height at which <code>start</code> and <code>last</code>'s paths in the tree diverge.<a href="#section-4.5-2.2.2.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-4.5-2.2.2.3">
-                <p id="section-4.5-2.2.2.3.1">Let <code>mid</code> be <code>last</code> with the least significant <code>split</code> bits set to zero. <code>mid</code> is the leftmost leaf node in the above divergence point's right branch.<a href="#section-4.5-2.2.2.3.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-4.5-2.2.2.4">
-                <p id="section-4.5-2.2.2.4.1">Within the least significant <code>split</code> bits of <code>left</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.5-2.2.2.4.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5-2.2.2.4.2">
-<li id="section-4.5-2.2.2.4.2.1">
-                    <p id="section-4.5-2.2.2.4.2.1.1">If there is such a bit, let <code>left_split</code> be <code>b + 1</code>.<a href="#section-4.5-2.2.2.4.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li id="section-4.5-2.2.2.4.2.2">
-                    <p id="section-4.5-2.2.2.4.2.2.1">Otherwise, let <code>left_split</code> be zero.<a href="#section-4.5-2.2.2.4.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                </ol>
-<p id="section-4.5-2.2.2.4.3">
-<code>left_split</code> is the height of the lowest common ancestor of the nodes in <code>[start, mid)</code>.<a href="#section-4.5-2.2.2.4.3" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-4.5-2.2.2.5">
-                <p id="section-4.5-2.2.2.5.1">Let <code>left_start</code> be <code>start</code> with the least significant <code>left_split</code> bits set to zero. <code>left_start</code> is the above lowest common ancestor's leftmost leaf node.<a href="#section-4.5-2.2.2.5.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-4.5-2.2.2.6">
-                <p id="section-4.5-2.2.2.6.1">Return the subtrees <code>[left_start, mid)</code> and <code>[mid, end)</code>.<a href="#section-4.5-2.2.2.6.1" class="pilcrow">¶</a></p>
-</li>
-            </ol>
-</li>
-        </ol>
-<p id="section-4.5-3">When the procedure returns a single subtree, the subtree is <code>[start, start+1)</code>. When it returns two subtrees, <code>left</code> and <code>right</code>, the subtrees satisfy the following properties:<a href="#section-4.5-3" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-4.5-4.1">
-            <p id="section-4.5-4.1.1"><code>left.end = right.start</code>. That is, the two subtrees cover adjacent intervals.<a href="#section-4.5-4.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-4.5-4.2">
-            <p id="section-4.5-4.2.1"><code>left.start &lt;= start</code> and <code>end = right.end</code>. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before <code>start</code> left, but not after <code>end</code>.<a href="#section-4.5-4.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-4.5-4.3">
-            <p id="section-4.5-4.3.1"><code>left.end - left.start &lt; 2 * (end - start)</code> and <code>right.end - right.start &lt;= end - start</code>. That is, the two subtrees efficiently cover the interval.<a href="#section-4.5-4.3.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-4.5-4.4">
-            <p id="section-4.5-4.4.1"><code>left</code> is full, while <code>right</code> may be partial.<a href="#section-4.5-4.4.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-4.5-5">The following Python code implements this procedure:<a href="#section-4.5-5" class="pilcrow">¶</a></p>
-<div class="lang-python sourcecode" id="section-4.5-6">
-<pre>
-def find_subtrees(start, end):
-    """ Returns a list of one or two subtrees that efficiently
-    cover [start, end). """
-    assert start &lt; end
-    if end - start == 1:
-        return [(start, end),]
-    last = end - 1
-    # Find where start and last's tree paths diverge. The two
-    # subtrees will be on either side of the split.
-    split = (start ^ last).bit_length() - 1
-    mask = (1 &lt;&lt; split) - 1
-    mid = last &amp; ~mask
-    # Maximize the left endpoint. This is just before start's
-    # path leaves the right edge of its new subtree.
-    left_split = (~start &amp; mask).bit_length()
-    left_start = start &amp; ~((1 &lt;&lt; left_split) - 1)
-    return [(left_start, mid), (mid, end)]
-</pre><a href="#section-4.5-6" class="pilcrow">¶</a>
-</div>
-<p id="section-4.5-7"><a href="#fig-subtree-pair-example" class="auto internal xref">Figure 9</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.5-7" class="pilcrow">¶</a></p>
-<span id="name-an-example-selection-of-sub"></span><div id="fig-subtree-pair-example">
-<figure id="figure-9">
-          <div id="section-4.5-8.1">
-            <div class="alignLeft art-svg artwork" id="section-4.5-8.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="456" viewBox="0 0 456 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
-                <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
-                <path d="M 24,288 L 24,320" fill="none" stroke="black"></path>
-                <path d="M 32,160 L 32,192" fill="none" stroke="black"></path>
-                <path d="M 40,288 L 40,320" fill="none" stroke="black"></path>
-                <path d="M 56,224 L 56,256" fill="none" stroke="black"></path>
-                <path d="M 56,288 L 56,320" fill="none" stroke="black"></path>
-                <path d="M 64,96 L 64,128" fill="none" stroke="black"></path>
-                <path d="M 72,224 L 72,256" fill="none" stroke="black"></path>
-                <path d="M 72,288 L 72,320" fill="none" stroke="black"></path>
-                <path d="M 88,288 L 88,320" fill="none" stroke="black"></path>
-                <path d="M 104,160 L 104,192" fill="none" stroke="black"></path>
-                <path d="M 104,288 L 104,320" fill="none" stroke="black"></path>
-                <path d="M 120,224 L 120,256" fill="none" stroke="black"></path>
-                <path d="M 120,288 L 120,320" fill="none" stroke="black"></path>
-                <path d="M 136,32 L 136,64" fill="none" stroke="black"></path>
-                <path d="M 136,224 L 136,256" fill="none" stroke="black"></path>
-                <path d="M 136,288 L 136,320" fill="none" stroke="black"></path>
-                <path d="M 152,288 L 152,320" fill="none" stroke="black"></path>
-                <path d="M 160,160 L 160,192" fill="none" stroke="black"></path>
-                <path d="M 168,288 L 168,320" fill="none" stroke="black"></path>
-                <path d="M 184,224 L 184,256" fill="none" stroke="black"></path>
-                <path d="M 184,288 L 184,320" fill="none" stroke="black"></path>
-                <path d="M 200,96 L 200,128" fill="none" stroke="black"></path>
-                <path d="M 200,224 L 200,256" fill="none" stroke="black"></path>
-                <path d="M 200,288 L 200,320" fill="none" stroke="black"></path>
-                <path d="M 216,288 L 216,320" fill="none" stroke="black"></path>
-                <path d="M 232,160 L 232,192" fill="none" stroke="black"></path>
-                <path d="M 232,288 L 232,320" fill="none" stroke="black"></path>
-                <path d="M 248,224 L 248,256" fill="none" stroke="black"></path>
-                <path d="M 248,288 L 248,320" fill="none" stroke="black"></path>
-                <path d="M 264,224 L 264,256" fill="none" stroke="black"></path>
-                <path d="M 264,288 L 264,320" fill="none" stroke="black"></path>
-                <path d="M 280,288 L 280,320" fill="none" stroke="black"></path>
-                <path d="M 288,160 L 288,192" fill="none" stroke="black"></path>
-                <path d="M 296,288 L 296,320" fill="none" stroke="black"></path>
-                <path d="M 312,96 L 312,128" fill="none" stroke="black"></path>
-                <path d="M 312,288 L 312,320" fill="none" stroke="black"></path>
-                <path d="M 320,224 L 320,256" fill="none" stroke="black"></path>
-                <path d="M 328,288 L 328,320" fill="none" stroke="black"></path>
-                <path d="M 336,224 L 336,256" fill="none" stroke="black"></path>
-                <path d="M 352,288 L 352,320" fill="none" stroke="black"></path>
-                <path d="M 368,160 L 368,192" fill="none" stroke="black"></path>
-                <path d="M 368,288 L 368,320" fill="none" stroke="black"></path>
-                <path d="M 376,32 L 376,64" fill="none" stroke="black"></path>
-                <path d="M 392,288 L 392,320" fill="none" stroke="black"></path>
-                <path d="M 400,224 L 400,256" fill="none" stroke="black"></path>
-                <path d="M 408,288 L 408,320" fill="none" stroke="black"></path>
-                <path d="M 424,144 L 424,272" fill="none" stroke="black"></path>
-                <path d="M 432,288 L 432,320" fill="none" stroke="black"></path>
-                <path d="M 448,96 L 448,128" fill="none" stroke="black"></path>
-                <path d="M 136,32 L 376,32" fill="none" stroke="black"></path>
-                <path d="M 136,64 L 376,64" fill="none" stroke="black"></path>
-                <path d="M 64,96 L 200,96" fill="none" stroke="black"></path>
-                <path d="M 312,94 L 448,94" fill="none" stroke="black"></path>
-                <path d="M 312,98 L 448,98" fill="none" stroke="black"></path>
-                <path d="M 64,128 L 200,128" fill="none" stroke="black"></path>
-                <path d="M 312,126 L 448,126" fill="none" stroke="black"></path>
-                <path d="M 312,130 L 448,130" fill="none" stroke="black"></path>
-                <path d="M 32,160 L 104,160" fill="none" stroke="black"></path>
-                <path d="M 160,158 L 232,158" fill="none" stroke="black"></path>
-                <path d="M 160,162 L 232,162" fill="none" stroke="black"></path>
-                <path d="M 288,160 L 368,160" fill="none" stroke="black"></path>
-                <path d="M 32,192 L 104,192" fill="none" stroke="black"></path>
-                <path d="M 160,190 L 232,190" fill="none" stroke="black"></path>
-                <path d="M 160,194 L 232,194" fill="none" stroke="black"></path>
-                <path d="M 288,192 L 368,192" fill="none" stroke="black"></path>
-                <path d="M 8,224 L 56,224" fill="none" stroke="black"></path>
-                <path d="M 72,224 L 120,224" fill="none" stroke="black"></path>
-                <path d="M 136,224 L 184,224" fill="none" stroke="black"></path>
-                <path d="M 200,224 L 248,224" fill="none" stroke="black"></path>
-                <path d="M 264,224 L 320,224" fill="none" stroke="black"></path>
-                <path d="M 336,224 L 400,224" fill="none" stroke="black"></path>
-                <path d="M 8,256 L 56,256" fill="none" stroke="black"></path>
-                <path d="M 72,256 L 120,256" fill="none" stroke="black"></path>
-                <path d="M 136,256 L 184,256" fill="none" stroke="black"></path>
-                <path d="M 200,256 L 248,256" fill="none" stroke="black"></path>
-                <path d="M 264,256 L 320,256" fill="none" stroke="black"></path>
-                <path d="M 336,256 L 400,256" fill="none" stroke="black"></path>
-                <path d="M 8,288 L 24,288" fill="none" stroke="black"></path>
-                <path d="M 40,288 L 56,288" fill="none" stroke="black"></path>
-                <path d="M 72,288 L 88,288" fill="none" stroke="black"></path>
-                <path d="M 104,288 L 120,288" fill="none" stroke="black"></path>
-                <path d="M 136,288 L 152,288" fill="none" stroke="black"></path>
-                <path d="M 168,286 L 184,286" fill="none" stroke="black"></path>
-                <path d="M 168,290 L 184,290" fill="none" stroke="black"></path>
-                <path d="M 200,286 L 216,286" fill="none" stroke="black"></path>
-                <path d="M 200,290 L 216,290" fill="none" stroke="black"></path>
-                <path d="M 232,286 L 248,286" fill="none" stroke="black"></path>
-                <path d="M 232,290 L 248,290" fill="none" stroke="black"></path>
-                <path d="M 264,286 L 280,286" fill="none" stroke="black"></path>
-                <path d="M 264,290 L 280,290" fill="none" stroke="black"></path>
-                <path d="M 296,286 L 312,286" fill="none" stroke="black"></path>
-                <path d="M 296,290 L 312,290" fill="none" stroke="black"></path>
-                <path d="M 328,286 L 352,286" fill="none" stroke="black"></path>
-                <path d="M 328,290 L 352,290" fill="none" stroke="black"></path>
-                <path d="M 368,286 L 392,286" fill="none" stroke="black"></path>
-                <path d="M 368,290 L 392,290" fill="none" stroke="black"></path>
-                <path d="M 408,286 L 432,286" fill="none" stroke="black"></path>
-                <path d="M 408,290 L 432,290" fill="none" stroke="black"></path>
-                <path d="M 8,320 L 24,320" fill="none" stroke="black"></path>
-                <path d="M 40,320 L 56,320" fill="none" stroke="black"></path>
-                <path d="M 72,320 L 88,320" fill="none" stroke="black"></path>
-                <path d="M 104,320 L 120,320" fill="none" stroke="black"></path>
-                <path d="M 136,320 L 152,320" fill="none" stroke="black"></path>
-                <path d="M 168,318 L 184,318" fill="none" stroke="black"></path>
-                <path d="M 168,322 L 184,322" fill="none" stroke="black"></path>
-                <path d="M 200,318 L 216,318" fill="none" stroke="black"></path>
-                <path d="M 200,322 L 216,322" fill="none" stroke="black"></path>
-                <path d="M 232,318 L 248,318" fill="none" stroke="black"></path>
-                <path d="M 232,322 L 248,322" fill="none" stroke="black"></path>
-                <path d="M 264,318 L 280,318" fill="none" stroke="black"></path>
-                <path d="M 264,322 L 280,322" fill="none" stroke="black"></path>
-                <path d="M 296,318 L 312,318" fill="none" stroke="black"></path>
-                <path d="M 296,322 L 312,322" fill="none" stroke="black"></path>
-                <path d="M 328,318 L 352,318" fill="none" stroke="black"></path>
-                <path d="M 328,322 L 352,322" fill="none" stroke="black"></path>
-                <path d="M 368,318 L 392,318" fill="none" stroke="black"></path>
-                <path d="M 368,322 L 392,322" fill="none" stroke="black"></path>
-                <path d="M 408,318 L 432,318" fill="none" stroke="black"></path>
-                <path d="M 408,322 L 432,322" fill="none" stroke="black"></path>
-                <g class="text">
-                  <text x="248" y="52">[0,</text>
-                  <text x="280" y="52">13)</text>
-                  <text x="160" y="84">/</text>
-                  <text x="352" y="84">\</text>
-                  <text x="120" y="116">[0,</text>
-                  <text x="148" y="116">8)</text>
-                  <text x="368" y="116">[8,</text>
-                  <text x="400" y="116">13)</text>
-                  <text x="72" y="148">/</text>
-                  <text x="192" y="148">\</text>
-                  <text x="336" y="148">/</text>
-                  <text x="56" y="180">[0,</text>
-                  <text x="84" y="180">4)</text>
-                  <text x="184" y="180">[4,</text>
-                  <text x="212" y="180">8)</text>
-                  <text x="312" y="180">[8,</text>
-                  <text x="344" y="180">12)</text>
-                  <text x="40" y="212">/</text>
-                  <text x="96" y="212">\</text>
-                  <text x="168" y="212">/</text>
-                  <text x="224" y="212">\</text>
-                  <text x="304" y="212">/</text>
-                  <text x="360" y="212">\</text>
-                  <text x="32" y="244">[0,2)</text>
-                  <text x="96" y="244">[2,4)</text>
-                  <text x="160" y="244">[4,6)</text>
-                  <text x="224" y="244">[6,8)</text>
-                  <text x="292" y="244">[8,10)</text>
-                  <text x="368" y="244">[10,12)</text>
-                  <text x="24" y="276">/</text>
-                  <text x="40" y="276">\</text>
-                  <text x="88" y="276">/</text>
-                  <text x="104" y="276">\</text>
-                  <text x="152" y="276">/</text>
-                  <text x="168" y="276">\</text>
-                  <text x="216" y="276">/</text>
-                  <text x="232" y="276">\</text>
-                  <text x="280" y="276">/</text>
-                  <text x="296" y="276">\</text>
-                  <text x="352" y="276">/</text>
-                  <text x="368" y="276">\</text>
-                  <text x="16" y="308">0</text>
-                  <text x="48" y="308">1</text>
-                  <text x="80" y="308">2</text>
-                  <text x="112" y="308">3</text>
-                  <text x="144" y="308">4</text>
-                  <text x="176" y="308">5</text>
-                  <text x="208" y="308">6</text>
-                  <text x="240" y="308">7</text>
-                  <text x="272" y="308">8</text>
-                  <text x="304" y="308">9</text>
-                  <text x="340" y="308">10</text>
-                  <text x="380" y="308">11</text>
-                  <text x="420" y="308">12</text>
-                </g>
-              </svg><a href="#section-4.5-8.1.1" class="pilcrow">¶</a>
-</div>
-</div>
-<figcaption><a href="#figure-9" class="selfRef">Figure 9</a>:
-<a href="#name-an-example-selection-of-sub" class="selfRef">An example selection of subtrees to cover an interval</a>
-          </figcaption></figure>
-</div>
-<p id="section-4.5-9">Two subtrees are needed because a single subtree may not be able to efficiently cover an interval. <a href="#fig-subtree-counterexample" class="auto internal xref">Figure 10</a> shows the smallest subtree that contains <code>[7, 9)</code> in a 9-element tree. The smallest single subtree that contains the interval is <code>[0, 9)</code> but this is the entire tree. Using two subtrees, the interval can be described by <code>[7, 8)</code> and <code>[8, 9)</code>.<a href="#section-4.5-9" class="pilcrow">¶</a></p>
+<p id="section-4.5-1">This document uses subtrees to sign over arbitrary intervals, <code>[start, end)</code>, of a Merkle Tree. However, not all intervals are valid subtrees. While subtrees containing the intervals would suffice, the smallest subtree containing <code>[start, end)</code> may be much larger than <code>[start, end)</code>.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.5-2">For example, <a href="#fig-subtree-counterexample" class="auto internal xref">Figure 9</a> shows the smallest subtree that contains <code>[7, 9)</code> in a 9-element tree. The smallest single subtree that contains the interval is <code>[0, 9)</code>, but this is the entire tree.<a href="#section-4.5-2" class="pilcrow">¶</a></p>
 <span id="name-an-example-showing-an-ineff"></span><div id="fig-subtree-counterexample">
-<figure id="figure-10">
-          <div id="section-4.5-10.1">
-            <div class="alignLeft art-svg artwork" id="section-4.5-10.1.1">
+<figure id="figure-9">
+          <div id="section-4.5-3.1">
+            <div class="alignLeft art-svg artwork" id="section-4.5-3.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="304" viewBox="0 0 304 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
                 <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
@@ -3602,10 +3359,8 @@ def find_subtrees(start, end):
                 <path d="M 272,80 L 272,272" fill="none" stroke="black"></path>
                 <path d="M 280,288 L 280,320" fill="none" stroke="black"></path>
                 <path d="M 296,32 L 296,64" fill="none" stroke="black"></path>
-                <path d="M 136,30 L 296,30" fill="none" stroke="black"></path>
-                <path d="M 136,34 L 296,34" fill="none" stroke="black"></path>
-                <path d="M 136,62 L 296,62" fill="none" stroke="black"></path>
-                <path d="M 136,66 L 296,66" fill="none" stroke="black"></path>
+                <path d="M 136,32 Q 138,28.8 140,32 Q 142,35.2 144,32 Q 146,28.8 148,32 Q 150,35.2 152,32 Q 154,28.8 156,32 Q 158,35.2 160,32 Q 162,28.8 164,32 Q 166,35.2 168,32 Q 170,28.8 172,32 Q 174,35.2 176,32 Q 178,28.8 180,32 Q 182,35.2 184,32 Q 186,28.8 188,32 Q 190,35.2 192,32 Q 194,28.8 196,32 Q 198,35.2 200,32 Q 202,28.8 204,32 Q 206,35.2 208,32 Q 210,28.8 212,32 Q 214,35.2 216,32 Q 218,28.8 220,32 Q 222,35.2 224,32 Q 226,28.8 228,32 Q 230,35.2 232,32 Q 234,28.8 236,32 Q 238,35.2 240,32 Q 242,28.8 244,32 Q 246,35.2 248,32 Q 250,28.8 252,32 Q 254,35.2 256,32 Q 258,28.8 260,32 Q 262,35.2 264,32 Q 266,28.8 268,32 Q 270,35.2 272,32 Q 274,28.8 276,32 Q 278,35.2 280,32 Q 282,28.8 284,32 Q 286,35.2 288,32 Q 290,28.8 292,32 Q 294,35.2 296,32" fill="none" stroke="black"></path>
+                <path d="M 136,64 Q 138,60.8 140,64 Q 142,67.2 144,64 Q 146,60.8 148,64 Q 150,67.2 152,64 Q 154,60.8 156,64 Q 158,67.2 160,64 Q 162,60.8 164,64 Q 166,67.2 168,64 Q 170,60.8 172,64 Q 174,67.2 176,64 Q 178,60.8 180,64 Q 182,67.2 184,64 Q 186,60.8 188,64 Q 190,67.2 192,64 Q 194,60.8 196,64 Q 198,67.2 200,64 Q 202,60.8 204,64 Q 206,67.2 208,64 Q 210,60.8 212,64 Q 214,67.2 216,64 Q 218,60.8 220,64 Q 222,67.2 224,64 Q 226,60.8 228,64 Q 230,67.2 232,64 Q 234,60.8 236,64 Q 238,67.2 240,64 Q 242,60.8 244,64 Q 246,67.2 248,64 Q 250,60.8 252,64 Q 254,67.2 256,64 Q 258,60.8 260,64 Q 262,67.2 264,64 Q 266,60.8 268,64 Q 270,67.2 272,64 Q 274,60.8 276,64 Q 278,67.2 280,64 Q 282,60.8 284,64 Q 286,67.2 288,64 Q 290,60.8 292,64 Q 294,67.2 296,64" fill="none" stroke="black"></path>
                 <path d="M 64,96 L 200,96" fill="none" stroke="black"></path>
                 <path d="M 64,128 L 200,128" fill="none" stroke="black"></path>
                 <path d="M 32,160 L 104,160" fill="none" stroke="black"></path>
@@ -3680,12 +3435,280 @@ def find_subtrees(start, end):
                   <text x="240" y="308">7</text>
                   <text x="272" y="308">8</text>
                 </g>
-              </svg><a href="#section-4.5-10.1.1" class="pilcrow">¶</a>
+              </svg><a href="#section-4.5-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-9" class="selfRef">Figure 9</a>:
+<a href="#name-an-example-showing-an-ineff" class="selfRef">An example showing an inefficient choice of a single subtree</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.5-4">While one subtree can be inefficient, two subtrees are sufficient to efficiently cover any interval, as described below.<a href="#section-4.5-4" class="pilcrow">¶</a></p>
+<div id="selecting-two-subtrees">
+<section id="section-4.5.1">
+          <h4 id="name-selecting-two-subtrees">
+<a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-selecting-two-subtrees" class="section-name selfRef">Selecting Two Subtrees</a>
+          </h4>
+<p id="section-4.5.1-1">This section defines a procedure for selecting up to two subtrees, given any non-empty interval (<code>start &lt; end</code>). Combined, the subtrees contain <code>[start, end)</code> with bounded excess elements. The procedure either returns <code>[start, end)</code> as a subtree, or two subtrees, <code>left</code> and <code>right</code>, that satisfy the following properties:<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.5.1-2.1">
+              <p id="section-4.5.1-2.1.1">The two subtrees cover adjacent intervals. That is, <code>left.end = right.start</code>.<a href="#section-4.5.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.5.1-2.2">
+              <p id="section-4.5.1-2.2.1">The two subtrees together contain the entire interval <code>[start, end)</code>. There are no extra entries after <code>end</code>, but there may be extra entries before <code>start</code>. That is, <code>left.start &lt;= start</code> and <code>end = right.end</code>.<a href="#section-4.5.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.5.1-2.3">
+              <p id="section-4.5.1-2.3.1">The extra entries before <code>start</code> are less than half of <code>left</code>. That is, <code>start - left.start &lt; left.end - start</code>.<a href="#section-4.5.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-4.5.1-3">The subtrees are selected as follows:<a href="#section-4.5.1-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.5.1-4">
+<li id="section-4.5.1-4.1">
+              <p id="section-4.5.1-4.1.1">If <code>end - start</code> is one, return a single subtree, <code>[start, end)</code>.<a href="#section-4.5.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-4.5.1-4.2">
+              <p id="section-4.5.1-4.2.1">Otherwise, run the following to return a pair of subtrees:<a href="#section-4.5.1-4.2.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.5.1-4.2.2">
+<li id="section-4.5.1-4.2.2.1">
+                  <p id="section-4.5.1-4.2.2.1.1">Let <code>last</code> be <code>end - 1</code>, the last index in <code>[start, end)</code>.<a href="#section-4.5.1-4.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.5.1-4.2.2.2">
+                  <p id="section-4.5.1-4.2.2.2.1">Let <code>split</code> be the bit index of the most significant bit where <code>start</code> and <code>last</code> differ. Bits are numbered from the least significant bit, starting at zero. <code>split</code> is the height at which <code>start</code> and <code>last</code>'s paths in the tree diverge.<a href="#section-4.5.1-4.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.5.1-4.2.2.3">
+                  <p id="section-4.5.1-4.2.2.3.1">Let <code>mid</code> be <code>last</code> with the least significant <code>split</code> bits set to zero. <code>mid</code> is the leftmost leaf node in the above divergence point's right branch.<a href="#section-4.5.1-4.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.5.1-4.2.2.4">
+                  <p id="section-4.5.1-4.2.2.4.1">Within the least significant <code>split</code> bits of <code>left</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.5.1-4.2.2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.5.1-4.2.2.4.2">
+<li id="section-4.5.1-4.2.2.4.2.1">
+                      <p id="section-4.5.1-4.2.2.4.2.1.1">If there is such a bit, let <code>left_split</code> be <code>b + 1</code>.<a href="#section-4.5.1-4.2.2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-4.5.1-4.2.2.4.2.2">
+                      <p id="section-4.5.1-4.2.2.4.2.2.1">Otherwise, let <code>left_split</code> be zero.<a href="#section-4.5.1-4.2.2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+<p id="section-4.5.1-4.2.2.4.3">
+<code>left_split</code> is the height of the lowest common ancestor of the nodes in <code>[start, mid)</code>.<a href="#section-4.5.1-4.2.2.4.3" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.5.1-4.2.2.5">
+                  <p id="section-4.5.1-4.2.2.5.1">Let <code>left_start</code> be <code>start</code> with the least significant <code>left_split</code> bits set to zero. <code>left_start</code> is the above lowest common ancestor's leftmost leaf node.<a href="#section-4.5.1-4.2.2.5.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.5.1-4.2.2.6">
+                  <p id="section-4.5.1-4.2.2.6.1">Return the subtrees <code>[left_start, mid)</code> and <code>[mid, end)</code>.<a href="#section-4.5.1-4.2.2.6.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+</li>
+          </ol>
+<p id="section-4.5.1-5">Intuitively, this procedure considers the tree <code>MTH(D[0:end])</code> and finds the lowest common ancestor of the elements in <code>[start, end)</code>. It splits the interval by that ancestor's left and right children and returns the lowest common ancestor of each half.<a href="#section-4.5.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-6">The following Python code implements this procedure:<a href="#section-4.5.1-6" class="pilcrow">¶</a></p>
+<div class="lang-python sourcecode" id="section-4.5.1-7">
+<pre>
+def find_subtrees(start, end):
+    """ Returns a list of one or two subtrees that efficiently
+    cover [start, end). """
+    assert start &lt; end
+    if end - start == 1:
+        return [(start, end),]
+    last = end - 1
+    # Find where start and last's tree paths diverge. The two
+    # subtrees will be on either side of the split.
+    split = (start ^ last).bit_length() - 1
+    mask = (1 &lt;&lt; split) - 1
+    mid = last &amp; ~mask
+    # Maximize the left endpoint. This is just before start's
+    # path leaves the right edge of its new subtree.
+    left_split = (~start &amp; mask).bit_length()
+    left_start = start &amp; ~((1 &lt;&lt; left_split) - 1)
+    return [(left_start, mid), (mid, end)]
+</pre><a href="#section-4.5.1-7" class="pilcrow">¶</a>
+</div>
+<p id="section-4.5.1-8"><a href="#fig-subtree-pair-example" class="auto internal xref">Figure 10</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements in wavy lines. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.5.1-8" class="pilcrow">¶</a></p>
+<span id="name-an-example-selection-of-sub"></span><div id="fig-subtree-pair-example">
+<figure id="figure-10">
+            <div id="section-4.5.1-9.1">
+              <div class="alignLeft art-svg artwork" id="section-4.5.1-9.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="456" viewBox="0 0 456 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
+                  <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
+                  <path d="M 24,288 L 24,320" fill="none" stroke="black"></path>
+                  <path d="M 32,160 L 32,192" fill="none" stroke="black"></path>
+                  <path d="M 40,288 L 40,320" fill="none" stroke="black"></path>
+                  <path d="M 56,224 L 56,256" fill="none" stroke="black"></path>
+                  <path d="M 56,288 L 56,320" fill="none" stroke="black"></path>
+                  <path d="M 64,96 L 64,128" fill="none" stroke="black"></path>
+                  <path d="M 72,224 L 72,256" fill="none" stroke="black"></path>
+                  <path d="M 72,288 L 72,320" fill="none" stroke="black"></path>
+                  <path d="M 88,288 L 88,320" fill="none" stroke="black"></path>
+                  <path d="M 104,160 L 104,192" fill="none" stroke="black"></path>
+                  <path d="M 104,288 L 104,320" fill="none" stroke="black"></path>
+                  <path d="M 120,224 L 120,256" fill="none" stroke="black"></path>
+                  <path d="M 120,288 L 120,320" fill="none" stroke="black"></path>
+                  <path d="M 136,32 L 136,64" fill="none" stroke="black"></path>
+                  <path d="M 136,224 L 136,256" fill="none" stroke="black"></path>
+                  <path d="M 136,288 L 136,320" fill="none" stroke="black"></path>
+                  <path d="M 152,288 L 152,320" fill="none" stroke="black"></path>
+                  <path d="M 160,160 L 160,192" fill="none" stroke="black"></path>
+                  <path d="M 168,288 L 168,320" fill="none" stroke="black"></path>
+                  <path d="M 184,224 L 184,256" fill="none" stroke="black"></path>
+                  <path d="M 184,288 L 184,320" fill="none" stroke="black"></path>
+                  <path d="M 200,96 L 200,128" fill="none" stroke="black"></path>
+                  <path d="M 200,224 L 200,256" fill="none" stroke="black"></path>
+                  <path d="M 200,288 L 200,320" fill="none" stroke="black"></path>
+                  <path d="M 216,288 L 216,320" fill="none" stroke="black"></path>
+                  <path d="M 232,160 L 232,192" fill="none" stroke="black"></path>
+                  <path d="M 232,288 L 232,320" fill="none" stroke="black"></path>
+                  <path d="M 248,224 L 248,256" fill="none" stroke="black"></path>
+                  <path d="M 248,288 L 248,320" fill="none" stroke="black"></path>
+                  <path d="M 264,224 L 264,256" fill="none" stroke="black"></path>
+                  <path d="M 264,288 L 264,320" fill="none" stroke="black"></path>
+                  <path d="M 280,288 L 280,320" fill="none" stroke="black"></path>
+                  <path d="M 288,160 L 288,192" fill="none" stroke="black"></path>
+                  <path d="M 296,288 L 296,320" fill="none" stroke="black"></path>
+                  <path d="M 312,96 L 312,128" fill="none" stroke="black"></path>
+                  <path d="M 312,288 L 312,320" fill="none" stroke="black"></path>
+                  <path d="M 320,224 L 320,256" fill="none" stroke="black"></path>
+                  <path d="M 328,288 L 328,320" fill="none" stroke="black"></path>
+                  <path d="M 336,224 L 336,256" fill="none" stroke="black"></path>
+                  <path d="M 352,288 L 352,320" fill="none" stroke="black"></path>
+                  <path d="M 368,160 L 368,192" fill="none" stroke="black"></path>
+                  <path d="M 368,288 L 368,320" fill="none" stroke="black"></path>
+                  <path d="M 376,32 L 376,64" fill="none" stroke="black"></path>
+                  <path d="M 392,288 L 392,320" fill="none" stroke="black"></path>
+                  <path d="M 400,224 L 400,256" fill="none" stroke="black"></path>
+                  <path d="M 408,288 L 408,320" fill="none" stroke="black"></path>
+                  <path d="M 424,144 L 424,272" fill="none" stroke="black"></path>
+                  <path d="M 432,288 L 432,320" fill="none" stroke="black"></path>
+                  <path d="M 448,96 L 448,128" fill="none" stroke="black"></path>
+                  <path d="M 136,32 L 376,32" fill="none" stroke="black"></path>
+                  <path d="M 136,64 L 376,64" fill="none" stroke="black"></path>
+                  <path d="M 64,96 L 200,96" fill="none" stroke="black"></path>
+                  <path d="M 312,96 Q 314,92.8 316,96 Q 318,99.2 320,96 Q 322,92.8 324,96 Q 326,99.2 328,96 Q 330,92.8 332,96 Q 334,99.2 336,96 Q 338,92.8 340,96 Q 342,99.2 344,96 Q 346,92.8 348,96 Q 350,99.2 352,96 Q 354,92.8 356,96 Q 358,99.2 360,96 Q 362,92.8 364,96 Q 366,99.2 368,96 Q 370,92.8 372,96 Q 374,99.2 376,96 Q 378,92.8 380,96 Q 382,99.2 384,96 Q 386,92.8 388,96 Q 390,99.2 392,96 Q 394,92.8 396,96 Q 398,99.2 400,96 Q 402,92.8 404,96 Q 406,99.2 408,96 Q 410,92.8 412,96 Q 414,99.2 416,96 Q 418,92.8 420,96 Q 422,99.2 424,96 Q 426,92.8 428,96 Q 430,99.2 432,96 Q 434,92.8 436,96 Q 438,99.2 440,96 Q 442,92.8 444,96 Q 446,99.2 448,96" fill="none" stroke="black"></path>
+                  <path d="M 64,128 L 200,128" fill="none" stroke="black"></path>
+                  <path d="M 312,128 Q 314,124.8 316,128 Q 318,131.2 320,128 Q 322,124.8 324,128 Q 326,131.2 328,128 Q 330,124.8 332,128 Q 334,131.2 336,128 Q 338,124.8 340,128 Q 342,131.2 344,128 Q 346,124.8 348,128 Q 350,131.2 352,128 Q 354,124.8 356,128 Q 358,131.2 360,128 Q 362,124.8 364,128 Q 366,131.2 368,128 Q 370,124.8 372,128 Q 374,131.2 376,128 Q 378,124.8 380,128 Q 382,131.2 384,128 Q 386,124.8 388,128 Q 390,131.2 392,128 Q 394,124.8 396,128 Q 398,131.2 400,128 Q 402,124.8 404,128 Q 406,131.2 408,128 Q 410,124.8 412,128 Q 414,131.2 416,128 Q 418,124.8 420,128 Q 422,131.2 424,128 Q 426,124.8 428,128 Q 430,131.2 432,128 Q 434,124.8 436,128 Q 438,131.2 440,128 Q 442,124.8 444,128 Q 446,131.2 448,128" fill="none" stroke="black"></path>
+                  <path d="M 32,160 L 104,160" fill="none" stroke="black"></path>
+                  <path d="M 160,160 Q 162,156.8 164,160 Q 166,163.2 168,160 Q 170,156.8 172,160 Q 174,163.2 176,160 Q 178,156.8 180,160 Q 182,163.2 184,160 Q 186,156.8 188,160 Q 190,163.2 192,160 Q 194,156.8 196,160 Q 198,163.2 200,160 Q 202,156.8 204,160 Q 206,163.2 208,160 Q 210,156.8 212,160 Q 214,163.2 216,160 Q 218,156.8 220,160 Q 222,163.2 224,160 Q 226,156.8 228,160 Q 230,163.2 232,160" fill="none" stroke="black"></path>
+                  <path d="M 288,160 L 368,160" fill="none" stroke="black"></path>
+                  <path d="M 32,192 L 104,192" fill="none" stroke="black"></path>
+                  <path d="M 160,192 Q 162,188.8 164,192 Q 166,195.2 168,192 Q 170,188.8 172,192 Q 174,195.2 176,192 Q 178,188.8 180,192 Q 182,195.2 184,192 Q 186,188.8 188,192 Q 190,195.2 192,192 Q 194,188.8 196,192 Q 198,195.2 200,192 Q 202,188.8 204,192 Q 206,195.2 208,192 Q 210,188.8 212,192 Q 214,195.2 216,192 Q 218,188.8 220,192 Q 222,195.2 224,192 Q 226,188.8 228,192 Q 230,195.2 232,192" fill="none" stroke="black"></path>
+                  <path d="M 288,192 L 368,192" fill="none" stroke="black"></path>
+                  <path d="M 8,224 L 56,224" fill="none" stroke="black"></path>
+                  <path d="M 72,224 L 120,224" fill="none" stroke="black"></path>
+                  <path d="M 136,224 L 184,224" fill="none" stroke="black"></path>
+                  <path d="M 200,224 L 248,224" fill="none" stroke="black"></path>
+                  <path d="M 264,224 L 320,224" fill="none" stroke="black"></path>
+                  <path d="M 336,224 L 400,224" fill="none" stroke="black"></path>
+                  <path d="M 8,256 L 56,256" fill="none" stroke="black"></path>
+                  <path d="M 72,256 L 120,256" fill="none" stroke="black"></path>
+                  <path d="M 136,256 L 184,256" fill="none" stroke="black"></path>
+                  <path d="M 200,256 L 248,256" fill="none" stroke="black"></path>
+                  <path d="M 264,256 L 320,256" fill="none" stroke="black"></path>
+                  <path d="M 336,256 L 400,256" fill="none" stroke="black"></path>
+                  <path d="M 8,288 L 24,288" fill="none" stroke="black"></path>
+                  <path d="M 40,288 L 56,288" fill="none" stroke="black"></path>
+                  <path d="M 72,288 L 88,288" fill="none" stroke="black"></path>
+                  <path d="M 104,288 L 120,288" fill="none" stroke="black"></path>
+                  <path d="M 136,288 L 152,288" fill="none" stroke="black"></path>
+                  <path d="M 168,286 L 184,286" fill="none" stroke="black"></path>
+                  <path d="M 168,290 L 184,290" fill="none" stroke="black"></path>
+                  <path d="M 200,286 L 216,286" fill="none" stroke="black"></path>
+                  <path d="M 200,290 L 216,290" fill="none" stroke="black"></path>
+                  <path d="M 232,286 L 248,286" fill="none" stroke="black"></path>
+                  <path d="M 232,290 L 248,290" fill="none" stroke="black"></path>
+                  <path d="M 264,286 L 280,286" fill="none" stroke="black"></path>
+                  <path d="M 264,290 L 280,290" fill="none" stroke="black"></path>
+                  <path d="M 296,286 L 312,286" fill="none" stroke="black"></path>
+                  <path d="M 296,290 L 312,290" fill="none" stroke="black"></path>
+                  <path d="M 328,286 L 352,286" fill="none" stroke="black"></path>
+                  <path d="M 328,290 L 352,290" fill="none" stroke="black"></path>
+                  <path d="M 368,286 L 392,286" fill="none" stroke="black"></path>
+                  <path d="M 368,290 L 392,290" fill="none" stroke="black"></path>
+                  <path d="M 408,286 L 432,286" fill="none" stroke="black"></path>
+                  <path d="M 408,290 L 432,290" fill="none" stroke="black"></path>
+                  <path d="M 8,320 L 24,320" fill="none" stroke="black"></path>
+                  <path d="M 40,320 L 56,320" fill="none" stroke="black"></path>
+                  <path d="M 72,320 L 88,320" fill="none" stroke="black"></path>
+                  <path d="M 104,320 L 120,320" fill="none" stroke="black"></path>
+                  <path d="M 136,320 L 152,320" fill="none" stroke="black"></path>
+                  <path d="M 168,318 L 184,318" fill="none" stroke="black"></path>
+                  <path d="M 168,322 L 184,322" fill="none" stroke="black"></path>
+                  <path d="M 200,318 L 216,318" fill="none" stroke="black"></path>
+                  <path d="M 200,322 L 216,322" fill="none" stroke="black"></path>
+                  <path d="M 232,318 L 248,318" fill="none" stroke="black"></path>
+                  <path d="M 232,322 L 248,322" fill="none" stroke="black"></path>
+                  <path d="M 264,318 L 280,318" fill="none" stroke="black"></path>
+                  <path d="M 264,322 L 280,322" fill="none" stroke="black"></path>
+                  <path d="M 296,318 L 312,318" fill="none" stroke="black"></path>
+                  <path d="M 296,322 L 312,322" fill="none" stroke="black"></path>
+                  <path d="M 328,318 L 352,318" fill="none" stroke="black"></path>
+                  <path d="M 328,322 L 352,322" fill="none" stroke="black"></path>
+                  <path d="M 368,318 L 392,318" fill="none" stroke="black"></path>
+                  <path d="M 368,322 L 392,322" fill="none" stroke="black"></path>
+                  <path d="M 408,318 L 432,318" fill="none" stroke="black"></path>
+                  <path d="M 408,322 L 432,322" fill="none" stroke="black"></path>
+                  <g class="text">
+                    <text x="248" y="52">[0,</text>
+                    <text x="280" y="52">13)</text>
+                    <text x="160" y="84">/</text>
+                    <text x="352" y="84">\</text>
+                    <text x="120" y="116">[0,</text>
+                    <text x="148" y="116">8)</text>
+                    <text x="368" y="116">[8,</text>
+                    <text x="400" y="116">13)</text>
+                    <text x="72" y="148">/</text>
+                    <text x="192" y="148">\</text>
+                    <text x="336" y="148">/</text>
+                    <text x="56" y="180">[0,</text>
+                    <text x="84" y="180">4)</text>
+                    <text x="184" y="180">[4,</text>
+                    <text x="212" y="180">8)</text>
+                    <text x="312" y="180">[8,</text>
+                    <text x="344" y="180">12)</text>
+                    <text x="40" y="212">/</text>
+                    <text x="96" y="212">\</text>
+                    <text x="168" y="212">/</text>
+                    <text x="224" y="212">\</text>
+                    <text x="304" y="212">/</text>
+                    <text x="360" y="212">\</text>
+                    <text x="32" y="244">[0,2)</text>
+                    <text x="96" y="244">[2,4)</text>
+                    <text x="160" y="244">[4,6)</text>
+                    <text x="224" y="244">[6,8)</text>
+                    <text x="292" y="244">[8,10)</text>
+                    <text x="368" y="244">[10,12)</text>
+                    <text x="24" y="276">/</text>
+                    <text x="40" y="276">\</text>
+                    <text x="88" y="276">/</text>
+                    <text x="104" y="276">\</text>
+                    <text x="152" y="276">/</text>
+                    <text x="168" y="276">\</text>
+                    <text x="216" y="276">/</text>
+                    <text x="232" y="276">\</text>
+                    <text x="280" y="276">/</text>
+                    <text x="296" y="276">\</text>
+                    <text x="352" y="276">/</text>
+                    <text x="368" y="276">\</text>
+                    <text x="16" y="308">0</text>
+                    <text x="48" y="308">1</text>
+                    <text x="80" y="308">2</text>
+                    <text x="112" y="308">3</text>
+                    <text x="144" y="308">4</text>
+                    <text x="176" y="308">5</text>
+                    <text x="208" y="308">6</text>
+                    <text x="240" y="308">7</text>
+                    <text x="272" y="308">8</text>
+                    <text x="304" y="308">9</text>
+                    <text x="340" y="308">10</text>
+                    <text x="380" y="308">11</text>
+                    <text x="420" y="308">12</text>
+                  </g>
+                </svg><a href="#section-4.5.1-9.1.1" class="pilcrow">¶</a>
 </div>
 </div>
 <figcaption><a href="#figure-10" class="selfRef">Figure 10</a>:
-<a href="#name-an-example-showing-an-ineff" class="selfRef">An example showing an inefficient choice of a single subtree</a>
-          </figcaption></figure>
+<a href="#name-an-example-selection-of-sub" class="selfRef">An example selection of subtrees to cover an interval</a>
+            </figcaption></figure>
+</div>
+</section>
 </div>
 </section>
 </div>
@@ -6006,39 +6029,229 @@ END
 <p id="appendix-B.1-11">Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is <code>0b100</code>. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a left child. However, at bit 1, <code>0b100</code> has not yet diverged from the last element, <code>0b101</code>. That instead indicates a skipped node, not a left child.<a href="#appendix-B.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="inclusion-proof-evaluation-explain">
+<div id="subtrees-explain">
 <section id="appendix-B.2">
-        <h3 id="name-inclusion-proof-evaluation">
-<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-inclusion-proof-evaluation" class="section-name selfRef">Inclusion Proof Evaluation</a>
+        <h3 id="name-subtrees-2">
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-subtrees-2" class="section-name selfRef">Subtrees</a>
         </h3>
-<p id="appendix-B.2-1">The procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a> builds up a subtree hash in <code>r</code> by starting from <code>entry_hash</code> and iteratively hashing elements of <code>inclusion_proof</code> on the left or right. That means this procedure, when successful, must return <em>some</em> hash that contains <code>entry_hash</code>.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-2">Treating <code>[start, end)</code> as a Merkle Tree of size <code>end - start</code>, the procedure hashes based on the path to <code>index</code>. Within this smaller Merkle Tree, it has index <code>fn = index - start</code> (first number), and the last element has index <code>sn = end - start - 1</code> (second number).<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-3">Step 4 iterates through <code>inclusion_proof</code> and the paths to <code>fn</code> and <code>sn</code> in parallel. As the procedure right-shifts <code>fn</code> and <code>sn</code> and looks at the least-significant bit, it moves up the two paths, towards the root. When <code>sn</code> is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.<a href="#appendix-B.2-3" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-4">Iterating from level 0 up, <code>fn</code> and <code>sn</code> will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in <a href="#binary-representations" class="auto internal xref">Appendix B.1</a>.<a href="#appendix-B.2-4" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-5">Once <code>fn = sn</code>, the remainder of the path is on the right edge. At that point, the condition in step 4.2 is always true. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.<a href="#appendix-B.2-5" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-6">Inclusion proofs can also be evaluated by considering these two stages separately. The first stage consumes <code>l1 = BIT_WIDTH(fn XOR sn)</code> proof entries. The second stage consumes <code>l2 = POPCOUNT(fn &gt;&gt; l1)</code> proof entries. A valid inclusion proof must then have <code>l1 + l2</code> entries. The first <code>l1</code> entries are hashed based on <code>fn</code>'s least significant bits, and the remaining <code>l2</code> entries are hashed on the left.<a href="#appendix-B.2-6" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-1">Given a list of elements and Merkle Tree over them, it is possible to construct a smaller Merkle Tree over any interval of elements. However, those smaller trees may not have the same structure as the original tree.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-2"><a href="#fig-misaligned-tree" class="auto internal xref">Figure 15</a> shows a Merkle Tree of size 8, and a tree built over elements <code>[1, 5)</code>. When <code>[1, 5)</code> is considered as an independent, 4-element sequence, it does not align with the portion of the overall tree that covers <code>[1, 5)</code>. The two trees do not share any intermediate nodes. This prevents constructing subtree consistency proofs (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>).<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
+<span id="name-an-example-misaligned-tree"></span><div id="fig-misaligned-tree">
+<figure id="figure-15">
+          <div id="appendix-B.2-3.1">
+            <div class="alignLeft art-svg artwork" id="appendix-B.2-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="480" width="328" viewBox="0 0 328 480" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,160 L 8,192" fill="none" stroke="black"></path>
+                <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
+                <path d="M 24,224 L 24,256" fill="none" stroke="black"></path>
+                <path d="M 32,96 L 32,128" fill="none" stroke="black"></path>
+                <path d="M 40,224 L 40,256" fill="none" stroke="black"></path>
+                <path d="M 40,368 L 40,400" fill="none" stroke="black"></path>
+                <path d="M 40,432 L 40,464" fill="none" stroke="black"></path>
+                <path d="M 56,160 L 56,192" fill="none" stroke="black"></path>
+                <path d="M 56,224 L 56,256" fill="none" stroke="black"></path>
+                <path d="M 56,432 L 56,464" fill="none" stroke="black"></path>
+                <path d="M 64,32 L 64,64" fill="none" stroke="black"></path>
+                <path d="M 64,304 L 64,336" fill="none" stroke="black"></path>
+                <path d="M 72,160 L 72,192" fill="none" stroke="black"></path>
+                <path d="M 72,224 L 72,256" fill="none" stroke="black"></path>
+                <path d="M 72,432 L 72,464" fill="none" stroke="black"></path>
+                <path d="M 88,224 L 88,256" fill="none" stroke="black"></path>
+                <path d="M 88,368 L 88,400" fill="none" stroke="black"></path>
+                <path d="M 88,432 L 88,464" fill="none" stroke="black"></path>
+                <path d="M 104,96 L 104,128" fill="none" stroke="black"></path>
+                <path d="M 104,224 L 104,256" fill="none" stroke="black"></path>
+                <path d="M 104,368 L 104,400" fill="none" stroke="black"></path>
+                <path d="M 104,432 L 104,464" fill="none" stroke="black"></path>
+                <path d="M 120,160 L 120,192" fill="none" stroke="black"></path>
+                <path d="M 120,224 L 120,256" fill="none" stroke="black"></path>
+                <path d="M 120,432 L 120,464" fill="none" stroke="black"></path>
+                <path d="M 136,160 L 136,192" fill="none" stroke="black"></path>
+                <path d="M 136,224 L 136,256" fill="none" stroke="black"></path>
+                <path d="M 136,304 L 136,336" fill="none" stroke="black"></path>
+                <path d="M 136,432 L 136,464" fill="none" stroke="black"></path>
+                <path d="M 152,224 L 152,256" fill="none" stroke="black"></path>
+                <path d="M 152,368 L 152,400" fill="none" stroke="black"></path>
+                <path d="M 152,432 L 152,464" fill="none" stroke="black"></path>
+                <path d="M 160,96 L 160,128" fill="none" stroke="black"></path>
+                <path d="M 168,224 L 168,256" fill="none" stroke="black"></path>
+                <path d="M 184,160 L 184,192" fill="none" stroke="black"></path>
+                <path d="M 184,224 L 184,256" fill="none" stroke="black"></path>
+                <path d="M 200,32 L 200,64" fill="none" stroke="black"></path>
+                <path d="M 200,160 L 200,192" fill="none" stroke="black"></path>
+                <path d="M 200,224 L 200,256" fill="none" stroke="black"></path>
+                <path d="M 216,224 L 216,256" fill="none" stroke="black"></path>
+                <path d="M 232,96 L 232,128" fill="none" stroke="black"></path>
+                <path d="M 232,224 L 232,256" fill="none" stroke="black"></path>
+                <path d="M 248,160 L 248,192" fill="none" stroke="black"></path>
+                <path d="M 248,224 L 248,256" fill="none" stroke="black"></path>
+                <path d="M 64,32 L 200,32" fill="none" stroke="black"></path>
+                <path d="M 64,64 L 200,64" fill="none" stroke="black"></path>
+                <path d="M 32,96 L 104,96" fill="none" stroke="black"></path>
+                <path d="M 160,96 L 232,96" fill="none" stroke="black"></path>
+                <path d="M 32,128 L 104,128" fill="none" stroke="black"></path>
+                <path d="M 160,128 L 232,128" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 56,160" fill="none" stroke="black"></path>
+                <path d="M 72,160 L 120,160" fill="none" stroke="black"></path>
+                <path d="M 136,160 L 184,160" fill="none" stroke="black"></path>
+                <path d="M 200,160 L 248,160" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 56,192" fill="none" stroke="black"></path>
+                <path d="M 72,192 L 120,192" fill="none" stroke="black"></path>
+                <path d="M 136,192 L 184,192" fill="none" stroke="black"></path>
+                <path d="M 200,192 L 248,192" fill="none" stroke="black"></path>
+                <path d="M 8,224 L 24,224" fill="none" stroke="black"></path>
+                <path d="M 40,224 L 56,224" fill="none" stroke="black"></path>
+                <path d="M 72,224 L 88,224" fill="none" stroke="black"></path>
+                <path d="M 104,224 L 120,224" fill="none" stroke="black"></path>
+                <path d="M 136,224 L 152,224" fill="none" stroke="black"></path>
+                <path d="M 168,224 L 184,224" fill="none" stroke="black"></path>
+                <path d="M 200,224 L 216,224" fill="none" stroke="black"></path>
+                <path d="M 232,224 L 248,224" fill="none" stroke="black"></path>
+                <path d="M 8,256 L 24,256" fill="none" stroke="black"></path>
+                <path d="M 40,256 L 56,256" fill="none" stroke="black"></path>
+                <path d="M 72,256 L 88,256" fill="none" stroke="black"></path>
+                <path d="M 104,256 L 120,256" fill="none" stroke="black"></path>
+                <path d="M 136,256 L 152,256" fill="none" stroke="black"></path>
+                <path d="M 168,256 L 184,256" fill="none" stroke="black"></path>
+                <path d="M 200,256 L 216,256" fill="none" stroke="black"></path>
+                <path d="M 232,256 L 248,256" fill="none" stroke="black"></path>
+                <path d="M 64,304 L 136,304" fill="none" stroke="black"></path>
+                <path d="M 64,336 L 136,336" fill="none" stroke="black"></path>
+                <path d="M 40,368 L 88,368" fill="none" stroke="black"></path>
+                <path d="M 104,368 L 152,368" fill="none" stroke="black"></path>
+                <path d="M 40,400 L 88,400" fill="none" stroke="black"></path>
+                <path d="M 104,400 L 152,400" fill="none" stroke="black"></path>
+                <path d="M 40,432 L 56,432" fill="none" stroke="black"></path>
+                <path d="M 72,432 L 88,432" fill="none" stroke="black"></path>
+                <path d="M 104,432 L 120,432" fill="none" stroke="black"></path>
+                <path d="M 136,432 L 152,432" fill="none" stroke="black"></path>
+                <path d="M 40,464 L 56,464" fill="none" stroke="black"></path>
+                <path d="M 72,464 L 88,464" fill="none" stroke="black"></path>
+                <path d="M 104,464 L 120,464" fill="none" stroke="black"></path>
+                <path d="M 136,464 L 152,464" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="120" y="52">[0,</text>
+                  <text x="148" y="52">8)</text>
+                  <text x="288" y="52">level</text>
+                  <text x="320" y="52">3</text>
+                  <text x="72" y="84">/</text>
+                  <text x="192" y="84">\</text>
+                  <text x="56" y="116">[0,</text>
+                  <text x="84" y="116">4)</text>
+                  <text x="184" y="116">[4,</text>
+                  <text x="212" y="116">8)</text>
+                  <text x="288" y="116">level</text>
+                  <text x="320" y="116">2</text>
+                  <text x="40" y="148">/</text>
+                  <text x="96" y="148">\</text>
+                  <text x="168" y="148">/</text>
+                  <text x="224" y="148">\</text>
+                  <text x="32" y="180">[0,2)</text>
+                  <text x="96" y="180">[2,4)</text>
+                  <text x="160" y="180">[4,6)</text>
+                  <text x="224" y="180">[6,8)</text>
+                  <text x="288" y="180">level</text>
+                  <text x="320" y="180">1</text>
+                  <text x="24" y="212">/</text>
+                  <text x="40" y="212">\</text>
+                  <text x="88" y="212">/</text>
+                  <text x="104" y="212">\</text>
+                  <text x="152" y="212">/</text>
+                  <text x="168" y="212">\</text>
+                  <text x="216" y="212">/</text>
+                  <text x="232" y="212">\</text>
+                  <text x="16" y="244">0</text>
+                  <text x="48" y="244">1</text>
+                  <text x="80" y="244">2</text>
+                  <text x="112" y="244">3</text>
+                  <text x="144" y="244">4</text>
+                  <text x="176" y="244">5</text>
+                  <text x="208" y="244">6</text>
+                  <text x="240" y="244">7</text>
+                  <text x="288" y="244">level</text>
+                  <text x="320" y="244">0</text>
+                  <text x="88" y="324">[1,</text>
+                  <text x="116" y="324">5)</text>
+                  <text x="288" y="324">level</text>
+                  <text x="320" y="324">2</text>
+                  <text x="72" y="356">/</text>
+                  <text x="128" y="356">\</text>
+                  <text x="64" y="388">[1,3)</text>
+                  <text x="128" y="388">[3,5)</text>
+                  <text x="288" y="388">level</text>
+                  <text x="320" y="388">1</text>
+                  <text x="56" y="420">/</text>
+                  <text x="72" y="420">\</text>
+                  <text x="120" y="420">/</text>
+                  <text x="136" y="420">\</text>
+                  <text x="48" y="452">1</text>
+                  <text x="80" y="452">2</text>
+                  <text x="112" y="452">3</text>
+                  <text x="144" y="452">4</text>
+                  <text x="288" y="452">level</text>
+                  <text x="320" y="452">0</text>
+                </g>
+              </svg><a href="#appendix-B.2-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
+<a href="#name-an-example-misaligned-tree" class="selfRef">An example misaligned tree</a>
+          </figcaption></figure>
+</div>
+<p id="appendix-B.2-4">The numerical constraints on <code>start</code> and <code>end</code> in <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a> restrict subtrees to ensure that they are properly aligned with the original tree as to permit subtree consistency proofs. A Merkle Tree built over <code>[start, end)</code> has size <code>end - start</code>, and is constructed as if <code>start</code> were the first element of the sequence at index zero. To be aligned, <code>start</code> must be the leftmost leaf of the lowest common ancestor of <code>start</code> and <code>end - 1</code> in the original tree:<a href="#appendix-B.2-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B.2-5.1">
+            <p id="appendix-B.2-5.1.1">Numerically, this means the least significant <code>BIT_WIDTH(end - start - 1)</code> bits of <code>start</code> must be zero. Equivalently, <code>start</code> must be divisible by <code>BIT_CEIL(end - start)</code>.<a href="#appendix-B.2-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.2-5.2">
+            <p id="appendix-B.2-5.2.1">In the tree, this means subtrees are constructed by taking any node in the tree, setting <code>start</code> to the leftmost leaf under the node, and <code>end</code> to one past any other leaf under the node.<a href="#appendix-B.2-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="appendix-B.2-6">Though most nodes overlap, not every node of the subtree is necessarily in the larger Merkle Tree, as shown in <a href="#fig-subtree-containment-example-2" class="auto internal xref">Figure 5</a>. In general:<a href="#appendix-B.2-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B.2-7.1">
+            <p id="appendix-B.2-7.1.1">Subtrees whose sizes are a power of two are called <em>full subtrees</em>. A full subtree's root node will always be in the original tree.<a href="#appendix-B.2-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-B.2-7.2">
+            <p id="appendix-B.2-7.2.1">Subtrees whose sizes are not a power of two are called <em>partial subtrees</em>. A partial subtree's root node will be in the original tree of size <code>n</code>, if and only if <code>n = end</code>. Otherwise, non-leaf nodes along the partial subtree's right edge will not be part of the original tree.<a href="#appendix-B.2-7.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="appendix-B.2-8">The difference between full and partial subtrees does not impact their usage, but they can help in understanding the proof constructions below.<a href="#appendix-B.2-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="inclusion-proof-evaluation-explain">
+<section id="appendix-B.3">
+        <h3 id="name-inclusion-proof-evaluation">
+<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-inclusion-proof-evaluation" class="section-name selfRef">Inclusion Proof Evaluation</a>
+        </h3>
+<p id="appendix-B.3-1">The procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a> builds up a subtree hash in <code>r</code> by starting from <code>entry_hash</code> and iteratively hashing elements of <code>inclusion_proof</code> on the left or right. That means this procedure, when successful, must return <em>some</em> hash that contains <code>entry_hash</code>.<a href="#appendix-B.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-2">Treating <code>[start, end)</code> as a Merkle Tree of size <code>end - start</code>, the procedure hashes based on the path to <code>index</code>. Within this smaller Merkle Tree, it has index <code>fn = index - start</code> (first number), and the last element has index <code>sn = end - start - 1</code> (second number).<a href="#appendix-B.3-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-3">Step 4 iterates through <code>inclusion_proof</code> and the paths to <code>fn</code> and <code>sn</code> in parallel. As the procedure right-shifts <code>fn</code> and <code>sn</code> and looks at the least-significant bit, it moves up the two paths, towards the root. When <code>sn</code> is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.<a href="#appendix-B.3-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-4">Iterating from level 0 up, <code>fn</code> and <code>sn</code> will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in <a href="#binary-representations" class="auto internal xref">Appendix B.1</a>.<a href="#appendix-B.3-4" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-5">Once <code>fn = sn</code>, the remainder of the path is on the right edge. At that point, the condition in step 4.2 is always true. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.<a href="#appendix-B.3-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-6">Inclusion proofs can also be evaluated by considering these two stages separately. The first stage consumes <code>l1 = BIT_WIDTH(fn XOR sn)</code> proof entries. The second stage consumes <code>l2 = POPCOUNT(fn &gt;&gt; l1)</code> proof entries. A valid inclusion proof must then have <code>l1 + l2</code> entries. The first <code>l1</code> entries are hashed based on <code>fn</code>'s least significant bits, and the remaining <code>l2</code> entries are hashed on the left.<a href="#appendix-B.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="consistency-proof-structure">
-<section id="appendix-B.3">
+<section id="appendix-B.4">
         <h3 id="name-consistency-proof-structure">
-<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-consistency-proof-structure" class="section-name selfRef">Consistency Proof Structure</a>
+<a href="#appendix-B.4" class="section-number selfRef">B.4. </a><a href="#name-consistency-proof-structure" class="section-name selfRef">Consistency Proof Structure</a>
         </h3>
-<p id="appendix-B.3-1">A subtree consistency proof for <code>[start, end)</code> and the tree of <code>n</code> elements is similar to an inclusion proof for element <code>end - 1</code>. If one starts from <code>end - 1</code>'s hash, incorporating the whole inclusion proof should reconstruct <code>root_hash</code> and incorporating a subset of the inclusion proof should reconstruct <code>node_hash</code>. Thus <code>end - 1</code>'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:<a href="#appendix-B.3-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="appendix-B.3-2">
-<li id="appendix-B.3-2.1">
-            <p id="appendix-B.3-2.1.1">Instead of starting at level 0 with <code>end - 1</code>, the proof can start at a higher level. Any ancestor of <code>end - 1</code> shared by both the subtree and the overall tree is a valid starting node to reconstruct <code>node_hash</code> and <code>root_hash</code>. Use the highest level with a commmon ancestor. This truncates the inclusion proof portion of the consistency proof.<a href="#appendix-B.3-2.1.1" class="pilcrow">¶</a></p>
+<p id="appendix-B.4-1">A subtree consistency proof for <code>[start, end)</code> and the tree of <code>n</code> elements is similar to an inclusion proof for element <code>end - 1</code>. If one starts from <code>end - 1</code>'s hash, incorporating the whole inclusion proof should reconstruct <code>root_hash</code> and incorporating a subset of the inclusion proof should reconstruct <code>node_hash</code>. Thus <code>end - 1</code>'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:<a href="#appendix-B.4-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-B.4-2">
+<li id="appendix-B.4-2.1">
+            <p id="appendix-B.4-2.1.1">Instead of starting at level 0 with <code>end - 1</code>, the proof can start at a higher level. Any ancestor of <code>end - 1</code> shared by both the subtree and the overall tree is a valid starting node to reconstruct <code>node_hash</code> and <code>root_hash</code>. Use the highest level with a commmon ancestor. This truncates the inclusion proof.<a href="#appendix-B.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="appendix-B.3-2.2">
-            <p id="appendix-B.3-2.2.1">If this starting node is the entire subtree, omit its hash from the consistency proof. The verifier is assumed to already know <code>node_hash</code>.<a href="#appendix-B.3-2.2.1" class="pilcrow">¶</a></p>
+          <li id="appendix-B.4-2.2">
+            <p id="appendix-B.4-2.2.1">If this starting node is the entire subtree, omit its hash from the consistency proof. The verifier is assumed to already know <code>node_hash</code>.<a href="#appendix-B.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="appendix-B.3-3">A Merkle consistency proof, defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, applies these same optimizations.<a href="#appendix-B.3-3" class="pilcrow">¶</a></p>
-<p id="appendix-B.3-4"><a href="#fig-truncate-consistency-proof" class="auto internal xref">Figure 15</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 8. The consistency proof begins at level 1, or node <code>[4, 6)</code>. The inclusion proof portion is similarly truncated to start at level 1: <code>[6, 8)</code> and <code>[0, 4)</code>. If the consistency proof began at level 0, the starting node would be leaf 5, and the consistency proof would additionally include leaf 4.<a href="#appendix-B.3-4" class="pilcrow">¶</a></p>
+<p id="appendix-B.4-3">A Merkle consistency proof, defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, applies these same optimizations.<a href="#appendix-B.4-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.4-4"><a href="#fig-truncate-consistency-proof" class="auto internal xref">Figure 16</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 8. The consistency proof begins at level 1, or node <code>[4, 6)</code>. The inclusion proof portion is similarly truncated to start at level 1: <code>[6, 8)</code> and <code>[0, 4)</code>. If the consistency proof began at level 0, the starting node would be leaf 5, and the consistency proof would additionally include leaf 4.<a href="#appendix-B.4-4" class="pilcrow">¶</a></p>
 <span id="name-a-subtree-consistency-proof"></span><div id="fig-truncate-consistency-proof">
-<figure id="figure-15">
-          <div id="appendix-B.3-5.1">
-            <div class="alignLeft art-svg artwork" id="appendix-B.3-5.1.1">
+<figure id="figure-16">
+          <div id="appendix-B.4-5.1">
+            <div class="alignLeft art-svg artwork" id="appendix-B.4-5.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="544" width="336" viewBox="0 0 336 544" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,160 L 8,192" fill="none" stroke="black"></path>
                 <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
@@ -6230,18 +6443,18 @@ END
                   <text x="296" y="516">level</text>
                   <text x="328" y="516">0</text>
                 </g>
-              </svg><a href="#appendix-B.3-5.1.1" class="pilcrow">¶</a>
+              </svg><a href="#appendix-B.4-5.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
+<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
 <a href="#name-a-subtree-consistency-proof" class="selfRef">A subtree consistency proof that starts at level 1 instead of level 0</a>
           </figcaption></figure>
 </div>
-<p id="appendix-B.3-6">Note that the truncated inclusion proof may include nodes from lower levels, if the corresponding level was skipped on the right edge. <a href="#fig-truncate-consistency-proof-2" class="auto internal xref">Figure 16</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 7. As above, the starting node is <code>[4, 6)</code> at level 1. The inclusion proof portion includes leaf 6 at level 0. This is because leaf 6 is taking the place of its skipped parent at level 1. (A skipped node can be thought of as a duplicate of its singular child.)<a href="#appendix-B.3-6" class="pilcrow">¶</a></p>
+<p id="appendix-B.4-6">Note that the truncated inclusion proof may include nodes from lower levels, if the corresponding level was skipped on the right edge. <a href="#fig-truncate-consistency-proof-2" class="auto internal xref">Figure 17</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 7. As above, the starting node is <code>[4, 6)</code> at level 1. The inclusion proof portion includes leaf 6 at level 0. This is because leaf 6 is taking the place of its skipped parent at level 1. (A skipped node can be thought of as a duplicate of its singular child.)<a href="#appendix-B.4-6" class="pilcrow">¶</a></p>
 <span id="name-the-interaction-between-inc"></span><div id="fig-truncate-consistency-proof-2">
-<figure id="figure-16">
-          <div id="appendix-B.3-7.1">
-            <div class="alignLeft art-svg artwork" id="appendix-B.3-7.1.1">
+<figure id="figure-17">
+          <div id="appendix-B.4-7.1">
+            <div class="alignLeft art-svg artwork" id="appendix-B.4-7.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="544" width="320" viewBox="0 0 320 544" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,160 L 8,192" fill="none" stroke="black"></path>
                 <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
@@ -6427,51 +6640,51 @@ END
                   <text x="280" y="516">level</text>
                   <text x="312" y="516">0</text>
                 </g>
-              </svg><a href="#appendix-B.3-7.1.1" class="pilcrow">¶</a>
+              </svg><a href="#appendix-B.4-7.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
+<figcaption><a href="#figure-17" class="selfRef">Figure 17</a>:
 <a href="#name-the-interaction-between-inc" class="selfRef">The interaction between inclusion proof truncation and skipped levels</a>
           </figcaption></figure>
 </div>
 </section>
 </div>
 <div id="consistency-proof-verification-explain">
-<section id="appendix-B.4">
+<section id="appendix-B.5">
         <h3 id="name-consistency-proof-verificat">
-<a href="#appendix-B.4" class="section-number selfRef">B.4. </a><a href="#name-consistency-proof-verificat" class="section-name selfRef">Consistency Proof Verification</a>
+<a href="#appendix-B.5" class="section-number selfRef">B.5. </a><a href="#name-consistency-proof-verificat" class="section-name selfRef">Consistency Proof Verification</a>
         </h3>
-<p id="appendix-B.4-1">The procedure in <a href="#verifying-a-subtree-consistency-proof" class="auto internal xref">Section 4.4.3</a> is structured similarly to inclusion proof evaluation (<a href="#inclusion-proof-evaluation-explain" class="auto internal xref">Appendix B.2</a>). It iteratively builds two hashes, <code>fr</code> and <code>sr</code>, which are expected to equal <code>node_hash</code> and <code>root_hash</code>, respectively. Everything hashed into <code>fr</code> is also hashed into <code>sr</code>, so success demonstrates that <code>root_hash</code> contains <code>node_hash</code>.<a href="#appendix-B.4-1" class="pilcrow">¶</a></p>
-<p id="appendix-B.4-2">Step 2 initializes <code>fn</code> (first number), <code>sn</code> (second number), and <code>tn</code> (third number) to follow, respectively, the paths to <code>start</code>, <code>end - 1</code> (the last element of the subtree), and <code>n - 1</code> (the last element of the tree).<a href="#appendix-B.4-2" class="pilcrow">¶</a></p>
-<p id="appendix-B.4-3">Steps 3 and 4 then skip to the starting node, described in <a href="#consistency-proof-structure" class="auto internal xref">Appendix B.3</a>. The starting node may be:<a href="#appendix-B.4-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-1">The procedure in <a href="#verifying-a-subtree-consistency-proof" class="auto internal xref">Section 4.4.3</a> is structured similarly to inclusion proof evaluation (<a href="#inclusion-proof-evaluation-explain" class="auto internal xref">Appendix B.3</a>). It iteratively builds two hashes, <code>fr</code> and <code>sr</code>, which are expected to equal <code>node_hash</code> and <code>root_hash</code>, respectively. Everything hashed into <code>fr</code> is also hashed into <code>sr</code>, so success demonstrates that <code>root_hash</code> contains <code>node_hash</code>.<a href="#appendix-B.5-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-2">Step 2 initializes <code>fn</code> (first number), <code>sn</code> (second number), and <code>tn</code> (third number) to follow, respectively, the paths to <code>start</code>, <code>end - 1</code> (the last element of the subtree), and <code>n - 1</code> (the last element of the tree).<a href="#appendix-B.5-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-3">Steps 3 and 4 then skip to the starting node, described in <a href="#consistency-proof-structure" class="auto internal xref">Appendix B.4</a>. The starting node may be:<a href="#appendix-B.5-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-B.4-4.1">
-            <p id="appendix-B.4-4.1.1">The entire subtree <code>[start, end)</code> if <code>[start, end)</code> is directly contained in the tree. This will occur if <code>end</code> is <code>n</code> (step 3), or if <code>[start, end)</code> is full (exiting step 4 because <code>fn</code> is <code>sn</code>).<a href="#appendix-B.4-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-B.5-4.1">
+            <p id="appendix-B.5-4.1.1">The entire subtree <code>[start, end)</code> if the subtree root is in the tree. This will occur if <code>end</code> is <code>n</code> (step 3), or if <code>[start, end)</code> is a full subtree (exiting step 4 because <code>fn</code> is <code>sn</code>).<a href="#appendix-B.5-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.4-4.2">
-            <p id="appendix-B.4-4.2.1">Otherwise, the highest full subtree along the right edge of <code>[start, end)</code>. This corresponds to the process exiting step 4 because <code>LSB(sn)</code> is not set.<a href="#appendix-B.4-4.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-B.5-4.2">
+            <p id="appendix-B.5-4.2.1">Otherwise, the highest full subtree along the right edge of <code>[start, end)</code>. This corresponds to the process exiting step 4 because <code>LSB(sn)</code> is not set.<a href="#appendix-B.5-4.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-B.4-5">Steps 5 and 6 initialize the hashes <code>fr</code> and <code>sr</code>:<a href="#appendix-B.4-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-5">Steps 5 and 6 initialize the hashes <code>fr</code> and <code>sr</code>:<a href="#appendix-B.5-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-B.4-6.1">
-            <p id="appendix-B.4-6.1.1">In the first case above, <code>fn</code> will equal <code>sn</code> after truncation. Step 5 will then initialize the hashes to <code>node_hash</code> because the consistency proof does not need to include the starting node.<a href="#appendix-B.4-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-B.5-6.1">
+            <p id="appendix-B.5-6.1.1">In the first case above, <code>fn</code> will equal <code>sn</code> after truncation. Step 5 will then initialize the hashes to <code>node_hash</code> because the consistency proof does not need to include the starting node.<a href="#appendix-B.5-6.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.4-6.2">
-            <p id="appendix-B.4-6.2.1">In the second case above, <code>fn</code> is less than <code>sn</code>. Step 6 will then initialize the hashes to the first value in the consistency proof.<a href="#appendix-B.4-6.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-B.5-6.2">
+            <p id="appendix-B.5-6.2.1">In the second case above, <code>fn</code> is less than <code>sn</code>. Step 6 will then initialize the hashes to the first value in the consistency proof.<a href="#appendix-B.5-6.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-B.4-7">Step 7 incorporates the remainder of the consistency proof into <code>fr</code> and <code>sr</code>:<a href="#appendix-B.4-7" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-7">Step 7 incorporates the remainder of the consistency proof into <code>fr</code> and <code>sr</code>:<a href="#appendix-B.5-7" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-B.4-8.1">
-            <p id="appendix-B.4-8.1.1">All hashes are incorporated into <code>sr</code>, with hashing on the left or right determined the same as in inclusion proof evaluation.<a href="#appendix-B.4-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-B.5-8.1">
+            <p id="appendix-B.5-8.1.1">All hashes are incorporated into <code>sr</code>, with hashing on the left or right determined the same as in inclusion proof evaluation.<a href="#appendix-B.5-8.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.4-8.2">
-            <p id="appendix-B.4-8.2.1">A subset of the hashes are incorporated into <code>fr</code>. It skips any hash on the right because those contain elements greater than <code>end - 1</code>. It also stops incorporating when <code>fn</code> and <code>sn</code> have converged.<a href="#appendix-B.4-8.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-B.5-8.2">
+            <p id="appendix-B.5-8.2.1">A subset of the hashes are incorporated into <code>fr</code>. It skips any hash on the right because those contain elements greater than <code>end - 1</code>. It also stops incorporating when <code>fn</code> and <code>sn</code> have converged.<a href="#appendix-B.5-8.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-B.4-9">This reconstructs the hashes of the subtree and full tree, which are then compared to expected values in step 8.<a href="#appendix-B.4-9" class="pilcrow">¶</a></p>
-<p id="appendix-B.4-10">In the case when <code>fn</code> is <code>sn</code> in step 5, the condition in step 7.2.1 is always false, and <code>fr</code> is always equal to <code>node_hash</code> in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree <code>[fn, sn + 1)</code> and truncated tree <code>tn + 1</code>.<a href="#appendix-B.4-10" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-9">This reconstructs the hashes of the subtree and original tree, which are then compared to expected values in step 8.<a href="#appendix-B.5-9" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-10">In the case when <code>fn</code> is <code>sn</code> in step 5, the condition in step 7.2.1 is always false, and <code>fr</code> is always equal to <code>node_hash</code> in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree <code>[fn, sn + 1)</code> and truncated tree <code>tn + 1</code>.<a href="#appendix-B.5-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
