@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 30 November 2026                                     Apple Inc.
+Expires: 3 December 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             29 May 2026
+                                                             1 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 November 2026.
+   This Internet-Draft will expire on 3 December 2026.
 
 Copyright Notice
 
@@ -3683,11 +3683,12 @@ B.2.  Subtrees
                    Figure 15: An example misaligned tree
 
    The numerical constraints on start and end in Section 4.1 restrict
-   subtrees to avoid this.  A Merkle Tree built over [start, end) has
-   size end - start, and is constructed as if start were the first
-   element of the sequence at index zero.  To be aligned, start must be
-   the leftmost leaf of the lowest common ancestor of start and end in
-   the original tree:
+   subtrees to ensure that they are properly aligned with the original
+   tree as to permit subtree consistency proofs.  A Merkle Tree built
+   over [start, end) has size end - start, and is constructed as if
+   start were the first element of the sequence at index zero.  To be
+   aligned, start must be the leftmost leaf of the lowest common
+   ancestor of start and end - 1 in the original tree:
 
    *  Numerically, this means the least significant BIT_WIDTH(end -
       start - 1) bits of start must be zero.  Equivalently, start must
@@ -3705,15 +3706,15 @@ B.2.  Subtrees
       subtrees_. A full subtree's root node will always be in the
       original tree.
 
-   *  Subtree whose sizes are not a power of two are called _partial
+   *  Subtrees whose sizes are not a power of two are called _partial
       subtrees_. A partial subtree's root node will be in the original
       tree of size n, if and only if n = end.  Otherwise, non-leaf nodes
       along the partial subtree's right edge will not be part of the
       original tree.
 
-   The difference between full and partial subtrees do not impact their
-   usage, but they can help in understanding the proof constructions
-   below.
+   The difference between full and partial subtrees does not impact
+   their usage, but they can help in understanding the proof
+   constructions below.
 
 B.3.  Inclusion Proof Evaluation
 
