@@ -2092,7 +2092,7 @@ Given a list of elements and Merkle Tree over them, it is possible to construct 
 ~~~
 {: #fig-misaligned-tree title="An example misaligned tree"}
 
-The numerical constraints on `start` and `end` in {{definition-of-a-subtree}} restrict subtrees to avoid this. A Merkle Tree built over `[start, end)` has size `end - start`, and is constructed as if `start` were the first element of the sequence at index zero. To be aligned, `start` must be the leftmost leaf of the lowest common ancestor of `start` and `end` in the original tree:
+The numerical constraints on `start` and `end` in {{definition-of-a-subtree}} restrict subtrees to ensure that they are properly aligned with the original tree as to permit subtree consistency proofs. A Merkle Tree built over `[start, end)` has size `end - start`, and is constructed as if `start` were the first element of the sequence at index zero. To be aligned, `start` must be the leftmost leaf of the lowest common ancestor of `start` and `end - 1` in the original tree:
 
 * Numerically, this means the least significant `BIT_WIDTH(end - start - 1)` bits of `start` must be zero. Equivalently, `start` must be divisible by `BIT_CEIL(end - start)`.
 
@@ -2102,9 +2102,9 @@ Though most nodes overlap, not every node of the subtree is necessarily in the l
 
 * Subtrees whose sizes are a power of two are called *full subtrees*. A full subtree's root node will always be in the original tree.
 
-* Subtree whose sizes are not a power of two are called *partial subtrees*. A partial subtree's root node will be in the original tree of size `n`, if and only if `n = end`. Otherwise, non-leaf nodes along the partial subtree's right edge will not be part of the original tree.
+* Subtrees whose sizes are not a power of two are called *partial subtrees*. A partial subtree's root node will be in the original tree of size `n`, if and only if `n = end`. Otherwise, non-leaf nodes along the partial subtree's right edge will not be part of the original tree.
 
-The difference between full and partial subtrees do not impact their usage, but they can help in understanding the proof constructions below.
+The difference between full and partial subtrees does not impact their usage, but they can help in understanding the proof constructions below.
 
 ## Inclusion Proof Evaluation {#inclusion-proof-evaluation-explain}
 
