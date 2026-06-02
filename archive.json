@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-31T04:43:22.026483+00:00",
+  "timestamp": "2026-06-02T04:51:41.974268+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3572,6 +3572,24 @@
           "updatedAt": "2026-05-25T11:50:20Z"
         }
       ]
+    },
+    {
+      "number": 246,
+      "id": "I_kwDOJIBkVc8AAAABEAxCTw",
+      "title": "Landmark-relative certs can be built directly from the CA issuance log",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/246",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "We'll probably want to have support for clients to fetch landmark-relative certificates directly from the ACME server (#203, #207), but it's also worth documenting that clients can construct landmark-relative certs for themselves (while also doing \"[re-anchoring](https://mailarchive.ietf.org/arch/msg/plants/zY4l-TzRAsCXSwBueiMVOvRqAoE/)\") by directly fetching tiles from the CA issuance log.\n\n(This is a followup to https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207#discussion_r3290634320 and some other conversations.)",
+      "createdAt": "2026-06-01T15:12:29Z",
+      "updatedAt": "2026-06-01T15:34:34Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -17513,24 +17531,26 @@
       "id": "PR_kwDOJIBkVc7gx4RE",
       "title": "Take another pass at describing subtrees",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/244",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Punt all unused properties into the explanations section (full vs partial, directly contained), and add a section explaining what the numerical property is about.\r\n\r\nWe still mention full/partial in the explanation section, just because the subtree consistency proof evaluation talks about it. To that end, replace \"full tree\" with \"original tree\" when we're talking about the big tree that you used to pull a subtree out.",
       "createdAt": "2026-05-29T19:32:17Z",
-      "updatedAt": "2026-05-30T01:19:50Z",
+      "updatedAt": "2026-06-01T16:08:25Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "9029a99bcfa4e91b8b8e9ba646ac386a6e1c208f",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "subtree-explain",
-      "headRefOid": "cbd6f6f9285e6534204105215bc6fa9e35fd4891",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "36ae46b4eb16784b0c48e265cbbe5aa96d4ad403",
+      "closedAt": "2026-06-01T16:08:23Z",
+      "mergedAt": "2026-06-01T16:08:23Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "509f66b32cc63b8d87c8cba49b3f8a4c2b2b345b"
+      },
       "comments": [],
       "reviews": [
         {
@@ -17579,7 +17599,7 @@
       "labels": [],
       "body": "The instructions to include TBSCertificate contents up to the SPKI would include serialNumber and signature fields, which aren't part of TBSCertificateLogEntry. Change it to explicitly list the fields to include.",
       "createdAt": "2026-05-30T01:01:13Z",
-      "updatedAt": "2026-05-30T01:29:41Z",
+      "updatedAt": "2026-06-01T17:17:23Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "9029a99bcfa4e91b8b8e9ba646ac386a6e1c208f",
@@ -17605,6 +17625,48 @@
           "body": "",
           "createdAt": "2026-05-30T01:29:36Z",
           "updatedAt": "2026-05-30T01:29:36Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 247,
+      "id": "PR_kwDOJIBkVc7hhJ45",
+      "title": "fix typo",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/247",
+      "state": "MERGED",
+      "author": "matt-mueller",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-01T20:24:56Z",
+      "updatedAt": "2026-06-01T21:58:38Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "509f66b32cc63b8d87c8cba49b3f8a4c2b2b345b",
+      "headRepository": "matt-mueller/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "9c85baf82643e52e7e2f2a2244c7911a84aa5196",
+      "closedAt": "2026-06-01T20:34:15Z",
+      "mergedAt": "2026-06-01T20:34:15Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7ca3110bb3ec3276bada93da90217d49ba4e3027"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBoeBIg",
+          "commit": {
+            "abbreviatedOid": "9c85baf"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-01T20:34:08Z",
+          "updatedAt": "2026-06-01T20:34:08Z",
           "comments": []
         }
       ]
