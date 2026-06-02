@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 3 December 2026                                      Apple Inc.
+Expires: 4 December 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             1 June 2026
+                                                             2 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 December 2026.
+   This Internet-Draft will expire on 4 December 2026.
 
 Copyright Notice
 
@@ -1043,8 +1043,8 @@ Table of Contents
            zero. mid is the leftmost leaf node in the above divergence
            point's right branch.
 
-       4.  Within the least significant split bits of left, let b be the
-           bit index of the most significant bit with value zero, if
+       4.  Within the least significant split bits of start, let b be
+           the bit index of the most significant bit with value zero, if
            any:
 
            1.  If there is such a bit, let left_split be b + 1.
@@ -1241,7 +1241,7 @@ Table of Contents
    enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
 
    struct {
-       ExtensionType extension_type;
+       MerkleTreeCertEntryExtensionType extension_type;
        opaque extension_data<0..2^16-1>;
    } MerkleTreeCertEntryExtension;
 
@@ -1848,7 +1848,8 @@ Table of Contents
    timestamp field used when computing the signature MUST be zero.
 
    Each element of the signatures field MUST have a unique cosigner_id.
-   Elements MUST be ordered by cosigner_id as follows:
+   Elements MUST be ordered by cosigner_id (excluding length prefix) as
+   follows:
 
    *  Shorter byte strings are ordered before longer byte strings
 
@@ -1938,7 +1939,7 @@ Table of Contents
    To issue landmark-relative certificates, a CA must additionally
    maintain a _landmark sequence_, which is a sequence of _landmarks_.
 
-   Each landmark specifies an agreed tree size, as a common point of
+   Each landmark specifies a tree size, used as a common point of
    reference across the ecosystem for optimizing certificates.
    Landmarks are numbered consecutively from zero.  The first landmark,
    numbered zero, MUST have a tree size of zero.  The sequence of tree
@@ -2634,10 +2635,11 @@ Table of Contents
    ID assignments for standalone and landmark-relative certificates.
 
    When processing an order for a Merkle Tree certificate, the ACME
-   server moves the order to the "valid" state once the corresponding
-   entry is sequenced in the issuance log.  The order's certificate URL
-   then serves the standalone certificate, constructed as described in
-   Section 6.2.
+   server moves the order to the "valid" state after the corresponding
+   entry is sequenced in the issuance log, cosignatures are collected,
+   and the standalone certificate is available.  The order's certificate
+   URL then serves the standalone certificate, constructed as described
+   in Section 6.2.
 
    The standalone certificate response SHOULD additionally carry an
    alternate URL for the landmark-relative certificate, as described

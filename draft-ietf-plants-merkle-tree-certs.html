@@ -1050,7 +1050,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 3 December 2026</td>
+<td class="center">Expires 4 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-01" class="published">1 June 2026</time>
+<time datetime="2026-06-02" class="published">2 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-03">3 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-04">4 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3478,7 +3478,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                   <p id="section-4.5.1-4.2.2.3.1">Let <code>mid</code> be <code>last</code> with the least significant <code>split</code> bits set to zero. <code>mid</code> is the leftmost leaf node in the above divergence point's right branch.<a href="#section-4.5.1-4.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-4.5.1-4.2.2.4">
-                  <p id="section-4.5.1-4.2.2.4.1">Within the least significant <code>split</code> bits of <code>left</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.5.1-4.2.2.4.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.5.1-4.2.2.4.1">Within the least significant <code>split</code> bits of <code>start</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.5.1-4.2.2.4.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.5.1-4.2.2.4.2">
 <li id="section-4.5.1-4.2.2.4.2.1">
                       <p id="section-4.5.1-4.2.2.4.2.1.1">If there is such a bit, let <code>left_split</code> be <code>b + 1</code>.<a href="#section-4.5.1-4.2.2.4.2.1.1" class="pilcrow">¶</a></p>
@@ -3824,7 +3824,7 @@ struct {} Empty;
 enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
 
 struct {
-    ExtensionType extension_type;
+    MerkleTreeCertEntryExtensionType extension_type;
     opaque extension_data&lt;0..2^16-1&gt;;
 } MerkleTreeCertEntryExtension;
 
@@ -4503,7 +4503,7 @@ struct {
 </div>
 <p id="section-6.1-10"><code>extensions</code> MUST contain the log entry's <code>extensions</code> value (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>).<a href="#section-6.1-10" class="pilcrow">¶</a></p>
 <p id="section-6.1-11"><code>start</code> and <code>end</code> MUST contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> MUST contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for the log entry and the subtree. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. The <code>timestamp</code> field used when computing the signature MUST be zero.<a href="#section-6.1-11" class="pilcrow">¶</a></p>
-<p id="section-6.1-12">Each element of the <code>signatures</code> field MUST have a unique <code>cosigner_id</code>. Elements MUST be ordered by <code>cosigner_id</code> as follows:<a href="#section-6.1-12" class="pilcrow">¶</a></p>
+<p id="section-6.1-12">Each element of the <code>signatures</code> field MUST have a unique <code>cosigner_id</code>. Elements MUST be ordered by <code>cosigner_id</code> (excluding length prefix) as follows:<a href="#section-6.1-12" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1-13.1">
             <p id="section-6.1-13.1.1">Shorter byte strings are ordered before longer byte strings<a href="#section-6.1-13.1.1" class="pilcrow">¶</a></p>
@@ -4560,7 +4560,7 @@ struct {
 <a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmark-tree-sizes" class="section-name selfRef">Landmark Tree Sizes</a>
           </h4>
 <p id="section-6.3.1-1">To issue landmark-relative certificates, a CA must additionally maintain a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-2">Each landmark specifies an agreed tree size, as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">Each landmark specifies a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-3">Landmarks determine <em>landmark subtrees</em>: for each landmark, other than number zero, let <code>tree_size</code> be the landmark's tree size and <code>prev_tree_size</code> be that of the previous landmark. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-4">As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer <code>max_active_landmarks</code> parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-5">The most recent <code>max_active_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_active_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
@@ -5053,7 +5053,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
       </h2>
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
 <p id="section-9-4">The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
 </section>
