@@ -819,7 +819,7 @@ The subtrees are selected as follows:
 
    3. Let `mid` be `last` with the least significant `split` bits set to zero. `mid` is the leftmost leaf node in the above divergence point's right branch.
 
-   4. Within the least significant `split` bits of `left`, let `b` be the bit index of the most significant bit with value zero, if any:
+   4. Within the least significant `split` bits of `start`, let `b` be the bit index of the most significant bit with value zero, if any:
 
       1. If there is such a bit, let `left_split` be `b + 1`.
       2. Otherwise, let `left_split` be zero.
@@ -967,7 +967,7 @@ struct {} Empty;
 enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
 
 struct {
-    ExtensionType extension_type;
+    MerkleTreeCertEntryExtensionType extension_type;
     opaque extension_data<0..2^16-1>;
 } MerkleTreeCertEntryExtension;
 
@@ -1313,7 +1313,7 @@ struct {
 
 `start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
-Each element of the `signatures` field MUST have a unique `cosigner_id`. Elements MUST be ordered by `cosigner_id` as follows:
+Each element of the `signatures` field MUST have a unique `cosigner_id`. Elements MUST be ordered by `cosigner_id` (excluding length prefix) as follows:
 
 * Shorter byte strings are ordered before longer byte strings
 * Byte strings of the same length are ordered lexicographically
@@ -1349,7 +1349,7 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 To issue landmark-relative certificates, a CA must additionally maintain a *landmark sequence*, which is a sequence of *landmarks*.
 
-Each landmark specifies an agreed tree size, as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
+Each landmark specifies a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
 Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
 
@@ -1651,7 +1651,7 @@ This section describes how to issue Merkle Tree certificates using ACME {{!RFC85
 
 When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
 
-When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
+When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
 The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}} and serves it from the alternate URL.
 
