@@ -1857,7 +1857,7 @@ Merkle Tree Certificates' transparency properties only apply to certificates dir
 
 Relying parties with transparency requirements SHOULD impose policies that prevent these bypasses. For example, a relying party might require that all subordinate CAs have name constraints ({{Section 4.2.1.10 of !RFC5280}}) or forbid subordinate CAs entirely. Relying parties MAY enforce these policies as part of certification path validation.
 
-Monitors SHOULD monitor for adherence to this policy as part of monitoring for unauthorized certificates. For example, a monitor that looks for entries covering `example.com` SHOULD look for either a subject alternative name ({{Section 4.2.1.6 of !RFC5280}}) of `example.com` or a basic constraints ({{Section 4.2.1.9 of !RFC5280}}) extension with the cA boolean set to true.
+Monitors SHOULD monitor for adherence to applicable policies as part of monitoring for unauthorized certificates. For example, a monitor that looks for entries covering `example.com` SHOULD look for either a subject alternative name ({{Section 4.2.1.6 of !RFC5280}}) of `example.com` or a basic constraints ({{Section 4.2.1.9 of !RFC5280}}) extension with the cA boolean set to true.
 
 It is not sufficient to constrain the MTC CA with a path length constraint ({{Section 4.2.1.9 of !RFC5280}}) of zero. Self-issued certificates do not contribute to path length constraints, so such an MTC CA might still issue CA certificates with the same name as itself.
 
