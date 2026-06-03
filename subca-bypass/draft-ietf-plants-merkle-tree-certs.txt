@@ -3203,8 +3203,8 @@ Table of Contents
    that prevent these bypasses.  For example, a relying party might
    require that all subordinate CAs have name constraints
    (Section 4.2.1.10 of [RFC5280]) or forbid subordinate CAs entirely.
-   Relying parties MAY enforce these policies as part of certification
-   path validation.
+   Relying parties SHOULD enforce these policies as part of
+   certification path validation.
 
    Monitors SHOULD monitor for adherence to applicable policies as part
    of monitoring for unauthorized certificates.  For example, a monitor
