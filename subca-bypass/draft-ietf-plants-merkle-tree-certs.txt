@@ -3206,8 +3206,8 @@ Table of Contents
    Relying parties MAY enforce these policies as part of certification
    path validation.
 
-   Monitors SHOULD monitor for adherence to this policy as part of
-   monitoring for unauthorized certificates.  For example, a monitor
+   Monitors SHOULD monitor for adherence to applicable policies as part
+   of monitoring for unauthorized certificates.  For example, a monitor
    that looks for entries covering example.com SHOULD look for either a
    subject alternative name (Section 4.2.1.6 of [RFC5280]) of
    example.com or a basic constraints (Section 4.2.1.9 of [RFC5280])
