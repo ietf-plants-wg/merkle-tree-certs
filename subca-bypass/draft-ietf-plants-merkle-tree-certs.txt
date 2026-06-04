@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 5 December 2026                                      Apple Inc.
+Expires: 6 December 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             3 June 2026
+                                                             4 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 December 2026.
+   This Internet-Draft will expire on 6 December 2026.
 
 Copyright Notice
 
@@ -3196,15 +3196,20 @@ Table of Contents
    CA might issue a certificate that describes an unconstrained,
    subordinate, non-MTC CA.  Certificates issued by the subordinate CA
    would not be visible in the MTC CA's issuance log and thus may not be
-   visible to monitors.  However, the certificate that enables this
-   transparency bypass will still be visible in the issuance logs.
+   visible to monitors.  However, the subordinate CA certificate that
+   enables this bypass will still be visible in the issuance logs.
 
-   Relying parties with transparency requirements SHOULD impose policies
-   that prevent these bypasses.  For example, a relying party might
-   require that all subordinate CAs have name constraints
-   (Section 4.2.1.10 of [RFC5280]) or forbid subordinate CAs entirely.
-   Relying parties SHOULD enforce these policies as part of
-   certification path validation.
+   Although the scope is larger, this scenario is similar to an
+   unauthorized end-entity certificate and can be handled analogously:
+
+   Relying parties with transparency requirements SHOULD define policy
+   requirements on trusted CAs that prevent these bypasses, with any
+   violation treated as an unauthorized certificate.  For example, a
+   relying party might require that all subordinate CAs have name
+   constraints (Section 4.2.1.10 of [RFC5280]) or forbid subordinate CAs
+   entirely.  In addition to holding CAs responsible for meeting these
+   policies, relying parties SHOULD programmatically enforce these
+   policies as part of certification path validation.
 
    Monitors SHOULD monitor for adherence to applicable policies as part
    of monitoring for unauthorized certificates.  For example, a monitor
