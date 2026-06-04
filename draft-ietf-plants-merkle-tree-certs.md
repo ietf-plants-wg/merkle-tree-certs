@@ -2440,4 +2440,4 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Editorial fixes
 
-- Discuss the implications of subordinate CAs in Security Consideratiosn
+- Discuss the implications of subordinate CAs in Security Considerations 
