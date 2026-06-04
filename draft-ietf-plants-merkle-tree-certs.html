@@ -1050,7 +1050,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 4 December 2026</td>
+<td class="center">Expires 6 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-02" class="published">2 June 2026</time>
+<time datetime="2026-06-04" class="published">4 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-04">4 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-06">6 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1397,6 +1397,9 @@ svg {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.8">
                 <p id="section-toc.1-1.12.2.8.1"><a href="#section-12.8" class="auto internal xref">12.8</a>.  <a href="#name-signature-domain-separation" class="internal xref">Signature Domain Separation</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.9">
+                <p id="section-toc.1-1.12.2.9.1"><a href="#section-12.9" class="auto internal xref">12.9</a>.  <a href="#name-subordinate-certification-a" class="internal xref">Subordinate Certification Authorities</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
@@ -1500,6 +1503,9 @@ svg {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.15">
                 <p id="section-toc.1-1.18.2.15.1"><a href="#appendix-D.15" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-03</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.16">
+                <p id="section-toc.1-1.18.2.16.1"><a href="#appendix-D.16" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-04</a></p>
 </li>
             </ul>
 </li>
@@ -5304,6 +5310,18 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-12.8-4">Domain separation analysis based on the structures themselves is fragile, particularly when individual ASN.1 fields must be analyzed. This document depends on a structure-level analysis for CRLs and OCSP responses due to how these legacy protocols were defined. Future uses of the key SHOULD use a more robust mechanism, namely a fixed label prefix or a context string parameter if the signature scheme supports it.<a href="#section-12.8-4" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="subordinate-certification-authorities">
+<section id="section-12.9">
+        <h3 id="name-subordinate-certification-a">
+<a href="#section-12.9" class="section-number selfRef">12.9. </a><a href="#name-subordinate-certification-a" class="section-name selfRef">Subordinate Certification Authorities</a>
+        </h3>
+<p id="section-12.9-1">Merkle Tree Certificates' transparency properties only apply to certificates directly issued by the CA, not certification paths. The CA might issue a certificate that describes an unconstrained, subordinate, non-MTC CA. Certificates issued by the subordinate CA would not be visible in the MTC CA's issuance log and thus may not be visible to monitors. However, the subordinate CA certificate that enables this bypass will still be visible in the issuance logs.<a href="#section-12.9-1" class="pilcrow">¶</a></p>
+<p id="section-12.9-2">Although the scope is larger, this scenario is similar to an unauthorized end-entity certificate and can be handled analogously:<a href="#section-12.9-2" class="pilcrow">¶</a></p>
+<p id="section-12.9-3">Relying parties with transparency requirements SHOULD define policy requirements on trusted CAs that prevent these bypasses, with any violation treated as an unauthorized certificate. For example, a relying party might require that all subordinate CAs have name constraints (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.10" class="relref">Section 4.2.1.10</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) or forbid subordinate CAs entirely. In addition to holding CAs responsible for meeting these policies, relying parties SHOULD programmatically enforce these policies as part of certification path validation.<a href="#section-12.9-3" class="pilcrow">¶</a></p>
+<p id="section-12.9-4">Monitors SHOULD monitor for adherence to applicable policies as part of monitoring for unauthorized certificates. For example, a monitor that looks for entries covering <code>example.com</code> SHOULD look for either a subject alternative name (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.6" class="relref">Section 4.2.1.6</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) of <code>example.com</code> or a basic constraints (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.9" class="relref">Section 4.2.1.9</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) extension with the cA boolean set to true.<a href="#section-12.9-4" class="pilcrow">¶</a></p>
+<p id="section-12.9-5">It is not sufficient to constrain the MTC CA with a path length constraint (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.9" class="relref">Section 4.2.1.9</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) of zero. Self-issued certificates do not contribute to path length constraints, so such an MTC CA might still issue CA certificates with the same name as itself.<a href="#section-12.9-5" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana-considerations">
@@ -7014,6 +7032,24 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-D.15-1.12">
             <p id="appendix-D.15-1.12.1">Add an extensions block to log entries<a href="#appendix-D.15-1.12.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-ietf-plants-merkle-tree-certs-04">
+<section id="appendix-D.16">
+        <h3 id="name-since-draft-ietf-plants-merkle-">
+<a href="#name-since-draft-ietf-plants-merkle-" class="section-name selfRef">Since draft-ietf-plants-merkle-tree-certs-04</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-D.16-1.1">
+            <p id="appendix-D.16-1.1.1">Fix some mistakes in the single-pass signature verification algorithm<a href="#appendix-D.16-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.16-1.2">
+            <p id="appendix-D.16-1.2.1">Editorial fixes<a href="#appendix-D.16-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.16-1.3">
+            <p id="appendix-D.16-1.3.1">Discuss the implications of subordinate CAs in Security Considerations<a href="#appendix-D.16-1.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
