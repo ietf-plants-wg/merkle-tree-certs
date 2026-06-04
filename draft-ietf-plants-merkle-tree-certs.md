@@ -1851,6 +1851,18 @@ These ASN.1 structures all begin with a SEQUENCE tag, which is encoded in DER as
 
 Domain separation analysis based on the structures themselves is fragile, particularly when individual ASN.1 fields must be analyzed. This document depends on a structure-level analysis for CRLs and OCSP responses due to how these legacy protocols were defined. Future uses of the key SHOULD use a more robust mechanism, namely a fixed label prefix or a context string parameter if the signature scheme supports it.
 
+## Subordinate Certification Authorities
+
+Merkle Tree Certificates' transparency properties only apply to certificates directly issued by the CA, not certification paths. The CA might issue a certificate that describes an unconstrained, subordinate, non-MTC CA. Certificates issued by the subordinate CA would not be visible in the MTC CA's issuance log and thus may not be visible to monitors. However, the subordinate CA certificate that enables this bypass will still be visible in the issuance logs.
+
+Although the scope is larger, this scenario is similar to an unauthorized end-entity certificate and can be handled analogously:
+
+Relying parties with transparency requirements SHOULD define policy requirements on trusted CAs that prevent these bypasses, with any violation treated as an unauthorized certificate. For example, a relying party might require that all subordinate CAs have name constraints ({{Section 4.2.1.10 of !RFC5280}}) or forbid subordinate CAs entirely. In addition to holding CAs responsible for meeting these policies, relying parties SHOULD programmatically enforce these policies as part of certification path validation.
+
+Monitors SHOULD monitor for adherence to applicable policies as part of monitoring for unauthorized certificates. For example, a monitor that looks for entries covering `example.com` SHOULD look for either a subject alternative name ({{Section 4.2.1.6 of !RFC5280}}) of `example.com` or a basic constraints ({{Section 4.2.1.9 of !RFC5280}}) extension with the cA boolean set to true.
+
+It is not sufficient to constrain the MTC CA with a path length constraint ({{Section 4.2.1.9 of !RFC5280}}) of zero. Self-issued certificates do not contribute to path length constraints, so such an MTC CA might still issue CA certificates with the same name as itself.
+
 # IANA Considerations
 
 ## Module Identifier
@@ -2420,3 +2432,12 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Remove sketch of tlog subtree signer API in favor of https://github.com/C2SP/C2SP/pull/245 in {{TLOG-WITNESS}}
 
 - Add an extensions block to log entries
+
+## Since draft-ietf-plants-merkle-tree-certs-04
+{:numbered="false"}
+
+- Fix some mistakes in the single-pass signature verification algorithm
+
+- Editorial fixes
+
+- Discuss the implications of subordinate CAs in Security Considerations 
