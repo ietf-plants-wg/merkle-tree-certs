@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-02T04:51:41.974268+00:00",
+  "timestamp": "2026-06-04T04:55:46.261227+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -1973,7 +1973,7 @@
       "labels": [],
       "body": "The tls-server-end-point channel binding is ridiculous. You actually have to break apart the X.509 signature algorithm to compute it:\r\nhttps://www.rfc-editor.org/rfc/rfc5929.html#section-4.1\r\n\r\nThere's an obvious hash from the choice of hash in MTCs, but we don't want the subscriber to have to break apart the ProofType. Thus I suggest that the hash for BikeshedCertificate is SHA-256. SHA-256 is _fine_. If we really want to cycle that hash, define a new channel binding. I started sketching out a CertificatePropertyList design, but doing that is a waste of time.\r\n\r\nThere's also a domain separation problem. The hash should have included the certificate type... we could patch this if we want, relying on X.509 certificates always starting with 0x30.",
       "createdAt": "2024-07-26T05:56:51Z",
-      "updatedAt": "2025-06-21T14:41:08Z",
+      "updatedAt": "2026-06-03T06:51:14Z",
       "closedAt": null,
       "comments": [
         {
@@ -1982,6 +1982,13 @@
           "body": "Post-Photosynthesis triage: I guess this actually still needs to be defined. The signatureAlgorithm no longer implies a hash. The log ID does, but it may be tricky for generic code to parse that out.\n\nSo I still would say \"it's SHA-256, please move on with life\". The bigger question is do we want to make the hash cover the whole Certificate or just the TBSCertificate. Malleability isn't a direct concern, but what is a concern is being able to punch out cosigners during negotiation. I could easily imagine APIs causing some issues here if code outside the TLS stack computes this.",
           "createdAt": "2025-06-21T14:41:08Z",
           "updatedAt": "2025-06-21T14:41:08Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Related: https://mailarchive.ietf.org/arch/msg/tls/CEaZg1l-4iVg0_wdEr5_rXfGYWc/\n\nThe tls-server-end-point binding is generally bust. If we fix it by just locking the hash in (the right move IMO), we'll get this fixed for free and this bug will be moot.",
+          "createdAt": "2026-06-03T06:51:14Z",
+          "updatedAt": "2026-06-03T06:51:14Z"
         }
       ]
     },
@@ -2159,7 +2166,7 @@
       "labels": [],
       "body": "Operating systems often ship a list of trusted certificates in a well-known location. The [go source code](https://go.dev/src/crypto/x509/root_linux.go) is a nice place for an overview of where Linux stores its trusted roots. It might be nice to recommend a file structure as part of the RFC as well.\r\n\r\n## Relying Party\r\nI propose the following structure for a relying party, mainly inspired by Debian/Ubuntu:\r\n\r\n```text\r\netc\r\n\u2514\u2500 ssl\r\n    \u2514\u2500 mtc\r\n        \u2514\u2500 <issuer_id>\r\n            \u251c\u2500 ca-params\r\n            \u251c\u2500 validity-window\r\n            \u2514\u2500 signature\r\n```\r\n\r\nI think the prefix of the storage location may be different per distribution. For example, `etc/ssl/mtc` for Debian and `/etc/pki/tls/mtc` for Fedora/RHEL. What is more interesting is the structure thereafter.\r\n\r\nEach CA would live in its own subdirectory with the Issuer ID (i.e., TAI/OID) as the directory name. This directory contains the CA parameters, the root hashes of the validity window, and optionally the signature over the validity window. The CA parameters would be the following binary representation:\r\n\r\n```text\r\nstruct {\r\n    TrustAnchorIdentifier   issuer;\r\n    SignatureScheme         signature_scheme;\r\n    opaque                  public_key<1..2^16-1>;\r\n    ProofType               proof_type;\r\n    uint64                  start_time;\r\n    uint64                  batch_duration;\r\n    uint64                  lifetime;\r\n    uint32                  validity_window_size;\r\n    uint64                  storage_window_size;\r\n    opaque                  http_server<1..2^16-1>;\r\n}\r\n```\r\n\r\nThe validity window would contain the batch number and all currently valid root hashes, like defined in the draft already:\r\n```text\r\nstruct {\r\n    uint32      batch_number;\r\n    TreeHead    tree_heads[validity_window_size*hash.length];\r\n} ValidityWindow;\r\n```\r\nThe signature seems optional to me. If the relying party trusts its trust services, there might not be a need to sync them as well.\r\nThis would also save quite some bandwidth, depending on how often an RP gets updated and how many CAs exist.\r\n\r\nThat is also the reason I would like to have the signature and validity window separate, as it simplifies the update service to fetch only the missing tree heads and optionally the signature.\r\n\r\nFor the CA parameters, I am not sure if all information is actually required on the RP side. At the same time, the size is not very important here, as it would get updated only occasionally. Mainly, either the validity window size or lifetime might be left out, and the HTTP server location of the CA might be irrelevant as updates should get fetched from the transparency services. \r\n\r\n## Authenticating Party\r\nFor the authenticating party, a common structure does not seem as relevant; still, it might be nice to recommend one:\r\n\r\nI propose to store the certificates the server can choose from as `<batch_number>.mtc` in separate files and reuse the same format as for the RP for the CA parameters. To my understanding, the CA parameters are only required to know when a certificate becomes invalid, but keeping the other information in the struct allows reusing a parser that was written for the RP.\r\nThe private key is necessary to authenticate the handshake. It may be stored somewhere else as well.\r\n\r\n```text\r\n<some directory>\r\n\u2514\u2500 <issuer_id>\r\n    \u251c\u2500 0.mtc\r\n    \u251c\u2500 240.mtc\r\n    \u251c\u2500 ca-params\r\n    \u2514\u2500 private-key.pem\r\n```\r\n\r\nAny comments on the proposed structure, as well as the need to include this as a recommendation, are welcome.",
       "createdAt": "2024-10-30T11:29:49Z",
-      "updatedAt": "2025-06-21T14:43:30Z",
+      "updatedAt": "2026-06-03T13:57:56Z",
       "closedAt": null,
       "comments": [
         {
@@ -2168,6 +2175,13 @@
           "body": "Post-Photosynthesis triage: structure is slightly different, but overall topic is still relevant to new formulation",
           "createdAt": "2025-06-21T14:43:30Z",
           "updatedAt": "2025-06-21T14:43:30Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We've mostly done this. There's a format for CAs and works about the same as X.509 CAs today. It doesn't capture landmarks though.",
+          "createdAt": "2026-06-03T13:57:56Z",
+          "updatedAt": "2026-06-03T13:57:56Z"
         }
       ]
     },
@@ -2606,11 +2620,13 @@
       "state": "OPEN",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "davidben"
+      ],
       "labels": [],
       "body": "When we recast MTC as X.509, we picked up all of X.509's semantics, including the fact that a CA can, at least mechanically, issue non-MTC intermediate certificates. Doing so partially bypasses transparency benefits because only the intermediate is logged, not certificates chaining off of it.\n\nI say partially because the fact that the CA has done so is definitely visible in the log. But if the intermediate is unconstrained, and a PKI is okay with it, then we don't actually know what certificates are valid. But this might vary a lot by PKI:\n\n* Maybe your PKI is okay with transparency stopping at an intermediate, as long as it has name constraints, but it's not okay with intermediates without name constraints.\n\n* Maybe your PKI is the above, but its notion of \"name\" is something other than SANs + name constraints and is looking for a random other X.509 extension\n\n* Maybe you do not want to support this at all and want to forbid all intermediates\n\n* Maybe you're just unabashedly okay with all transparency stopping at any intermediate for... some reason? I can't come up with a reason for this.\n\nIf there's a range of options, one plausible, if a bit unsatisfying, answer is that we solve this by policy. X.509 often forces us down this path, sadly. :-( We say that the MTC mechanism itself has no opinion on this, but that a relying party and root program might (and probably should!) opine on this and say what they do and don't allow.\n\nIn that case, the spec should say something about this and note that you need to pick something. We also need the technical mechanisms to apply that policy.\n\nAt a bare minimum, the technical mechanism is \"monitors can see everything the CA signs and know to look for this\" and \"relying parties will hold the CA responsible for detected violations in trust decisions\". If you see a CA=true certificate in the log, you need to treat it as impacting _every_ name (up to constraints) and monitor it it accordingly.\n\nYou might also want relying party enforcement in code so that, even if it is in there, the relying party won't accept it. For at least the \"this CA should not issue intermediates period\" policy, there is _almost_ a natural mechanism in X.509 already: path length constraints.\n\nBut only _almost_ because X.509 special-cases self-issued certificates everywhere as part of key rollover. Is it worth updating RFC 5280 to knock out the self-issued special case? (Alternatively, the enforcement can just be using some extra mechanism. Relying parties add checks atop RFC 5280 path validation all the time.)",
       "createdAt": "2025-09-18T17:26:53Z",
-      "updatedAt": "2026-05-07T18:03:30Z",
+      "updatedAt": "2026-06-03T06:49:15Z",
       "closedAt": null,
       "comments": [
         {
@@ -2626,6 +2642,13 @@
           "body": "One could say that the MTC extension (including the implicit one on non-X509 anchors) just completely prohibits CA=true certificates (with implicit masking?), keyCertSign/cRLSign bits (with implicit masking if no KU), as well as any X.509 extensions that only make sense for CA certificates (e.g., policy mappings).\n\nThis does not affect delegated OCSP certificates, as those have CA=false and special EKU. Are there any other kinds of explicit delegation in X.509 (Indirect CRLs seem like implicit delegation)?",
           "createdAt": "2026-05-07T18:03:30Z",
           "updatedAt": "2026-05-07T18:03:30Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Uploaded https://github.com/ietf-plants-wg/merkle-tree-certs/pull/249 that applies the policy-level fix.",
+          "createdAt": "2026-06-03T06:49:04Z",
+          "updatedAt": "2026-06-03T06:49:04Z"
         }
       ]
     },
@@ -2692,15 +2715,15 @@
       "id": "I_kwDOJIBkVc7XOAU2",
       "title": "Duplicate landmarks?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/162",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "If we want to keep a regular cadence of landmarks, then we need to be able to issue duplicate landmarks if the MTCA didn't issue for that period. Currently, the section on landmarks doesn't prohibit this (there is no \"strictly\" in front of \"monotonically increasing\".) However, the text on how to assign subtrees to landmarks tacitly assumes they're not empty.\n\nI see two options:\n\n- Explicitly allow duplicate landmarks, and change text accordingly (eg. no subtrees are associated to them.)\n- Be explicit that landmark issuance can be stalled when no new certificates were issued.\n\nThe advantage of the latter is that it's simpler. The downside is that it's not directly obvious which landmarks are useless because all certificates in them expired. The advantage of allowing duplicate landmarks, is that it naturally leaves out the useless tree heads that expired.",
       "createdAt": "2025-11-11T05:31:47Z",
-      "updatedAt": "2025-11-11T06:10:28Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-03T13:56:57Z",
+      "closedAt": "2026-06-03T13:56:56Z",
       "comments": [
         {
           "author": "davidben",
@@ -2722,6 +2745,13 @@
           "body": "Added another missing one in 27312f81241a32bdbd72bc9db8650e214f03316c",
           "createdAt": "2025-11-11T06:10:27Z",
           "updatedAt": "2025-11-11T06:10:27Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Think we resolved this. There's a few extra \"strictly\"s and the recommended procedure says \"append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size\".",
+          "createdAt": "2026-06-03T13:56:57Z",
+          "updatedAt": "2026-06-03T13:56:57Z"
         }
       ]
     },
@@ -3003,16 +3033,24 @@
       "id": "I_kwDOJIBkVc7paSE2",
       "title": "Make subtree section easier to skip by adding some text to guide the reader and starting with properties first",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/183",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Cf. https://mailarchive.ietf.org/arch/msg/plants/MdvhfJSqd7iDFsglnroAMMXfzok/",
       "createdAt": "2026-02-09T11:47:48Z",
-      "updatedAt": "2026-02-09T11:47:48Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-06-03T13:55:21Z",
+      "closedAt": "2026-06-03T13:55:21Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Think this was done at some point. We now have this text in the section intro: https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-subtrees",
+          "createdAt": "2026-06-03T13:55:21Z",
+          "updatedAt": "2026-06-03T13:55:21Z"
+        }
+      ]
     },
     {
       "number": 192,
@@ -17668,6 +17706,168 @@
           "createdAt": "2026-06-01T20:34:08Z",
           "updatedAt": "2026-06-01T20:34:08Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 248,
+      "id": "PR_kwDOJIBkVc7h-2Uh",
+      "title": "Miscellaneous editorial fixes",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/248",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-02T21:52:35Z",
+      "updatedAt": "2026-06-02T22:10:19Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7ca3110bb3ec3276bada93da90217d49ba4e3027",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "misc-fixes",
+      "headRefOid": "bba1e815fb63c6a7f474573e82dcfd6148d7ee79",
+      "closedAt": "2026-06-02T22:10:16Z",
+      "mergedAt": "2026-06-02T22:10:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7fbc1e4c378dcfefa992c45d2f9c17877294da4f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABBxbzUg",
+          "commit": {
+            "abbreviatedOid": "bba1e81"
+          },
+          "author": "mcpherrinm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-02T21:53:19Z",
+          "updatedAt": "2026-06-02T21:53:19Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 249,
+      "id": "PR_kwDOJIBkVc7iGgyr",
+      "title": "Discuss subordinate CAs and transparency",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/249",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #146 by opting to just describe the issue and recommending a policy- and monitoring-level fix. That's probably the simplest outcome given X.509.",
+      "createdAt": "2026-06-03T06:48:17Z",
+      "updatedAt": "2026-06-03T19:56:59Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7fbc1e4c378dcfefa992c45d2f9c17877294da4f",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "subca-bypass",
+      "headRefOid": "bfa2e5a3b4679c32c107e8b23f6f387eecf12073",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB0sPUA",
+          "commit": {
+            "abbreviatedOid": "9718672"
+          },
+          "author": "robstradling",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-03T09:47:12Z",
+          "updatedAt": "2026-06-03T09:47:13Z",
+          "comments": [
+            {
+              "originalPosition": 10,
+              "body": "Which policy is \"this policy\"?  The context from the previous paragraph is \"policies\" (plural) that might not exist.\n\nSuggestion:\ns/this policy/applicable policies/",
+              "createdAt": "2026-06-03T09:47:12Z",
+              "updatedAt": "2026-06-03T09:47:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB2eI6g",
+          "commit": {
+            "abbreviatedOid": "9718672"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-03T13:53:58Z",
+          "updatedAt": "2026-06-03T13:53:58Z",
+          "comments": [
+            {
+              "originalPosition": 10,
+              "body": "Good point. Done.",
+              "createdAt": "2026-06-03T13:53:58Z",
+              "updatedAt": "2026-06-03T13:53:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB21zFQ",
+          "commit": {
+            "abbreviatedOid": "8cb93d1"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-03T14:36:07Z",
+          "updatedAt": "2026-06-03T14:36:07Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB4ppcg",
+          "commit": {
+            "abbreviatedOid": "8cb93d1"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "LGTM with one suggestion",
+          "createdAt": "2026-06-03T18:15:13Z",
+          "updatedAt": "2026-06-03T18:15:52Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "I think the stronger SHOULD here is appropriate; yes there are some policy decisions which cannot be enforced at validation time, but that should be the exception, not the rule.\n```suggestion\nRelying parties with transparency requirements SHOULD impose policies that prevent these bypasses. For example, a relying party might require that all subordinate CAs have name constraints ({{Section 4.2.1.10 of !RFC5280}}) or forbid subordinate CAs entirely. Relying parties SHOULD enforce these policies as part of certification path validation.\n```",
+              "createdAt": "2026-06-03T18:15:13Z",
+              "updatedAt": "2026-06-03T18:15:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB5ZQMA",
+          "commit": {
+            "abbreviatedOid": "8cb93d1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-03T19:56:54Z",
+          "updatedAt": "2026-06-03T19:56:54Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Fair enough. I put MAY because I imagine, say, a command-line tool with basic verification would not enforce this. But then you could argue such a tool is probably not checking transparency and thus doesn't have transparency requirements.",
+              "createdAt": "2026-06-03T19:56:54Z",
+              "updatedAt": "2026-06-03T19:56:54Z"
+            }
+          ]
         }
       ]
     }
