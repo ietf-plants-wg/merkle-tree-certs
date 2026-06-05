@@ -1443,7 +1443,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Check that the TBSCertificate's `signature` field is `id-alg-mtcProof` with omitted parameters. If this check fails, abort this process and fail verification.
 
-1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}.
+1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}. If decoding fails, including if `signatureValue` is not a multiple of 8 bits or has extra data after the MTCProof, abort this process and fail verification.
 
 1. Let `serial` be the certificate's serial number. If `serial` is negative or greater than 2<sup>64</sup>-1, abort this process and fail verification.
 
