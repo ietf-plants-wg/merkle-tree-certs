@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 6 December 2026                                      Apple Inc.
+Expires: 8 December 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             4 June 2026
+                                                             6 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 December 2026.
+   This Internet-Draft will expire on 8 December 2026.
 
 Copyright Notice
 
@@ -2159,7 +2159,9 @@ Table of Contents
         this process and fail verification.
 
    2.   Decode the signatureValue as an MTCProof, as described in
-        Section 6.1.
+        Section 6.1.  If decoding fails, including if signatureValue is
+        not a multiple of 8 bits or has extra data after the MTCProof,
+        abort this process and fail verification.
 
    3.   Let serial be the certificate's serial number.  If serial is
         negative or greater than 2^64-1, abort this process and fail

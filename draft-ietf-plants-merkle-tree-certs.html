@@ -1050,7 +1050,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 6 December 2026</td>
+<td class="center">Expires 8 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-04" class="published">4 June 2026</time>
+<time datetime="2026-06-06" class="published">6 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-06">6 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-08">8 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -4728,7 +4728,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-7.2-2.1.1">Check that the TBSCertificate's <code>signature</code> field is <code>id-alg-mtcProof</code> with omitted parameters. If this check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.2">
-            <p id="section-7.2-2.2.1">Decode the <code>signatureValue</code> as an MTCProof, as described in <a href="#certificate-format" class="auto internal xref">Section 6.1</a>.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.2.1">Decode the <code>signatureValue</code> as an MTCProof, as described in <a href="#certificate-format" class="auto internal xref">Section 6.1</a>. If decoding fails, including if <code>signatureValue</code> is not a multiple of 8 bits or has extra data after the MTCProof, abort this process and fail verification.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.3">
             <p id="section-7.2-2.3.1">Let <code>serial</code> be the certificate's serial number. If <code>serial</code> is negative or greater than 2<sup>64</sup>-1, abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
