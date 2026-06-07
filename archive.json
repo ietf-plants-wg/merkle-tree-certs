@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-04T04:55:46.261227+00:00",
+  "timestamp": "2026-06-07T04:48:46.765783+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -2617,7 +2617,7 @@
       "id": "I_kwDOJIBkVc7MhZgu",
       "title": "What happens when a MTC CA issues an unconstrained intermediate certificate?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/146",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -2626,8 +2626,8 @@
       "labels": [],
       "body": "When we recast MTC as X.509, we picked up all of X.509's semantics, including the fact that a CA can, at least mechanically, issue non-MTC intermediate certificates. Doing so partially bypasses transparency benefits because only the intermediate is logged, not certificates chaining off of it.\n\nI say partially because the fact that the CA has done so is definitely visible in the log. But if the intermediate is unconstrained, and a PKI is okay with it, then we don't actually know what certificates are valid. But this might vary a lot by PKI:\n\n* Maybe your PKI is okay with transparency stopping at an intermediate, as long as it has name constraints, but it's not okay with intermediates without name constraints.\n\n* Maybe your PKI is the above, but its notion of \"name\" is something other than SANs + name constraints and is looking for a random other X.509 extension\n\n* Maybe you do not want to support this at all and want to forbid all intermediates\n\n* Maybe you're just unabashedly okay with all transparency stopping at any intermediate for... some reason? I can't come up with a reason for this.\n\nIf there's a range of options, one plausible, if a bit unsatisfying, answer is that we solve this by policy. X.509 often forces us down this path, sadly. :-( We say that the MTC mechanism itself has no opinion on this, but that a relying party and root program might (and probably should!) opine on this and say what they do and don't allow.\n\nIn that case, the spec should say something about this and note that you need to pick something. We also need the technical mechanisms to apply that policy.\n\nAt a bare minimum, the technical mechanism is \"monitors can see everything the CA signs and know to look for this\" and \"relying parties will hold the CA responsible for detected violations in trust decisions\". If you see a CA=true certificate in the log, you need to treat it as impacting _every_ name (up to constraints) and monitor it it accordingly.\n\nYou might also want relying party enforcement in code so that, even if it is in there, the relying party won't accept it. For at least the \"this CA should not issue intermediates period\" policy, there is _almost_ a natural mechanism in X.509 already: path length constraints.\n\nBut only _almost_ because X.509 special-cases self-issued certificates everywhere as part of key rollover. Is it worth updating RFC 5280 to knock out the self-issued special case? (Alternatively, the enforcement can just be using some extra mechanism. Relying parties add checks atop RFC 5280 path validation all the time.)",
       "createdAt": "2025-09-18T17:26:53Z",
-      "updatedAt": "2026-06-03T06:49:15Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-04T13:18:55Z",
+      "closedAt": "2026-06-04T13:18:55Z",
       "comments": [
         {
           "author": "davidben",
@@ -17756,24 +17756,26 @@
       "id": "PR_kwDOJIBkVc7iGgyr",
       "title": "Discuss subordinate CAs and transparency",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/249",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #146 by opting to just describe the issue and recommending a policy- and monitoring-level fix. That's probably the simplest outcome given X.509.",
       "createdAt": "2026-06-03T06:48:17Z",
-      "updatedAt": "2026-06-03T19:56:59Z",
+      "updatedAt": "2026-06-04T19:12:22Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "7fbc1e4c378dcfefa992c45d2f9c17877294da4f",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "subca-bypass",
-      "headRefOid": "bfa2e5a3b4679c32c107e8b23f6f387eecf12073",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "9ad4452beb407dfdaf8147fffe37adf616bede05",
+      "closedAt": "2026-06-04T13:18:53Z",
+      "mergedAt": "2026-06-04T13:18:53Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "4caf43c778f6ba6818ad6514ae62f0b36a0d3b51"
+      },
       "comments": [],
       "reviews": [
         {
@@ -17868,6 +17870,81 @@
               "updatedAt": "2026-06-03T19:56:54Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB870jw",
+          "commit": {
+            "abbreviatedOid": "c983f6d"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-04T08:04:56Z",
+          "updatedAt": "2026-06-04T08:04:56Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABB-_ozA",
+          "commit": {
+            "abbreviatedOid": "c983f6d"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-04T13:18:18Z",
+          "updatedAt": "2026-06-04T13:18:19Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "Self-review, typo:\n\n```suggestion\n- Discuss the implications of subordinate CAs in Security Considerations \n```",
+              "createdAt": "2026-06-04T13:18:19Z",
+              "updatedAt": "2026-06-04T13:18:19Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 250,
+      "id": "PR_kwDOJIBkVc7jR6z2",
+      "title": "Clarify that leftover bits or bytes are invalid",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/250",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This is implied by the definition of the format:\r\n\r\n> The MTCProof is encoded into the signatureValue with no additional\r\n> ASN.1 wrapping. The most significant bit of the first octet of the\r\n> signature value SHALL become the first bit of the bit string, and so\r\n> on through the least significant bit of the last octet of the\r\n> signature value, which SHALL become the last bit of the bit string.\r\n\r\nBut it's tripped a couple folks already, so let's be explicit about it.\r\n\r\nThis is a tax that every use of X.509 must pay. Cryptography is built on bytes, and X.509 foolishly used BIT STRINGs everywhere.",
+      "createdAt": "2026-06-05T22:00:40Z",
+      "updatedAt": "2026-06-06T00:45:38Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "425ce63d2211d56133b3a6e4c4a20d7865e6410d",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "bit-str-leftover",
+      "headRefOid": "2a8f83ebd66a5b7f29219b47c4f97150e7bb8398",
+      "closedAt": "2026-06-06T00:45:35Z",
+      "mergedAt": "2026-06-06T00:45:35Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b4fad28bb18c3bc0886c81ed21380ebc94f499b2"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABCK4Amg",
+          "commit": {
+            "abbreviatedOid": "2a8f83e"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-06T00:28:17Z",
+          "updatedAt": "2026-06-06T00:28:17Z",
+          "comments": []
         }
       ]
     }
