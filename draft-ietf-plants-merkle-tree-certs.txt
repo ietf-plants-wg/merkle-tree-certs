@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 8 December 2026                                      Apple Inc.
+Expires: 10 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             6 June 2026
+                                                             8 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 December 2026.
+   This Internet-Draft will expire on 10 December 2026.
 
 Copyright Notice
 
@@ -111,14 +111,15 @@ Table of Contents
      5.4.  Certification Authority Cosigners
      5.5.  Representing Certification Authorities
    6.  Certificates
-     6.1.  Certificate Format
-     6.2.  Standalone Certificates
-     6.3.  Landmark-Relative Certificates
-       6.3.1.  Landmark Tree Sizes
-       6.3.2.  Allocating Landmarks
-       6.3.3.  Publishing Landmarks
-       6.3.4.  Constructing Landmark-Relative Certificates
-     6.4.  Size Estimates
+     6.1.  Certificate Inputs
+     6.2.  Certificate Format
+     6.3.  Standalone Certificates
+     6.4.  Landmark-Relative Certificates
+       6.4.1.  Landmark Tree Sizes
+       6.4.2.  Allocating Landmarks
+       6.4.3.  Publishing Landmarks
+       6.4.4.  Constructing Landmark-Relative Certificates
+     6.5.  Size Estimates
    7.  Relying Parties
      7.1.  Relying Party Configuration
      7.2.  Verifying Certificate Signatures
@@ -1131,7 +1132,7 @@ Table of Contents
    *  A CA cosigner (Section 5.4), which signs subtrees of issuance logs
       to certify their contents.
 
-   *  Optionally, a landmark sequence per log (Section 6.3.1), to
+   *  Optionally, a landmark sequence per log (Section 6.4.1), to
       support optimized landmark-relative certificates.
 
    Section 5.5 defines an X.509 certificate representation of a CA.
@@ -1149,7 +1150,7 @@ Table of Contents
       the issuance log N (Section 5.2).
 
    *  For each positive integer N and L, the OID {caID landmarks(1) N L}
-      represents landmark L (Section 6.3.1) of issuance log N.  These
+      represents landmark L (Section 6.4.1) of issuance log N.  These
       OIDs may be used as trust anchor IDs, as described in Section 8.2.
       These OIDs are used when it is necessary to identify an individual
       landmark, e.g. as in the retry mechanism described Section 4.3 of
@@ -1593,7 +1594,7 @@ Table of Contents
    with a non-zero timestamp.  A signature with a non-zero timestamp
    asserts the complete state of the cosigner's view of the log at a
    given time.  These signatures are not directly used in Merkle Tree
-   Certificates (Section 6.1), but cosigners MAY generate them, subject
+   Certificates (Section 6.2), but cosigners MAY generate them, subject
    to the rules above, as part of other functions in a PKI.  This may
    include log serving or integrating an issuance log into a
    transparency ecosystem.  For example, [TLOG-TILES] and [TLOG-WITNESS]
@@ -1758,8 +1759,11 @@ Table of Contents
 
    This section defines how to construct Merkle Tree Certificates, which
    are X.509 Certificates [RFC5280] that assert the information in an
-   issuance log entry.  A Merkle Tree Certificate is constructed from
-   the following:
+   issuance log entry.
+
+6.1.  Certificate Inputs
+
+   A Merkle Tree Certificate is constructed from the following inputs:
 
    *  A TBSCertificateLogEntry (Section 5.2.1) contained in the issuance
       log (Section 5.2)
@@ -1774,12 +1778,12 @@ Table of Contents
    For any given TBSCertificateLogEntry, there are multiple possible
    certificates that may prove the entry is certified by the CA and
    publicly logged, varying by choice of subtree and signatures.
-   Section 6.1 defines how the certificate is constructed based on those
-   choices.  Section 6.2 and Section 6.3 define two profiles of Merkle
+   Section 6.2 defines how the certificate is constructed based on those
+   choices.  Section 6.3 and Section 6.4 define two profiles of Merkle
    Tree Certificates, standalone certificates and landmark-relative
    certificates, and how to select the subtree and signatures for them.
 
-6.1.  Certificate Format
+6.2.  Certificate Format
 
    The information is encoded in an X.509 Certificate [RFC5280] as
    follows:
@@ -1868,7 +1872,7 @@ Table of Contents
    on through the least significant bit of the last octet of the
    signature value, which SHALL become the last bit of the bit string.
 
-6.2.  Standalone Certificates
+6.3.  Standalone Certificates
 
    A _standalone certificate_ is a Merkle Tree certificate which
    contains sufficient signatures to allow a relying party to trust the
@@ -1895,8 +1899,10 @@ Table of Contents
 
    5.  The CA requests subtree cosignatures from the cosigners above.
 
-   6.  For each certificate in the interval, the CA constructs
-       certificates (Section 6.1) using the covering subtree.
+   6.  For each log entry in the interval, the CA constructs a
+       certificate (Section 6.2) from the inputs in Section 6.1, using
+       the covering subtree and the subtree cosignatures collected in
+       steps 3 and 5.
 
    Steps 4 and 5 are analogous to requesting SCTs from CT logs in
    Certificate Transparency, except that a single run of this job
@@ -1923,7 +1929,7 @@ Table of Contents
    authenticating party, but the authenticating party MAY collect
    additional cosignatures and add them to the certificate.
 
-6.3.  Landmark-Relative Certificates
+6.4.  Landmark-Relative Certificates
 
    A _landmark-relative certificate_ is a Merkle Tree certificate which
    contains no signatures and instead assumes the relying party had
@@ -1936,7 +1942,7 @@ Table of Contents
    specific mechanism to select between the two.  Section 8 discusses
    such a mechanism for TLS [RFC8446].
 
-6.3.1.  Landmark Tree Sizes
+6.4.1.  Landmark Tree Sizes
 
    To issue landmark-relative certificates, a CA must additionally
    maintain a _landmark sequence_, which is a sequence of _landmarks_.
@@ -1972,7 +1978,7 @@ Table of Contents
    relying party as trusted subtrees, as described in Section 7.4.
 
    It is RECOMMENDED that landmarks be allocated following the procedure
-   described in Section 6.3.2.  If landmarks are allocated incorrectly
+   described in Section 6.4.2.  If landmarks are allocated incorrectly
    (e.g. past landmarks change, or max_active_landmarks is inaccurate),
    there are no security consequences, but some older certificates may
    fail to validate.
@@ -1985,7 +1991,7 @@ Table of Contents
    landmark every hour, will have a max_active_landmarks of 169.  The
    client state is then 338 hashes, or 10,816 bytes with SHA-256.
 
-6.3.2.  Allocating Landmarks
+6.4.2.  Allocating Landmarks
 
    It is RECOMMENDED that landmarks be allocated using the following
    procedure:
@@ -2006,7 +2012,7 @@ Table of Contents
    certificate expiry one interval further than ceil(max_cert_lifetime /
    time_between_landmarks) alone would bound.
 
-6.3.3.  Publishing Landmarks
+6.4.3.  Publishing Landmarks
 
    CAs SHOULD publish their active landmarks, so that relying parties
    can configure trusted subtrees (Section 7.4).  The following format
@@ -2032,10 +2038,10 @@ Table of Contents
    It is RECOMMENDED that this format be published as an HTTP resource
    [RFC9110] with content type text/plain; charset=utf-8.
 
-6.3.4.  Constructing Landmark-Relative Certificates
+6.4.4.  Constructing Landmark-Relative Certificates
 
-   Given a TBSCertificateLogEntry in the issuance log and a landmark
-   sequence, a landmark-relative certificate is constructed as follows:
+   Given the inputs in Section 6.1 and a landmark sequence, a landmark-
+   relative certificate is constructed as follows:
 
    1.  Wait for the first landmark to be allocated that contains the
        entry.
@@ -2043,7 +2049,7 @@ Table of Contents
    2.  Determine the landmark's subtrees and select the one that
        contains the entry.
 
-   3.  Construct a certificate (Section 6.1) using the selected subtree
+   3.  Construct a certificate (Section 6.2) using the selected subtree
        and no signatures.
 
    Before sending this certificate, the authenticating party SHOULD
@@ -2054,7 +2060,7 @@ Table of Contents
    the application protocol.  Section 8 discusses how to do this in TLS
    [RFC8446].
 
-6.4.  Size Estimates
+6.5.  Size Estimates
 
    The inclusion proofs in standalone and landmark-relative certificates
    scale logarithmically with the size of the subtree.  These sizes can
@@ -2159,7 +2165,7 @@ Table of Contents
         this process and fail verification.
 
    2.   Decode the signatureValue as an MTCProof, as described in
-        Section 6.1.  If decoding fails, including if signatureValue is
+        Section 6.2.  If decoding fails, including if signatureValue is
         not a multiple of 8 bits or has extra data after the MTCProof,
         abort this process and fail verification.
 
@@ -2342,7 +2348,7 @@ Table of Contents
    As an optional optimization, a relying party MAY incorporate a
    periodically updated, predistributed list of trusted subtrees from
    one or more of the CA's issuance logs.  This allows the relying party
-   to accept landmark-relative certificates (Section 6.3) constructed
+   to accept landmark-relative certificates (Section 6.4) constructed
    against those subtrees.
 
    Each trusted subtree contains:
@@ -2354,7 +2360,7 @@ Table of Contents
    *  The hash of the subtree
 
    Trusted subtrees for a given log are determined by its active
-   landmark subtrees, as described in Section 6.3.1.  Before configuring
+   landmark subtrees, as described in Section 6.4.1.  Before configuring
    the subtrees as trusted, the relying party MUST obtain assurance that
    each subtree is consistent with checkpoints observed by a sufficient
    set of cosigners (see Section 5.3) to meet its cosigner requirements.
@@ -2643,7 +2649,7 @@ Table of Contents
    entry is sequenced in the issuance log, cosignatures are collected,
    and the standalone certificate is available.  The order's certificate
    URL then serves the standalone certificate, constructed as described
-   in Section 6.2.
+   in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
    alternate URL for the landmark-relative certificate, as described
@@ -2652,7 +2658,7 @@ Table of Contents
    Unavailable) response, with a Retry-After header (Section 10.2.3 of
    [RFC9110]) estimating when the certificate will become available.
    Once the next landmark is allocated, the ACME server constructs a
-   landmark-relative certificate, as described in Section 6.3 and serves
+   landmark-relative certificate, as described in Section 6.4 and serves
    it from the alternate URL.
 
    ACME clients supporting Merkle Tree certificates SHOULD support
