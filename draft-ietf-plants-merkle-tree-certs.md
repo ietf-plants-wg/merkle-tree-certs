@@ -1258,7 +1258,11 @@ A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree 
 
 # Certificates
 
-This section defines how to construct Merkle Tree Certificates, which are X.509 Certificates {{!RFC5280}} that assert the information in an issuance log entry. A Merkle Tree Certificate is constructed from the following:
+This section defines how to construct Merkle Tree Certificates, which are X.509 Certificates {{!RFC5280}} that assert the information in an issuance log entry.
+
+## Certificate Inputs
+
+A Merkle Tree Certificate is constructed from the following inputs:
 
 * A TBSCertificateLogEntry ({{log-entries}}) contained in the issuance log ({{issuance-logs}})
 * A subject public key whose hash matches the TBSCertificateLogEntry
@@ -1333,7 +1337,7 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 3. The CA signs each subtree with its key(s) ({{cosigners}}).
 4. The CA requests sufficient checkpoint cosignatures ({{cosigners}}) from external cosigners to meet relying party requirements ({{trusted-cosigners}}).
 5. The CA requests subtree cosignatures from the cosigners above.
-6. For each certificate in the interval, the CA constructs certificates ({{certificate-format}}) using the covering subtree.
+6. For each log entry in the interval, the CA constructs a certificate ({{certificate-format}}) from the inputs in {{certificate-inputs}}, using the covering subtree and the subtree cosignatures collected in steps 3 and 5.
 
 Steps 4 and 5 are analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
 
@@ -1384,7 +1388,7 @@ It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}}
 
 ### Constructing Landmark-Relative Certificates
 
-Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark-relative certificate is constructed as follows:
+Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-relative certificate is constructed as follows:
 
 1. Wait for the first landmark to be allocated that contains the entry.
 2. Determine the landmark's subtrees and select the one that contains the entry.
