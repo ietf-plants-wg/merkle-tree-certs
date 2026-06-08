@@ -184,6 +184,13 @@ informative:
     author:
       org: C2SP
 
+  Accumulated:
+    title: Accumulated Test Vectors
+    target: https://words.filippo.io/accumulated/
+    date: October 9, 2024
+    author:
+    - name: Filippo Valsorda
+
 ...
 
 --- abstract
@@ -420,6 +427,8 @@ This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} b
 As with Merkle Trees, a subtree inclusion proof, defined in {{subtree-inclusion-proofs}}, can prove an entry is contained in some subtree. Subtrees, and thus their inclusion proofs, are smaller than those of the original tree, so this document uses subtree inclusion proofs as a certificate size optimization.
 
 Not all intervals can form subtrees. Subtrees are limited to intervals that can be efficiently proven consistent with the original tree, using subtree consistency proofs defined in {{subtree-consistency-proofs}}. However, every interval of a Merkle Tree can be efficiently covered by two subtrees. {{arbitrary-intervals}} describes how to determine these subtrees.
+
+{{subtree-test-vectors}} provides test vectors for the algorithms defined in this section.
 
 ## Definition of a Subtree
 
@@ -2251,6 +2260,119 @@ This reconstructs the hashes of the subtree and original tree, which are then co
 
 In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always false, and `fr` is always equal to `node_hash` in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree `[fn, sn + 1)` and truncated tree `tn + 1`.
 
+# Subtree Test Vectors
+
+The following are "accumulated" {{Accumulated}} test vectors for the various subtree algorithms defined in {{subtrees}}.
+
+They are hash values of the outputs of all possible inputs for each algorithm, for trees of sizes up to 130. They can be used to verify that an implementation matches the specification, without having to include a large number of individual test vectors.
+
+For all the test vectors, a tree `D_n` of size `n` is constructed with leaf values `d[0] = 0x00, d[1] = 0x01, ...`. The hash function used is SHA-256. The hash values are encoded in hexadecimal.
+
+## Subtree Hashes
+
+For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) HASH` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `HASH` is the hexadecimal encoding of `MTH(D[start:end])`, according to {{subtrees}}.
+
+The final hash value is
+
+~~~
+94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+~~~
+
+In Python, this can be expressed as:
+
+~~~python
+import hashlib
+h = hashlib.sha256()
+for end in range(1, 131):
+    for start in range(end):
+        if valid_subtree(start, end):
+            subtree_hash = MTH(D[start:end])
+            h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
+assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+~~~
+
+## Subtree Inclusion Proofs {#subtree-inclusion-proof-vectors}
+
+For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, for each value of `index` from `start` to `end - 1`, add to the rolling hash the ASCII string `INDEX [START, END)`, then, for each hash in the inclusion proof ({{subtree-inclusion-proofs}}) for `d[index]` in the subtree `[start, end)`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `INDEX` is the decimal representation of `index`, and `START` and `END` are the decimal representations of `start` and `end`, respectively.
+
+The final hash value is
+
+~~~
+ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f
+~~~
+
+In Python, this can be expressed as:
+
+~~~python
+import hashlib
+h = hashlib.sha256()
+for end in range(1, 131):
+    for start in range(end):
+        if valid_subtree(start, end):
+            for index in range(start, end):
+                inclusion_proof = get_inclusion_proof(D, start, end, index)
+                line = f'{index} [{start}, {end})'
+                for p in inclusion_proof:
+                    line += f' {p.hex()}'
+                h.update(f'{line}\n'.encode())
+assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
+~~~
+
+## Subtree Consistency Proofs {#subtree-consistency-proof-vectors}
+
+For each value of `n` from 0 to 130, and each value of `end` from 1 to `n`, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) N`, then, for each hash in the consistency proof ({{subtree-consistency-proofs}}) for the subtree `[start, end)` and tree of size `n`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `N` is the decimal representation of `n`.
+
+The final hash value is
+
+~~~
+c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+~~~
+
+In Python, this can be expressed as:
+
+~~~python
+import hashlib
+h = hashlib.sha256()
+for n in range(131):
+    for end in range(1, n + 1):
+        for start in range(end):
+            if valid_subtree(start, end):
+                consistency_proof = get_consistency_proof(D, n, start, end)
+                line = f'[{start}, {end}) {n}'
+                for p in consistency_proof:
+                    line += f' {p.hex()}'
+                h.update(f'{line}\n'.encode())
+assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+~~~
+
+## Efficient Covering Subtrees
+
+For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`:
+
+* if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END)` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively;
+* otherwise, add to the rolling hash the ASCII string `[LEFT_START, LEFT_END) [RIGHT_START, RIGHT_END)` followed by a newline (U+000A), where `LEFT_START`, `LEFT_END`, `RIGHT_START`, and `RIGHT_END` are the decimal representations of the start and end of the left and right subtrees, respectively, that efficiently cover ({{arbitrary-intervals}}) `[start, end)`.
+
+The final hash value is
+
+~~~
+e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
+~~~
+
+In Python, this can be expressed as:
+
+~~~python
+import hashlib
+h = hashlib.sha256()
+for end in range(1, 131):
+    for start in range(end):
+        if valid_subtree(start, end):
+            h.update(f'[{start}, {end})\n'.encode())
+        else:
+            left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+            h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
+~~~
+
 # Acknowledgements
 {:numbered="false"}
 
@@ -2445,3 +2567,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Editorial fixes
 
 - Discuss the implications of subordinate CAs in Security Considerations
+
+- Added subtree test vector appendix
