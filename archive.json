@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-07T04:48:46.765783+00:00",
+  "timestamp": "2026-06-09T04:16:25.541443+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3625,9 +3625,24 @@
       "labels": [],
       "body": "We'll probably want to have support for clients to fetch landmark-relative certificates directly from the ACME server (#203, #207), but it's also worth documenting that clients can construct landmark-relative certs for themselves (while also doing \"[re-anchoring](https://mailarchive.ietf.org/arch/msg/plants/zY4l-TzRAsCXSwBueiMVOvRqAoE/)\") by directly fetching tiles from the CA issuance log.\n\n(This is a followup to https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207#discussion_r3290634320 and some other conversations.)",
       "createdAt": "2026-06-01T15:12:29Z",
-      "updatedAt": "2026-06-01T15:34:34Z",
+      "updatedAt": "2026-06-08T03:11:07Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "Some (subtle) details in doing that:\n\n* Determining the landmark interval the certificate is in.\n* Determining the landmark number for the interval.\n* Determining ID aliases for the landmark.\n* Handling of generation bump while the certificate is valid (while AP can assume RP keeps all valid certificates if there is no generation bump, the generation bump case can be different).\n\nIf landmarks are recorded in the tree (I expect that some RPs need be able to verify landmarks), that could be used for the first two. The last one could be handled by having maximum active landmark count, and clearing the interval on generation bump. I do not have ideas for the third.",
+          "createdAt": "2026-06-07T12:58:55Z",
+          "updatedAt": "2026-06-07T13:05:09Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> * Determining the landmark interval the certificate is in.\n> * Determining the landmark number for the interval.\n\nThe AP can construct the landmark-relative cert from a standalone certificate and landmark sequence as described in https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#section-6.3.4 (plus https://github.com/ietf-plants-wg/merkle-tree-certs/pull/251).\n\nFor a [tlog](https://c2sp.org/tlog-tiles)-based log, the landmark sequence will be served at `<CA prefix URL>/<log number>/landmarks` as described in https://github.com/davidben/C2SP/blob/mtc-tlog/mtc-tlog.md#serving-issuance-logs.\n\nI haven't written it up yet, but the ACME server would need to provide at least `<CA prefix URL>` (and perhaps the URLs for 1 or 2 mirrors of the CA log) in order for RPs to be able to fetch tiles from `<CA prefix URL>/<log number>/tile/...>`. Note that `log number` is embedded in the corresponding standalone cert's serial number.\n\n> * Determining ID aliases for the landmark.\n\nAssuming this is referring to the landmark's trust anchor ID, what's needed (from [Section 8.2.1](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#section-8.2.1)) are:\n* The CA ID: AP gets it from the standalone cert's issuer\n* The log number N: AP gets it from the standalone cert's log number (first 16 bits of serial number)\n* The landmark number L: AP gets it from the standalone cert's index in the issuance log (last 48 bits of serial number) and the landmark sequence\n\n> Handling of generation bump while the certificate is valid\n\nIf the log generation's data is no longer available from the CA or its mirrors (e.g., due to catastrophic data loss), the AP will fail to fetch (presumably with 4xx or 5xx HTTP errors) the data needed to construct the landmark-relative cert and will need to gracefully handle that, presumably by initiating a new certificate order with the ACME server after some amount of retrying. Do you imagine that an ACME server could handle this differently?\n\n> If landmarks are recorded in the tree (I expect that some RPs need be able to verify landmarks)...\n\nNote that the landmark sequence is _not_ hashed into the tree, but served as separate auxiliary data. From Section 6.3.1: \"If landmarks are allocated incorrectly... there are no security consequences, but some older certificates may fail to validate.\"\n\n> The last one could be handled by having maximum active landmark count, and clearing the interval on generation bump.\n\nI believe the current draft for how to run MTC in the tlog-* ecosystem addresses this: https://github.com/davidben/C2SP/blob/mtc-tlog/mtc-tlog.md. Each issuance log (corresponding to a single log number) publishes its own landmark sequence.",
+          "createdAt": "2026-06-08T03:11:07Z",
+          "updatedAt": "2026-06-08T03:11:07Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -17947,6 +17962,74 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 251,
+      "id": "PR_kwDOJIBkVc7jvAYc",
+      "title": "Clarify inputs for constructing landmark-relative certs",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/251",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Previously, the instructions for constructing landmark-relative certificates said you needed only a TBSCertificateLogEntry and landmark sequence, but didn't mention the unhashed subject public key.\r\n\r\nBreak out the certificate inputs into it's own subsection and reference it in the sections describing how to construct standalone and landmark-relative certs.",
+      "createdAt": "2026-06-08T02:39:40Z",
+      "updatedAt": "2026-06-08T15:59:42Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b4fad28bb18c3bc0886c81ed21380ebc94f499b2",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "lvalenta/certificate-inputs",
+      "headRefOid": "9e2d1b2f64ccce263cb714b602fa88479f65c3aa",
+      "closedAt": "2026-06-08T15:59:41Z",
+      "mergedAt": "2026-06-08T15:59:41Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0b459810e778ae45c4b7053de2b77a416bd8ae83"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABCU_9IQ",
+          "commit": {
+            "abbreviatedOid": "9e2d1b2"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-08T15:59:34Z",
+          "updatedAt": "2026-06-08T15:59:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 252,
+      "id": "PR_kwDOJIBkVc7kI9aO",
+      "title": "Add appendix with accumulated subtree test vectors",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/252",
+      "state": "OPEN",
+      "author": "FiloSottile",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-08T23:43:38Z",
+      "updatedAt": "2026-06-08T23:43:38Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "0b459810e778ae45c4b7053de2b77a416bd8ae83",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "push-lkpwrxrlkvsq",
+      "headRefOid": "b7fb9b948578d19ee4bffe371934e772f7a3bf19",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
