@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 10 December 2026                                     Apple Inc.
+Expires: 11 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             8 June 2026
+                                                             9 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 December 2026.
+   This Internet-Draft will expire on 11 December 2026.
 
 Copyright Notice
 
@@ -166,6 +166,11 @@ Table of Contents
      B.3.  Inclusion Proof Evaluation
      B.4.  Consistency Proof Structure
      B.5.  Consistency Proof Verification
+   Appendix C.  Subtree Test Vectors
+     C.1.  Subtree Hashes
+     C.2.  Subtree Inclusion Proofs
+     C.3.  Subtree Consistency Proofs
+     C.4.  Efficient Covering Subtrees
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -549,6 +554,9 @@ Table of Contents
    However, every interval of a Merkle Tree can be efficiently covered
    by two subtrees.  Section 4.5 describes how to determine these
    subtrees.
+
+   Appendix C provides test vectors for the algorithms defined in this
+   section.
 
 4.1.  Definition of a Subtree
 
@@ -3375,6 +3383,10 @@ Table of Contents
 
 14.2.  Informative References
 
+   [Accumulated]
+              Valsorda, F., "Accumulated Test Vectors", October 2024,
+              <https://words.filippo.io/accumulated/>.
+
    [APPLE-CT] Apple, "Apple's Certificate Transparency policy", 5 March
               2021, <https://support.apple.com/en-us/HT205280>.
 
@@ -3965,6 +3977,140 @@ B.5.  Consistency Proof Verification
    proof for the truncated subtree [fn, sn + 1) and truncated tree tn +
    1.
 
+Appendix C.  Subtree Test Vectors
+
+   The following are "accumulated" [Accumulated] test vectors for the
+   various subtree algorithms defined in Section 4.
+
+   They are hash values of the outputs of all possible inputs for each
+   algorithm, for trees of sizes up to 130.  They can be used to verify
+   that an implementation matches the specification, without having to
+   include a large number of individual test vectors.
+
+   For all the test vectors, a tree D_n of size n is constructed with
+   leaf values d[0] = 0x00, d[1] = 0x01, .... The hash function used is
+   SHA-256.  The hash values are encoded in hexadecimal.
+
+C.1.  Subtree Hashes
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1, if [start, end) is a valid subtree, add to the rolling
+   hash the ASCII string [START, END) HASH followed by a newline
+   (U+000A), where START and END are the decimal representations of
+   start and end, respectively, and HASH is the hexadecimal encoding of
+   MTH(D[start:end]), according to Section 4.
+
+   The final hash value is
+
+   94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               subtree_hash = MTH(D[start:end])
+               h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
+   assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+
+C.2.  Subtree Inclusion Proofs
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1, if [start, end) is a valid subtree, for each value of
+   index from start to end - 1, add to the rolling hash the ASCII string
+   INDEX [START, END), then, for each hash in the inclusion proof
+   (Section 4.3) for d[index] in the subtree [start, end), a space
+   (U+0020) followed by the hexadecimal encoding of that hash, and
+   finally a newline (U+000A), where INDEX is the decimal representation
+   of index, and START and END are the decimal representations of start
+   and end, respectively.
+
+   The final hash value is
+
+   ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               for index in range(start, end):
+                   inclusion_proof = get_inclusion_proof(D, start, end, index)
+                   line = f'{index} [{start}, {end})'
+                   for p in inclusion_proof:
+                       line += f' {p.hex()}'
+                   h.update(f'{line}\n'.encode())
+   assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
+
+C.3.  Subtree Consistency Proofs
+
+   For each value of n from 0 to 130, and each value of end from 1 to n,
+   and each value of start from 0 to end - 1, if [start, end) is a valid
+   subtree, add to the rolling hash the ASCII string [START, END) N,
+   then, for each hash in the consistency proof (Section 4.4) for the
+   subtree [start, end) and tree of size n, a space (U+0020) followed by
+   the hexadecimal encoding of that hash, and finally a newline
+   (U+000A), where START and END are the decimal representations of
+   start and end, respectively, and N is the decimal representation of
+   n.
+
+   The final hash value is
+
+   c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for n in range(131):
+       for end in range(1, n + 1):
+           for start in range(end):
+               if valid_subtree(start, end):
+                   consistency_proof = get_consistency_proof(D, n, start, end)
+                   line = f'[{start}, {end}) {n}'
+                   for p in consistency_proof:
+                       line += f' {p.hex()}'
+                   h.update(f'{line}\n'.encode())
+   assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+
+C.4.  Efficient Covering Subtrees
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1:
+
+   *  if [start, end) is a valid subtree, add to the rolling hash the
+      ASCII string [START, END) followed by a newline (U+000A), where
+      START and END are the decimal representations of start and end,
+      respectively;
+
+   *  otherwise, add to the rolling hash the ASCII string [LEFT_START,
+      LEFT_END) [RIGHT_START, RIGHT_END) followed by a newline (U+000A),
+      where LEFT_START, LEFT_END, RIGHT_START, and RIGHT_END are the
+      decimal representations of the start and end of the left and right
+      subtrees, respectively, that efficiently cover (Section 4.5)
+      [start, end).
+
+   The final hash value is
+
+   e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               h.update(f'[{start}, {end})\n'.encode())
+           else:
+               left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+               h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+   assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
+
 Acknowledgements
 
    This document stands on the shoulders of giants and builds upon
@@ -4192,6 +4338,8 @@ Since draft-ietf-plants-merkle-tree-certs-04
 
    *  Discuss the implications of subordinate CAs in Security
       Considerations
+
+   *  Added subtree test vector appendix
 
 Authors' Addresses
 
