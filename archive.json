@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-09T04:16:25.541443+00:00",
+  "timestamp": "2026-06-11T04:49:52.315756+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18010,26 +18010,42 @@
       "id": "PR_kwDOJIBkVc7kI9aO",
       "title": "Add appendix with accumulated subtree test vectors",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/252",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "FiloSottile",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-06-08T23:43:38Z",
-      "updatedAt": "2026-06-08T23:43:38Z",
+      "updatedAt": "2026-06-09T17:14:16Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "0b459810e778ae45c4b7053de2b77a416bd8ae83",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "push-lkpwrxrlkvsq",
       "headRefOid": "b7fb9b948578d19ee4bffe371934e772f7a3bf19",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-06-09T17:14:16Z",
+      "mergedAt": "2026-06-09T17:14:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "609ad10710a6872f5fc108815667e4aec66a05c8"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABCeN7zw",
+          "commit": {
+            "abbreviatedOid": "b7fb9b9"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-09T17:14:10Z",
+          "updatedAt": "2026-06-09T17:14:10Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
