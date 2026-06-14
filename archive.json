@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-11T04:49:52.315756+00:00",
+  "timestamp": "2026-06-14T04:59:08.941351+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -15985,13 +15985,13 @@
       "labels": [],
       "body": "Currently, CAs often have managed intermediates to let entities get a \"branded\" issuer. In a root + intermediate PKI hierarchy, this has little cost. In a MTC PKI, adding an issuance log is expensive (e.g. mirrors need to learn about it, clients need to be provided landmarks, etc.).\r\n\r\nThis PR provides a mechanism to attribute cosmetically certificates to \"branded\" issuers using a Name (for equivalence to the Issuer field) in an issuer alternative name extension, without using separate issuance logs.\r\n\r\nI did some light profiling of the Name for implementation sanity (single-entry RDNs, UTF8String AttributeValues), one could do a lot more, but such rules are probably best left to root programs.",
       "createdAt": "2026-05-06T13:27:39Z",
-      "updatedAt": "2026-05-13T16:56:11Z",
+      "updatedAt": "2026-06-13T12:39:20Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "342db87c11c8c6e4b51f126fc4fcf2372f1df40b",
+      "baseRefOid": "609ad10710a6872f5fc108815667e4aec66a05c8",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "issuer-alternative-name",
-      "headRefOid": "856f949fce9062ba83dcf109a0ce41d5fffa5f37",
+      "headRefOid": "aa70af135f53119c901d18eb0a53016df4595e1e",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -16041,6 +16041,26 @@
               "body": "Re UTF8String, @robstradling that this breaks attributes like countryName that specifically use PrintableString, and also that RFC 5280 already has this text: https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1.2.4:~:text=CAs%0A%20%20%20conforming%20to%20this%20profile%20MUST%20use%20either%20the%20PrintableString%20or%0A%20%20%20UTF8String%20encoding%20of%20DirectoryString%2C%20with%20two%20exceptions.\n\nThat's not _quite_ as strong as this text, but maybe it's good enough.",
               "createdAt": "2026-05-13T16:56:11Z",
               "updatedAt": "2026-05-13T16:56:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABC7W2zQ",
+          "commit": {
+            "abbreviatedOid": "856f949"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-13T12:38:44Z",
+          "updatedAt": "2026-06-13T12:38:44Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "That's probably good enough, yeah. Removed the part about UTF8String.",
+              "createdAt": "2026-06-13T12:38:44Z",
+              "updatedAt": "2026-06-13T12:38:44Z"
             }
           ]
         }
