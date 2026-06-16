@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 11 December 2026                                     Apple Inc.
+Expires: 18 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             9 June 2026
+                                                            16 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 December 2026.
+   This Internet-Draft will expire on 18 December 2026.
 
 Copyright Notice
 
@@ -1312,6 +1312,19 @@ Table of Contents
 
    *  issuer is the CA ID as a PKIX distinguished name, as described in
       Section 5.1.
+
+      -  The issuer field is not human-readable.  A
+         TBSCertificateLogEntry MAY carry a human-readable label for the
+         CA, suitable for display in user interfaces, in an issuer
+         alternative name extension (Section 4.2.1.7 of [RFC5280]).  If
+         present, the extension MUST be marked non-critical.  The
+         IssuerAltName SEQUENCE MUST contain a single GeneralName of
+         type directoryName, whose Name MUST use the rdnSequence CHOICE.
+         Each RelativeDistinguishedName MUST contain a single
+         AttributeTypeAndValue.  The extension is purely cosmetic, and
+         MUST NOT be used in path validation or any other trust
+         decision.  The value MUST NOT be assumed unique across issuance
+         logs and MAY change across entries in the same issuance log.
 
    *  subjectPublicKeyAlgorithm describes the algorithm of the subject's
       public key.  It is constructed identically to the algorithm field
