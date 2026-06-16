@@ -1023,7 +1023,9 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `version`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` have the same semantics as the corresponding TBSCertificate fields, defined in {{Section 4.1.2 of !RFC5280}}.
 
-*  `issuer` is the CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
+* `issuer` is the CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
+
+  * The `issuer` field is not human-readable. A TBSCertificateLogEntry MAY carry a human-readable label for the CA, suitable for display in user interfaces, in an issuer alternative name extension ({{Section 4.2.1.7 of !RFC5280}}). If present, the extension MUST be marked non-critical. The `IssuerAltName` SEQUENCE MUST contain a single `GeneralName` of type `directoryName`, whose `Name` MUST use the `rdnSequence` CHOICE. Each `RelativeDistinguishedName` MUST contain a single `AttributeTypeAndValue`. The extension is purely cosmetic, and MUST NOT be used in path validation or any other trust decision. The value MUST NOT be assumed unique across issuance logs and MAY change across entries in the same issuance log.
 
 * `subjectPublicKeyAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
 
