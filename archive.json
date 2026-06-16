@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-14T04:59:08.941351+00:00",
+  "timestamp": "2026-06-16T05:22:30.266329+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3625,7 +3625,7 @@
       "labels": [],
       "body": "We'll probably want to have support for clients to fetch landmark-relative certificates directly from the ACME server (#203, #207), but it's also worth documenting that clients can construct landmark-relative certs for themselves (while also doing \"[re-anchoring](https://mailarchive.ietf.org/arch/msg/plants/zY4l-TzRAsCXSwBueiMVOvRqAoE/)\") by directly fetching tiles from the CA issuance log.\n\n(This is a followup to https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207#discussion_r3290634320 and some other conversations.)",
       "createdAt": "2026-06-01T15:12:29Z",
-      "updatedAt": "2026-06-08T03:11:07Z",
+      "updatedAt": "2026-06-16T04:09:17Z",
       "closedAt": null,
       "comments": [
         {
@@ -3641,8 +3641,31 @@
           "body": "> * Determining the landmark interval the certificate is in.\n> * Determining the landmark number for the interval.\n\nThe AP can construct the landmark-relative cert from a standalone certificate and landmark sequence as described in https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#section-6.3.4 (plus https://github.com/ietf-plants-wg/merkle-tree-certs/pull/251).\n\nFor a [tlog](https://c2sp.org/tlog-tiles)-based log, the landmark sequence will be served at `<CA prefix URL>/<log number>/landmarks` as described in https://github.com/davidben/C2SP/blob/mtc-tlog/mtc-tlog.md#serving-issuance-logs.\n\nI haven't written it up yet, but the ACME server would need to provide at least `<CA prefix URL>` (and perhaps the URLs for 1 or 2 mirrors of the CA log) in order for RPs to be able to fetch tiles from `<CA prefix URL>/<log number>/tile/...>`. Note that `log number` is embedded in the corresponding standalone cert's serial number.\n\n> * Determining ID aliases for the landmark.\n\nAssuming this is referring to the landmark's trust anchor ID, what's needed (from [Section 8.2.1](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#section-8.2.1)) are:\n* The CA ID: AP gets it from the standalone cert's issuer\n* The log number N: AP gets it from the standalone cert's log number (first 16 bits of serial number)\n* The landmark number L: AP gets it from the standalone cert's index in the issuance log (last 48 bits of serial number) and the landmark sequence\n\n> Handling of generation bump while the certificate is valid\n\nIf the log generation's data is no longer available from the CA or its mirrors (e.g., due to catastrophic data loss), the AP will fail to fetch (presumably with 4xx or 5xx HTTP errors) the data needed to construct the landmark-relative cert and will need to gracefully handle that, presumably by initiating a new certificate order with the ACME server after some amount of retrying. Do you imagine that an ACME server could handle this differently?\n\n> If landmarks are recorded in the tree (I expect that some RPs need be able to verify landmarks)...\n\nNote that the landmark sequence is _not_ hashed into the tree, but served as separate auxiliary data. From Section 6.3.1: \"If landmarks are allocated incorrectly... there are no security consequences, but some older certificates may fail to validate.\"\n\n> The last one could be handled by having maximum active landmark count, and clearing the interval on generation bump.\n\nI believe the current draft for how to run MTC in the tlog-* ecosystem addresses this: https://github.com/davidben/C2SP/blob/mtc-tlog/mtc-tlog.md. Each issuance log (corresponding to a single log number) publishes its own landmark sequence.",
           "createdAt": "2026-06-08T03:11:07Z",
           "updatedAt": "2026-06-08T03:11:07Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "https://github.com/C2SP/C2SP/pull/269 is an attempt to write this down in the mtc-tlog doc. Reviews welcome!",
+          "createdAt": "2026-06-16T04:09:17Z",
+          "updatedAt": "2026-06-16T04:09:17Z"
         }
       ]
+    },
+    {
+      "number": 253,
+      "id": "I_kwDOJIBkVc8AAAABFme1Yw",
+      "title": "Expand on how to determine a landmark subtree for an entry index from the landmark sequence",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/253",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Give a more exact description for how to determine a landmark subtree for an entry from the landmark sequence. The current text at https://github.com/ietf-plants-wg/merkle-tree-certs/blob/main/draft-ietf-plants-merkle-tree-certs.md#constructing-landmark-relative-certificates says:\n```\nGiven a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark-relative certificate is constructed as follows:\n\nWait for the first landmark to be allocated that contains the entry.\n\nDetermine the landmark's subtrees and select the one that contains the entry.\n\nConstruct a certificate ([Section 6.1](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#certificate-format)) using the selected subtree and no signatures.\n```\n\nWe can give a little more detail here and define an exact algorithm to derive the unique landmark subtree (if one exists for the entry) and corresponding landmark number. It's also slightly confusing to say a landmark 'contains' an entry, since we're really looking for an interval `[prev_tree_size, tree_size)` that contains the entry index.\n\nAlso worth stating that both landmark subtrees share the same landmark number, since that's a potential point of confusion.",
+      "createdAt": "2026-06-16T03:45:46Z",
+      "updatedAt": "2026-06-16T03:45:46Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
