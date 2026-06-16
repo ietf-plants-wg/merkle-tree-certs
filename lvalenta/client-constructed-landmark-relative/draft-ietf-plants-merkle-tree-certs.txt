@@ -2052,15 +2052,15 @@ Table of Contents
    Given the inputs in Section 6.1 and a landmark sequence, a landmark-
    relative certificate is constructed as follows:
 
-   1.  Let L be the smallest positive landmark number whose tree size is
-       strictly greater than the entry index i.  Because the landmark
-       sequence is strictly monotonically increasing, L - 1's tree size
-       is less than or equal to i.  If no such L has been allocated yet
-       (i is greater than or equal to last_landmark's tree size), wait
-       for one to be allocated.  If every landmark that once covered the
-       entry is no longer in the active window (last_landmark -
-       num_active_landmarks's tree size is greater than i), abort this
-       process.
+   1.  Let L be the smallest landmark number in the active window whose
+       tree size is strictly greater than the entry index i.  Because
+       the landmark sequence is strictly monotonically increasing, L -
+       1's tree size is less than or equal to i.  If no such L has been
+       allocated yet (i is greater than or equal to last_landmark's tree
+       size), wait for one to be allocated.  If every landmark that once
+       covered the entry is no longer in the active window
+       (last_landmark - num_active_landmarks's tree size is greater than
+       i), abort this process.
 
    2.  Determine landmark L's subtrees (Section 6.4.1) and select the
        unique one whose [start, end) interval contains i.
