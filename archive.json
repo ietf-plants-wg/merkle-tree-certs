@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-16T05:22:30.266329+00:00",
+  "timestamp": "2026-06-18T04:51:10.947280+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -16001,24 +16001,26 @@
       "id": "PR_kwDOJIBkVc7YyH_X",
       "title": "Add issuer alternative name to TBSCertificateLogEntry",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/223",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "FiloSottile",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Currently, CAs often have managed intermediates to let entities get a \"branded\" issuer. In a root + intermediate PKI hierarchy, this has little cost. In a MTC PKI, adding an issuance log is expensive (e.g. mirrors need to learn about it, clients need to be provided landmarks, etc.).\r\n\r\nThis PR provides a mechanism to attribute cosmetically certificates to \"branded\" issuers using a Name (for equivalence to the Issuer field) in an issuer alternative name extension, without using separate issuance logs.\r\n\r\nI did some light profiling of the Name for implementation sanity (single-entry RDNs, UTF8String AttributeValues), one could do a lot more, but such rules are probably best left to root programs.",
       "createdAt": "2026-05-06T13:27:39Z",
-      "updatedAt": "2026-06-13T12:39:20Z",
+      "updatedAt": "2026-06-16T20:39:57Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "609ad10710a6872f5fc108815667e4aec66a05c8",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "issuer-alternative-name",
       "headRefOid": "aa70af135f53119c901d18eb0a53016df4595e1e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-06-16T20:39:57Z",
+      "mergedAt": "2026-06-16T20:39:57Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a6b3f491b81217735674c237d72bc41bee6cffae"
+      },
       "comments": [],
       "reviews": [
         {
@@ -18089,6 +18091,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 254,
+      "id": "PR_kwDOJIBkVc7nG3da",
+      "title": "Clarify landmark-relative cert construction",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/254",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- Make explicit that a landmark consists of a number and a tree size, and that both subtrees of a given landmark share that landmark number.\r\n- Give an exact algorithm for selecting the landmark and subtree, with explicit wait and abort conditions for the cases where no allocated landmark yet covers the entry index, or where every landmark that once covered it has aged out.\r\n- Add a paragraph clarifying that landmark-relative certificate construction is not specific to the CA: any party that can read the issuance log and the landmark sequence can construct one from the standalone cert. Reference MTC-TLOG as an example for tile-based log ecosystems.\r\n- Note that a client MAY construct the landmark-relative certificate itself from the standalone certificate, as an alternative to fetching it from the ACME server's alternate URL.\r\n- Add an informative reference to MTC-TLOG (c2sp.org/mtc-tlog).\r\n\r\nCloses #246, #253. Also depends on https://github.com/C2SP/C2SP/pull/269.",
+      "createdAt": "2026-06-16T16:46:27Z",
+      "updatedAt": "2026-06-16T16:46:28Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "609ad10710a6872f5fc108815667e4aec66a05c8",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "lvalenta/client-constructed-landmark-relative",
+      "headRefOid": "70bae55347fba151567a6a723aced67220cacee7",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
