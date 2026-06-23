@@ -3073,7 +3073,7 @@ Table of Contents
    However, monitors may not know which log numbers to monitor.
 
    PKIs with transparency requirements SHOULD mitigate this by only
-   accepting a limited range of log numbers, in relying parties,
+   accepting a limited range of log numbers in relying parties,
    transparency cosigners, or both.  The log number limit MAY be set to
    a fixed value, or a rolling value that is updated whenever the CA
    switches its current log.  Fixed values require committing to a limit
