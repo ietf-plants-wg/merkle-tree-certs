@@ -3014,12 +3014,9 @@ Table of Contents
 12.2.1.  Log Failures
 
    Merkle Tree Certificates introduce additional state to PKI
-   deployments and thus new kinds of operational failures.  In
-   particular, unlike directly-signed certificates, some failures may
-   lead to a log being unable to issue new certificates.
-
-   CAs are required to only sign subtree hashes that are consistent with
-   a single append-only view of each issuance log.  A CA might violate
+   deployments and thus new kinds of operational failures.  CAs are
+   required to only sign subtree hashes that are consistent with a
+   single append-only view of each issuance log.  A CA might violate
    this as a result of operational failures.  For example:
 
    *  A CA loses some state and signs subtree hashes from two

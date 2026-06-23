@@ -5248,39 +5248,38 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           <h4 id="name-log-failures">
 <a href="#section-12.2.1" class="section-number selfRef">12.2.1. </a><a href="#name-log-failures" class="section-name selfRef">Log Failures</a>
           </h4>
-<p id="section-12.2.1-1">Merkle Tree Certificates introduce additional state to PKI deployments and thus new kinds of operational failures. In particular, unlike directly-signed certificates, some failures may lead to a log being unable to issue new certificates.<a href="#section-12.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-12.2.1-2">CAs are required to only sign subtree hashes that are consistent with a single append-only view of each issuance log. A CA might violate this as a result of operational failures. For example:<a href="#section-12.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-12.2.1-1">Merkle Tree Certificates introduce additional state to PKI deployments and thus new kinds of operational failures. CAs are required to only sign subtree hashes that are consistent with a single append-only view of each issuance log. A CA might violate this as a result of operational failures. For example:<a href="#section-12.2.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.2.1-3.1">
-              <p id="section-12.2.1-3.1.1">A CA loses some state and signs subtree hashes from two inconsistent copies of the log<a href="#section-12.2.1-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-12.2.1-2.1">
+              <p id="section-12.2.1-2.1.1">A CA loses some state and signs subtree hashes from two inconsistent copies of the log<a href="#section-12.2.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-12.2.1-3.2">
-              <p id="section-12.2.1-3.2.1">A CA miscalculates some hash and signs a subtree hash that cannot be computed from some underlying sequence of entries<a href="#section-12.2.1-3.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-12.2.1-2.2">
+              <p id="section-12.2.1-2.2.1">A CA miscalculates some hash and signs a subtree hash that cannot be computed from some underlying sequence of entries<a href="#section-12.2.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-12.2.1-4">As described above, PKIs can use additional cosigners to provide transparency guarantees even in the face of such CA violations. In doing so, individual cosigners may be locked to only one of two views of the log or unable to sign further checkpoints because some hash's preimage is unknown. It may then no longer be possible to add entries to the log that are trusted by existing relying parties.<a href="#section-12.2.1-4" class="pilcrow">¶</a></p>
-<p id="section-12.2.1-5">Whether by accident or compromise, these violations are ultimately CA failures. However, it is useful for the CA instance to remain functional during and after incident management:<a href="#section-12.2.1-5" class="pilcrow">¶</a></p>
+<p id="section-12.2.1-3">As described above, PKIs can use additional cosigners to provide transparency guarantees even in the face of such CA violations. In doing so, individual cosigners may be locked to only one of two views of the log or unable to sign further checkpoints because some hash's preimage is unknown. It may then no longer be possible to add entries to the log that are trusted by existing relying parties.<a href="#section-12.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-12.2.1-4">Whether by accident or compromise, these violations are ultimately CA failures. However, it is useful for the CA instance to remain functional during and after incident management:<a href="#section-12.2.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.2.1-6.1">
-              <p id="section-12.2.1-6.1.1">While the incident is diagnosed, authenticating parties may still need new certificates.<a href="#section-12.2.1-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-12.2.1-5.1">
+              <p id="section-12.2.1-5.1.1">While the incident is diagnosed, authenticating parties may still need new certificates.<a href="#section-12.2.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-12.2.1-6.2">
-              <p id="section-12.2.1-6.2.1">If the CA operator and the CA instance are still trustworthy, repairing the incident without changing the CA requires less overhead.<a href="#section-12.2.1-6.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-12.2.1-5.2">
+              <p id="section-12.2.1-5.2.1">If the CA operator and the CA instance are still trustworthy, repairing the incident without changing the CA requires less overhead.<a href="#section-12.2.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-12.2.1-6.3">
-              <p id="section-12.2.1-6.3.1">If either the CA operator or the CA instance are no longer trustworthy and must be replaced, the CA may still be needed to serve older, unupdated relying parties.<a href="#section-12.2.1-6.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-12.2.1-5.3">
+              <p id="section-12.2.1-5.3.1">If either the CA operator or the CA instance are no longer trustworthy and must be replaced, the CA may still be needed to serve older, unupdated relying parties.<a href="#section-12.2.1-5.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-12.2.1-7">This is mitigated by a CA instance consisting of a series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). After a log failure, the CA SHOULD increment its current issuance log to restore availability. Both the underlying log failure and the use of a new issuance log will be visible to monitors and SHOULD be treated as a PKI incident. Such PKI incidents can be handled by some combination of:<a href="#section-12.2.1-7" class="pilcrow">¶</a></p>
+<p id="section-12.2.1-6">This is mitigated by a CA instance consisting of a series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). After a log failure, the CA SHOULD increment its current issuance log to restore availability. Both the underlying log failure and the use of a new issuance log will be visible to monitors and SHOULD be treated as a PKI incident. Such PKI incidents can be handled by some combination of:<a href="#section-12.2.1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.2.1-8.1">
-              <p id="section-12.2.1-8.1.1">Revoking the diverging log indices (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>)<a href="#section-12.2.1-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-12.2.1-7.1">
+              <p id="section-12.2.1-7.1.1">Revoking the diverging log indices (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>)<a href="#section-12.2.1-7.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-12.2.1-8.2">
-              <p id="section-12.2.1-8.2.1">Reevaluating trusted CAs and, if necessary, removing the old CA instance and switching to a new CA instance<a href="#section-12.2.1-8.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-12.2.1-7.2">
+              <p id="section-12.2.1-7.2.1">Reevaluating trusted CAs and, if necessary, removing the old CA instance and switching to a new CA instance<a href="#section-12.2.1-7.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-12.2.1-9">In the latter case, the CA operator MAY continue to operate the removed CA instance if, for example, there remain unupdated relying parties that require it.<a href="#section-12.2.1-9" class="pilcrow">¶</a></p>
+<p id="section-12.2.1-8">In the latter case, the CA operator MAY continue to operate the removed CA instance if, for example, there remain unupdated relying parties that require it.<a href="#section-12.2.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="limiting-issuance-logs">
