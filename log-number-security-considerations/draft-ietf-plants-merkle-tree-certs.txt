@@ -3066,7 +3066,7 @@ Table of Contents
 12.2.2.  Limiting Issuance Logs
 
    While multiple issuance logs help mitigate log failures, as described
-   above, they introduce new transparency risks.  If a CA violates the
+   above, they introduce transparency risks.  If a CA violates the
    requirement to only use one issuance log at a time, it might add an
    entry in some far future log number.  To be accepted in transparency-
    enforcing relying parties, the log state must still be cosigned.
