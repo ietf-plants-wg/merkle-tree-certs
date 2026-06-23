@@ -3074,10 +3074,10 @@ Table of Contents
 
    PKIs with transparency requirements SHOULD mitigate this by only
    accepting a limited range of log numbers in relying parties,
-   transparency cosigners, or both.  The log number limit MAY be set to
-   a fixed value, or a rolling value that is updated whenever the CA
-   switches its current log.  Fixed values require committing to a limit
-   of recoverable log failures during the lifetime of a CA.
+   transparency cosigners, or both.  This limit MAY be set to a fixed
+   value or a rolling value that is updated whenever the CA switches its
+   current log.  Fixed values require committing to a limit of
+   recoverable log failures during the lifetime of a CA.
 
    Log number limits in relying parties can be implemented by revoking
    all serial numbers above some threshold.  (See Section 7.5.)
