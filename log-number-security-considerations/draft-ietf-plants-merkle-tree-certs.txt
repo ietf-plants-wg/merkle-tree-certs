@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 25 November 2026                                     Apple Inc.
+Expires: 25 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             24 May 2026
+                                                            23 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 November 2026.
+   This Internet-Draft will expire on 25 December 2026.
 
 Copyright Notice
 
@@ -96,7 +96,8 @@ Table of Contents
        4.4.1.  Generating a Subtree Consistency Proof
        4.4.2.  Example Subtree Consistency Proofs
        4.4.3.  Verifying a Subtree Consistency Proof
-     4.5.  Arbitrary Intervals
+     4.5.  Efficiently Covering Arbitrary Intervals
+       4.5.1.  Selecting Two Subtrees
    5.  Certification Authorities
      5.1.  Certification Authority Identifiers
      5.2.  Issuance Logs
@@ -110,14 +111,15 @@ Table of Contents
      5.4.  Certification Authority Cosigners
      5.5.  Representing Certification Authorities
    6.  Certificates
-     6.1.  Certificate Format
-     6.2.  Standalone Certificates
-     6.3.  Landmark-Relative Certificates
-       6.3.1.  Landmark Tree Sizes
-       6.3.2.  Allocating Landmarks
-       6.3.3.  Publishing Landmarks
-       6.3.4.  Constructing Landmark-Relative Certificates
-     6.4.  Size Estimates
+     6.1.  Certificate Inputs
+     6.2.  Certificate Format
+     6.3.  Standalone Certificates
+     6.4.  Landmark-Relative Certificates
+       6.4.1.  Landmark Tree Sizes
+       6.4.2.  Allocating Landmarks
+       6.4.3.  Publishing Landmarks
+       6.4.4.  Constructing Landmark-Relative Certificates
+     6.5.  Size Estimates
    7.  Relying Parties
      7.1.  Relying Party Configuration
      7.2.  Verifying Certificate Signatures
@@ -142,12 +144,15 @@ Table of Contents
    12. Security Considerations
      12.1.  Authenticity
      12.2.  Transparency
+       12.2.1.  Log Failures
+       12.2.2.  Limiting Issuance Logs
      12.3.  Public Key Hashes
      12.4.  Non-Repudiation
-     12.5.  New Log Entry Types
+     12.5.  Extensibility
      12.6.  Certificate Malleability
      12.7.  Revocation
      12.8.  Signature Domain Separation
+     12.9.  Subordinate Certification Authorities
    13. IANA Considerations
      13.1.  Module Identifier
      13.2.  Algorithm
@@ -159,9 +164,15 @@ Table of Contents
    Appendix A.  ASN.1 Module
    Appendix B.  Merkle Tree Structure
      B.1.  Binary Representations
-     B.2.  Inclusion Proof Evaluation
-     B.3.  Consistency Proof Structure
-     B.4.  Consistency Proof Verification
+     B.2.  Subtrees
+     B.3.  Inclusion Proof Evaluation
+     B.4.  Consistency Proof Structure
+     B.5.  Consistency Proof Verification
+   Appendix C.  Subtree Test Vectors
+     C.1.  Subtree Hashes
+     C.2.  Subtree Inclusion Proofs
+     C.3.  Subtree Consistency Proofs
+     C.4.  Efficient Covering Subtrees
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -179,6 +190,7 @@ Table of Contents
      Since draft-ietf-plants-merkle-tree-certs-01
      Since draft-ietf-plants-merkle-tree-certs-02
      Since draft-ietf-plants-merkle-tree-certs-03
+     Since draft-ietf-plants-merkle-tree-certs-04
    Authors' Addresses
 
 1.  Introduction
@@ -545,6 +557,9 @@ Table of Contents
    by two subtrees.  Section 4.5 describes how to determine these
    subtrees.
 
+   Appendix C provides test vectors for the algorithms defined in this
+   section.
+
 4.1.  Definition of a Subtree
 
    Given an ordered list of n inputs, D_n = {d[0], d[1], ..., d[n-1]},
@@ -558,21 +573,21 @@ Table of Contents
 
    *  start is a multiple of BIT_CEIL(end - start)
 
-   Note that, if start is zero, the second condition is always true.
+   The second condition ensures that MTH(D[start:end]), built over
+   D[start:end] as an independent list, is sufficiently aligned with the
+   original Merkle Tree to support subtree consistency proofs.  See
+   Appendix B.2 for more details.  Note that, if start is zero, this
+   second condition is always true.
 
-   In the context of a single Merkle Tree, the subtree defined by start
-   and end is denoted by half-open interval [start, end).  It contains
+   The _size_ of the subtree is end - start.
+
+   In the context of a single Merkle Tree, this document denotes subtree
+   MTH(D[start:end]) by half-open interval [start, end).  It contains
    the entries whose indices are in that half-open interval.
 
-   The _size_ of the subtree is end - start.  If the subtree's size is a
-   power of two, it is said to be _full_, otherwise it is said to be
-   _partial_.
-
-   If a subtree is full, then it is directly contained in the tree of
-   hash operations in MTH(D_n) for n >= end.
-
-   If a subtree is partial, it is directly contained in MTH(D_n) only if
-   n = end.
+   As a Merkle Tree grows, its subtrees remain unchanged.  That is, if
+   end <= m <= n, the subtree [start, end) of MTH(D[0:m]) and the
+   subtree [start, end) of MTH(D_n) are both valid and identical.
 
 4.2.  Example Subtrees
 
@@ -606,12 +621,11 @@ Table of Contents
    |8| |9| |10| |11| |12|
    +-+ +-+ +--+ +--+ +--+
 
-          Figure 3: Two example subtrees, one full and one partial
+                       Figure 3: Two example subtrees
 
-   Both subtrees are directly contained in a Merkle Tree of size 13,
-   depicted in Figure 4. [4, 8) is contained (marked with double lines)
-   because, although n (13) is not end (8), the subtree is full. [8, 13)
-   is contained (marked with wavy lines) because n (13) is end (13).
+   Both can be viewed as subtrees of a Merkle Tree of size 13, depicted
+   in Figure 4.  Nodes in common with [4, 8) and [8, 13) are marked with
+   doubled and wavy lines, respectively.
 
                    +-----------------------------+
                    |            [0, 13)          |
@@ -635,9 +649,12 @@ Table of Contents
 
                      Figure 4: A Merkle Tree of size 13
 
-   In contrast, [8, 13) is not directly contained in a Merkle Tree of
-   size 14, depicted in Figure 5.  However, the subtree is still
-   computed over consistent elements.
+   In some cases, not every node of a subtree will appear in the larger
+   Merkle Tree.  Figure 5 depicts a Merkle Tree of size 14.  Nodes in
+   common with [4, 8) and [8, 13) are marked as above.  While all nodes
+   of [4, 8) appear in the tree, non-leaf nodes on [8, 13)'s right edge
+   do not.  However, there is still sufficient overlap to construct
+   subtree consistency proofs (Section 4.4).
 
                    +-----------------------------+
                    |            [0, 14)          |
@@ -647,19 +664,21 @@ Table of Contents
           |     [0, 8)     |             |     [8, 14)    |
           +----------------+             +----------------+
            /              \                 /           |
-      +--------+      +--------+      +~~~~~~~~~+       |
+      +--------+      +========+      +~~~~~~~~~+       |
       | [0, 4) |      | [4, 8) |      | [8, 12) |       |
-      +--------+      +--------+      +~~~~~~~~~+       |
+      +--------+      +========+      +~~~~~~~~~+       |
        /      \        /      \         /      \        |
-   +-----+ +-----+ +-----+ +-----+ +~~~~~~+ +~~~~~~~+ +-------+
+   +-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+ +-------+
    |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
-   +-----+ +-----+ +-----+ +-----+ +~~~~~~+ +~~~~~~~+ +-------+
+   +-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+ +-------+
      / \     / \     / \     / \     / \      / \       / \
-   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
+   +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+ +--+
    |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
-   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
+   +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+ +--+
 
                      Figure 5: A Merkle Tree of size 14
+
+   Appendix B.2 discusses subtrees in more detail.
 
 4.3.  Subtree Inclusion Proofs
 
@@ -739,7 +758,7 @@ Table of Contents
    where leaf_index is index - start, tree_size is end - start, and r is
    returned instead of compared with root_hash.
 
-   Appendix B.2 explains this procedure in more detail.
+   Appendix B.3 explains this procedure in more detail.
 
 4.3.3.  Verifying a Subtree Inclusion Proof
 
@@ -765,9 +784,9 @@ Table of Contents
    to the Merkle Tree hash.
 
    Subtree consistency proofs contain sufficient nodes to reconstruct
-   both the subtree hash, MTH(D[start:end]), and the full tree hash,
+   both the subtree hash, MTH(D[start:end]), and the original tree hash,
    MTH(D_n), in such a way that every input to the subtree hash was also
-   incorporated into the full tree hash.
+   incorporated into the original tree hash.
 
 4.4.1.  Generating a Subtree Consistency Proof
 
@@ -813,15 +832,16 @@ Table of Contents
 
    SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 
-   Appendix B.3 explains the structure of a subtree consistency proof in
+   Appendix B.4 explains the structure of a subtree consistency proof in
    more detail.
 
 4.4.2.  Example Subtree Consistency Proofs
 
    The subtree consistency proof for [4, 8) and a tree of size 14
-   contains MTH(D[0:4]) and MTH(D[8:14]), depicted in Figure 7.  The
-   verifier is assumed to know the subtree hash, so there is no need to
-   include MTH(D[4:8]) itself in the consistency proof.
+   contains MTH(D[0:4]) and MTH(D[8:14]), depicted in Figure 7 with
+   doubled lines.  The verifier is assumed to know the subtree hash, so
+   there is no need to include MTH(D[4:8]), depicted with wavy lines, in
+   the consistency proof.
 
       +~~~~~~~~+
       | [4, 8) |
@@ -855,14 +875,15 @@ Table of Contents
    |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +--+ +--+
 
-     Figure 7: An example subtree consistency proof for a subtree that
-                   is directly contained in the full tree
+     Figure 7: An example subtree consistency proof that begins at the
+                            root of the subtree
 
    The subtree consistency proof for [8, 13) and a tree of size 14
    contains MTH({d[12]}), MTH({d[13]}), MTH(D[8:12]), and MTH(D[0:8]),
-   depicted in Figure 8. [8, 13) is not directly contained in the tree,
-   so the proof must include sufficient nodes to reconstruct both
-   hashes.
+   depicted in Figure 8 with doubled lines.  Not every node in [8, 13)
+   is also in the overall tree, so the proof must include sufficient
+   nodes to reconstruct both hashes.  However, there is enough overlap
+   for the proof to be possible.
 
          +----------------+
          |     [8, 13)    |
@@ -900,8 +921,8 @@ Table of Contents
    |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +==+ +==+
 
-     Figure 8: An example subtree consistency proof for a subtree that
-                 is not directly contained in the full tree
+       Figure 8: An example subtree consistency proof that decomposes
+                                the subtree
 
 4.4.3.  Verifying a Subtree Consistency Proof
 
@@ -959,14 +980,66 @@ Table of Contents
        are not equal, fail the proof verification.  If all are equal,
        accept the proof.
 
-   Appendix B.4 explains this procedure in more detail.
+   Appendix B.5 explains this procedure in more detail.
 
-4.5.  Arbitrary Intervals
+4.5.  Efficiently Covering Arbitrary Intervals
 
-   Not all [start, end) intervals of a Merkle Tree are valid subtrees.
-   This section describes how, for any start < end, to determine up to
-   two subtrees that efficiently cover the interval.  The subtrees are
-   determined by the following procedure:
+   This document uses subtrees to sign over arbitrary intervals, [start,
+   end), of a Merkle Tree.  However, not all intervals are valid
+   subtrees.  While subtrees containing the intervals would suffice, the
+   smallest subtree containing [start, end) may be much larger than
+   [start, end).
+
+   For example, Figure 9 shows the smallest subtree that contains [7, 9)
+   in a 9-element tree.  The smallest single subtree that contains the
+   interval is [0, 9), but this is the entire tree.
+
+                   +~~~~~~~~~~~~~~~~~~~+
+                   |      [0, 9)       |
+                   +~~~~~~~~~~~~~~~~~~~+
+                      /             |
+          +----------------+        |
+          |     [0, 8)     |        |
+          +----------------+        |
+           /              \         |
+      +--------+      +--------+    |
+      | [0, 4) |      | [4, 8) |    |
+      +--------+      +--------+    |
+       /      \        /      \     |
+   +-----+ +-----+ +-----+ +-----+  |
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)|  |
+   +-----+ +-----+ +-----+ +-----+  |
+     / \     / \     / \     / \    |
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
+   |0| |1| |2| |3| |4| |5| |6| |7| |8|
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
+
+       Figure 9: An example showing an inefficient choice of a single
+                                  subtree
+
+   While one subtree can be inefficient, two subtrees are sufficient to
+   efficiently cover any interval, as described below.
+
+4.5.1.  Selecting Two Subtrees
+
+   This section defines a procedure for selecting up to two subtrees,
+   given any non-empty interval (start < end).  Combined, the subtrees
+   contain [start, end) with bounded excess elements.  The procedure
+   either returns [start, end) as a subtree, or two subtrees, left and
+   right, that satisfy the following properties:
+
+   *  The two subtrees cover adjacent intervals.  That is, left.end =
+      right.start.
+
+   *  The two subtrees together contain the entire interval [start,
+      end).  There are no extra entries after end, but there may be
+      extra entries before start.  That is, left.start <= start and end
+      = right.end.
+
+   *  The extra entries before start are less than half of left.  That
+      is, start - left.start < left.end - start.
+
+   The subtrees are selected as follows:
 
    1.  If end - start is one, return a single subtree, [start, end).
 
@@ -983,8 +1056,8 @@ Table of Contents
            zero. mid is the leftmost leaf node in the above divergence
            point's right branch.
 
-       4.  Within the least significant split bits of left, let b be the
-           bit index of the most significant bit with value zero, if
+       4.  Within the least significant split bits of start, let b be
+           the bit index of the most significant bit with value zero, if
            any:
 
            1.  If there is such a bit, let left_split be b + 1.
@@ -1000,22 +1073,10 @@ Table of Contents
 
        6.  Return the subtrees [left_start, mid) and [mid, end).
 
-   When the procedure returns a single subtree, the subtree is [start,
-   start+1).  When it returns two subtrees, left and right, the subtrees
-   satisfy the following properties:
-
-   *  left.end = right.start.  That is, the two subtrees cover adjacent
-      intervals.
-
-   *  left.start <= start and end = right.end.  That is, the two
-      subtrees together cover the entire target interval, possibly with
-      some extra entries before start left, but not after end.
-
-   *  left.end - left.start < 2 * (end - start) and right.end -
-      right.start <= end - start.  That is, the two subtrees efficiently
-      cover the interval.
-
-   *  left is full, while right may be partial.
+   Intuitively, this procedure considers the tree MTH(D[0:end]) and
+   finds the lowest common ancestor of the elements in [start, end).  It
+   splits the interval by that ancestor's left and right children and
+   returns the lowest common ancestor of each half.
 
    The following Python code implements this procedure:
 
@@ -1037,21 +1098,22 @@ Table of Contents
        left_start = start & ~((1 << left_split) - 1)
        return [(left_start, mid), (mid, end)]
 
-   Figure 9 shows the subtrees which cover [5, 13) in a Merkle Tree of
-   13 elements.  The two subtrees selected are [4, 8) and [8, 13).  Note
-   that the subtrees cover a slightly larger interval than [5, 13).
+   Figure 10 shows the subtrees which cover [5, 13) in a Merkle Tree of
+   13 elements in wavy lines.  The two subtrees selected are [4, 8) and
+   [8, 13).  Note that the subtrees cover a slightly larger interval
+   than [5, 13).
 
                    +-----------------------------+
                    |            [0, 13)          |
                    +-----------------------------+
                       /                       \
-          +----------------+             +================+
+          +----------------+             +~~~~~~~~~~~~~~~~+
           |     [0, 8)     |             |     [8, 13)    |
-          +----------------+             +================+
+          +----------------+             +~~~~~~~~~~~~~~~~+
            /              \                 /          |
-      +--------+      +========+      +---------+      |
+      +--------+      +~~~~~~~~+      +---------+      |
       | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-      +--------+      +========+      +---------+      |
+      +--------+      +~~~~~~~~+      +---------+      |
        /      \        /      \         /      \       |
    +-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
    |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
@@ -1061,37 +1123,7 @@ Table of Contents
    |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
    +-+ +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
 
-      Figure 9: An example selection of subtrees to cover an interval
-
-   Two subtrees are needed because a single subtree may not be able to
-   efficiently cover an interval.  Figure 10 shows the smallest subtree
-   that contains [7, 9) in a 9-element tree.  The smallest single
-   subtree that contains the interval is [0, 9) but this is the entire
-   tree.  Using two subtrees, the interval can be described by [7, 8)
-   and [8, 9).
-
-                   +===================+
-                   |      [0, 9)       |
-                   +===================+
-                      /             |
-          +----------------+        |
-          |     [0, 8)     |        |
-          +----------------+        |
-           /              \         |
-      +--------+      +--------+    |
-      | [0, 4) |      | [4, 8) |    |
-      +--------+      +--------+    |
-       /      \        /      \     |
-   +-----+ +-----+ +-----+ +-----+  |
-   |[0,2)| |[2,4)| |[4,6)| |[6,8)|  |
-   +-----+ +-----+ +-----+ +-----+  |
-     / \     / \     / \     / \    |
-   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
-   |0| |1| |2| |3| |4| |5| |6| |7| |8|
-   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
-
-      Figure 10: An example showing an inefficient choice of a single
-                                  subtree
+      Figure 10: An example selection of subtrees to cover an interval
 
 5.  Certification Authorities
 
@@ -1105,12 +1137,13 @@ Table of Contents
       size of its output in bytes is referred to as HASH_SIZE.
 
    *  A series of issuance logs (Section 5.2), which contain all
-      statements the CA has certified.
+      statements the CA has certified.  One issuance log is designated
+      as the current log.
 
    *  A CA cosigner (Section 5.4), which signs subtrees of issuance logs
       to certify their contents.
 
-   *  Optionally, a landmark sequence per log (Section 6.3.1), to
+   *  Optionally, a landmark sequence per log (Section 6.4.1), to
       support optimized landmark-relative certificates.
 
    Section 5.5 defines an X.509 certificate representation of a CA.
@@ -1128,7 +1161,7 @@ Table of Contents
       the issuance log N (Section 5.2).
 
    *  For each positive integer N and L, the OID {caID landmarks(1) N L}
-      represents landmark L (Section 6.3.1) of issuance log N.  These
+      represents landmark L (Section 6.4.1) of issuance log N.  These
       OIDs may be used as trust anchor IDs, as described in Section 8.2.
       These OIDs are used when it is necessary to identify an individual
       landmark, e.g. as in the retry mechanism described Section 4.3 of
@@ -1177,7 +1210,7 @@ Table of Contents
 
    A CA operates a series of issuance logs, each identified by a
    positive integer _log number_. Log numbers are numbered consecutively
-   starting from 1.  Each log number MUST be at most 65535 (2^16-1).
+   from 1 to at most 65535 (2^16-1).
 
    Each issuance log has a _log ID_, which is a trust anchor ID
    constructed by concatenating the following OID components:
@@ -1211,6 +1244,14 @@ Table of Contents
    the Merkle Tree Hash (Section 2.1.1 of [RFC9162]) of entries zero
    through tree_size - 1.
 
+   At any point in time, one of the CA's issuance logs is its _current_
+   log.  Initially, this is log 1.  A CA MUST NOT append to any log that
+   is not the current log.  Logs before the current log may have
+   historical entries.  Logs after the current log MUST be empty.  A CA
+   MAY increment its current log number as part of recovering from
+   certain operational failures.  See Section 12.2.1 for further
+   discussion.
+
 5.2.1.  Log Entries
 
    Each entry in the log is a MerkleTreeCertEntry, defined with the TLS
@@ -1222,7 +1263,7 @@ Table of Contents
    enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
 
    struct {
-       ExtensionType extension_type;
+       MerkleTreeCertEntryExtensionType extension_type;
        opaque extension_data<0..2^16-1>;
    } MerkleTreeCertEntryExtension;
 
@@ -1282,6 +1323,19 @@ Table of Contents
 
    *  issuer is the CA ID as a PKIX distinguished name, as described in
       Section 5.1.
+
+      -  The issuer field is not human-readable.  A
+         TBSCertificateLogEntry MAY carry a human-readable label for the
+         CA, suitable for display in user interfaces, in an issuer
+         alternative name extension (Section 4.2.1.7 of [RFC5280]).  If
+         present, the extension MUST be marked non-critical.  The
+         IssuerAltName SEQUENCE MUST contain a single GeneralName of
+         type directoryName, whose Name MUST use the rdnSequence CHOICE.
+         Each RelativeDistinguishedName MUST contain a single
+         AttributeTypeAndValue.  The extension is purely cosmetic, and
+         MUST NOT be used in path validation or any other trust
+         decision.  The value MUST NOT be assumed unique across issuance
+         logs and MAY change across entries in the same issuance log.
 
    *  subjectPublicKeyAlgorithm describes the algorithm of the subject's
       public key.  It is constructed identically to the algorithm field
@@ -1572,7 +1626,7 @@ Table of Contents
    with a non-zero timestamp.  A signature with a non-zero timestamp
    asserts the complete state of the cosigner's view of the log at a
    given time.  These signatures are not directly used in Merkle Tree
-   Certificates (Section 6.1), but cosigners MAY generate them, subject
+   Certificates (Section 6.2), but cosigners MAY generate them, subject
    to the rules above, as part of other functions in a PKI.  This may
    include log serving or integrating an issuance log into a
    transparency ecosystem.  For example, [TLOG-TILES] and [TLOG-WITNESS]
@@ -1737,8 +1791,11 @@ Table of Contents
 
    This section defines how to construct Merkle Tree Certificates, which
    are X.509 Certificates [RFC5280] that assert the information in an
-   issuance log entry.  A Merkle Tree Certificate is constructed from
-   the following:
+   issuance log entry.
+
+6.1.  Certificate Inputs
+
+   A Merkle Tree Certificate is constructed from the following inputs:
 
    *  A TBSCertificateLogEntry (Section 5.2.1) contained in the issuance
       log (Section 5.2)
@@ -1753,12 +1810,12 @@ Table of Contents
    For any given TBSCertificateLogEntry, there are multiple possible
    certificates that may prove the entry is certified by the CA and
    publicly logged, varying by choice of subtree and signatures.
-   Section 6.1 defines how the certificate is constructed based on those
-   choices.  Section 6.2 and Section 6.3 define two profiles of Merkle
+   Section 6.2 defines how the certificate is constructed based on those
+   choices.  Section 6.3 and Section 6.4 define two profiles of Merkle
    Tree Certificates, standalone certificates and landmark-relative
    certificates, and how to select the subtree and signatures for them.
 
-6.1.  Certificate Format
+6.2.  Certificate Format
 
    The information is encoded in an X.509 Certificate [RFC5280] as
    follows:
@@ -1829,7 +1886,8 @@ Table of Contents
    timestamp field used when computing the signature MUST be zero.
 
    Each element of the signatures field MUST have a unique cosigner_id.
-   Elements MUST be ordered by cosigner_id as follows:
+   Elements MUST be ordered by cosigner_id (excluding length prefix) as
+   follows:
 
    *  Shorter byte strings are ordered before longer byte strings
 
@@ -1846,7 +1904,7 @@ Table of Contents
    on through the least significant bit of the last octet of the
    signature value, which SHALL become the last bit of the bit string.
 
-6.2.  Standalone Certificates
+6.3.  Standalone Certificates
 
    A _standalone certificate_ is a Merkle Tree certificate which
    contains sufficient signatures to allow a relying party to trust the
@@ -1873,8 +1931,10 @@ Table of Contents
 
    5.  The CA requests subtree cosignatures from the cosigners above.
 
-   6.  For each certificate in the interval, the CA constructs
-       certificates (Section 6.1) using the covering subtree.
+   6.  For each log entry in the interval, the CA constructs a
+       certificate (Section 6.2) from the inputs in Section 6.1, using
+       the covering subtree and the subtree cosignatures collected in
+       steps 3 and 5.
 
    Steps 4 and 5 are analogous to requesting SCTs from CT logs in
    Certificate Transparency, except that a single run of this job
@@ -1901,7 +1961,7 @@ Table of Contents
    authenticating party, but the authenticating party MAY collect
    additional cosignatures and add them to the certificate.
 
-6.3.  Landmark-Relative Certificates
+6.4.  Landmark-Relative Certificates
 
    A _landmark-relative certificate_ is a Merkle Tree certificate which
    contains no signatures and instead assumes the relying party had
@@ -1914,12 +1974,12 @@ Table of Contents
    specific mechanism to select between the two.  Section 8 discusses
    such a mechanism for TLS [RFC8446].
 
-6.3.1.  Landmark Tree Sizes
+6.4.1.  Landmark Tree Sizes
 
    To issue landmark-relative certificates, a CA must additionally
    maintain a _landmark sequence_, which is a sequence of _landmarks_.
 
-   Each landmark specifies an agreed tree size, as a common point of
+   Each landmark specifies a tree size, used as a common point of
    reference across the ecosystem for optimizing certificates.
    Landmarks are numbered consecutively from zero.  The first landmark,
    numbered zero, MUST have a tree size of zero.  The sequence of tree
@@ -1950,7 +2010,7 @@ Table of Contents
    relying party as trusted subtrees, as described in Section 7.4.
 
    It is RECOMMENDED that landmarks be allocated following the procedure
-   described in Section 6.3.2.  If landmarks are allocated incorrectly
+   described in Section 6.4.2.  If landmarks are allocated incorrectly
    (e.g. past landmarks change, or max_active_landmarks is inaccurate),
    there are no security consequences, but some older certificates may
    fail to validate.
@@ -1963,7 +2023,7 @@ Table of Contents
    landmark every hour, will have a max_active_landmarks of 169.  The
    client state is then 338 hashes, or 10,816 bytes with SHA-256.
 
-6.3.2.  Allocating Landmarks
+6.4.2.  Allocating Landmarks
 
    It is RECOMMENDED that landmarks be allocated using the following
    procedure:
@@ -1984,7 +2044,7 @@ Table of Contents
    certificate expiry one interval further than ceil(max_cert_lifetime /
    time_between_landmarks) alone would bound.
 
-6.3.3.  Publishing Landmarks
+6.4.3.  Publishing Landmarks
 
    CAs SHOULD publish their active landmarks, so that relying parties
    can configure trusted subtrees (Section 7.4).  The following format
@@ -2010,10 +2070,10 @@ Table of Contents
    It is RECOMMENDED that this format be published as an HTTP resource
    [RFC9110] with content type text/plain; charset=utf-8.
 
-6.3.4.  Constructing Landmark-Relative Certificates
+6.4.4.  Constructing Landmark-Relative Certificates
 
-   Given a TBSCertificateLogEntry in the issuance log and a landmark
-   sequence, a landmark-relative certificate is constructed as follows:
+   Given the inputs in Section 6.1 and a landmark sequence, a landmark-
+   relative certificate is constructed as follows:
 
    1.  Wait for the first landmark to be allocated that contains the
        entry.
@@ -2021,7 +2081,7 @@ Table of Contents
    2.  Determine the landmark's subtrees and select the one that
        contains the entry.
 
-   3.  Construct a certificate (Section 6.1) using the selected subtree
+   3.  Construct a certificate (Section 6.2) using the selected subtree
        and no signatures.
 
    Before sending this certificate, the authenticating party SHOULD
@@ -2032,7 +2092,7 @@ Table of Contents
    the application protocol.  Section 8 discusses how to do this in TLS
    [RFC8446].
 
-6.4.  Size Estimates
+6.5.  Size Estimates
 
    The inclusion proofs in standalone and landmark-relative certificates
    scale logarithmically with the size of the subtree.  These sizes can
@@ -2137,7 +2197,9 @@ Table of Contents
         this process and fail verification.
 
    2.   Decode the signatureValue as an MTCProof, as described in
-        Section 6.1.
+        Section 6.2.  If decoding fails, including if signatureValue is
+        not a multiple of 8 bits or has extra data after the MTCProof,
+        abort this process and fail verification.
 
    3.   Let serial be the certificate's serial number.  If serial is
         negative or greater than 2^64-1, abort this process and fail
@@ -2221,28 +2283,31 @@ Table of Contents
 
    1.   Initialize a hash instance.
 
-   2.   Write the extensions field from the MTCProof to the hash.
+   2.   Write the octet 0x00 to the hash.  This is the domain separator
+        for leaf nodes.
 
-   3.   Write the big-endian, two-byte tbs_cert_entry value to the hash.
+   3.   Write the extensions field from the MTCProof to the hash.
 
-   4.   Write the TBSCertificate contents octets to the hash, up to the
-        subjectPublicKeyInfo field.
+   4.   Write the big-endian, two-byte tbs_cert_entry value to the hash.
 
-   5.   Write the subjectPublicKeyInfo's algorithm field to the hash.
+   5.   Write the TBSCertificate's version, issuer, validity, and
+        subject fields to the hash.
 
-   6.   Write the octet 0x04 to the hash.  This is an OCTET STRING
-        identifer.
+   6.   Write the subjectPublicKeyInfo's algorithm field to the hash.
 
-   7.   Write the octet L to the hash, where L is the hash length.
+   7.   Write the octet 0x04 to the hash.  This is an OCTET STRING
+        identifier.
+
+   8.   Write the octet L to the hash, where L is the hash length.
         (This assumes L is at most 127.)
 
-   8.   Write H to the hash, where H is the hash of the entire
+   9.   Write H to the hash, where H is the hash of the entire
         subjectPublicKeyInfo field.
 
-   9.   Write the remainder of the TBSCertificate contents octets to the
+   10.  Write the remainder of the TBSCertificate contents octets to the
         hash, starting just after the subjectPublicKeyInfo field.
 
-   10.  Finalize the hash and set entry_hash to the result.
+   11.  Finalize the hash and set entry_hash to the result.
 
    This is possible because the structure in Section 5.2.1 omits the
    TBSCertificateLogEntry's identifier and length octets.
@@ -2314,8 +2379,8 @@ Table of Contents
 
    As an optional optimization, a relying party MAY incorporate a
    periodically updated, predistributed list of trusted subtrees from
-   one or more of the CA's issuance logs.  This allows the relying party
-   to accept landmark-relative certificates (Section 6.3) constructed
+   the CA's current issuance log.  This allows the relying party to
+   accept landmark-relative certificates (Section 6.4) constructed
    against those subtrees.
 
    Each trusted subtree contains:
@@ -2327,7 +2392,7 @@ Table of Contents
    *  The hash of the subtree
 
    Trusted subtrees for a given log are determined by its active
-   landmark subtrees, as described in Section 6.3.1.  Before configuring
+   landmark subtrees, as described in Section 6.4.1.  Before configuring
    the subtrees as trusted, the relying party MUST obtain assurance that
    each subtree is consistent with checkpoints observed by a sufficient
    set of cosigners (see Section 5.3) to meet its cosigner requirements.
@@ -2612,10 +2677,11 @@ Table of Contents
    ID assignments for standalone and landmark-relative certificates.
 
    When processing an order for a Merkle Tree certificate, the ACME
-   server moves the order to the "valid" state once the corresponding
-   entry is sequenced in the issuance log.  The order's certificate URL
-   then serves the standalone certificate, constructed as described in
-   Section 6.2.
+   server moves the order to the "valid" state after the corresponding
+   entry is sequenced in the issuance log, cosignatures are collected,
+   and the standalone certificate is available.  The order's certificate
+   URL then serves the standalone certificate, constructed as described
+   in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
    alternate URL for the landmark-relative certificate, as described
@@ -2624,7 +2690,7 @@ Table of Contents
    Unavailable) response, with a Retry-After header (Section 10.2.3 of
    [RFC9110]) estimating when the certificate will become available.
    Once the next landmark is allocated, the ACME server constructs a
-   landmark-relative certificate, as described in Section 6.3 and serves
+   landmark-relative certificate, as described in Section 6.4 and serves
    it from the alternate URL.
 
    ACME clients supporting Merkle Tree certificates SHOULD support
@@ -2945,6 +3011,80 @@ Table of Contents
       then react by revoking the undisclosed entries (Section 7.5), and
       likely removing the CA.
 
+12.2.1.  Log Failures
+
+   Merkle Tree Certificates introduce additional state to PKI
+   deployments and thus new kinds of operational failures.  In
+   particular, unlike directly-signed certificates, some failures may
+   lead to a log being unable to issue new certificates.
+
+   CAs are required to only sign subtree hashes that are consistent with
+   a single append-only view of each issuance log.  A CA might violate
+   this as a result of operational failures.  For example:
+
+   *  A CA loses some state and signs subtree hashes from two
+      inconsistent copies of the log
+
+   *  A CA miscalculates some hash and signs a subtree hash that cannot
+      be computed from some underlying sequence of entries
+
+   As described above, PKIs can use additional cosigners to provide
+   transparency guarantees even in the face of such CA violations.  In
+   doing so, individual cosigners may be locked to only one of two views
+   of the log or unable to sign further checkpoints because some hash's
+   preimage is unknown.  It may then no longer be possible to add
+   entries to the log that are trusted by existing relying parties.
+
+   Whether by accident or compromise, these violations are ultimately CA
+   failures.  However, it is useful for the CA instance to remain
+   functional during and after incident management:
+
+   *  While the incident is diagnosed, authenticating parties may still
+      need new certificates.
+
+   *  If the CA operator and the CA instance are still trustworthy,
+      repairing the incident without changing the CA requires less
+      overhead.
+
+   *  If either the CA operator or the CA instance are no longer
+      trustworthy and must be replaced, the CA may still be needed to
+      serve older, unupdated relying parties.
+
+   This is mitigated by a CA instance consisting of a series of issuance
+   logs (Section 5.2).  After a log failure, the CA SHOULD increment its
+   current issuance log to restore availability.  Both the underlying
+   log failure and the use of a new issuance log will be visible to
+   monitors and SHOULD be treated as a PKI incident.  Such PKI incidents
+   can be handled by some combination of:
+
+   *  Revoking the diverging log indices (Section 7.5)
+
+   *  Reevaluating trusted CAs and, if necessary, removing the old CA
+      instance and switching to a new CA instance
+
+   In the latter case, the CA operator MAY continue to operate the
+   removed CA instance if, for example, there remain unupdated relying
+   parties that require it.
+
+12.2.2.  Limiting Issuance Logs
+
+   While multiple issuance logs help mitigate log failures, as described
+   above, they introduce new transparency risks.  If a CA violates the
+   requirement to only use one issuance log at a time, it might add an
+   entry in some far future log number.  To be accepted in transparency-
+   enforcing relying parties, the log state must still be cosigned.
+   However, monitors may not know which log numbers to monitor.
+
+   PKIs with transparency requirements SHOULD mitigate this by only
+   accepting a limited range of log numbers, in relying parties,
+   transparency cosigners, or both.  The log number limit MAY be set to
+   a fixed value, or a rolling value that is updated whenever the CA
+   switches its current log.  Fixed values require committing to a limit
+   of recoverable log failures during the lifetime of a CA.
+
+   Log number limits in relying parties can be implemented by revoking
+   all serial numbers above some threshold.  (See Section 7.5.)
+
 12.3.  Public Key Hashes
 
    Unlike Certificate Transparency, the mechanisms in this document do
@@ -2989,38 +3129,50 @@ Table of Contents
    entries it certifies, whether or not the preimage of the hash is
    known.
 
-12.5.  New Log Entry Types
+12.5.  Extensibility
 
-   MerkleTreeCertEntry (Section 5.2.1) is extensible and permits
-   protocol extensions to define new formats for the CA to certify.
-   This means older CAs, cosigners, relying parties, and monitors might
-   interact with new entries:
+   MerkleTreeCertEntry (Section 5.2.1) contain several extension points:
+
+   *  New X.509 extensions can be added to TBSCertificateLogEntry.
+
+   *  New MerkleTreeCertEntryType values define new formats for the
+      entry contents.
+
+   *  New MerkleTreeCertEntryExtensionType values define new entry
+      extension fields.
+
+   X.509 extensions apply to Merkle Tree Certificates without any
+   modifications.  The two entry-level extension points are new to this
+   protocol.  Older CAs, cosigners, relying parties, and monitors may
+   encounter unrecognized entries:
+
+   Different cosigner roles interact with extensions differently.  Some
+   roles, e.g. [TLOG-MIRROR] and [TLOG-WITNESS], do not interpret entry
+   contents.  Unrecognized extensions do not impact these roles.  Other
+   roles, such as CA cosigners, have semantics that depend on the entry
+   contents.  If a cosigner role interprets log entry contents, it MUST
+   define how it interacts with unrecognized types and extensions.
 
    Section 5.4 forbids a CA from logging or signing entries that it does
    not recognize.  A CA cannot faithfully claim to certify information
    if it does not understand it.  This is analogous to how a correctly-
    operated X.509 CA can never sign an unrecognized X.509 extension.
 
-   External cosigners may or may not interact with the unrecognized
-   entries.  [TLOG-MIRROR] and [TLOG-WITNESS] describe cosigners whose
-   roles do not interpret the contents of log entries.  New entry types
-   MAY be added without updating them.  If a cosigner role does
-   interpret a log entry, it MUST define how it interacts with unknown
-   ones.
+   Unrecognized entry types do not impact older relying parties.  In
+   Section 7.2, the relying party constructs the MerkleTreeCertEntry
+   that it expects.  The unrecognized entry will have a different type
+   value, so the proof will never succeed, assuming the underlying hash
+   function remains collision-resistant.
 
-   If a relying party trusts an issuance log, but the issuance log
-   contains an unrecognized entry, the entry will not cause it to accept
-   an unexpected certificate.  In Section 7.2, the relying party
-   constructs the MerkleTreeCertEntry that it expects.  The unrecognized
-   entry will have a different type value, so the proof will never
-   succeed, assuming the underlying hash function remains collision-
-   resistant.
+   However, unrecognized entry extensions will be ignored by relying
+   parties, analogously to a non-critical X.509 extension.  Entry
+   extensions thus SHOULD be defined so that this is safe.
 
-   If a monitor observes an entry with unknown type, it may not be able
-   to determine if it is of interest.  For example, it may be unable to
-   tell whether it covers some relevant DNS name.  Until the monitor is
-   updated to reflect the current state of the PKI, the monitor may be
-   unable to detect all misissued certificates.
+   If a monitor observes an entry with unknown type or entry extension,
+   it may not be able to determine if it is of interest.  For example,
+   it may be unable to tell whether it covers some relevant DNS name.
+   Until the monitor is updated to reflect the current state of the PKI,
+   the monitor may be unable to detect all misissued certificates.
 
    This situation is analogous to the addition of a new X.509 extension.
    When relying parties add support for log entry types or new X.509
@@ -3150,6 +3302,41 @@ Table of Contents
    uses of the key SHOULD use a more robust mechanism, namely a fixed
    label prefix or a context string parameter if the signature scheme
    supports it.
+
+12.9.  Subordinate Certification Authorities
+
+   Merkle Tree Certificates' transparency properties only apply to
+   certificates directly issued by the CA, not certification paths.  The
+   CA might issue a certificate that describes an unconstrained,
+   subordinate, non-MTC CA.  Certificates issued by the subordinate CA
+   would not be visible in the MTC CA's issuance log and thus may not be
+   visible to monitors.  However, the subordinate CA certificate that
+   enables this bypass will still be visible in the issuance logs.
+
+   Although the scope is larger, this scenario is similar to an
+   unauthorized end-entity certificate and can be handled analogously:
+
+   Relying parties with transparency requirements SHOULD define policy
+   requirements on trusted CAs that prevent these bypasses, with any
+   violation treated as an unauthorized certificate.  For example, a
+   relying party might require that all subordinate CAs have name
+   constraints (Section 4.2.1.10 of [RFC5280]) or forbid subordinate CAs
+   entirely.  In addition to holding CAs responsible for meeting these
+   policies, relying parties SHOULD programmatically enforce these
+   policies as part of certification path validation.
+
+   Monitors SHOULD monitor for adherence to applicable policies as part
+   of monitoring for unauthorized certificates.  For example, a monitor
+   that looks for entries covering example.com SHOULD look for either a
+   subject alternative name (Section 4.2.1.6 of [RFC5280]) of
+   example.com or a basic constraints (Section 4.2.1.9 of [RFC5280])
+   extension with the cA boolean set to true.
+
+   It is not sufficient to constrain the MTC CA with a path length
+   constraint (Section 4.2.1.9 of [RFC5280]) of zero.  Self-issued
+   certificates do not contribute to path length constraints, so such an
+   MTC CA might still issue CA certificates with the same name as
+   itself.
 
 13.  IANA Considerations
 
@@ -3293,6 +3480,10 @@ Table of Contents
               (DER)", ISO/IEC 8824-1:2021 , February 2021.
 
 14.2.  Informative References
+
+   [Accumulated]
+              Valsorda, F., "Accumulated Test Vectors", October 2024,
+              <https://words.filippo.io/accumulated/>.
 
    [APPLE-CT] Apple, "Apple's Certificate Transparency policy", 5 March
               2021, <https://support.apple.com/en-us/HT205280>.
@@ -3606,7 +3797,86 @@ B.1.  Binary Representations
    last element, 0b101.  That instead indicates a skipped node, not a
    left child.
 
-B.2.  Inclusion Proof Evaluation
+B.2.  Subtrees
+
+   Given a list of elements and Merkle Tree over them, it is possible to
+   construct a smaller Merkle Tree over any interval of elements.
+   However, those smaller trees may not have the same structure as the
+   original tree.
+
+   Figure 15 shows a Merkle Tree of size 8, and a tree built over
+   elements [1, 5).  When [1, 5) is considered as an independent,
+   4-element sequence, it does not align with the portion of the overall
+   tree that covers [1, 5).  The two trees do not share any intermediate
+   nodes.  This prevents constructing subtree consistency proofs
+   (Section 4.4).
+
+          +----------------+
+          |     [0, 8)     |        level 3
+          +----------------+
+           /              \
+      +--------+      +--------+
+      | [0, 4) |      | [4, 8) |    level 2
+      +--------+      +--------+
+       /      \        /      \
+   +-----+ +-----+ +-----+ +-----+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)|  level 1
+   +-----+ +-----+ +-----+ +-----+
+     / \     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5| |6| |7|  level 0
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+
+          +--------+
+          | [1, 5) |                level 2
+          +--------+
+           /      \
+       +-----+ +-----+
+       |[1,3)| |[3,5)|              level 1
+       +-----+ +-----+
+         / \     / \
+       +-+ +-+ +-+ +-+
+       |1| |2| |3| |4|              level 0
+       +-+ +-+ +-+ +-+
+
+                   Figure 15: An example misaligned tree
+
+   The numerical constraints on start and end in Section 4.1 restrict
+   subtrees to ensure that they are properly aligned with the original
+   tree as to permit subtree consistency proofs.  A Merkle Tree built
+   over [start, end) has size end - start, and is constructed as if
+   start were the first element of the sequence at index zero.  To be
+   aligned, start must be the leftmost leaf of the lowest common
+   ancestor of start and end - 1 in the original tree:
+
+   *  Numerically, this means the least significant BIT_WIDTH(end -
+      start - 1) bits of start must be zero.  Equivalently, start must
+      be divisible by BIT_CEIL(end - start).
+
+   *  In the tree, this means subtrees are constructed by taking any
+      node in the tree, setting start to the leftmost leaf under the
+      node, and end to one past any other leaf under the node.
+
+   Though most nodes overlap, not every node of the subtree is
+   necessarily in the larger Merkle Tree, as shown in Figure 5.  In
+   general:
+
+   *  Subtrees whose sizes are a power of two are called _full
+      subtrees_. A full subtree's root node will always be in the
+      original tree.
+
+   *  Subtrees whose sizes are not a power of two are called _partial
+      subtrees_. A partial subtree's root node will be in the original
+      tree of size n, if and only if n = end.  Otherwise, non-leaf nodes
+      along the partial subtree's right edge will not be part of the
+      original tree.
+
+   The difference between full and partial subtrees does not impact
+   their usage, but they can help in understanding the proof
+   constructions below.
+
+B.3.  Inclusion Proof Evaluation
 
    The procedure in Section 4.3.2 builds up a subtree hash in r by
    starting from entry_hash and iteratively hashing elements of
@@ -3641,7 +3911,7 @@ B.2.  Inclusion Proof Evaluation
    significant bits, and the remaining l2 entries are hashed on the
    left.
 
-B.3.  Consistency Proof Structure
+B.4.  Consistency Proof Structure
 
    A subtree consistency proof for [start, end) and the tree of n
    elements is similar to an inclusion proof for element end - 1.  If
@@ -3656,8 +3926,7 @@ B.3.  Consistency Proof Structure
        at a higher level.  Any ancestor of end - 1 shared by both the
        subtree and the overall tree is a valid starting node to
        reconstruct node_hash and root_hash.  Use the highest level with
-       a commmon ancestor.  This truncates the inclusion proof portion
-       of the consistency proof.
+       a commmon ancestor.  This truncates the inclusion proof.
 
    2.  If this starting node is the entire subtree, omit its hash from
        the consistency proof.  The verifier is assumed to already know
@@ -3666,7 +3935,7 @@ B.3.  Consistency Proof Structure
    A Merkle consistency proof, defined in Section 2.1.4 of [RFC9162],
    applies these same optimizations.
 
-   Figure 15 depicts a subtree consistency proof between the subtree [0,
+   Figure 16 depicts a subtree consistency proof between the subtree [0,
    6) and the Merkle Tree of size 8.  The consistency proof begins at
    level 1, or node [4, 6).  The inclusion proof portion is similarly
    truncated to start at level 1: [6, 8) and [0, 4).  If the consistency
@@ -3706,12 +3975,12 @@ B.3.  Consistency Proof Structure
    |0| |1| |2| |3| |4| |5| |6| |7|   level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-       Figure 15: A subtree consistency proof that starts at level 1
+       Figure 16: A subtree consistency proof that starts at level 1
                              instead of level 0
 
    Note that the truncated inclusion proof may include nodes from lower
    levels, if the corresponding level was skipped on the right edge.
-   Figure 16 depicts a subtree consistency proof between the subtree [0,
+   Figure 17 depicts a subtree consistency proof between the subtree [0,
    6) and the Merkle Tree of size 7.  As above, the starting node is [4,
    6) at level 1.  The inclusion proof portion includes leaf 6 at level
    0.  This is because leaf 6 is taking the place of its skipped parent
@@ -3751,13 +4020,13 @@ B.3.  Consistency Proof Structure
    |0| |1| |2| |3| |4| |5| |6|     level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-     Figure 16: The interaction between inclusion proof truncation and
+     Figure 17: The interaction between inclusion proof truncation and
                                skipped levels
 
-B.4.  Consistency Proof Verification
+B.5.  Consistency Proof Verification
 
    The procedure in Section 4.4.3 is structured similarly to inclusion
-   proof evaluation (Appendix B.2).  It iteratively builds two hashes,
+   proof evaluation (Appendix B.3).  It iteratively builds two hashes,
    fr and sr, which are expected to equal node_hash and root_hash,
    respectively.  Everything hashed into fr is also hashed into sr, so
    success demonstrates that root_hash contains node_hash.
@@ -3768,11 +4037,11 @@ B.4.  Consistency Proof Verification
    tree).
 
    Steps 3 and 4 then skip to the starting node, described in
-   Appendix B.3.  The starting node may be:
+   Appendix B.4.  The starting node may be:
 
-   *  The entire subtree [start, end) if [start, end) is directly
-      contained in the tree.  This will occur if end is n (step 3), or
-      if [start, end) is full (exiting step 4 because fn is sn).
+   *  The entire subtree [start, end) if the subtree root is in the
+      tree.  This will occur if end is n (step 3), or if [start, end) is
+      a full subtree (exiting step 4 because fn is sn).
 
    *  Otherwise, the highest full subtree along the right edge of
       [start, end).  This corresponds to the process exiting step 4
@@ -3797,14 +4066,148 @@ B.4.  Consistency Proof Verification
       hash on the right because those contain elements greater than end
       - 1.  It also stops incorporating when fn and sn have converged.
 
-   This reconstructs the hashes of the subtree and full tree, which are
-   then compared to expected values in step 8.
+   This reconstructs the hashes of the subtree and original tree, which
+   are then compared to expected values in step 8.
 
    In the case when fn is sn in step 5, the condition in step 7.2.1 is
    always false, and fr is always equal to node_hash in step 8.  In this
    case, steps 6 through 8 are equivalent to verifying an inclusion
    proof for the truncated subtree [fn, sn + 1) and truncated tree tn +
    1.
+
+Appendix C.  Subtree Test Vectors
+
+   The following are "accumulated" [Accumulated] test vectors for the
+   various subtree algorithms defined in Section 4.
+
+   They are hash values of the outputs of all possible inputs for each
+   algorithm, for trees of sizes up to 130.  They can be used to verify
+   that an implementation matches the specification, without having to
+   include a large number of individual test vectors.
+
+   For all the test vectors, a tree D_n of size n is constructed with
+   leaf values d[0] = 0x00, d[1] = 0x01, .... The hash function used is
+   SHA-256.  The hash values are encoded in hexadecimal.
+
+C.1.  Subtree Hashes
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1, if [start, end) is a valid subtree, add to the rolling
+   hash the ASCII string [START, END) HASH followed by a newline
+   (U+000A), where START and END are the decimal representations of
+   start and end, respectively, and HASH is the hexadecimal encoding of
+   MTH(D[start:end]), according to Section 4.
+
+   The final hash value is
+
+   94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               subtree_hash = MTH(D[start:end])
+               h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
+   assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+
+C.2.  Subtree Inclusion Proofs
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1, if [start, end) is a valid subtree, for each value of
+   index from start to end - 1, add to the rolling hash the ASCII string
+   INDEX [START, END), then, for each hash in the inclusion proof
+   (Section 4.3) for d[index] in the subtree [start, end), a space
+   (U+0020) followed by the hexadecimal encoding of that hash, and
+   finally a newline (U+000A), where INDEX is the decimal representation
+   of index, and START and END are the decimal representations of start
+   and end, respectively.
+
+   The final hash value is
+
+   ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               for index in range(start, end):
+                   inclusion_proof = get_inclusion_proof(D, start, end, index)
+                   line = f'{index} [{start}, {end})'
+                   for p in inclusion_proof:
+                       line += f' {p.hex()}'
+                   h.update(f'{line}\n'.encode())
+   assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
+
+C.3.  Subtree Consistency Proofs
+
+   For each value of n from 0 to 130, and each value of end from 1 to n,
+   and each value of start from 0 to end - 1, if [start, end) is a valid
+   subtree, add to the rolling hash the ASCII string [START, END) N,
+   then, for each hash in the consistency proof (Section 4.4) for the
+   subtree [start, end) and tree of size n, a space (U+0020) followed by
+   the hexadecimal encoding of that hash, and finally a newline
+   (U+000A), where START and END are the decimal representations of
+   start and end, respectively, and N is the decimal representation of
+   n.
+
+   The final hash value is
+
+   c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for n in range(131):
+       for end in range(1, n + 1):
+           for start in range(end):
+               if valid_subtree(start, end):
+                   consistency_proof = get_consistency_proof(D, n, start, end)
+                   line = f'[{start}, {end}) {n}'
+                   for p in consistency_proof:
+                       line += f' {p.hex()}'
+                   h.update(f'{line}\n'.encode())
+   assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+
+C.4.  Efficient Covering Subtrees
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1:
+
+   *  if [start, end) is a valid subtree, add to the rolling hash the
+      ASCII string [START, END) followed by a newline (U+000A), where
+      START and END are the decimal representations of start and end,
+      respectively;
+
+   *  otherwise, add to the rolling hash the ASCII string [LEFT_START,
+      LEFT_END) [RIGHT_START, RIGHT_END) followed by a newline (U+000A),
+      where LEFT_START, LEFT_END, RIGHT_START, and RIGHT_END are the
+      decimal representations of the start and end of the left and right
+      subtrees, respectively, that efficiently cover (Section 4.5)
+      [start, end).
+
+   The final hash value is
+
+   e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               h.update(f'[{start}, {end})\n'.encode())
+           else:
+               left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+               h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+   assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
 
 Acknowledgements
 
@@ -4019,10 +4422,24 @@ Since draft-ietf-plants-merkle-tree-certs-03
 
    *  Canonicalize the order of cosignatures in MTCProofs
 
-   *  Remove subtree signer API in favor of
+   *  Remove sketch of tlog subtree signer API in favor of
       https://github.com/C2SP/C2SP/pull/245 in [TLOG-WITNESS]
 
    *  Add an extensions block to log entries
+
+Since draft-ietf-plants-merkle-tree-certs-04
+
+   *  Fix some mistakes in the single-pass signature verification
+      algorithm
+
+   *  Editorial fixes
+
+   *  Discuss the implications of subordinate CAs in Security
+      Considerations
+
+   *  Added subtree test vector appendix
+
+   *  Define a CA's current issuance log and rules around that
 
 Authors' Addresses
 
