@@ -144,6 +144,8 @@ Table of Contents
    12. Security Considerations
      12.1.  Authenticity
      12.2.  Transparency
+       12.2.1.  Log Failures
+       12.2.2.  Limiting Issuance Logs
      12.3.  Public Key Hashes
      12.4.  Non-Repudiation
      12.5.  Extensibility
@@ -1247,7 +1249,8 @@ Table of Contents
    is not the current log.  Logs before the current log may have
    historical entries.  Logs after the current log MUST be empty.  A CA
    MAY increment its current log number as part of recovering from
-   certain operational failures.
+   certain operational failures.  See Section 12.2.1 for further
+   discussion.
 
 5.2.1.  Log Entries
 
@@ -3007,6 +3010,77 @@ Table of Contents
       sufficient to determine the serial number, so relying parties can
       then react by revoking the undisclosed entries (Section 7.5), and
       likely removing the CA.
+
+12.2.1.  Log Failures
+
+   Merkle Tree Certificates introduce additional state to PKI
+   deployments and thus new kinds of operational failures.  CAs are
+   required to only sign subtree hashes that are consistent with a
+   single append-only view of each issuance log.  A CA might violate
+   this as a result of operational failures.  For example:
+
+   *  A CA loses some state and signs subtree hashes from two
+      inconsistent copies of the log
+
+   *  A CA miscalculates some hash and signs a subtree hash that cannot
+      be computed from some underlying sequence of entries
+
+   As described above, PKIs can use additional cosigners to provide
+   transparency guarantees even in the face of such CA violations.  In
+   doing so, individual cosigners may be locked to only one of two views
+   of the log or unable to sign further checkpoints because some hash's
+   preimage is unknown.  It may then no longer be possible to add
+   entries to the log that are trusted by existing relying parties.
+
+   Whether by accident or compromise, these violations are ultimately CA
+   failures.  However, it is useful for the CA instance to remain
+   functional during and after incident management:
+
+   *  While the incident is diagnosed, authenticating parties may still
+      need new certificates.
+
+   *  If relying parties consider the CA operator and the CA instance
+      still trustworthy, repairing the incident without changing the CA
+      requires less overhead.
+
+   *  If relying parties consider either the CA operator or the CA
+      instance no longer trustworthy and in need of replacement, the CA
+      may still be needed to serve older, unupdated relying parties.
+
+   This is mitigated by a CA instance consisting of a series of issuance
+   logs (Section 5.2).  After a log failure, the CA SHOULD increment its
+   current issuance log to restore availability.  Both the underlying
+   log failure and the use of a new issuance log will be visible to
+   monitors and SHOULD be treated as a PKI incident.  Such PKI incidents
+   can be handled by some combination of:
+
+   *  Revoking the diverging log indices (Section 7.5)
+
+   *  Reevaluating trusted CAs and, if necessary, removing the old CA
+      instance and switching to a new CA instance
+
+   In the latter case, the CA operator MAY continue to operate the
+   removed CA instance if, for example, there remain unupdated relying
+   parties that require it.
+
+12.2.2.  Limiting Issuance Logs
+
+   While multiple issuance logs help mitigate log failures, as described
+   above, they introduce transparency risks.  If a CA violates the
+   requirement to only use one issuance log at a time, it might add an
+   entry in some far future log number.  To be accepted in transparency-
+   enforcing relying parties, the log state must still be cosigned.
+   However, monitors may not know which log numbers to monitor.
+
+   PKIs with transparency requirements SHOULD mitigate this by only
+   accepting a limited range of log numbers in relying parties,
+   transparency cosigners, or both.  This limit MAY be set to a fixed
+   value or a rolling value that is updated whenever the CA switches its
+   current log.  Fixed values require committing to a limit of
+   recoverable log failures over the lifetime of a CA.
+
+   Log number limits in relying parties can be implemented by revoking
+   all serial numbers above some threshold.  (See Section 7.5.)
 
 12.3.  Public Key Hashes
 
