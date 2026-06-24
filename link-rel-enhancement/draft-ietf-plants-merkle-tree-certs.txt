@@ -4413,6 +4413,9 @@ Since draft-ietf-plants-merkle-tree-certs-04
 
    *  Added subtree test vector appendix
 
+   *  Switch the ACME construction to a new link relation and change the
+      HTTP status code
+
 Authors' Addresses
 
    David Benjamin
