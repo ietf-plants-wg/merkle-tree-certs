@@ -1668,21 +1668,21 @@ This section describes how to issue Merkle Tree certificates using ACME {{!RFC85
 
 This section introduces a new link relation {{!RFC8288}}, "enhancement". It identifies an optional substitute for the original context. This substitute may be preferable in some way (e.g. it may be smaller) but is optional. Consumers that accept the substitute are expected to also accept the original context, so it is not an error if the resource is unavailable.
 
-This is similar to the "alternate" link relation, except that it specifies the substitute is optional. In some applications, a client may fetch all alternates, so that it may forward the one of the alternates to another party. For example, {{Section 7.4.2 of !RFC8555}} describes how an ACME server uses the "alternate" link relation to server multiple certificate chains for an ACME order. An ACME client might then fetch all of them and configure them in a TLS server, which presents them to TLS clients. Different TLS clients need different chains, so the ACME client would treat any unavailable alternate as an error.
+This is similar to the "alternate" link relation, except that it specifies the substitute is optional. In some applications, a client may fetch all alternates, so that it may forward one of the alternates to another party. For example, {{Section 7.4.2 of !RFC8555}} describes how an ACME server uses the "alternate" link relation to serve multiple certificate chains for an ACME order. An ACME client might then fetch all of them and configure them in a TLS server, which presents them to TLS clients. Different TLS clients need different chains, so the ACME client would treat any unavailable alternate as an error.
 
-This behavior is not ideal for landmark-relative certificates, which are available asynchronously and should not block deployment of their corresponding standalone certificate. The "enhancement" link relation allows an ACME server to specify which chains are necessary to fulfill the ACME order and which are optional additions:
+This behavior is not ideal for landmark-relative certificates, which are available asynchronously and should not block deployment of their corresponding standalone certificate. The "enhancement" link relation allows an ACME server to specify which chains are necessary to fulfill the ACME order and which are optional additions.
 
-When serving a certificate, an ACME server MAY provide one or more link relation header fields with relation "enhancement". Each such field SHOULD express a certificate chain that the ACME server expects to be redundant with (but potentially preferable to) either the original certificate chain or one of the chains served from an "alternate" relation. If the certificate chain is not yet available, the enhancement MAY serve an HTTP 202 (Accepted) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when it will become available.
+When serving a certificate, an ACME server MAY provide one or more link relation header fields with relation "enhancement". Each such field SHOULD express a certificate chain that the ACME server expects to be redundant with (but potentially preferable to) either the original certificate chain or one of the chains served from an "alternate" relation. If the certificate chain is not yet available, the enhancement URL MAY serve an HTTP 202 (Accepted) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when it will become available.
 
 ACME clients can fetch enhancement URLs to collect additional alternate certificate chains. If the resource is unavailable, the ACME client SHOULD NOT fail the overall transaction. If the resource returns an HTTP 202 (Accepted) response, the ACME client SHOULD retry the request later, incorporating any Retry-After header, but it SHOULD NOT block deployment of other chains on this process.
 
 ## Using ACME with Merkle Tree Certificates
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates.
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
-The standalone certificate response SHOULD additionally carry an enhancement URL ({{enhancement-link-relation}}) for the landmark-relative certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the enhancement URL SHOULD return a HTTP 202 (Accepted) response. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the enhancement URL.
+The standalone certificate response SHOULD additionally carry an enhancement URL ({{enhancement-link-relation}}) for the landmark-relative certificate, as described in {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the enhancement URL SHOULD return an HTTP 202 (Accepted) response. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the enhancement URL.
 
 # Deployment Considerations
 
@@ -1932,7 +1932,7 @@ Relation Name:
 : enhancement
 
 Description:
-: Refers to an optional substitute for this context. Consumers that accept the substitute are expected to also accept this the original context, so it is not an error if the substitute is unavailable.
+: Refers to an optional substitute for this context. Consumers that accept the substitute are expected to also accept the original context, so it is not an error if the substitute is unavailable.
 
 Reference:
 : [this-RFC], {{enhancement-link-relation}}
