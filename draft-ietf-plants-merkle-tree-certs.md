@@ -898,7 +898,7 @@ A CA consists of the following components:
 
 * A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 {{!SHS=DOI.10.6028/NIST.FIPS.180-4}} is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.
 
-* A series of issuance logs ({{issuance-logs}}), which contain all statements the CA has certified.
+* A series of issuance logs ({{issuance-logs}}), which contain all statements the CA has certified. One issuance log is designated as the current log.
 
 * A CA cosigner ({{certification-authority-cosigners}}), which signs subtrees of issuance logs to certify their contents.
 
@@ -948,7 +948,7 @@ For example, the distinguished name for a CA with ID `32473.1` would be represen
 
 ## Issuance Logs
 
-A CA operates a series of issuance logs, each identified by a positive integer *log number*. Log numbers are numbered consecutively starting from 1. Each log number MUST be at most 65535 (2<sup>16</sup>-1).
+A CA operates a series of issuance logs, each identified by a positive integer *log number*. Log numbers are numbered consecutively from 1 to at most 65535 (2<sup>16</sup>-1).
 
 Each issuance log has a *log ID*, which is a trust anchor ID constructed by concatenating the following OID components:
 
@@ -965,6 +965,8 @@ Each log additionally maintains a *minimum index* value, which is the index of t
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
+
+At any point in time, one of the CA's issuance logs is its *current* log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures.
 
 ### Log Entries
 
@@ -1542,7 +1544,7 @@ Cosigner roles are extensible without changes to certificate verification itself
 
 ## Trusted Subtrees
 
-As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from one or more of the CA's issuance logs. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
+As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from the CA's current issuance log. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
 
 Each trusted subtree contains:
 
@@ -2571,3 +2573,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Discuss the implications of subordinate CAs in Security Considerations
 
 - Added subtree test vector appendix
+
+- Define a CA's current issuance log and rules around that
