@@ -2676,8 +2676,8 @@ Table of Contents
    serve multiple certificate chains for an ACME order.  An ACME client
    might then fetch all of them and configure them in a TLS server,
    which presents them to TLS clients.  Different TLS clients need
-   different chains, so the ACME client would treat any unavailable
-   alternate as an error.
+   different chains, so the ACME client might reasonably treat any
+   unavailable alternate as an error.
 
    This behavior is not ideal for landmark-relative certificates, which
    are available asynchronously and should not block deployment of their
