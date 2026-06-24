@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 25 December 2026                                     Apple Inc.
+Expires: 26 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            23 June 2026
+                                                            24 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 December 2026.
+   This Internet-Draft will expire on 26 December 2026.
 
 Copyright Notice
 
@@ -3039,13 +3039,13 @@ Table of Contents
    *  While the incident is diagnosed, authenticating parties may still
       need new certificates.
 
-   *  If the CA operator and the CA instance are still trustworthy,
-      repairing the incident without changing the CA requires less
-      overhead.
+   *  If relying parties consider the CA operator and the CA instance
+      still trustworthy, repairing the incident without changing the CA
+      requires less overhead.
 
-   *  If either the CA operator or the CA instance are no longer
-      trustworthy and must be replaced, the CA may still be needed to
-      serve older, unupdated relying parties.
+   *  If relying parties consider either the CA operator or the CA
+      instance no longer trustworthy and in need of replacement, the CA
+      may still be needed to serve older, unupdated relying parties.
 
    This is mitigated by a CA instance consisting of a series of issuance
    logs (Section 5.2).  After a log failure, the CA SHOULD increment its
