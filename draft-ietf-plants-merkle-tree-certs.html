@@ -13,21 +13,22 @@
 <meta content="
        This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to existing X.509 constructions and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
     " name="description">
-<meta content="xml2rfc 3.33.0" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="draft-ietf-plants-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.33.0
-    Python 3.12.13
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.9.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.7.0
+    wcwidth 0.8.1
 -->
 <link href="draft-ietf-plants-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1050,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 18 December 2026</td>
+<td class="center">Expires 26 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-16" class="published">16 June 2026</time>
+<time datetime="2026-06-24" class="published">24 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-18">18 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-26">26 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1135,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 26 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3755,7 +3756,7 @@ def find_subtrees(start, end):
           <p id="section-5-2.2.1">A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span> is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.3">
-          <p id="section-5-2.3.1">A series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>), which contain all statements the CA has certified.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.3.1">A series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>), which contain all statements the CA has certified. One issuance log is designated as the current log.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.4">
           <p id="section-5-2.4.1">A CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>), which signs subtrees of issuance logs to certify their contents.<a href="#section-5-2.4.1" class="pilcrow">¶</a></p>
@@ -3820,7 +3821,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
         <h3 id="name-issuance-logs">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-issuance-logs" class="section-name selfRef">Issuance Logs</a>
         </h3>
-<p id="section-5.2-1">A CA operates a series of issuance logs, each identified by a positive integer <em>log number</em>. Log numbers are numbered consecutively starting from 1. Each log number MUST be at most 65535 (2<sup>16</sup>-1).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">A CA operates a series of issuance logs, each identified by a positive integer <em>log number</em>. Log numbers are numbered consecutively from 1 to at most 65535 (2<sup>16</sup>-1).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">Each issuance log has a <em>log ID</em>, which is a trust anchor ID constructed by concatenating the following OID components:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.2-3.1">
@@ -3838,6 +3839,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 <p id="section-5.2-6">Each log additionally maintains a <em>minimum index</em> value, which is the index of the first log entry which is available. See <a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>. This value changes over the lifetime of the log.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
 <p id="section-5.2-7">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
 <p id="section-5.2-8">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5.2-8" class="pilcrow">¶</a></p>
+<p id="section-5.2-9">At any point in time, one of the CA's issuance logs is its <em>current</em> log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures.<a href="#section-5.2-9" class="pilcrow">¶</a></p>
 <div id="log-entries">
 <section id="section-5.2.1">
           <h4 id="name-log-entries">
@@ -4910,7 +4912,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from one or more of the CA's issuance logs. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from the CA's current issuance log. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <p id="section-7.4-2">Each trusted subtree contains:<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-3.1">
@@ -7227,6 +7229,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.16-1.4">
             <p id="appendix-E.16-1.4.1">Added subtree test vector appendix<a href="#appendix-E.16-1.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.16-1.5">
+            <p id="appendix-E.16-1.5.1">Define a CA's current issuance log and rules around that<a href="#appendix-E.16-1.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

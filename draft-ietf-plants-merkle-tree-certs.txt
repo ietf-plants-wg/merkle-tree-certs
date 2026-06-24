@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 18 December 2026                                     Apple Inc.
+Expires: 26 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            16 June 2026
+                                                            24 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 December 2026.
+   This Internet-Draft will expire on 26 December 2026.
 
 Copyright Notice
 
@@ -1135,7 +1135,8 @@ Table of Contents
       size of its output in bytes is referred to as HASH_SIZE.
 
    *  A series of issuance logs (Section 5.2), which contain all
-      statements the CA has certified.
+      statements the CA has certified.  One issuance log is designated
+      as the current log.
 
    *  A CA cosigner (Section 5.4), which signs subtrees of issuance logs
       to certify their contents.
@@ -1207,7 +1208,7 @@ Table of Contents
 
    A CA operates a series of issuance logs, each identified by a
    positive integer _log number_. Log numbers are numbered consecutively
-   starting from 1.  Each log number MUST be at most 65535 (2^16-1).
+   from 1 to at most 65535 (2^16-1).
 
    Each issuance log has a _log ID_, which is a trust anchor ID
    constructed by concatenating the following OID components:
@@ -1240,6 +1241,13 @@ Table of Contents
    committed to the log at the time.  Its contents can be described by
    the Merkle Tree Hash (Section 2.1.1 of [RFC9162]) of entries zero
    through tree_size - 1.
+
+   At any point in time, one of the CA's issuance logs is its _current_
+   log.  Initially, this is log 1.  A CA MUST NOT append to any log that
+   is not the current log.  Logs before the current log may have
+   historical entries.  Logs after the current log MUST be empty.  A CA
+   MAY increment its current log number as part of recovering from
+   certain operational failures.
 
 5.2.1.  Log Entries
 
@@ -2368,8 +2376,8 @@ Table of Contents
 
    As an optional optimization, a relying party MAY incorporate a
    periodically updated, predistributed list of trusted subtrees from
-   one or more of the CA's issuance logs.  This allows the relying party
-   to accept landmark-relative certificates (Section 6.4) constructed
+   the CA's current issuance log.  This allows the relying party to
+   accept landmark-relative certificates (Section 6.4) constructed
    against those subtrees.
 
    Each trusted subtree contains:
@@ -4353,6 +4361,8 @@ Since draft-ietf-plants-merkle-tree-certs-04
       Considerations
 
    *  Added subtree test vector appendix
+
+   *  Define a CA's current issuance log and rules around that
 
 Authors' Addresses
 
