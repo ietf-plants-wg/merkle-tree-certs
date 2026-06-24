@@ -1796,8 +1796,8 @@ As described above, PKIs can use additional cosigners to provide transparency gu
 Whether by accident or compromise, these violations are ultimately CA failures. However, it is useful for the CA instance to remain functional during and after incident management:
 
 * While the incident is diagnosed, authenticating parties may still need new certificates.
-* If the CA operator and the CA instance are still trustworthy, repairing the incident without changing the CA requires less overhead.
-* If either the CA operator or the CA instance are no longer trustworthy and must be replaced, the CA may still be needed to serve older, unupdated relying parties.
+* If relying parties consider the CA operator and the CA instance still trustworthy, repairing the incident without changing the CA requires less overhead.
+* If relying parties consider either the CA operator or the CA instance no longer trustworthy and in need of replacement, the CA may still be needed to serve older, unupdated relying parties.
 
 This is mitigated by a CA instance consisting of a series of issuance logs ({{issuance-logs}}). After a log failure, the CA SHOULD increment its current issuance log to restore availability. Both the underlying log failure and the use of a new issuance log will be visible to monitors and SHOULD be treated as a PKI incident. Such PKI incidents can be handled by some combination of:
 
