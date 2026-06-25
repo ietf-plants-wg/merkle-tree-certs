@@ -4462,7 +4462,7 @@ MTCCertificationAuthority ::= SEQUENCE {
     logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
     minSerial INTEGER (0..mtcMaxSerial),
-    maxSerial INTEGER (0..mtcMaxSerial),
+    maxSerial INTEGER (0..mtcMaxSerial)
 }
 </pre><a href="#section-5.5-6" class="pilcrow">¶</a>
 </div>
@@ -5809,7 +5809,7 @@ MTCCertificationAuthority ::= SEQUENCE {
     logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
     minSerial INTEGER (0..mtcMaxSerial),
-    maxSerial INTEGER (0..mtcMaxSerial),
+    maxSerial INTEGER (0..mtcMaxSerial)
 }
 
 END
@@ -7298,6 +7298,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.16-1.5">
             <p id="appendix-E.16-1.5.1">Define a CA's current issuance log and rules around that<a href="#appendix-E.16-1.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.16-1.6">
+            <p id="appendix-E.16-1.6.1">Add a maxSerial field to the CA format<a href="#appendix-E.16-1.6.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

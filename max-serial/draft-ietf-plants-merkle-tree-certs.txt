@@ -1754,7 +1754,7 @@ Table of Contents
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
        minSerial INTEGER (0..mtcMaxSerial),
-       maxSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    For initial experimentation, early implementations of this design
@@ -3693,7 +3693,7 @@ Appendix A.  ASN.1 Module
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
        minSerial INTEGER (0..mtcMaxSerial),
-       maxSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    END
@@ -4454,6 +4454,8 @@ Since draft-ietf-plants-merkle-tree-certs-04
    *  Added subtree test vector appendix
 
    *  Define a CA's current issuance log and rules around that
+
+   *  Add a maxSerial field to the CA format
 
 Authors' Addresses
 
