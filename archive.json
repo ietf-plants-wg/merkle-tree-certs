@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-23T04:13:35.681177+00:00",
+  "timestamp": "2026-06-25T04:16:34.415588+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3542,7 +3542,7 @@
       "id": "I_kwDOJIBkVc8AAAABCaLv1A",
       "title": "Log numbers follow-up work",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/232",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -3551,8 +3551,8 @@
       "labels": [],
       "body": "Filing some follow-up work for myself after we merge https://github.com/ietf-plants-wg/merkle-tree-certs/pull/213. Filing this so I can reference this in TODOs\n\n- [x] Make the serial numbers fit in 64 bits again\n- [x] Fix up the slightly awkward sectioning\n- [ ] Some text discussing how you use multiple logs, like how CAs should only be appending to the latest and other considerations",
       "createdAt": "2026-05-15T20:04:19Z",
-      "updatedAt": "2026-05-16T05:09:59Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-24T21:11:11Z",
+      "closedAt": "2026-06-24T21:11:11Z",
       "comments": []
     },
     {
@@ -3592,15 +3592,15 @@
       "id": "I_kwDOJIBkVc8AAAABDO_lNQ",
       "title": "Whither null_entry?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/241",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "After #213, null_entry is no longer needed for avoiding the zero serial. Should we still have it?\n\nBenefits:\n* Exercises the entry type extension point ahead of time\n* Maybe useful for liveness checks?\n* Maaaybe useful if someone wants to pad out the tree to some multiple of a power of 2 and avoid partial subtrees????\n\nDownsides:\n* Doesn't _really_ do anything. :-)\n* The spec text right now doesn't particularly motivate it so maybe we should fix that if we keep it",
       "createdAt": "2026-05-24T15:13:53Z",
-      "updatedAt": "2026-05-25T11:50:20Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-24T19:52:38Z",
+      "closedAt": "2026-06-24T19:52:38Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -3608,6 +3608,13 @@
           "body": "I like it for liveness checks.",
           "createdAt": "2026-05-25T11:50:20Z",
           "updatedAt": "2026-05-25T11:50:20Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hehe, good enough reason for me. Closing.",
+          "createdAt": "2026-06-24T19:52:38Z",
+          "updatedAt": "2026-06-24T19:52:38Z"
         }
       ]
     },
@@ -3664,6 +3671,46 @@
       "body": "Give a more exact description for how to determine a landmark subtree for an entry from the landmark sequence. The current text at https://github.com/ietf-plants-wg/merkle-tree-certs/blob/main/draft-ietf-plants-merkle-tree-certs.md#constructing-landmark-relative-certificates says:\n```\nGiven a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark-relative certificate is constructed as follows:\n\nWait for the first landmark to be allocated that contains the entry.\n\nDetermine the landmark's subtrees and select the one that contains the entry.\n\nConstruct a certificate ([Section 6.1](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#certificate-format)) using the selected subtree and no signatures.\n```\n\nWe can give a little more detail here and define an exact algorithm to derive the unique landmark subtree (if one exists for the entry) and corresponding landmark number. It's also slightly confusing to say a landmark 'contains' an entry, since we're really looking for an interval `[prev_tree_size, tree_size)` that contains the entry index.\n\nAlso worth stating that both landmark subtrees share the same landmark number, since that's a potential point of confusion.",
       "createdAt": "2026-06-16T03:45:46Z",
       "updatedAt": "2026-06-16T03:45:46Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 258,
+      "id": "I_kwDOJIBkVc8AAAABGg3B9Q",
+      "title": "Single-pass entry_hash procedure omits the RFC 9162 Merkle leaf prefix",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/258",
+      "state": "CLOSED",
+      "author": "Vaisman",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "While comparing the full entry_hash construction with the single-pass shortcut, I noticed that the latter appears to omit the RFC 9162 leaf prefix.\n\nThe full procedure in \"Verifying Certificate Signatures\" defines `entry_hash` as:\n\n> Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in Section 2.1.1 of RFC9162.\n\nThe single-pass procedure described right after it, however, appears to start hashing the serialized `MerkleTreeCertEntry` directly:\n\n1. Initialize a hash instance.\n2. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.\n3. Write the `TBSCertificate` contents octets to the hash, up to the `subjectPublicKeyInfo` field.\n\nThere is no step that writes the required `0x00` Merkle leaf prefix before the entry bytes. Without that prefix, the single-pass procedure computes `HASH(entry)` rather than `HASH(0x00 || entry)`, so it is not equivalent to `MTH({entry})`.\n\nSuggested fix: add an explicit first hashing step before writing the `MerkleTreeCertEntry` contents:\n\n> Write the octet `0x00` to the hash.",
+      "createdAt": "2026-06-24T05:51:54Z",
+      "updatedAt": "2026-06-24T15:42:39Z",
+      "closedAt": "2026-06-24T15:42:38Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks! Already fixed in #243. (You can look at the editor's draft in GitHub. We haven't cut draft-05 yet, but it'll be in there.)",
+          "createdAt": "2026-06-24T15:42:39Z",
+          "updatedAt": "2026-06-24T15:42:39Z"
+        }
+      ]
+    },
+    {
+      "number": 259,
+      "id": "I_kwDOJIBkVc8AAAABGmdO-w",
+      "title": "Whither relative OIDs in RDN attributes?",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/259",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See this thread https://mailarchive.ietf.org/arch/msg/plants/sQSyFQkAXUGp-YxTJDzyD4S-vc8/\n\nMixed responses so far. Filing this just so we don't forget this is a decision we have to make.",
+      "createdAt": "2026-06-24T19:53:17Z",
+      "updatedAt": "2026-06-24T19:53:17Z",
       "closedAt": null,
       "comments": []
     }
@@ -18123,26 +18170,216 @@
       "id": "PR_kwDOJIBkVc7pZCri",
       "title": "Define a CA's current issuance log and rules around that",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/255",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This clarifies that log numbers are not a free-for-all for CAs to just start issuing at any point. We care about monotonicity of sequence numbers for something like minSeriael to work, and we care that only one issuance log's landmarks are enough in normal operation.\r\n\r\nSee issue #232. This still isn't quite everything. I'd like to add some discussion on log failures, to clarify what this mechanism is actually for, and also discuss things that transparency-enforcing relying parties should do as a result. (Still working on that text, but this PR was ready in the meantime.)",
       "createdAt": "2026-06-22T22:09:54Z",
-      "updatedAt": "2026-06-22T22:09:54Z",
+      "updatedAt": "2026-06-24T16:04:43Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a6b3f491b81217735674c237d72bc41bee6cffae",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "current-log-number",
       "headRefOid": "28054b14b9dc4ab78c4b1b36556a3656cd390f8b",
+      "closedAt": "2026-06-24T16:04:40Z",
+      "mergedAt": "2026-06-24T16:04:40Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "73917459ca861815701949fc994d2ebcd66ca50e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABD5Hx5g",
+          "commit": {
+            "abbreviatedOid": "28054b1"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-23T18:51:07Z",
+          "updatedAt": "2026-06-23T18:51:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 256,
+      "id": "PR_kwDOJIBkVc7p3KLb",
+      "title": "Add a discussion of multiple logs in security considerations",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/256",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #232. This PR sits on top of #255.",
+      "createdAt": "2026-06-23T22:38:33Z",
+      "updatedAt": "2026-06-24T21:11:13Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a6b3f491b81217735674c237d72bc41bee6cffae",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "log-number-security-considerations",
+      "headRefOid": "405b8bb97410467deb1124fc15ce9f659cd729f4",
+      "closedAt": "2026-06-24T21:11:10Z",
+      "mergedAt": "2026-06-24T21:11:10Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "6795e4f7ead20f0adaccabfad793bd5258f4a610"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABD-sqvQ",
+          "commit": {
+            "abbreviatedOid": "bf582f8"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-24T12:13:14Z",
+          "updatedAt": "2026-06-24T12:31:06Z",
+          "comments": [
+            {
+              "originalPosition": 52,
+              "body": "Feel free to reject to keep it more general, but this just makes it clear whose 'trustworthy or not' opinion ultimately matters.\n```suggestion\n* If relying parties consider the CA operator and the CA instance still trustworthy, repairing the incident without changing the CA requires less overhead.\n```",
+              "createdAt": "2026-06-24T12:21:42Z",
+              "updatedAt": "2026-06-24T12:31:07Z"
+            },
+            {
+              "originalPosition": 53,
+              "body": "```suggestion\n* If relying parties consider either the CA operator or the CA instance no longer trustworthy and in need of replacement, the CA may still be needed to serve older, unupdated relying parties.\n```",
+              "createdAt": "2026-06-24T12:23:07Z",
+              "updatedAt": "2026-06-24T12:31:07Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "minor nit: We're a bit inconsistent with having a period or not terminating list items. Probably can all be cleaned up in an editorial pass down the road.",
+              "createdAt": "2026-06-24T12:27:56Z",
+              "updatedAt": "2026-06-24T12:31:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEA8T2Q",
+          "commit": {
+            "abbreviatedOid": "405b8bb"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-24T17:15:24Z",
+          "updatedAt": "2026-06-24T17:15:51Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "I've usually done it based on whether it's a list of clauses (no period) or a list of sentences (period), but maybe that's not right?",
+              "createdAt": "2026-06-24T17:15:24Z",
+              "updatedAt": "2026-06-24T17:15:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEBfewQ",
+          "commit": {
+            "abbreviatedOid": "bf582f8"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-24T18:42:59Z",
+          "updatedAt": "2026-06-24T18:42:59Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "That works for me!",
+              "createdAt": "2026-06-24T18:42:59Z",
+              "updatedAt": "2026-06-24T18:42:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABECcQJA",
+          "commit": {
+            "abbreviatedOid": "405b8bb"
+          },
+          "author": "jdeblasio",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-24T21:02:52Z",
+          "updatedAt": "2026-06-24T21:02:52Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 257,
+      "id": "PR_kwDOJIBkVc7p4f1E",
+      "title": "The \"enhancement\" link relation",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/257",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Another ACME option. Fourth time's the charm? :-)",
+      "createdAt": "2026-06-24T00:00:14Z",
+      "updatedAt": "2026-06-24T12:41:07Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a6b3f491b81217735674c237d72bc41bee6cffae",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "link-rel-enhancement",
+      "headRefOid": "23ea09584ae5f182b162d20825bbe625b709770e",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABD69PvA",
+          "commit": {
+            "abbreviatedOid": "ce59bee"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-24T00:28:04Z",
+          "updatedAt": "2026-06-24T00:31:26Z",
+          "comments": [
+            {
+              "originalPosition": 10,
+              "body": "```suggestion\nThis is similar to the \"alternate\" link relation, except that it specifies the substitute is optional. In some applications, a client may fetch all alternates, so that it may forward one of the alternates to another party. For example, {{Section 7.4.2 of !RFC8555}} describes how an ACME server uses the \"alternate\" link relation to serve multiple certificate chains for an ACME order. An ACME client might then fetch all of them and configure them in a TLS server, which presents them to TLS clients. Different TLS clients need different chains, so the ACME client might reasonably treat any unavailable alternate as an error.\n```",
+              "createdAt": "2026-06-24T00:28:04Z",
+              "updatedAt": "2026-06-24T00:31:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABD-4XKg",
+          "commit": {
+            "abbreviatedOid": "23ea095"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-24T12:41:06Z",
+          "updatedAt": "2026-06-24T12:41:06Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
