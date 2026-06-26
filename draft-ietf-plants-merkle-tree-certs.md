@@ -958,7 +958,7 @@ Each issuance log has a *log ID*, which is a trust anchor ID constructed by conc
 
 A log ID specifies both the CA and the log number in a single ID.
 
-Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified consecutively by an integer *index* value, starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
 Each log additionally maintains a *minimum index* value, which is the index of the first log entry which is available. See {{log-pruning}}. This value changes over the lifetime of the log.
 
