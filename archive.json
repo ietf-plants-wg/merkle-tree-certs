@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-25T04:16:34.415588+00:00",
+  "timestamp": "2026-06-28T04:42:39.684853+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3713,6 +3713,30 @@
       "updatedAt": "2026-06-24T19:53:17Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 260,
+      "id": "I_kwDOJIBkVc8AAAABGvv-1w",
+      "title": "No explicit bound on issuance log size (index/tree_size)",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/260",
+      "state": "OPEN",
+      "author": "Vaisman",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "\nSection \"Issuance Logs\" describes an issuance log as an append-only sequence of entries identified by an index starting from zero, \nwith no stated upper bound. The only explicitly bounded quantity in this area is the log number itself:\n\n> \"Log numbers are numbered consecutively from 1 to at most 65535 (2^16-1).\"\n\nHowever, the certificate format depends on the log entry index and subtree boundaries fitting in 48 bits.\nSection \"Certificate Format\" defines:\n\n> \"The `serialNumber` MUST be equal to `(log_number << 48) | index`.\"\n\nand `MTCProof`'s `start` and `end` fields are typed as `uint48`. Verification reconstructs the split the same way:\n\n> \"Let `index` be the least significant 48 bits of `serial` and let `log_number` be `serial >> 48`.\"\n\nNone of this is tied to a normative bound on `index` or the log's `tree_size`. \nThere does not appear to be a statement requiring an issuance log to remain small enough for all certificate-relevant values (`index`, `start`, and `end`) to fit in `uint48`.\n\nIf a log grew beyond the range representable by the certificate fields, the certificate format would no longer have a well-defined way to represent later entry indexes in `serialNumber` or subtree boundaries in `MTCProof.start` / `MTCProof.end`. \nThis is the same kind of asymmetry that is already handled for log numbers, which are explicitly bounded at 65535; `index` / `tree_size` do not seem to have the corresponding statement.\n\n**Suggested fix:** Add an explicit requirement defining the maximum allowed issuance log tree size, chosen so that all certificate-relevant indexes and subtree boundaries fit in `uint48`.\n",
+      "createdAt": "2026-06-25T22:00:24Z",
+      "updatedAt": "2026-06-25T22:18:43Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Coincidentally did this in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/261 before I saw this bug.\n\n(This is, of course, not *really* a concern. Even if you issued 1,000 certificates a second, it would still take you almost 9,000 years to reach 2^48.)",
+          "createdAt": "2026-06-25T22:18:43Z",
+          "updatedAt": "2026-06-25T22:18:43Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -18378,6 +18402,130 @@
           "createdAt": "2026-06-24T12:41:06Z",
           "updatedAt": "2026-06-24T12:41:06Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 261,
+      "id": "PR_kwDOJIBkVc7qwsMI",
+      "title": "Add a maxSerial field to the CA format",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/261",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I suspect the discussion around revoking, log numbers, min/max indices, the CA format, etc., can be refactored given how scattered it has become. Ah well.\r\n\r\n(Also closes #260)",
+      "createdAt": "2026-06-25T22:14:26Z",
+      "updatedAt": "2026-06-26T01:22:07Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6795e4f7ead20f0adaccabfad793bd5258f4a610",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "max-serial",
+      "headRefOid": "1548df01c5a7a00253c896d94355a27d4e8f1453",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEL7jCw",
+          "commit": {
+            "abbreviatedOid": "c4790c3"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-26T00:15:40Z",
+          "updatedAt": "2026-06-26T00:30:59Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "This reads slightly better to me, but either is fine\n```suggestion\nEach issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.\n```",
+              "createdAt": "2026-06-26T00:15:40Z",
+              "updatedAt": "2026-06-26T00:30:59Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 262,
+      "id": "PR_kwDOJIBkVc7rXkgq",
+      "title": "demo: fix UnusedBit panic on signing error",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/262",
+      "state": "OPEN",
+      "author": "Vaisman",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes a panic in `CreateCertificate` when `CertificateConfig.UnusedBit` is set and a cosigner fails to sign.\r\n\r\nThe existing condition had an operator-precedence bug:\r\n\r\n```go\r\nif sig, err := certSig.Bytes(); err == nil && len(sig) == 0 || sig[len(sig)-1]&1 != 0 {\r\n```\r\n\r\nSince `&&` binds tighter than `||`, the final `sig[len(sig)-1]` expression could still be evaluated when `certSig.Bytes()` returned an error. In that case, `sig` may be nil or empty, causing a panic instead of allowing the existing builder error to propagate through the normal `Bytes()` path.\r\n\r\nThis change only inspects the signature bytes when `certSig.Bytes()` succeeds.\r\n\r\nA regression test covers the case with `UnusedBit: true` and a `crypto.Signer` whose `Sign` method always returns an error.\r\n\r\nTested:\r\n\r\n```text\r\ngo test -run TestCreateCertificateUnusedBitCosignerError -v\r\ngo test ./... -v\r\n```\r\n",
+      "createdAt": "2026-06-27T20:18:28Z",
+      "updatedAt": "2026-06-27T23:32:00Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6795e4f7ead20f0adaccabfad793bd5258f4a610",
+      "headRepository": "Vaisman/merkle-tree-certs",
+      "headRefName": "fix-unusedbit-panic",
+      "headRefOid": "87afb57edc9f9b654baa955ad4125c88667cf9be",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEWBFog",
+          "commit": {
+            "abbreviatedOid": "87afb57"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-27T23:12:39Z",
+          "updatedAt": "2026-06-27T23:31:59Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "Any reason this changed the structure to pull the assignment out of the `if`?",
+              "createdAt": "2026-06-27T23:12:39Z",
+              "updatedAt": "2026-06-27T23:31:59Z"
+            },
+            {
+              "originalPosition": 80,
+              "body": "What's this for? Go's test framework will already catch panics.",
+              "createdAt": "2026-06-27T23:13:03Z",
+              "updatedAt": "2026-06-27T23:31:59Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "TBH I'm not sure how much it's worth bothering with a test here. It seems mostly scar tissue. At the least, let's put this in encode_test.go.",
+              "createdAt": "2026-06-27T23:22:59Z",
+              "updatedAt": "2026-06-27T23:31:59Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "Same ID as the issuer is fine. We expect to have at least one cosigner that's the same name as the issuer anyway.",
+              "createdAt": "2026-06-27T23:26:16Z",
+              "updatedAt": "2026-06-27T23:31:59Z"
+            },
+            {
+              "originalPosition": 40,
+              "body": "I suspect this test does not *actually* need you to put anything here, but if you put this in encode_test.go, it can at least share a constant.",
+              "createdAt": "2026-06-27T23:26:45Z",
+              "updatedAt": "2026-06-27T23:31:59Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "Hmm, I am not thrilled about breaking the `Cosigner` abstraction here. It's something we'll have to remember to update every time we update that struct.\n\nInstead of all this, I think you could get the same coverage by just passing an invalid subtree to CreateCertificate.",
+              "createdAt": "2026-06-27T23:31:36Z",
+              "updatedAt": "2026-06-27T23:31:59Z"
+            }
+          ]
         }
       ]
     }
