@@ -406,7 +406,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 				}
 			})
 			if certConfig.UnusedBit {
-				if sig, err := certSig.Bytes(); err == nil && len(sig) == 0 || sig[len(sig)-1]&1 != 0 {
+				if sig, err := certSig.Bytes(); err == nil && (len(sig) == 0 || sig[len(sig)-1]&1 != 0) {
 					certSig.SetError(errors.New("last bit in signature with not zero, unable to encode as unused"))
 					return
 				}
