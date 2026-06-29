@@ -2630,5 +2630,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Added subtree test vector appendix
 
 - Define a CA's current issuance log and rules around that
- 
+
 - Switch the ACME construction to a new link relation and change the HTTP status code
