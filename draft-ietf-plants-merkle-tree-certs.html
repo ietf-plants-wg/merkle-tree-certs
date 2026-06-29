@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 26 December 2026</td>
+<td class="center">Expires 31 December 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-24" class="published">24 June 2026</time>
+<time datetime="2026-06-29" class="published">29 June 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-26">26 December 2026</time></dd>
+<dd class="expires"><time datetime="2026-12-31">31 December 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 26 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 31 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1342,6 +1342,14 @@ svg {
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
             <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-acme-extensions" class="internal xref">ACME Extensions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-enhancement-link-relation" class="internal xref">Enhancement Link Relation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-using-acme-with-merkle-tree" class="internal xref">Using ACME with Merkle Tree Certificates</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
             <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-deployment-considerations" class="internal xref">Deployment Considerations</a></p>
@@ -1428,6 +1436,9 @@ svg {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.4">
                 <p id="section-toc.1-1.13.2.4.1"><a href="#section-13.4" class="auto internal xref">13.4</a>.  <a href="#name-relative-distinguished-name" class="internal xref">Relative Distinguished Name Attribute</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.5">
+                <p id="section-toc.1-1.13.2.5.1"><a href="#section-13.5" class="auto internal xref">13.5</a>.  <a href="#name-link-relation-type" class="internal xref">Link Relation Type</a></p>
 </li>
             </ul>
 </li>
@@ -5102,10 +5113,28 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acme-extensions" class="section-name selfRef">ACME Extensions</a>
       </h2>
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
-<p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
+<div id="enhancement-link-relation">
+<section id="section-9.1">
+        <h3 id="name-enhancement-link-relation">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-enhancement-link-relation" class="section-name selfRef">Enhancement Link Relation</a>
+        </h3>
+<p id="section-9.1-1">This section introduces a new link relation <span>[<a href="#RFC8288" class="cite xref">RFC8288</a>]</span>, "enhancement". It identifies an optional substitute for the original context. This substitute may be preferable in some way (e.g. it may be smaller) but is optional. Consumers that accept the substitute are expected to also accept the original context, so it is not an error if the resource is unavailable.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">This is similar to the "alternate" link relation, except that it specifies the substitute is optional. In some applications, a client may fetch all alternates, so that it may forward one of the alternates to another party. For example, <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> describes how an ACME server uses the "alternate" link relation to serve multiple certificate chains for an ACME order. An ACME client might then fetch all of them and configure them in a TLS server, which presents them to TLS clients. Different TLS clients need different chains, so the ACME client might reasonably treat any unavailable alternate as an error.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+<p id="section-9.1-3">This behavior is not ideal for landmark-relative certificates, which are available asynchronously and should not block deployment of their corresponding standalone certificate. The "enhancement" link relation allows an ACME server to specify which chains are necessary to fulfill the ACME order and which are optional additions.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
+<p id="section-9.1-4">When serving a certificate, an ACME server MAY provide one or more link relation header fields with relation "enhancement". Each such field SHOULD express a certificate chain that the ACME server expects to be redundant with (but potentially preferable to) either the original certificate chain or one of the chains served from an "alternate" relation. If the certificate chain is not yet available, the enhancement URL MAY serve an HTTP 202 (Accepted) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when it will become available.<a href="#section-9.1-4" class="pilcrow">¶</a></p>
+<p id="section-9.1-5">ACME clients can fetch enhancement URLs to collect additional alternate certificate chains. If the resource is unavailable, the ACME client SHOULD NOT fail the overall transaction. If the resource returns an HTTP 202 (Accepted) response, the ACME client SHOULD retry the request later, incorporating any Retry-After header, but it SHOULD NOT block deployment of other chains on this process.<a href="#section-9.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="using-acme-with-merkle-tree-certificates">
+<section id="section-9.2">
+        <h3 id="name-using-acme-with-merkle-tree">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-using-acme-with-merkle-tree" class="section-name selfRef">Using ACME with Merkle Tree Certificates</a>
+        </h3>
+<p id="section-9.2-1">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> describes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<p id="section-9.2-3">The standalone certificate response SHOULD additionally carry an enhancement URL (<a href="#enhancement-link-relation" class="auto internal xref">Section 9.1</a>) for the landmark-relative certificate, as described in <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the landmark-relative certificate is available, the enhancement URL SHOULD return an HTTP 202 (Accepted) response. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>, and serves it from the enhancement URL.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="deployment-considerations">
@@ -5522,6 +5551,31 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         </table>
 </section>
 </div>
+<div id="link-relation-type">
+<section id="section-13.5">
+        <h3 id="name-link-relation-type">
+<a href="#section-13.5" class="section-number selfRef">13.5. </a><a href="#name-link-relation-type" class="section-name selfRef">Link Relation Type</a>
+        </h3>
+<p id="section-13.5-1">IANA is requested to add the following entry to the "Link Relation Types" registry <span>[<a href="#RFC8288" class="cite xref">RFC8288</a>]</span>:<a href="#section-13.5-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-13.5-2">
+          <dt id="section-13.5-2.1">Relation Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.5-2.2">
+            <p id="section-13.5-2.2.1">enhancement<a href="#section-13.5-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-13.5-2.3">Description:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.5-2.4">
+            <p id="section-13.5-2.4.1">Refers to an optional substitute for this context. Consumers that accept the substitute are expected to also accept the original context, so it is not an error if the substitute is unavailable.<a href="#section-13.5-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-13.5-2.5">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.5-2.6">
+            <p id="section-13.5-2.6.1">[this-RFC], <a href="#enhancement-link-relation" class="auto internal xref">Section 9.1</a><a href="#section-13.5-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="sec-combined-references">
@@ -5566,6 +5620,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8288">[RFC8288]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Web Linking"</span>, <span class="seriesInfo">RFC 8288</span>, <span class="seriesInfo">DOI 10.17487/RFC8288</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8288">https://www.rfc-editor.org/rfc/rfc8288</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8446">[RFC8446]</dt>
         <dd>
@@ -7289,6 +7347,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.16-1.5">
             <p id="appendix-E.16-1.5.1">Define a CA's current issuance log and rules around that<a href="#appendix-E.16-1.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.16-1.6">
+            <p id="appendix-E.16-1.6.1">Switch the ACME construction to a new link relation and change the HTTP status code<a href="#appendix-E.16-1.6.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

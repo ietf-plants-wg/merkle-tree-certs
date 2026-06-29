@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 26 December 2026                                     Apple Inc.
+Expires: 31 December 2026                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            24 June 2026
+                                                            29 June 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 December 2026.
+   This Internet-Draft will expire on 31 December 2026.
 
 Copyright Notice
 
@@ -132,6 +132,8 @@ Table of Contents
        8.2.1.  Single-Log Landmark Groups
        8.2.2.  Timestamped Landmark Groups
    9.  ACME Extensions
+     9.1.  Enhancement Link Relation
+     9.2.  Using ACME with Merkle Tree Certificates
    10. Deployment Considerations
      10.1.  Operational Costs
        10.1.1.  Certification Authority Costs
@@ -158,6 +160,7 @@ Table of Contents
      13.2.  Algorithm
      13.3.  Certificate Extension
      13.4.  Relative Distinguished Name Attribute
+     13.5.  Link Relation Type
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -2667,14 +2670,60 @@ Table of Contents
    This section describes how to issue Merkle Tree certificates using
    ACME [RFC8555].
 
+9.1.  Enhancement Link Relation
+
+   This section introduces a new link relation [RFC8288], "enhancement".
+   It identifies an optional substitute for the original context.  This
+   substitute may be preferable in some way (e.g. it may be smaller) but
+   is optional.  Consumers that accept the substitute are expected to
+   also accept the original context, so it is not an error if the
+   resource is unavailable.
+
+   This is similar to the "alternate" link relation, except that it
+   specifies the substitute is optional.  In some applications, a client
+   may fetch all alternates, so that it may forward one of the
+   alternates to another party.  For example, Section 7.4.2 of [RFC8555]
+   describes how an ACME server uses the "alternate" link relation to
+   serve multiple certificate chains for an ACME order.  An ACME client
+   might then fetch all of them and configure them in a TLS server,
+   which presents them to TLS clients.  Different TLS clients need
+   different chains, so the ACME client might reasonably treat any
+   unavailable alternate as an error.
+
+   This behavior is not ideal for landmark-relative certificates, which
+   are available asynchronously and should not block deployment of their
+   corresponding standalone certificate.  The "enhancement" link
+   relation allows an ACME server to specify which chains are necessary
+   to fulfill the ACME order and which are optional additions.
+
+   When serving a certificate, an ACME server MAY provide one or more
+   link relation header fields with relation "enhancement".  Each such
+   field SHOULD express a certificate chain that the ACME server expects
+   to be redundant with (but potentially preferable to) either the
+   original certificate chain or one of the chains served from an
+   "alternate" relation.  If the certificate chain is not yet available,
+   the enhancement URL MAY serve an HTTP 202 (Accepted) response, with a
+   Retry-After header (Section 10.2.3 of [RFC9110]) estimating when it
+   will become available.
+
+   ACME clients can fetch enhancement URLs to collect additional
+   alternate certificate chains.  If the resource is unavailable, the
+   ACME client SHOULD NOT fail the overall transaction.  If the resource
+   returns an HTTP 202 (Accepted) response, the ACME client SHOULD retry
+   the request later, incorporating any Retry-After header, but it
+   SHOULD NOT block deployment of other chains on this process.
+
+9.2.  Using ACME with Merkle Tree Certificates
+
    When downloading the certificate (Section 7.4.2 of [RFC8555]), ACME
    clients supporting Merkle Tree certificates SHOULD send "application/
    pem-certificate-chain-with-properties" in their Accept header
    (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
    certificates SHOULD then respond with that content type and include
    trust anchor ID information as described in Section 7 of
-   [I-D.ietf-tls-trust-anchor-ids].  Section 8 decribes the trust anchor
-   ID assignments for standalone and landmark-relative certificates.
+   [I-D.ietf-tls-trust-anchor-ids].  Section 8 describes the trust
+   anchor ID assignments for standalone and landmark-relative
+   certificates.
 
    When processing an order for a Merkle Tree certificate, the ACME
    server moves the order to the "valid" state after the corresponding
@@ -2684,19 +2733,13 @@ Table of Contents
    in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
-   alternate URL for the landmark-relative certificate, as described
-   Section 7.4.2 of [RFC8555].  Before the landmark-relative certificate
-   is available, the alternate URL SHOULD return a HTTP 503 (Service
-   Unavailable) response, with a Retry-After header (Section 10.2.3 of
-   [RFC9110]) estimating when the certificate will become available.
-   Once the next landmark is allocated, the ACME server constructs a
-   landmark-relative certificate, as described in Section 6.4 and serves
-   it from the alternate URL.
-
-   ACME clients supporting Merkle Tree certificates SHOULD support
-   fetching alternate chains.  If an alternate chain returns an HTTP 503
-   with a Retry-After header, as described above, the client SHOULD
-   retry the request at the specified time.
+   enhancement URL (Section 9.1) for the landmark-relative certificate,
+   as described in Section 7.4.2 of [RFC8555].  Before the landmark-
+   relative certificate is available, the enhancement URL SHOULD return
+   an HTTP 202 (Accepted) response.  Once the next landmark is
+   allocated, the ACME server constructs a landmark-relative
+   certificate, as described in Section 6.4, and serves it from the
+   enhancement URL.
 
 10.  Deployment Considerations
 
@@ -3390,6 +3433,20 @@ Table of Contents
 
                                  Table 4
 
+13.5.  Link Relation Type
+
+   IANA is requested to add the following entry to the "Link Relation
+   Types" registry [RFC8288]:
+
+   Relation Name:  enhancement
+
+   Description:  Refers to an optional substitute for this context.
+      Consumers that accept the substitute are expected to also accept
+      the original context, so it is not an error if the substitute is
+      unavailable.
+
+   Reference:  [this-RFC], Section 9.1
+
 14.  References
 
 14.1.  Normative References
@@ -3437,6 +3494,10 @@ Table of Contents
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8288]  Nottingham, M., "Web Linking", RFC 8288,
+              DOI 10.17487/RFC8288, October 2017,
+              <https://www.rfc-editor.org/rfc/rfc8288>.
 
    [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
@@ -4437,6 +4498,9 @@ Since draft-ietf-plants-merkle-tree-certs-04
    *  Added subtree test vector appendix
 
    *  Define a CA's current issuance log and rules around that
+
+   *  Switch the ACME construction to a new link relation and change the
+      HTTP status code
 
 Authors' Addresses
 
