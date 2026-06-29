@@ -898,7 +898,7 @@ A CA consists of the following components:
 
 * A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 {{!SHS=DOI.10.6028/NIST.FIPS.180-4}} is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.
 
-* A series of issuance logs ({{issuance-logs}}), which contain all statements the CA has certified.
+* A series of issuance logs ({{issuance-logs}}), which contain all statements the CA has certified. One issuance log is designated as the current log.
 
 * A CA cosigner ({{certification-authority-cosigners}}), which signs subtrees of issuance logs to certify their contents.
 
@@ -948,7 +948,7 @@ For example, the distinguished name for a CA with ID `32473.1` would be represen
 
 ## Issuance Logs
 
-A CA operates a series of issuance logs, each identified by a positive integer *log number*. Log numbers are numbered consecutively starting from 1. Each log number MUST be at most 65535 (2<sup>16</sup>-1).
+A CA operates a series of issuance logs, each identified by a positive integer *log number*. Log numbers are numbered consecutively from 1 to at most 65535 (2<sup>16</sup>-1).
 
 Each issuance log has a *log ID*, which is a trust anchor ID constructed by concatenating the following OID components:
 
@@ -965,6 +965,8 @@ Each log additionally maintains a *minimum index* value, which is the index of t
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
+
+At any point in time, one of the CA's issuance logs is its *current* log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures. See {{log-failures}} for further discussion.
 
 ### Log Entries
 
@@ -1542,7 +1544,7 @@ Cosigner roles are extensible without changes to certificate verification itself
 
 ## Trusted Subtrees
 
-As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from one or more of the CA's issuance logs. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
+As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from the CA's current issuance log. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
 
 Each trusted subtree contains:
 
@@ -1793,6 +1795,36 @@ A CA might correctly construct its log, but refuse to serve some unauthorized en
 * If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it.
 
 * If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of _some_ entry at that index will be visible, so monitors will know the CA is failing to present an entry. This is sufficient to determine the serial number, so relying parties can then react by revoking the undisclosed entries ({{revoked-ranges}}), and likely removing the CA.
+
+### Log Failures
+
+Merkle Tree Certificates introduce additional state to PKI deployments and thus new kinds of operational failures. CAs are required to only sign subtree hashes that are consistent with a single append-only view of each issuance log. A CA might violate this as a result of operational failures. For example:
+
+* A CA loses some state and signs subtree hashes from two inconsistent copies of the log
+* A CA miscalculates some hash and signs a subtree hash that cannot be computed from some underlying sequence of entries
+
+As described above, PKIs can use additional cosigners to provide transparency guarantees even in the face of such CA violations. In doing so, individual cosigners may be locked to only one of two views of the log or unable to sign further checkpoints because some hash's preimage is unknown. It may then no longer be possible to add entries to the log that are trusted by existing relying parties.
+
+Whether by accident or compromise, these violations are ultimately CA failures. However, it is useful for the CA instance to remain functional during and after incident management:
+
+* While the incident is diagnosed, authenticating parties may still need new certificates.
+* If relying parties consider the CA operator and the CA instance still trustworthy, repairing the incident without changing the CA requires less overhead.
+* If relying parties consider either the CA operator or the CA instance no longer trustworthy and in need of replacement, the CA may still be needed to serve older, unupdated relying parties.
+
+This is mitigated by a CA instance consisting of a series of issuance logs ({{issuance-logs}}). After a log failure, the CA SHOULD increment its current issuance log to restore availability. Both the underlying log failure and the use of a new issuance log will be visible to monitors and SHOULD be treated as a PKI incident. Such PKI incidents can be handled by some combination of:
+
+* Revoking the diverging log indices ({{revoked-ranges}})
+* Reevaluating trusted CAs and, if necessary, removing the old CA instance and switching to a new CA instance
+
+In the latter case, the CA operator MAY continue to operate the removed CA instance if, for example, there remain unupdated relying parties that require it.
+
+### Limiting Issuance Logs
+
+While multiple issuance logs help mitigate log failures, as described above, they introduce transparency risks. If a CA violates the requirement to only use one issuance log at a time, it might add an entry in some far future log number. To be accepted in transparency-enforcing relying parties, the log state must still be cosigned. However, monitors may not know which log numbers to monitor.
+
+PKIs with transparency requirements SHOULD mitigate this by only accepting a limited range of log numbers in relying parties, transparency cosigners, or both. This limit MAY be set to a fixed value or a rolling value that is updated whenever the CA switches its current log. Fixed values require committing to a limit of recoverable log failures over the lifetime of a CA.
+
+Log number limits in relying parties can be implemented by revoking all serial numbers above some threshold. (See {{revoked-ranges}}.)
 
 ## Public Key Hashes
 
@@ -2597,4 +2629,6 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Added subtree test vector appendix
 
+- Define a CA's current issuance log and rules around that
+ 
 - Switch the ACME construction to a new link relation and change the HTTP status code
