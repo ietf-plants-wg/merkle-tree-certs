@@ -958,7 +958,7 @@ Each issuance log has a *log ID*, which is a trust anchor ID constructed by conc
 
 A log ID specifies both the CA and the log number in a single ID.
 
-Each issuance log describes an append-only sequence of *entries* ({{log-entries}}), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
 Each log additionally maintains a *minimum index* value, which is the index of the first log entry which is available. See {{log-pruning}}. This value changes over the lifetime of the log.
 
@@ -1246,10 +1246,14 @@ ext-mtcCertificationAuthority EXTENSION ::= {
 -- From draft-ietf-tls-trust-anchor-ids
 TrustAnchorID ::= RELATIVE-OID
 
+-- This is 2^64-1, the maximum possible serial number in this protocol.
+mtcMaxSerial INTEGER ::= 18446744073709551615
+
 MTCCertificationAuthority ::= SEQUENCE {
     logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER
+    minSerial INTEGER (0..mtcMaxSerial),
+    maxSerial INTEGER (0..mtcMaxSerial)
 }
 ~~~
 
@@ -1261,7 +1265,7 @@ The fields of a MTCCertificationAuthority structure are defined as follows:
 
 * `sigAlg` is the CA cosigner's signature algorithm ({{signature-algorithms}}).
 
-* `minSerial` is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number ({{issuance-logs}}) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log ({{log-pruning}}).
+* `minSerial` and `maxSerial` describe the minimum and maximum allowed serial numbers from this CA, respectively. See {{revoked-ranges}} for discussion on setting these values.
 
 If this extension is present, the key described in `subjectPublicKeyInfo` is a CA cosigner key and subject to the usage restrictions described in {{certification-authority-cosigners}}. In particular, it MUST NOT be used to directly sign TBSCertificate structures.
 
@@ -1452,7 +1456,7 @@ This information may be obtained from a CA certificate structure, defined in {{r
 
 * No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.
 
-* The revoked serial number ranges include the half-open range `[0, minSerial)`, but the relying party MAY incorporate additional ranges from out-of-band information.
+* The revoked serial number ranges include the half-open ranges `[0, minSerial)` and `[maxSerial+1, 2^64)`, but the relying party MAY incorporate additional ranges from out-of-band information.
 
 ## Verifying Certificate Signatures
 
@@ -1572,7 +1576,9 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
 
-When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
+When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `minSerial` value.
+
+A relying party with transparency requirements additionally SHOULD revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `maxSerial` value. See {{limiting-issuance-logs}}.
 
 A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies ({{trusted-cosigners}}) do not require durable logging (e.g. via {{TLOG-MIRROR}}) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.
 
@@ -1803,7 +1809,7 @@ Merkle Tree Certificates introduce additional state to PKI deployments and thus 
 * A CA loses some state and signs subtree hashes from two inconsistent copies of the log
 * A CA miscalculates some hash and signs a subtree hash that cannot be computed from some underlying sequence of entries
 
-As described above, PKIs can use additional cosigners to provide transparency guarantees even in the face of such CA violations. In doing so, individual cosigners may be locked to only one of two views of the log or unable to sign further checkpoints because some hash's preimage is unknown. It may then no longer be possible to add entries to the log that are trusted by existing relying parties.
+As described in {{transparency}}, PKIs can use additional cosigners to provide transparency guarantees even in the face of such CA violations. In doing so, individual cosigners may be locked to only one of two views of the log or unable to sign further checkpoints because some hash's preimage is unknown. It may then no longer be possible to add entries to the log that are trusted by existing relying parties.
 
 Whether by accident or compromise, these violations are ultimately CA failures. However, it is useful for the CA instance to remain functional during and after incident management:
 
@@ -1820,11 +1826,11 @@ In the latter case, the CA operator MAY continue to operate the removed CA insta
 
 ### Limiting Issuance Logs
 
-While multiple issuance logs help mitigate log failures, as described above, they introduce transparency risks. If a CA violates the requirement to only use one issuance log at a time, it might add an entry in some far future log number. To be accepted in transparency-enforcing relying parties, the log state must still be cosigned. However, monitors may not know which log numbers to monitor.
+While multiple issuance logs help mitigate log failures, as described in {{log-failures}}, they introduce transparency risks. If a CA violates the requirement to only use one issuance log at a time, it might add an entry in some far future log number. To be accepted in transparency-enforcing relying parties, the log state must still be cosigned. However, monitors may not know which log numbers to monitor.
 
 PKIs with transparency requirements SHOULD mitigate this by only accepting a limited range of log numbers in relying parties, transparency cosigners, or both. This limit MAY be set to a fixed value or a rolling value that is updated whenever the CA switches its current log. Fixed values require committing to a limit of recoverable log failures over the lifetime of a CA.
 
-Log number limits in relying parties can be implemented by revoking all serial numbers above some threshold. (See {{revoked-ranges}}.)
+Log number limits in relying parties can be implemented by revoking all serial numbers above some threshold. (See {{revoked-ranges}}.) If using the format described in {{representing-certification-authorities}}, this can be implemented with the `maxSerial` field.
 
 ## Public Key Hashes
 
@@ -2051,10 +2057,14 @@ ext-mtcCertificationAuthority EXTENSION ::= {
     CRITICALITY TRUE
 }
 
+-- This is 2^64-1, the maximum possible serial number in this protocol.
+mtcMaxSerial INTEGER ::= 18446744073709551615
+
 MTCCertificationAuthority ::= SEQUENCE {
     logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER
+    minSerial INTEGER (0..mtcMaxSerial),
+    maxSerial INTEGER (0..mtcMaxSerial)
 }
 
 END
@@ -2632,3 +2642,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Define a CA's current issuance log and rules around that
 
 - Switch the ACME construction to a new link relation and change the HTTP status code
+
+- Add a maxSerial field to the CA format
