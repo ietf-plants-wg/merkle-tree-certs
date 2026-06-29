@@ -1227,9 +1227,10 @@ Table of Contents
    A log ID specifies both the CA and the log number in a single ID.
 
    Each issuance log describes an append-only sequence of _entries_
-   (Section 5.2.1), identified consecutively by an index value, starting
-   from zero.  Each entry is an assertion that the CA has certified.
-   The entries in the issuance log are represented as a Merkle Tree,
+   (Section 5.2.1).  Each entry is identified by an integer _index_,
+   assigned consecutively starting from zero.  Indices are at most
+   2^48-1.  Each entry is an assertion that the CA has certified.  The
+   entries in the issuance log are represented as a Merkle Tree,
    described in Section 2.1 of [RFC9162].
 
    Each log additionally maintains a _minimum index_ value, which is the
@@ -1749,10 +1750,14 @@ Table of Contents
    -- From draft-ietf-tls-trust-anchor-ids
    TrustAnchorID ::= RELATIVE-OID
 
+   -- This is 2^64-1, the maximum possible serial number in this protocol.
+   mtcMaxSerial INTEGER ::= 18446744073709551615
+
    MTCCertificationAuthority ::= SEQUENCE {
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER
+       minSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    For initial experimentation, early implementations of this design
@@ -1768,11 +1773,9 @@ Table of Contents
 
    *  sigAlg is the CA cosigner's signature algorithm (Section 5.3.3).
 
-   *  minSerial is an integer describing the minimum allowed serial
-      number from this CA.  Since the serial number encodes both the log
-      number (Section 5.2) and the entry index into a specific log, it
-      can be used to set a minimum allowed log number or a minimum
-      allowed index in a particular log (Section 5.2.3).
+   *  minSerial and maxSerial describe the minimum and maximum allowed
+      serial numbers from this CA, respectively.  See Section 7.5 for
+      discussion on setting these values.
 
    If this extension is present, the key described in
    subjectPublicKeyInfo is a CA cosigner key and subject to the usage
@@ -2185,9 +2188,9 @@ Table of Contents
       structure, but the relying party MAY incorporate trusted subtrees
       from out-of-band information.
 
-   *  The revoked serial number ranges include the half-open range [0,
-      minSerial), but the relying party MAY incorporate additional
-      ranges from out-of-band information.
+   *  The revoked serial number ranges include the half-open ranges [0,
+      minSerial) and [maxSerial+1, 2^64), but the relying party MAY
+      incorporate additional ranges from out-of-band information.
 
 7.2.  Verifying Certificate Signatures
 
@@ -2455,7 +2458,13 @@ Table of Contents
    unavailable entries.  This gives assurance that, even if some
    unavailable entry had not yet expired, the relying party will not
    trust it.  It also allows monitors to start monitoring a log without
-   processing expired entries.
+   processing expired entries.  If using the format defined in
+   Section 5.5, this can be configured with the minSerial value.
+
+   A relying party with transparency requirements additionally SHOULD
+   revoke all log numbers above some threshold to bound monitoring
+   overhead.  If using the format defined in Section 5.5, this can be
+   configured with the maxSerial value.  See Section 12.2.2.
 
    A misbehaving CA might correctly construct a globally consistent log,
    but refuse to make some entries or intermediate nodes available.
@@ -3068,12 +3077,13 @@ Table of Contents
    *  A CA miscalculates some hash and signs a subtree hash that cannot
       be computed from some underlying sequence of entries
 
-   As described above, PKIs can use additional cosigners to provide
-   transparency guarantees even in the face of such CA violations.  In
-   doing so, individual cosigners may be locked to only one of two views
-   of the log or unable to sign further checkpoints because some hash's
-   preimage is unknown.  It may then no longer be possible to add
-   entries to the log that are trusted by existing relying parties.
+   As described in Section 12.2, PKIs can use additional cosigners to
+   provide transparency guarantees even in the face of such CA
+   violations.  In doing so, individual cosigners may be locked to only
+   one of two views of the log or unable to sign further checkpoints
+   because some hash's preimage is unknown.  It may then no longer be
+   possible to add entries to the log that are trusted by existing
+   relying parties.
 
    Whether by accident or compromise, these violations are ultimately CA
    failures.  However, it is useful for the CA instance to remain
@@ -3109,11 +3119,12 @@ Table of Contents
 12.2.2.  Limiting Issuance Logs
 
    While multiple issuance logs help mitigate log failures, as described
-   above, they introduce transparency risks.  If a CA violates the
-   requirement to only use one issuance log at a time, it might add an
-   entry in some far future log number.  To be accepted in transparency-
-   enforcing relying parties, the log state must still be cosigned.
-   However, monitors may not know which log numbers to monitor.
+   in Section 12.2.1, they introduce transparency risks.  If a CA
+   violates the requirement to only use one issuance log at a time, it
+   might add an entry in some far future log number.  To be accepted in
+   transparency-enforcing relying parties, the log state must still be
+   cosigned.  However, monitors may not know which log numbers to
+   monitor.
 
    PKIs with transparency requirements SHOULD mitigate this by only
    accepting a limited range of log numbers in relying parties,
@@ -3123,7 +3134,9 @@ Table of Contents
    recoverable log failures over the lifetime of a CA.
 
    Log number limits in relying parties can be implemented by revoking
-   all serial numbers above some threshold.  (See Section 7.5.)
+   all serial numbers above some threshold.  (See Section 7.5.)  If
+   using the format described in Section 5.5, this can be implemented
+   with the maxSerial field.
 
 12.3.  Public Key Hashes
 
@@ -3734,10 +3747,14 @@ Appendix A.  ASN.1 Module
        CRITICALITY TRUE
    }
 
+   -- This is 2^64-1, the maximum possible serial number in this protocol.
+   mtcMaxSerial INTEGER ::= 18446744073709551615
+
    MTCCertificationAuthority ::= SEQUENCE {
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER
+       minSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    END
@@ -4501,6 +4518,8 @@ Since draft-ietf-plants-merkle-tree-certs-04
 
    *  Switch the ACME construction to a new link relation and change the
       HTTP status code
+
+   *  Add a maxSerial field to the CA format
 
 Authors' Addresses
 
