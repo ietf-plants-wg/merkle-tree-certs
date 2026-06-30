@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-28T04:42:39.684853+00:00",
+  "timestamp": "2026-06-30T04:17:52.672627+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3227,15 +3227,15 @@
       "id": "I_kwDOJIBkVc78BbHY",
       "title": "HTTP 503 isn't quite right for pending landmark",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/202",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Watson Ladd points out:\n\n> I'm not sure 503 is the right error code for the landmark-relative cert in ACME: a 400 series code would make more sense given that some are about resource conditions. There isn't one that fits though. 503 may complicate infrastructure monitoring as it is usually a server problem you want to worry about.\n\nhttps://mailarchive.ietf.org/arch/msg/plants/-Q5kuTg9HQUTcbkv8ybIndgqj5U/",
       "createdAt": "2026-04-08T22:59:42Z",
-      "updatedAt": "2026-04-09T04:48:56Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-29T15:58:30Z",
+      "closedAt": "2026-06-29T15:58:30Z",
       "comments": [
         {
           "author": "aarongable",
@@ -3271,6 +3271,13 @@
           "body": "> Whichever the status code, do you think it warrants a different header in that case? (I see ACME also has this error system. I've no idea if that's appropriate here.)\n\nAh interesting. ACME actually already uses Retry-After on 200 responses, so that bridge has already been crossed:\n\n>  \"processing\": The certificate is being issued.  Send a POST-as-GET request after the time given in the Retry-After header field of the response, if any.",
           "createdAt": "2026-04-09T04:48:56Z",
           "updatedAt": "2026-04-09T04:48:56Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed in #257 ",
+          "createdAt": "2026-06-29T15:58:30Z",
+          "updatedAt": "2026-06-29T15:58:30Z"
         }
       ]
     },
@@ -3719,15 +3726,15 @@
       "id": "I_kwDOJIBkVc8AAAABGvv-1w",
       "title": "No explicit bound on issuance log size (index/tree_size)",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/260",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Vaisman",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "\nSection \"Issuance Logs\" describes an issuance log as an append-only sequence of entries identified by an index starting from zero, \nwith no stated upper bound. The only explicitly bounded quantity in this area is the log number itself:\n\n> \"Log numbers are numbered consecutively from 1 to at most 65535 (2^16-1).\"\n\nHowever, the certificate format depends on the log entry index and subtree boundaries fitting in 48 bits.\nSection \"Certificate Format\" defines:\n\n> \"The `serialNumber` MUST be equal to `(log_number << 48) | index`.\"\n\nand `MTCProof`'s `start` and `end` fields are typed as `uint48`. Verification reconstructs the split the same way:\n\n> \"Let `index` be the least significant 48 bits of `serial` and let `log_number` be `serial >> 48`.\"\n\nNone of this is tied to a normative bound on `index` or the log's `tree_size`. \nThere does not appear to be a statement requiring an issuance log to remain small enough for all certificate-relevant values (`index`, `start`, and `end`) to fit in `uint48`.\n\nIf a log grew beyond the range representable by the certificate fields, the certificate format would no longer have a well-defined way to represent later entry indexes in `serialNumber` or subtree boundaries in `MTCProof.start` / `MTCProof.end`. \nThis is the same kind of asymmetry that is already handled for log numbers, which are explicitly bounded at 65535; `index` / `tree_size` do not seem to have the corresponding statement.\n\n**Suggested fix:** Add an explicit requirement defining the maximum allowed issuance log tree size, chosen so that all certificate-relevant indexes and subtree boundaries fit in `uint48`.\n",
       "createdAt": "2026-06-25T22:00:24Z",
-      "updatedAt": "2026-06-25T22:18:43Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-29T17:07:59Z",
+      "closedAt": "2026-06-29T17:07:59Z",
       "comments": [
         {
           "author": "davidben",
@@ -18350,24 +18357,26 @@
       "id": "PR_kwDOJIBkVc7p4f1E",
       "title": "The \"enhancement\" link relation",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/257",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Another ACME option. Fourth time's the charm? :-)",
       "createdAt": "2026-06-24T00:00:14Z",
-      "updatedAt": "2026-06-24T12:41:07Z",
+      "updatedAt": "2026-06-29T15:58:03Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "a6b3f491b81217735674c237d72bc41bee6cffae",
+      "baseRefOid": "6795e4f7ead20f0adaccabfad793bd5258f4a610",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "link-rel-enhancement",
-      "headRefOid": "23ea09584ae5f182b162d20825bbe625b709770e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "e6cb5d4789aa511b56f4e246975c890e2610211a",
+      "closedAt": "2026-06-29T15:57:53Z",
+      "mergedAt": "2026-06-29T15:57:53Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "957e0beb77c9c603b708af51f3668da4b4a09121"
+      },
       "comments": [],
       "reviews": [
         {
@@ -18410,24 +18419,26 @@
       "id": "PR_kwDOJIBkVc7qwsMI",
       "title": "Add a maxSerial field to the CA format",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/261",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "I suspect the discussion around revoking, log numbers, min/max indices, the CA format, etc., can be refactored given how scattered it has become. Ah well.\r\n\r\n(Also closes #260)",
       "createdAt": "2026-06-25T22:14:26Z",
-      "updatedAt": "2026-06-26T01:22:07Z",
+      "updatedAt": "2026-06-29T17:08:01Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "6795e4f7ead20f0adaccabfad793bd5258f4a610",
+      "baseRefOid": "56cc9c32452ae76b9174b80dac5ea5fd47e3c541",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "max-serial",
-      "headRefOid": "1548df01c5a7a00253c896d94355a27d4e8f1453",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "43d1cee9e67ef2a1efaf31848a7422a59d094f38",
+      "closedAt": "2026-06-29T17:07:58Z",
+      "mergedAt": "2026-06-29T17:07:58Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "545b71faa5ef5e729945f4f96f27964e1a7bc951"
+      },
       "comments": [],
       "reviews": [
         {
@@ -18457,25 +18468,35 @@
       "id": "PR_kwDOJIBkVc7rXkgq",
       "title": "demo: fix UnusedBit panic on signing error",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/262",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Vaisman",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
-      "body": "Fixes a panic in `CreateCertificate` when `CertificateConfig.UnusedBit` is set and a cosigner fails to sign.\r\n\r\nThe existing condition had an operator-precedence bug:\r\n\r\n```go\r\nif sig, err := certSig.Bytes(); err == nil && len(sig) == 0 || sig[len(sig)-1]&1 != 0 {\r\n```\r\n\r\nSince `&&` binds tighter than `||`, the final `sig[len(sig)-1]` expression could still be evaluated when `certSig.Bytes()` returned an error. In that case, `sig` may be nil or empty, causing a panic instead of allowing the existing builder error to propagate through the normal `Bytes()` path.\r\n\r\nThis change only inspects the signature bytes when `certSig.Bytes()` succeeds.\r\n\r\nA regression test covers the case with `UnusedBit: true` and a `crypto.Signer` whose `Sign` method always returns an error.\r\n\r\nTested:\r\n\r\n```text\r\ngo test -run TestCreateCertificateUnusedBitCosignerError -v\r\ngo test ./... -v\r\n```\r\n",
+      "body": "Fixes an operator-precedence bug in CreateCertificate's UnusedBit handling.\r\n\r\n&& binds tighter than ||, so sig[len(sig)-1] could be evaluated even when certSig.Bytes() returned an error. Add parentheses so the signature bytes are only inspected when Bytes() succeeds.\r\n\r\nTested:\r\n\r\ngo test ./...\r\n",
       "createdAt": "2026-06-27T20:18:28Z",
-      "updatedAt": "2026-06-27T23:32:00Z",
+      "updatedAt": "2026-06-29T17:04:49Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6795e4f7ead20f0adaccabfad793bd5258f4a610",
       "headRepository": "Vaisman/merkle-tree-certs",
       "headRefName": "fix-unusedbit-panic",
-      "headRefOid": "87afb57edc9f9b654baa955ad4125c88667cf9be",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "a6888e8dfe2d790263b9d591d70385a40c9bc501",
+      "closedAt": "2026-06-29T17:04:49Z",
+      "mergedAt": "2026-06-29T17:04:49Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "56cc9c32452ae76b9174b80dac5ea5fd47e3c541"
+      },
+      "comments": [
+        {
+          "author": "Vaisman",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Thanks, that makes sense. Reduced this to the minimal one-line fix and dropped the regression test.",
+          "createdAt": "2026-06-28T05:42:28Z",
+          "updatedAt": "2026-06-28T05:42:28Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABEWBFog",
