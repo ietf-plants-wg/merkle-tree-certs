@@ -156,6 +156,13 @@ informative:
     - name: Christopher Patton
     - name: Bas Westerbaan
 
+  MTC-TLOG:
+    title: Merkle Tree Certificates With Tiled Transparency Logs
+    target: https://c2sp.org/mtc-tlog
+    date: June 2026
+    author:
+      org: C2SP
+
   TLOG-TILES:
     title: Tiled Transparency Logs
     target: https://c2sp.org/tlog-tiles
@@ -1370,9 +1377,9 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 To issue landmark-relative certificates, a CA must additionally maintain a *landmark sequence*, which is a sequence of *landmarks*.
 
-Each landmark specifies a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
+Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
-Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
+The landmark sequence determines *landmark subtrees* for each landmark: for each landmark `L`, other than number zero, let `tree_size` be `L`'s tree size and `prev_tree_size` be that of `L - 1`. The landmark subtrees for `L` are the one or two subtrees that cover `[prev_tree_size, tree_size)`, as described in {{arbitrary-intervals}}. Landmark zero has no landmark subtrees.
 
 As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer `max_active_landmarks` parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.
 
@@ -1399,7 +1406,7 @@ CAs SHOULD publish their active landmarks, so that relying parties can configure
   This line MUST satisfy the following, otherwise it is invalid:
   * `num_active_landmarks <= max_active_landmarks`
   * `num_active_landmarks <= last_landmark`
-* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be strictly monotonically decreasing and lower or equal to the log's latest tree size.
+* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.
 
 It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}} with content type `text/plain; charset=utf-8`.
 
@@ -1407,11 +1414,15 @@ It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}}
 
 Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-relative certificate is constructed as follows:
 
-1. Wait for the first landmark to be allocated that contains the entry.
-2. Determine the landmark's subtrees and select the one that contains the entry.
-3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
+1. Let `L` be the smallest landmark number in the active window whose tree size is strictly greater than the entry index `i`. Because the landmark sequence is strictly monotonically increasing, `L - 1`'s tree size is less than or equal to `i`. If no such `L` has been allocated yet (`i` is greater than or equal to `last_landmark`'s tree size), wait for one to be allocated. If every landmark that once covered the entry is no longer in the active window (`last_landmark - num_active_landmarks`'s tree size is greater than `i`), abort this process.
+
+1. Determine landmark `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `i`.
+
+1. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
 
 Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+
+The procedure above is not specific to the CA. Any party with access to the certificate inputs ({{certificate-inputs}}), the issuance log, and the landmark sequence can construct a landmark-relative certificate. {{MTC-TLOG}} describes such a procedure for an authenticating party holding a standalone certificate, in log ecosystems based on {{TLOG-TILES}}.
 
 ## Size Estimates
 
@@ -1691,6 +1702,8 @@ When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients s
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
 The standalone certificate response SHOULD additionally carry an enhancement URL ({{enhancement-link-relation}}) for the landmark-relative certificate, as described in {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the enhancement URL SHOULD return an HTTP 202 (Accepted) response. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the enhancement URL.
+
+As an alternative to fetching the landmark-relative certificate from the ACME server, a client with access to the issuance log and the landmark sequence MAY construct it itself from the standalone certificate, as described in {{constructing-landmark-relative-certificates}}. {{MTC-TLOG}} describes a concrete procedure for log ecosystems based on {{TLOG-TILES}}.
 
 # Deployment Considerations
 
