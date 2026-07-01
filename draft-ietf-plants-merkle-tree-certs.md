@@ -1371,7 +1371,7 @@ To issue landmark-relative certificates, a CA must additionally maintain a *land
 
 Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
-The landmark sequence determines *landmark subtrees*: for each landmark `L`, other than number zero, let `tree_size` be `L`'s tree size and `prev_tree_size` be that of `L - 1`. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree with landmark number `L`. Landmark zero has no landmark subtrees.
+The landmark sequence determines *landmark subtrees* for each landmark: for each landmark `L`, other than number zero, let `tree_size` be `L`'s tree size and `prev_tree_size` be that of `L - 1`. The landmark subtrees for `L` are the one or two subtrees that cover `[prev_tree_size, tree_size)`, as described in {{arbitrary-intervals}}. Landmark zero has no landmark subtrees.
 
 As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer `max_active_landmarks` parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.
 
