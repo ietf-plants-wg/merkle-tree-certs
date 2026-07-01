@@ -2691,14 +2691,14 @@ Table of Contents
    This behavior is not ideal for landmark-relative certificates, which
    are available asynchronously and should not block deployment of their
    corresponding standalone certificate.  This section defines the
-   "acme-optional-cert" link relation.  When serving a certificate, an
-   ACME server MAY provide one or more link relation header fields of
-   type "acme-optional-cert". "acme-optional-cert" identifies an
-   alternate certificate chain, but one that is optional.  Relying
+   "acme-optional-alternate" link relation.  When serving a certificate,
+   an ACME server MAY provide one or more link relation header fields of
+   type "acme-optional-alternate". "acme-optional-alternate" identifies
+   an alternate certificate chain, but one that is optional.  Relying
    parties that accept the optional alternate are expected to also
    accept either the original certificate chain or chains served under
    the "alternate" link relation.  If the certificate chain is not yet
-   available, the "acme-optional-cert" URL MAY serve an HTTP 202
+   available, the "acme-optional-alternate" URL MAY serve an HTTP 202
    (Accepted) response, with a Retry-After header (Section 10.2.3 of
    [RFC9110]) estimating when it will become available.
 
@@ -2729,7 +2729,7 @@ Table of Contents
    in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
-   "acme-optional-cert" URL (Section 9.1) for the landmark-relative
+   "acme-optional-alternate" URL (Section 9.1) for the landmark-relative
    certificate, as described in Section 7.4.2 of [RFC8555].  Before the
    landmark-relative certificate is available, the URL SHOULD return an
    HTTP 202 (Accepted) response.  Once the next landmark is allocated,
@@ -3437,7 +3437,7 @@ Table of Contents
    IANA is requested to add the following entry to the "Link Relation
    Types" registry [RFC8288]:
 
-   Relation Name:  acme-optional-cert
+   Relation Name:  acme-optional-alternate
 
    Description:  Refers to an optional alternate certificate chain,
       which may not be available immediately.  Relying parties that
