@@ -1672,17 +1672,13 @@ The relying party can mitigate this in a number of ways:
 
 This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
 
-## Enhancement Link Relation
+## Optional Certificates
 
-This section introduces a new link relation {{!RFC8288}}, "enhancement". It identifies an optional substitute for the original context. This substitute may be preferable in some way (e.g. it may be smaller) but is optional. Consumers that accept the substitute are expected to also accept the original context, so it is not an error if the resource is unavailable.
+{{Section 7.4.2 of !RFC8555}} describes how an ACME server uses the "alternate" link relation {{!RFC8288}} to serve multiple certificate chains for an ACME order. An ACME client might fetch all of them and deploy them in the authenticating party. Different relying parties need different chains, so the ACME client might reasonably treat any unavailable alternate as an error.
 
-This is similar to the "alternate" link relation, except that it specifies the substitute is optional. In some applications, a client may fetch all alternates, so that it may forward one of the alternates to another party. For example, {{Section 7.4.2 of !RFC8555}} describes how an ACME server uses the "alternate" link relation to serve multiple certificate chains for an ACME order. An ACME client might then fetch all of them and configure them in a TLS server, which presents them to TLS clients. Different TLS clients need different chains, so the ACME client might reasonably treat any unavailable alternate as an error.
+This behavior is not ideal for landmark-relative certificates, which are available asynchronously and should not block deployment of their corresponding standalone certificate. This section defines the "acme-optional-alternate" link relation. When serving a certificate, an ACME server MAY provide one or more link relation header fields of type "acme-optional-alternate". "acme-optional-alternate" identifies an alternate certificate chain, but one that is optional. Relying parties that accept the optional alternate are expected to also accept either the original certificate chain or chains served under the "alternate" link relation.  If the certificate chain is not yet available, the "acme-optional-alternate" URL MAY serve an HTTP 202 (Accepted) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when it will become available.
 
-This behavior is not ideal for landmark-relative certificates, which are available asynchronously and should not block deployment of their corresponding standalone certificate. The "enhancement" link relation allows an ACME server to specify which chains are necessary to fulfill the ACME order and which are optional additions.
-
-When serving a certificate, an ACME server MAY provide one or more link relation header fields with relation "enhancement". Each such field SHOULD express a certificate chain that the ACME server expects to be redundant with (but potentially preferable to) either the original certificate chain or one of the chains served from an "alternate" relation. If the certificate chain is not yet available, the enhancement URL MAY serve an HTTP 202 (Accepted) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when it will become available.
-
-ACME clients can fetch enhancement URLs to collect additional alternate certificate chains. If the resource is unavailable, the ACME client SHOULD NOT fail the overall transaction. If the resource returns an HTTP 202 (Accepted) response, the ACME client SHOULD retry the request later, incorporating any Retry-After header, but it SHOULD NOT block deployment of other chains on this process.
+An ACME client MAY fetch these URLs to collect additional alternate certificate chains. If the resource is unavailable, the ACME client SHOULD NOT fail the overall transaction. If the resource returns an HTTP 202 (Accepted) response, the ACME client SHOULD retry the request later, incorporating any Retry-After header, but it SHOULD NOT block deployment of other chains on this process.
 
 ## Using ACME with Merkle Tree Certificates
 
@@ -1690,7 +1686,7 @@ When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients s
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
-The standalone certificate response SHOULD additionally carry an enhancement URL ({{enhancement-link-relation}}) for the landmark-relative certificate, as described in {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the enhancement URL SHOULD return an HTTP 202 (Accepted) response. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the enhancement URL.
+The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL ({{optional-certificates}}) for the landmark-relative certificate, as described in {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the URL SHOULD return an HTTP 202 (Accepted) response. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the URL.
 
 # Deployment Considerations
 
@@ -1967,13 +1963,13 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 IANA is requested to add the following entry to the "Link Relation Types" registry {{!RFC8288}}:
 
 Relation Name:
-: enhancement
+: acme-optional-alternate
 
 Description:
-: Refers to an optional substitute for this context. Consumers that accept the substitute are expected to also accept the original context, so it is not an error if the substitute is unavailable.
+: Refers to an optional alternate certificate chain, which may not be available immediately. Relying parties that accept the alternate are expected to also accept the original certificate, so it is not an error if the alternate is unavailable.
 
 Reference:
-: [this-RFC], {{enhancement-link-relation}}
+: [this-RFC], {{optional-certificates}}
 
 --- back
 
