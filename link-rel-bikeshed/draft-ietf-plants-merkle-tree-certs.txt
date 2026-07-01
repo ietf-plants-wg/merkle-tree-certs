@@ -2688,8 +2688,8 @@ Table of Contents
    need different chains, so the ACME client might reasonably treat any
    unavailable alternate as an error.
 
-   This behavior is not ideal for landmark-relative certificates, which
-   are available asynchronously and should not block deployment of their
+   This behavior is not ideal for a landmark-relative certificate, which
+   is available asynchronously and is not intended to delay the
    corresponding standalone certificate.  This section defines the
    "acme-optional-alternate" link relation.  When serving a certificate,
    an ACME server MAY provide one or more link relation header fields of
@@ -2706,8 +2706,14 @@ Table of Contents
    certificate chains.  If the resource is unavailable, the ACME client
    SHOULD NOT fail the overall transaction.  If the resource returns an
    HTTP 202 (Accepted) response, the ACME client SHOULD retry the
-   request later, incorporating any Retry-After header, but it SHOULD
-   NOT block deployment of other chains on this process.
+   request later, incorporating any Retry-After header, but this process
+   SHOULD be independent of deploying other chains in the ACME order.
+   In particular, if deploying a new service, the ACME client SHOULD NOT
+   block deployment on optional alternates.
+
+   If renewing certificates, the ACME client MAY opt to wait for
+   optional alternates to simplify certificate replacement, but only
+   while the previous certificates remain valid.
 
 9.2.  Using ACME with Merkle Tree Certificates
 
