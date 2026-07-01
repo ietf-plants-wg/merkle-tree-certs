@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 18 December 2026                                     Apple Inc.
+Expires: 2 January 2027                                       Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            16 June 2026
+                                                             1 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 December 2026.
+   This Internet-Draft will expire on 2 January 2027.
 
 Copyright Notice
 
@@ -1962,12 +1962,12 @@ Table of Contents
    have a tree size of zero.  The sequence of tree sizes MUST be append-
    only and strictly monotonically increasing.
 
-   The landmark sequence determines _landmark subtrees_: for each
-   landmark L, other than number zero, let tree_size be L's tree size
-   and prev_tree_size be that of L - 1.  As described in Section 4.5,
-   select the one or two subtrees that cover [prev_tree_size,
-   tree_size).  Each of those subtrees is a landmark subtree with
-   landmark number L.  Landmark zero has no landmark subtrees.
+   The landmark sequence determines _landmark subtrees_ for each
+   landmark: for each landmark L, other than number zero, let tree_size
+   be L's tree size and prev_tree_size be that of L - 1.  The landmark
+   subtrees for L are the one or two subtrees that cover
+   [prev_tree_size, tree_size), as described in Section 4.5.  Landmark
+   zero has no landmark subtrees.
 
    As the issuance log grows, CAs continuously allocate new landmarks.
    This allocation balances minimizing landmark-relative certificate
