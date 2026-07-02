@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-30T04:17:52.672627+00:00",
+  "timestamp": "2026-07-02T04:13:11.079071+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18182,19 +18182,72 @@
       "labels": [],
       "body": "- Make explicit that a landmark consists of a number and a tree size, and that both subtrees of a given landmark share that landmark number.\r\n- Give an exact algorithm for selecting the landmark and subtree, with explicit wait and abort conditions for the cases where no allocated landmark yet covers the entry index, or where every landmark that once covered it has aged out.\r\n- Add a paragraph clarifying that landmark-relative certificate construction is not specific to the CA: any party that can read the issuance log and the landmark sequence can construct one from the standalone cert. Reference MTC-TLOG as an example for tile-based log ecosystems.\r\n- Note that a client MAY construct the landmark-relative certificate itself from the standalone certificate, as an alternative to fetching it from the ACME server's alternate URL.\r\n- Add an informative reference to MTC-TLOG (c2sp.org/mtc-tlog).\r\n\r\nCloses #246, #253. Also depends on https://github.com/C2SP/C2SP/pull/269.",
       "createdAt": "2026-06-16T16:46:27Z",
-      "updatedAt": "2026-06-16T16:46:28Z",
+      "updatedAt": "2026-07-01T20:50:43Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "609ad10710a6872f5fc108815667e4aec66a05c8",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "lvalenta/client-constructed-landmark-relative",
-      "headRefOid": "70bae55347fba151567a6a723aced67220cacee7",
+      "headRefOid": "86a307d9831057569e7eecf6f1b1a670fe699133",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEsXehQ",
+          "commit": {
+            "abbreviatedOid": "70bae55"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-01T14:20:39Z",
+          "updatedAt": "2026-07-01T14:29:50Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Ooh yeah, probably most of the places that cite {{TLOG-TILES}} should cite {{MTC-TLOG}} either instead or in addition to {{TLOG-TILES}}.",
+              "createdAt": "2026-07-01T14:20:39Z",
+              "updatedAt": "2026-07-01T14:29:50Z"
+            },
+            {
+              "originalPosition": 22,
+              "body": "Some more wordsmithing.\n\n```suggestion\nThe landmark sequence determines *landmark subtrees* for each landmark: for each landmark `L`, other than number zero, let `tree_size` be `L`'s tree size and `prev_tree_size` be that of `L - 1`. The landmark subtrees for `L` are the one or two subtrees that cover `[prev_tree_size, tree_size)`, as described in {{arbitrary-intervals}}. Landmark zero has no landmark subtrees.\n```",
+              "createdAt": "2026-07-01T14:23:01Z",
+              "updatedAt": "2026-07-01T20:13:18Z"
+            },
+            {
+              "originalPosition": 50,
+              "body": "I guess there's the question of this two PR depending on the other, but TBH we could almost just delete the last sentence here and we'd be saying the same thing. :-)",
+              "createdAt": "2026-07-01T14:28:50Z",
+              "updatedAt": "2026-07-01T14:29:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEvGIRw",
+          "commit": {
+            "abbreviatedOid": "70bae55"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-01T20:50:34Z",
+          "updatedAt": "2026-07-01T20:50:34Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "Heh, yeah I wasn't sure how to handle that and just settled on getting both PRs into good shape and merging at the same time \ud83e\udd37 But if this one is otherwise ready to merge first happy to just drop the MTC-TLOG references.\n\nNext step is updating this PR to add more detail on constructing landmark-relative certs based on https://github.com/C2SP/C2SP/pull/269/changes#r3506669159.",
+              "createdAt": "2026-07-01T20:50:34Z",
+              "updatedAt": "2026-07-01T20:50:34Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 255,
@@ -18549,6 +18602,196 @@
           ]
         }
       ]
+    },
+    {
+      "number": 263,
+      "id": "PR_kwDOJIBkVc7sUPaw",
+      "title": "Add Jacob Hoffman-Andrews to acknowlegements",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/263",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@jsha",
+      "createdAt": "2026-06-30T16:26:48Z",
+      "updatedAt": "2026-06-30T16:32:40Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "545b71faa5ef5e729945f4f96f27964e1a7bc951",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "ack-jsha",
+      "headRefOid": "cac7285459335a8f5ab309eaaa3579f91811c4fd",
+      "closedAt": "2026-06-30T16:32:37Z",
+      "mergedAt": "2026-06-30T16:32:37Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "cc1407601d7652f2342508e63ab535b4322e8697"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABElDJMw",
+          "commit": {
+            "abbreviatedOid": "cac7285"
+          },
+          "author": "jsha",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-30T16:31:55Z",
+          "updatedAt": "2026-06-30T16:31:55Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 264,
+      "id": "PR_kwDOJIBkVc7s0C7W",
+      "title": "Repaint the link relation bikeshed",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/264",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Based on feedback from mnot",
+      "createdAt": "2026-07-01T18:36:42Z",
+      "updatedAt": "2026-07-01T20:32:18Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "cc1407601d7652f2342508e63ab535b4322e8697",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "link-rel-bikeshed",
+      "headRefOid": "96710337e12d3447fdeb59ae46348ac66da25cdb",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@aarongable LGTY?",
+          "createdAt": "2026-07-01T18:37:05Z",
+          "updatedAt": "2026-07-01T18:37:05Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(Ah whoops, misremembered that your suggestion was `acme-optional-alternate`, not `acme-optional-cert`. Switched to that.)",
+          "createdAt": "2026-07-01T18:38:11Z",
+          "updatedAt": "2026-07-01T18:38:11Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEuiGLQ",
+          "commit": {
+            "abbreviatedOid": "21fdabb"
+          },
+          "author": "jdeblasio",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-01T19:11:03Z",
+          "updatedAt": "2026-07-01T19:11:32Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "nit: I feel slightly weird about saying \"SHOULD NOT block deployment of other chains\". I think a rollout scenario we need not discourage is \"renew early; hold off on rolling out new certs until landmarks are ready\"",
+              "createdAt": "2026-07-01T19:11:03Z",
+              "updatedAt": "2026-07-01T19:11:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEuvzjw",
+          "commit": {
+            "abbreviatedOid": "21fdabb"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-01T19:49:42Z",
+          "updatedAt": "2026-07-01T19:49:43Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "Hmm. I guess there's a whole spectrum of models here. Strictly speaking, this text is talking about deploying other changes, not un-deploying your old ones. I'll give a stab at rephrasing this, but the problem is there's a whole spectrum of different strategies, that depend on whether you currently have certificates or if your old one is expiring. It very quickly becomes too complicated to understand.",
+              "createdAt": "2026-07-01T19:49:42Z",
+              "updatedAt": "2026-07-01T19:49:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEu1CZg",
+          "commit": {
+            "abbreviatedOid": "21fdabb"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-01T20:02:01Z",
+          "updatedAt": "2026-07-01T20:02:01Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "Rephrased.",
+              "createdAt": "2026-07-01T20:02:01Z",
+              "updatedAt": "2026-07-01T20:02:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEu_3Jw",
+          "commit": {
+            "abbreviatedOid": "21fdabb"
+          },
+          "author": "jdeblasio",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-01T20:32:17Z",
+          "updatedAt": "2026-07-01T20:32:17Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "Thank you! That seems like a reasonable threading of the needle to me.",
+              "createdAt": "2026-07-01T20:32:17Z",
+              "updatedAt": "2026-07-01T20:32:18Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 265,
+      "id": "PR_kwDOJIBkVc7s3-KN",
+      "title": "Document the draft OIDs allocated so far",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/265",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-01T21:54:04Z",
+      "updatedAt": "2026-07-01T21:54:04Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "cc1407601d7652f2342508e63ab535b4322e8697",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "draft-oids",
+      "headRefOid": "871019ff23f50d73a8670d6ca3b362d414efa0fe",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
