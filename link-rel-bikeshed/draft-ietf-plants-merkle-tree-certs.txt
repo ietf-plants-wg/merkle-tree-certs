@@ -2706,7 +2706,7 @@ Table of Contents
    certificate chains.  If the resource is unavailable, the ACME client
    SHOULD NOT fail the overall transaction.  If the resource returns an
    HTTP 202 (Accepted) response, the ACME client SHOULD retry the
-   request later, according to Retry-After header, but this process
+   request later, according to the Retry-After header, but this process
    SHOULD be independent of deploying other chains in the ACME order.
    In particular, if deploying a new service, the ACME client SHOULD NOT
    block deployment on optional alternates.
