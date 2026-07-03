@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 2 January 2027                                       Apple Inc.
+Expires: 4 January 2027                                       Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             1 July 2026
+                                                             3 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 January 2027.
+   This Internet-Draft will expire on 4 January 2027.
 
 Copyright Notice
 
@@ -2698,7 +2698,7 @@ Table of Contents
    parties that accept the optional alternate are expected to also
    accept either the original certificate chain or chains served under
    the "alternate" link relation.  If the certificate chain is not yet
-   available, the "acme-optional-alternate" URL MAY serve an HTTP 202
+   available, the "acme-optional-alternate" URL SHOULD serve an HTTP 202
    (Accepted) response, with a Retry-After header (Section 10.2.3 of
    [RFC9110]) estimating when it will become available.
 
@@ -2706,7 +2706,7 @@ Table of Contents
    certificate chains.  If the resource is unavailable, the ACME client
    SHOULD NOT fail the overall transaction.  If the resource returns an
    HTTP 202 (Accepted) response, the ACME client SHOULD retry the
-   request later, incorporating any Retry-After header, but this process
+   request later, according to Retry-After header, but this process
    SHOULD be independent of deploying other chains in the ACME order.
    In particular, if deploying a new service, the ACME client SHOULD NOT
    block deployment on optional alternates.
@@ -2735,12 +2735,11 @@ Table of Contents
    in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
-   "acme-optional-alternate" URL (Section 9.1) for the landmark-relative
-   certificate, as described in Section 7.4.2 of [RFC8555].  Before the
-   landmark-relative certificate is available, the URL SHOULD return an
-   HTTP 202 (Accepted) response.  Once the next landmark is allocated,
-   the ACME server constructs a landmark-relative certificate, as
-   described in Section 6.4, and serves it from the URL.
+   "acme-optional-alternate" URL for the landmark-relative certificate.
+   It initially serves an HTTP 202 response, as described in
+   Section 9.1.  Once the next landmark is allocated, the ACME server
+   constructs a landmark-relative certificate, as described in
+   Section 6.4, and serves it from the URL.
 
 10.  Deployment Considerations
 
