@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-02T04:13:11.079071+00:00",
+  "timestamp": "2026-07-05T04:12:32.046120+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3742,6 +3742,30 @@
           "body": "Coincidentally did this in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/261 before I saw this bug.\n\n(This is, of course, not *really* a concern. Even if you issued 1,000 certificates a second, it would still take you almost 9,000 years to reach 2^48.)",
           "createdAt": "2026-06-25T22:18:43Z",
           "updatedAt": "2026-06-25T22:18:43Z"
+        }
+      ]
+    },
+    {
+      "number": 266,
+      "id": "I_kwDOJIBkVc8AAAABHaNyAA",
+      "title": "Do cosignatures need to sign over a signature algorithm identifier?",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/266",
+      "state": "OPEN",
+      "author": "martinthomson",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The cosignatures don't sign over an algorithm identifier for the signature (and hash algorithm), which bothers me a little.\n\nIt's hard to come up with a concrete attack, but let's say that you have a hash algorithm for which it is difficult to generate collisions within its own output domain, but trivial to generate collisions with the output of a different hash function[^1]. Then, an attacker might seek to convince recipients that they are using this new hash function rather than one of these others.  In that case, the cosignature might be accepted as valid.\n\nThe defense you have in the draft is that each cosigner is tightly bound to the algorithms it uses. The hash function is a fixed property of the log.  I think that guarantees that -- provided your trust anchor distribution is solid -- there is no risk that a client with a valid trust configuration will get confused.  Still, redundancy might help.\n\n(I'd have added that you might want an algorithm identifier in case the signature needs to include two paired algorithms, where one or other might end up being weak.  But that seemed a bit silly in this context.)\n\n[^1]: I don't believe that we necessarily depend on hash functions being free from collisions with other hash functions.  Imagine that your function is SHA-256, except that two specific values of your choice are swapped.  That's a function that meets the same security target as SHA-256 on its own, but it has known collisions with SHA-256.",
+      "createdAt": "2026-07-02T07:26:36Z",
+      "updatedAt": "2026-07-03T04:50:38Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "TLS doesn't sign over the signature algorithm either. It doesn't really do anything because you've already decided to use the signature algorithm.\n\nThough actually we do sign over the signature algorithm by way of signing over the cosigner ID, which encompasses the algorithm and more. Likewise, as you note, we sign over the hash by way of signing over the log ID, which encompasses the hash and more.\n\nThis is a standard pattern. We also don't separately list the PSK hash in TLS ClientHellos. The transcript hash is just fine using the ID to stand for it. If your trust store might believe some properties of an ID are wrong, you have worse problems.",
+          "createdAt": "2026-07-03T04:50:38Z",
+          "updatedAt": "2026-07-03T04:50:38Z"
         }
       ]
     }
@@ -18657,13 +18681,13 @@
       "labels": [],
       "body": "Based on feedback from mnot",
       "createdAt": "2026-07-01T18:36:42Z",
-      "updatedAt": "2026-07-01T20:32:18Z",
+      "updatedAt": "2026-07-03T14:49:08Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "cc1407601d7652f2342508e63ab535b4322e8697",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "link-rel-bikeshed",
-      "headRefOid": "96710337e12d3447fdeb59ae46348ac66da25cdb",
+      "headRefOid": "ab358dcfc0476e83b8aba9dac1e3dc66f9d1802b",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -18764,6 +18788,72 @@
               "updatedAt": "2026-07-01T20:32:18Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABE34frQ",
+          "commit": {
+            "abbreviatedOid": "9671033"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-03T00:59:04Z",
+          "updatedAt": "2026-07-03T01:02:35Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "I'd strengthen the MAY at the end of this paragraph to a SHOULD, but that opinion is weakly held.\n\n_edit:_ Wait, I see that the paragraph in the next section says SHOULD. I think this document should probably only make statements about the HTTP 202 and Retry-After header in one place, to avoid contradicting itself.",
+              "createdAt": "2026-07-03T00:59:04Z",
+              "updatedAt": "2026-07-03T01:02:35Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "nit: I'm not sure that \"incorporating\" is the right word here (it sounds like the client should include the Retry-After header in its own follow-up request, which is obviously not the right thing to do). Maybe just `s/incorporating/according to/`?",
+              "createdAt": "2026-07-03T01:00:30Z",
+              "updatedAt": "2026-07-03T01:02:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABE8Sp_w",
+          "commit": {
+            "abbreviatedOid": "9671033"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-03T14:48:41Z",
+          "updatedAt": "2026-07-03T14:48:41Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "Done. MAY strengthened to SHOULD and then reworked the second reference to just cite this one. (The two places are an awkward attempt to define acme-optional-alternate as a general ACME feature, but then the MTC section needs to tell you to use this feature.)",
+              "createdAt": "2026-07-03T14:48:41Z",
+              "updatedAt": "2026-07-03T14:48:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABE8SsTg",
+          "commit": {
+            "abbreviatedOid": "9671033"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-03T14:48:47Z",
+          "updatedAt": "2026-07-03T14:48:47Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Done",
+              "createdAt": "2026-07-03T14:48:47Z",
+              "updatedAt": "2026-07-03T14:48:48Z"
+            }
+          ]
         }
       ]
     },
@@ -18772,26 +18862,42 @@
       "id": "PR_kwDOJIBkVc7s3-KN",
       "title": "Document the draft OIDs allocated so far",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/265",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-07-01T21:54:04Z",
-      "updatedAt": "2026-07-01T21:54:04Z",
+      "updatedAt": "2026-07-02T12:53:19Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "cc1407601d7652f2342508e63ab535b4322e8697",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "draft-oids",
       "headRefOid": "871019ff23f50d73a8670d6ca3b362d414efa0fe",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-02T12:53:15Z",
+      "mergedAt": "2026-07-02T12:53:15Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "8dd3c150cb4b572f15e365f99200231eff03fc3e"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABEzdxBw",
+          "commit": {
+            "abbreviatedOid": "871019f"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-02T12:24:04Z",
+          "updatedAt": "2026-07-02T12:24:04Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
