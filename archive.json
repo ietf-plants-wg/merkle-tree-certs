@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-05T04:12:32.046120+00:00",
+  "timestamp": "2026-07-07T04:09:26.967257+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18674,24 +18674,26 @@
       "id": "PR_kwDOJIBkVc7s0C7W",
       "title": "Repaint the link relation bikeshed",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/264",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Based on feedback from mnot",
       "createdAt": "2026-07-01T18:36:42Z",
-      "updatedAt": "2026-07-03T14:49:08Z",
+      "updatedAt": "2026-07-06T18:52:24Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "cc1407601d7652f2342508e63ab535b4322e8697",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "link-rel-bikeshed",
       "headRefOid": "ab358dcfc0476e83b8aba9dac1e3dc66f9d1802b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-06T18:52:22Z",
+      "mergedAt": "2026-07-06T18:52:22Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "69a29c7f017d8fd418a6f2e3cedd2ceb05208de6"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -18854,6 +18856,19 @@
               "updatedAt": "2026-07-03T14:48:48Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABFHh0Bw",
+          "commit": {
+            "abbreviatedOid": "ab358dc"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-06T17:50:13Z",
+          "updatedAt": "2026-07-06T17:50:13Z",
+          "comments": []
         }
       ]
     },
