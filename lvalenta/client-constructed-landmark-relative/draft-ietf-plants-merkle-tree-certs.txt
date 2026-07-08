@@ -2142,11 +2142,14 @@ Table of Contents
    as for any landmark-relative certificate (Section 8 describes this
    for TLS).  The certificate's landmark trust anchor ID and its single-
    log landmark group (Section 8.2.1) follow directly from the CA ID,
-   log number, and landmark number.  However, if the PKI also uses
-   timestamped landmark groups (Section 8.2.2) spanning multiple CAs,
-   configuring the corresponding group inclusions requires knowledge of
-   those group definitions, which is not derivable from the issuance log
-   and must be obtained out of band.
+   log number, and landmark number.  However, if the PKI also uses trust
+   anchor groups that span multiple CAs, such as timestamped landmark
+   groups (Section 8.2.2), configuring the corresponding group
+   inclusions requires those groups' definitions and any inputs they
+   entail; for timestamped landmark groups, this includes the timestamp
+   at which the landmark was allocated, used to select the group
+   version.  This information is not derivable from the issuance log and
+   must be obtained out of band.
 
    The CA does not need to perform any per-entry work to enable this:
    the landmark sequence and inclusion proof hashes are exactly those
