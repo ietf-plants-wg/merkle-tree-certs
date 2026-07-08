@@ -28,7 +28,7 @@
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.1
+    wcwidth 0.8.2
 -->
 <link href="draft-ietf-plants-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 2 January 2027</td>
+<td class="center">Expires 9 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-01" class="published">1 July 2026</time>
+<time datetime="2026-07-08" class="published">8 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-02">2 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-09">9 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 2 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1342,6 +1342,14 @@ svg {
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
             <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-acme-extensions" class="internal xref">ACME Extensions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-optional-certificates" class="internal xref">Optional Certificates</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-using-acme-with-merkle-tree" class="internal xref">Using ACME with Merkle Tree Certificates</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
             <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-deployment-considerations" class="internal xref">Deployment Considerations</a></p>
@@ -1382,6 +1390,14 @@ svg {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
                 <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-transparency" class="internal xref">Transparency</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.1">
+                    <p id="section-toc.1-1.12.2.2.2.1.1"><a href="#section-12.2.1" class="auto internal xref">12.2.1</a>.  <a href="#name-log-failures" class="internal xref">Log Failures</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.2">
+                    <p id="section-toc.1-1.12.2.2.2.2.1"><a href="#section-12.2.2" class="auto internal xref">12.2.2</a>.  <a href="#name-limiting-issuance-logs" class="internal xref">Limiting Issuance Logs</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
                 <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="auto internal xref">12.3</a>.  <a href="#name-public-key-hashes" class="internal xref">Public Key Hashes</a></p>
@@ -1420,6 +1436,9 @@ svg {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.4">
                 <p id="section-toc.1-1.13.2.4.1"><a href="#section-13.4" class="auto internal xref">13.4</a>.  <a href="#name-relative-distinguished-name" class="internal xref">Relative Distinguished Name Attribute</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.5">
+                <p id="section-toc.1-1.13.2.5.1"><a href="#section-13.5" class="auto internal xref">13.5</a>.  <a href="#name-link-relation-type" class="internal xref">Link Relation Type</a></p>
 </li>
             </ul>
 </li>
@@ -3756,7 +3775,7 @@ def find_subtrees(start, end):
           <p id="section-5-2.2.1">A collision-resistant cryptographic hash function, used by the CA's issuance logs. SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span> is RECOMMENDED. Throughout this document, this hash function is referred to as HASH, and the size of its output in bytes is referred to as HASH_SIZE.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.3">
-          <p id="section-5-2.3.1">A series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>), which contain all statements the CA has certified.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.3.1">A series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>), which contain all statements the CA has certified. One issuance log is designated as the current log.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.4">
           <p id="section-5-2.4.1">A CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>), which signs subtrees of issuance logs to certify their contents.<a href="#section-5-2.4.1" class="pilcrow">¶</a></p>
@@ -3821,7 +3840,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
         <h3 id="name-issuance-logs">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-issuance-logs" class="section-name selfRef">Issuance Logs</a>
         </h3>
-<p id="section-5.2-1">A CA operates a series of issuance logs, each identified by a positive integer <em>log number</em>. Log numbers are numbered consecutively starting from 1. Each log number MUST be at most 65535 (2<sup>16</sup>-1).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">A CA operates a series of issuance logs, each identified by a positive integer <em>log number</em>. Log numbers are numbered consecutively from 1 to at most 65535 (2<sup>16</sup>-1).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">Each issuance log has a <em>log ID</em>, which is a trust anchor ID constructed by concatenating the following OID components:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.2-3.1">
@@ -3835,10 +3854,11 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 </li>
         </ul>
 <p id="section-5.2-4">A log ID specifies both the CA and the log number in a single ID.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">Each issuance log describes an append-only sequence of <em>entries</em> (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.2-5">Each issuance log describes an append-only sequence of <em>entries</em> (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>). Each entry is identified by an integer <em>index</em>, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
 <p id="section-5.2-6">Each log additionally maintains a <em>minimum index</em> value, which is the index of the first log entry which is available. See <a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>. This value changes over the lifetime of the log.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
 <p id="section-5.2-7">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
 <p id="section-5.2-8">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5.2-8" class="pilcrow">¶</a></p>
+<p id="section-5.2-9">At any point in time, one of the CA's issuance logs is its <em>current</em> log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures. See <a href="#log-failures" class="auto internal xref">Section 12.2.1</a> for further discussion.<a href="#section-5.2-9" class="pilcrow">¶</a></p>
 <div id="log-entries">
 <section id="section-5.2.1">
           <h4 id="name-log-entries">
@@ -3899,6 +3919,11 @@ TBSCertificateLogEntry ::= SEQUENCE {
 </li>
             <li class="normal" id="section-5.2.1-9.2">
               <p id="section-5.2.1-9.2.1"><code>issuer</code> is the CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-5.2.1-9.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2.1-9.2.2.1">
+                  <p id="section-5.2.1-9.2.2.1.1">The <code>issuer</code> field is not human-readable. A TBSCertificateLogEntry MAY carry a human-readable label for the CA, suitable for display in user interfaces, in an issuer alternative name extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.7" class="relref">Section 4.2.1.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>). If present, the extension MUST be marked non-critical. The <code>IssuerAltName</code> SEQUENCE MUST contain a single <code>GeneralName</code> of type <code>directoryName</code>, whose <code>Name</code> MUST use the <code>rdnSequence</code> CHOICE. Each <code>RelativeDistinguishedName</code> MUST contain a single <code>AttributeTypeAndValue</code>. The extension is purely cosmetic, and MUST NOT be used in path validation or any other trust decision. The value MUST NOT be assumed unique across issuance logs and MAY change across entries in the same issuance log.<a href="#section-5.2.1-9.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              </ul>
 </li>
             <li class="normal" id="section-5.2.1-9.3">
               <p id="section-5.2.1-9.3.1"><code>subjectPublicKeyAlgorithm</code> describes the algorithm of the subject's public key. It is constructed identically to the <code>algorithm</code> field of a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>).<a href="#section-5.2.1-9.3.1" class="pilcrow">¶</a></p>
@@ -3919,7 +3944,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
           </h4>
 <p id="section-5.2.2-1">This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See <a href="#transparency" class="auto internal xref">Section 12.2</a>.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-2">This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-3">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs; <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> defines such a profile for Merkle Tree Certificates. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="log-pruning">
@@ -4441,10 +4466,14 @@ ext-mtcCertificationAuthority EXTENSION ::= {
 -- From draft-ietf-tls-trust-anchor-ids
 TrustAnchorID ::= RELATIVE-OID
 
+-- This is 2^64-1, the maximum possible serial number in this protocol.
+mtcMaxSerial INTEGER ::= 18446744073709551615
+
 MTCCertificationAuthority ::= SEQUENCE {
     logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER
+    minSerial INTEGER (0..mtcMaxSerial),
+    maxSerial INTEGER (0..mtcMaxSerial)
 }
 </pre><a href="#section-5.5-6" class="pilcrow">¶</a>
 </div>
@@ -4458,7 +4487,7 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-5.5-9.2.1"><code>sigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.3.3</a>).<a href="#section-5.5-9.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-9.3">
-            <p id="section-5.5-9.3.1"><code>minSerial</code> is an integer describing the minimum allowed serial number from this CA. Since the serial number encodes both the log number (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>) and the entry index into a specific log, it can be used to set a minimum allowed log number or a minimum allowed index in a particular log (<a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>).<a href="#section-5.5-9.3.1" class="pilcrow">¶</a></p>
+            <p id="section-5.5-9.3.1"><code>minSerial</code> and <code>maxSerial</code> describe the minimum and maximum allowed serial numbers from this CA, respectively. See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> for discussion on setting these values.<a href="#section-5.5-9.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>. In particular, it MUST NOT be used to directly sign TBSCertificate structures.<a href="#section-5.5-10" class="pilcrow">¶</a></p>
@@ -4665,7 +4694,23 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 </li>
           </ol>
 <p id="section-6.4.4-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
-<p id="section-6.4.4-4">The procedure above is not specific to the CA. Any party with access to the certificate inputs (<a href="#certificate-inputs" class="auto internal xref">Section 6.1</a>), the issuance log, and the landmark sequence can construct a landmark-relative certificate. <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> describes such a procedure for an authenticating party holding a standalone certificate, in log ecosystems based on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-6.4.4-4" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-4">The procedure above is not specific to the CA. Any party with access to the certificate inputs (<a href="#certificate-inputs" class="auto internal xref">Section 6.1</a>), the issuance log, and its landmark sequence can construct a landmark-relative certificate. In particular, a party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) for an entry can construct a landmark-relative certificate for the same entry, without any CA-specific issuance service, as follows:<a href="#section-6.4.4-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.4.4-5">
+<li id="section-6.4.4-5.1">
+              <p id="section-6.4.4-5.1.1">Recover the certificate inputs (<a href="#certificate-inputs" class="auto internal xref">Section 6.1</a>) from the standalone certificate. The TBSCertificateLogEntry fields and subject public key are those of the standalone certificate, and the log entry's <code>extensions</code> are carried in the standalone certificate's MTCProof (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>). The CA ID is the certificate's issuer (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>), and the log number and entry index are recovered from the serial number, which is <code>(log_number &lt;&lt; 48) | index</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>).<a href="#section-6.4.4-5.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.4-5.2">
+              <p id="section-6.4.4-5.2.1">Obtain the CA's landmark sequence, for example from its published active landmarks (<a href="#publishing-landmarks" class="auto internal xref">Section 6.4.3</a>).<a href="#section-6.4.4-5.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.4-5.3">
+              <p id="section-6.4.4-5.3.1">Produce the subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) by reading the necessary hashes directly from the issuance log (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). A party that is aware of a mirror of the issuance log MAY read these hashes from the mirror instead.<a href="#section-6.4.4-5.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.4-5.4">
+              <p id="section-6.4.4-5.4.1">Construct the landmark-relative certificate following the steps above, selecting the landmark subtree that covers the entry and using no signatures. The result copies every field of the standalone certificate except the <code>signatureValue</code>: its MTCProof instead describes the selected landmark subtree and its inclusion proof, and has an empty <code>signatures</code> field.<a href="#section-6.4.4-5.4.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.4.4-6">To use such a certificate, the party configures certificate selection as for any landmark-relative certificate (<a href="#use-in-tls" class="auto internal xref">Section 8</a> describes this for TLS). The certificate's landmark trust anchor ID and its single-log landmark group (<a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>) follow directly from the CA ID, log number, and landmark number. However, if the PKI also uses timestamped landmark groups (<a href="#timestamped-landmark-groups" class="auto internal xref">Section 8.2.2</a>) spanning multiple CAs, configuring the corresponding group inclusions requires knowledge of those group definitions, which is not derivable from the issuance log and must be obtained out of band.<a href="#section-6.4.4-6" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-7">The CA does not need to perform any per-entry work to enable this: the landmark sequence and inclusion proof hashes are exactly those already published by the issuance log. <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> specifies this construction for log ecosystems based on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, including where to fetch the landmark sequence and the inclusion proof hashes.<a href="#section-6.4.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4743,7 +4788,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-7.1-4.4.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party MAY incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.5">
-            <p id="section-7.1-4.5.1">The revoked serial number ranges include the half-open range <code>[0, minSerial)</code>, but the relying party MAY incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.5.1">The revoked serial number ranges include the half-open ranges <code>[0, minSerial)</code> and <code>[maxSerial+1, 2^64)</code>, but the relying party MAY incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -4907,7 +4952,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from one or more of the CA's issuance logs. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from the CA's current issuance log. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <p id="section-7.4-2">Each trusted subtree contains:<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-3.1">
@@ -4952,10 +4997,11 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-revoked-ranges" class="section-name selfRef">Revoked Ranges</a>
         </h3>
 <p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
-<p id="section-7.5-3">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
-<p id="section-7.5-4">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
-<p id="section-7.5-5">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>minSerial</code> value.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-3">A relying party with transparency requirements additionally SHOULD revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>maxSerial</code> value. See <a href="#limiting-issuance-logs" class="auto internal xref">Section 12.2.2</a>.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
+<p id="section-7.5-4">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
+<p id="section-7.5-5">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
+<p id="section-7.5-6">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5089,11 +5135,28 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acme-extensions" class="section-name selfRef">ACME Extensions</a>
       </h2>
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
-<p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
-<p id="section-9-6">As an alternative to fetching the landmark-relative certificate from the ACME server, a client with access to the issuance log and the landmark sequence MAY construct it itself from the standalone certificate, as described in <a href="#constructing-landmark-relative-certificates" class="auto internal xref">Section 6.4.4</a>. <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> describes a concrete procedure for log ecosystems based on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-9-6" class="pilcrow">¶</a></p>
+<div id="optional-certificates">
+<section id="section-9.1">
+        <h3 id="name-optional-certificates">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-optional-certificates" class="section-name selfRef">Optional Certificates</a>
+        </h3>
+<p id="section-9.1-1"><span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> describes how an ACME server uses the "alternate" link relation <span>[<a href="#RFC8288" class="cite xref">RFC8288</a>]</span> to serve multiple certificate chains for an ACME order. An ACME client might fetch all of them and deploy them in the authenticating party. Different relying parties need different chains, so the ACME client might reasonably treat any unavailable alternate as an error.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">This behavior is not ideal for a landmark-relative certificate, which is available asynchronously and is not intended to delay the corresponding standalone certificate. This section defines the "acme-optional-alternate" link relation. When serving a certificate, an ACME server MAY provide one or more link relation header fields of type "acme-optional-alternate". "acme-optional-alternate" identifies an alternate certificate chain, but one that is optional. Relying parties that accept the optional alternate are expected to also accept either the original certificate chain or chains served under the "alternate" link relation. If the certificate chain is not yet available, the "acme-optional-alternate" URL SHOULD serve an HTTP 202 (Accepted) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when it will become available.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+<p id="section-9.1-3">An ACME client MAY fetch these URLs to collect additional alternate certificate chains. If the resource is unavailable, the ACME client SHOULD NOT fail the overall transaction. If the resource returns an HTTP 202 (Accepted) response, the ACME client SHOULD retry the request later, according to the Retry-After header, but this process SHOULD be independent of deploying other chains in the ACME order. In particular, if deploying a new service, the ACME client SHOULD NOT block deployment on optional alternates.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
+<p id="section-9.1-4">If renewing certificates, the ACME client MAY opt to wait for optional alternates to simplify certificate replacement, but only while the previous certificates remain valid.<a href="#section-9.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="using-acme-with-merkle-tree-certificates">
+<section id="section-9.2">
+        <h3 id="name-using-acme-with-merkle-tree">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-using-acme-with-merkle-tree" class="section-name selfRef">Using ACME with Merkle Tree Certificates</a>
+        </h3>
+<p id="section-9.2-1">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> describes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<p id="section-9.2-3">The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. It initially serves an HTTP 202 response, as described in <a href="#optional-certificates" class="auto internal xref">Section 9.1</a>. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>, and serves it from the URL.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
+<p id="section-9.2-4">As an alternative to fetching the landmark-relative certificate from the ACME server, a client with access to the issuance log and the landmark sequence MAY construct it itself from the standalone certificate, as described in <a href="#constructing-landmark-relative-certificates" class="auto internal xref">Section 6.4.4</a>. <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> describes a concrete procedure for log ecosystems based on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="deployment-considerations">
@@ -5112,7 +5175,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-10.1.1" class="section-number selfRef">10.1.1. </a><a href="#name-certification-authority-cost" class="section-name selfRef">Certification Authority Costs</a>
           </h4>
 <p id="section-10.1.1-1">While Merkle Tree certificates expect CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>:<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-10.1.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> (profiled for Merkle Tree Certificates in <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span>), the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. Costs are thus expected to scale with the CA's own issuance.<a href="#section-10.1.1-3" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-4">A CA only needs to produce a digital signature for every checkpoint, rather than for every certificate. The lower signature rate requirements could allow more secure and/or economical key storage choices.<a href="#section-10.1.1-4" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-5">Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.<a href="#section-10.1.1-5" class="pilcrow">¶</a></p>
@@ -5231,6 +5294,55 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             <p id="section-12.2-6.2.1">If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of <em>some</em> entry at that index will be visible, so monitors will know the CA is failing to present an entry. This is sufficient to determine the serial number, so relying parties can then react by revoking the undisclosed entries (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>), and likely removing the CA.<a href="#section-12.2-6.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
+<div id="log-failures">
+<section id="section-12.2.1">
+          <h4 id="name-log-failures">
+<a href="#section-12.2.1" class="section-number selfRef">12.2.1. </a><a href="#name-log-failures" class="section-name selfRef">Log Failures</a>
+          </h4>
+<p id="section-12.2.1-1">Merkle Tree Certificates introduce additional state to PKI deployments and thus new kinds of operational failures. CAs are required to only sign subtree hashes that are consistent with a single append-only view of each issuance log. A CA might violate this as a result of operational failures. For example:<a href="#section-12.2.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-12.2.1-2.1">
+              <p id="section-12.2.1-2.1.1">A CA loses some state and signs subtree hashes from two inconsistent copies of the log<a href="#section-12.2.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.2.1-2.2">
+              <p id="section-12.2.1-2.2.1">A CA miscalculates some hash and signs a subtree hash that cannot be computed from some underlying sequence of entries<a href="#section-12.2.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-12.2.1-3">As described in <a href="#transparency" class="auto internal xref">Section 12.2</a>, PKIs can use additional cosigners to provide transparency guarantees even in the face of such CA violations. In doing so, individual cosigners may be locked to only one of two views of the log or unable to sign further checkpoints because some hash's preimage is unknown. It may then no longer be possible to add entries to the log that are trusted by existing relying parties.<a href="#section-12.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-12.2.1-4">Whether by accident or compromise, these violations are ultimately CA failures. However, it is useful for the CA instance to remain functional during and after incident management:<a href="#section-12.2.1-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-12.2.1-5.1">
+              <p id="section-12.2.1-5.1.1">While the incident is diagnosed, authenticating parties may still need new certificates.<a href="#section-12.2.1-5.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.2.1-5.2">
+              <p id="section-12.2.1-5.2.1">If relying parties consider the CA operator and the CA instance still trustworthy, repairing the incident without changing the CA requires less overhead.<a href="#section-12.2.1-5.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.2.1-5.3">
+              <p id="section-12.2.1-5.3.1">If relying parties consider either the CA operator or the CA instance no longer trustworthy and in need of replacement, the CA may still be needed to serve older, unupdated relying parties.<a href="#section-12.2.1-5.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-12.2.1-6">This is mitigated by a CA instance consisting of a series of issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). After a log failure, the CA SHOULD increment its current issuance log to restore availability. Both the underlying log failure and the use of a new issuance log will be visible to monitors and SHOULD be treated as a PKI incident. Such PKI incidents can be handled by some combination of:<a href="#section-12.2.1-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-12.2.1-7.1">
+              <p id="section-12.2.1-7.1.1">Revoking the diverging log indices (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>)<a href="#section-12.2.1-7.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.2.1-7.2">
+              <p id="section-12.2.1-7.2.1">Reevaluating trusted CAs and, if necessary, removing the old CA instance and switching to a new CA instance<a href="#section-12.2.1-7.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-12.2.1-8">In the latter case, the CA operator MAY continue to operate the removed CA instance if, for example, there remain unupdated relying parties that require it.<a href="#section-12.2.1-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="limiting-issuance-logs">
+<section id="section-12.2.2">
+          <h4 id="name-limiting-issuance-logs">
+<a href="#section-12.2.2" class="section-number selfRef">12.2.2. </a><a href="#name-limiting-issuance-logs" class="section-name selfRef">Limiting Issuance Logs</a>
+          </h4>
+<p id="section-12.2.2-1">While multiple issuance logs help mitigate log failures, as described in <a href="#log-failures" class="auto internal xref">Section 12.2.1</a>, they introduce transparency risks. If a CA violates the requirement to only use one issuance log at a time, it might add an entry in some far future log number. To be accepted in transparency-enforcing relying parties, the log state must still be cosigned. However, monitors may not know which log numbers to monitor.<a href="#section-12.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-12.2.2-2">PKIs with transparency requirements SHOULD mitigate this by only accepting a limited range of log numbers in relying parties, transparency cosigners, or both. This limit MAY be set to a fixed value or a rolling value that is updated whenever the CA switches its current log. Fixed values require committing to a limit of recoverable log failures over the lifetime of a CA.<a href="#section-12.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-12.2.2-3">Log number limits in relying parties can be implemented by revoking all serial numbers above some threshold. (See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>.) If using the format described in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be implemented with the <code>maxSerial</code> field.<a href="#section-12.2.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="public-key-hashes">
@@ -5461,6 +5573,31 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         </table>
 </section>
 </div>
+<div id="link-relation-type">
+<section id="section-13.5">
+        <h3 id="name-link-relation-type">
+<a href="#section-13.5" class="section-number selfRef">13.5. </a><a href="#name-link-relation-type" class="section-name selfRef">Link Relation Type</a>
+        </h3>
+<p id="section-13.5-1">IANA is requested to add the following entry to the "Link Relation Types" registry <span>[<a href="#RFC8288" class="cite xref">RFC8288</a>]</span>:<a href="#section-13.5-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-13.5-2">
+          <dt id="section-13.5-2.1">Relation Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.5-2.2">
+            <p id="section-13.5-2.2.1">acme-optional-alternate<a href="#section-13.5-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-13.5-2.3">Description:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.5-2.4">
+            <p id="section-13.5-2.4.1">Refers to an optional alternate certificate chain, which may not be available immediately. Relying parties that accept the alternate are expected to also accept the original certificate, so it is not an error if the alternate is unavailable.<a href="#section-13.5-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-13.5-2.5">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-13.5-2.6">
+            <p id="section-13.5-2.6.1">[this-RFC], <a href="#optional-certificates" class="auto internal xref">Section 9.1</a><a href="#section-13.5-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="sec-combined-references">
@@ -5505,6 +5642,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8288">[RFC8288]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Web Linking"</span>, <span class="seriesInfo">RFC 8288</span>, <span class="seriesInfo">DOI 10.17487/RFC8288</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8288">https://www.rfc-editor.org/rfc/rfc8288</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8446">[RFC8446]</dt>
         <dd>
@@ -5740,10 +5881,14 @@ ext-mtcCertificationAuthority EXTENSION ::= {
     CRITICALITY TRUE
 }
 
+-- This is 2^64-1, the maximum possible serial number in this protocol.
+mtcMaxSerial INTEGER ::= 18446744073709551615
+
 MTCCertificationAuthority ::= SEQUENCE {
     logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER
+    minSerial INTEGER (0..mtcMaxSerial),
+    maxSerial INTEGER (0..mtcMaxSerial)
 }
 
 END
@@ -6889,7 +7034,7 @@ assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b
 <a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
 <p id="appendix-D-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication, X.509, and Certificate Transparency. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
-<p id="appendix-D-2">The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gable, Nick Harper, Russ Housley, Dennis Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton, Michael Richardson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document, as well as feedback and contributions to the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
+<p id="appendix-D-2">The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton, Michael Richardson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document, as well as feedback and contributions to the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
 <p id="appendix-D-3">The idea to mint tree heads infrequently was originally described by Richard Barnes in <span>[<a href="#STH-Discipline" class="cite xref">STH-Discipline</a>]</span>. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.<a href="#appendix-D-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -7229,6 +7374,15 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.16-1.4">
             <p id="appendix-E.16-1.4.1">Added subtree test vector appendix<a href="#appendix-E.16-1.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.16-1.5">
+            <p id="appendix-E.16-1.5.1">Define a CA's current issuance log and rules around that<a href="#appendix-E.16-1.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.16-1.6">
+            <p id="appendix-E.16-1.6.1">Switch the ACME construction to a new link relation and change the HTTP status code<a href="#appendix-E.16-1.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.16-1.7">
+            <p id="appendix-E.16-1.7.1">Add a maxSerial field to the CA format<a href="#appendix-E.16-1.7.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

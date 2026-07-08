@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 2 January 2027                                       Apple Inc.
+Expires: 9 January 2027                                       Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             1 July 2026
+                                                             8 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 January 2027.
+   This Internet-Draft will expire on 9 January 2027.
 
 Copyright Notice
 
@@ -132,6 +132,8 @@ Table of Contents
        8.2.1.  Single-Log Landmark Groups
        8.2.2.  Timestamped Landmark Groups
    9.  ACME Extensions
+     9.1.  Optional Certificates
+     9.2.  Using ACME with Merkle Tree Certificates
    10. Deployment Considerations
      10.1.  Operational Costs
        10.1.1.  Certification Authority Costs
@@ -144,6 +146,8 @@ Table of Contents
    12. Security Considerations
      12.1.  Authenticity
      12.2.  Transparency
+       12.2.1.  Log Failures
+       12.2.2.  Limiting Issuance Logs
      12.3.  Public Key Hashes
      12.4.  Non-Repudiation
      12.5.  Extensibility
@@ -156,6 +160,7 @@ Table of Contents
      13.2.  Algorithm
      13.3.  Certificate Extension
      13.4.  Relative Distinguished Name Attribute
+     13.5.  Link Relation Type
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -1135,7 +1140,8 @@ Table of Contents
       size of its output in bytes is referred to as HASH_SIZE.
 
    *  A series of issuance logs (Section 5.2), which contain all
-      statements the CA has certified.
+      statements the CA has certified.  One issuance log is designated
+      as the current log.
 
    *  A CA cosigner (Section 5.4), which signs subtrees of issuance logs
       to certify their contents.
@@ -1207,7 +1213,7 @@ Table of Contents
 
    A CA operates a series of issuance logs, each identified by a
    positive integer _log number_. Log numbers are numbered consecutively
-   starting from 1.  Each log number MUST be at most 65535 (2^16-1).
+   from 1 to at most 65535 (2^16-1).
 
    Each issuance log has a _log ID_, which is a trust anchor ID
    constructed by concatenating the following OID components:
@@ -1221,9 +1227,10 @@ Table of Contents
    A log ID specifies both the CA and the log number in a single ID.
 
    Each issuance log describes an append-only sequence of _entries_
-   (Section 5.2.1), identified consecutively by an index value, starting
-   from zero.  Each entry is an assertion that the CA has certified.
-   The entries in the issuance log are represented as a Merkle Tree,
+   (Section 5.2.1).  Each entry is identified by an integer _index_,
+   assigned consecutively starting from zero.  Indices are at most
+   2^48-1.  Each entry is an assertion that the CA has certified.  The
+   entries in the issuance log are represented as a Merkle Tree,
    described in Section 2.1 of [RFC9162].
 
    Each log additionally maintains a _minimum index_ value, which is the
@@ -1240,6 +1247,14 @@ Table of Contents
    committed to the log at the time.  Its contents can be described by
    the Merkle Tree Hash (Section 2.1.1 of [RFC9162]) of entries zero
    through tree_size - 1.
+
+   At any point in time, one of the CA's issuance logs is its _current_
+   log.  Initially, this is log 1.  A CA MUST NOT append to any log that
+   is not the current log.  Logs before the current log may have
+   historical entries.  Logs after the current log MUST be empty.  A CA
+   MAY increment its current log number as part of recovering from
+   certain operational failures.  See Section 12.2.1 for further
+   discussion.
 
 5.2.1.  Log Entries
 
@@ -1313,6 +1328,19 @@ Table of Contents
    *  issuer is the CA ID as a PKIX distinguished name, as described in
       Section 5.1.
 
+      -  The issuer field is not human-readable.  A
+         TBSCertificateLogEntry MAY carry a human-readable label for the
+         CA, suitable for display in user interfaces, in an issuer
+         alternative name extension (Section 4.2.1.7 of [RFC5280]).  If
+         present, the extension MUST be marked non-critical.  The
+         IssuerAltName SEQUENCE MUST contain a single GeneralName of
+         type directoryName, whose Name MUST use the rdnSequence CHOICE.
+         Each RelativeDistinguishedName MUST contain a single
+         AttributeTypeAndValue.  The extension is purely cosmetic, and
+         MUST NOT be used in path validation or any other trust
+         decision.  The value MUST NOT be assumed unique across issuance
+         logs and MAY change across entries in the same issuance log.
+
    *  subjectPublicKeyAlgorithm describes the algorithm of the subject's
       public key.  It is constructed identically to the algorithm field
       of a SubjectPublicKeyInfo (Section 4.1.2.7 of [RFC5280]).
@@ -1352,7 +1380,8 @@ Table of Contents
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
-   For example, a log ecosystem could use [TLOG-TILES] to serve logs.
+   For example, a log ecosystem could use [TLOG-TILES] to serve logs;
+   [MTC-TLOG] defines such a profile for Merkle Tree Certificates.
    [TLOG-TILES] improves on [RFC6962] and [RFC9162] by exposing the log
    as a collection of cacheable, immutable "tiles".  This works well
    with a variety of common HTTP [RFC9110] serving architectures.  It
@@ -1722,10 +1751,14 @@ Table of Contents
    -- From draft-ietf-tls-trust-anchor-ids
    TrustAnchorID ::= RELATIVE-OID
 
+   -- This is 2^64-1, the maximum possible serial number in this protocol.
+   mtcMaxSerial INTEGER ::= 18446744073709551615
+
    MTCCertificationAuthority ::= SEQUENCE {
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER
+       minSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    For initial experimentation, early implementations of this design
@@ -1741,11 +1774,9 @@ Table of Contents
 
    *  sigAlg is the CA cosigner's signature algorithm (Section 5.3.3).
 
-   *  minSerial is an integer describing the minimum allowed serial
-      number from this CA.  Since the serial number encodes both the log
-      number (Section 5.2) and the entry index into a specific log, it
-      can be used to set a minimum allowed log number or a minimum
-      allowed index in a particular log (Section 5.2.3).
+   *  minSerial and maxSerial describe the minimum and maximum allowed
+      serial numbers from this CA, respectively.  See Section 7.5 for
+      discussion on setting these values.
 
    If this extension is present, the key described in
    subjectPublicKeyInfo is a CA cosigner key and subject to the usage
@@ -2077,11 +2108,51 @@ Table of Contents
    [RFC8446].
 
    The procedure above is not specific to the CA.  Any party with access
-   to the certificate inputs (Section 6.1), the issuance log, and the
-   landmark sequence can construct a landmark-relative certificate.
-   [MTC-TLOG] describes such a procedure for an authenticating party
-   holding a standalone certificate, in log ecosystems based on
-   [TLOG-TILES].
+   to the certificate inputs (Section 6.1), the issuance log, and its
+   landmark sequence can construct a landmark-relative certificate.  In
+   particular, a party holding a standalone certificate (Section 6.3)
+   for an entry can construct a landmark-relative certificate for the
+   same entry, without any CA-specific issuance service, as follows:
+
+   1.  Recover the certificate inputs (Section 6.1) from the standalone
+       certificate.  The TBSCertificateLogEntry fields and subject
+       public key are those of the standalone certificate, and the log
+       entry's extensions are carried in the standalone certificate's
+       MTCProof (Section 6.2).  The CA ID is the certificate's issuer
+       (Section 5.1), and the log number and entry index are recovered
+       from the serial number, which is (log_number << 48) | index
+       (Section 6.2).
+
+   2.  Obtain the CA's landmark sequence, for example from its published
+       active landmarks (Section 6.4.3).
+
+   3.  Produce the subtree inclusion proof (Section 4.3) by reading the
+       necessary hashes directly from the issuance log (Section 5.2).  A
+       party that is aware of a mirror of the issuance log MAY read
+       these hashes from the mirror instead.
+
+   4.  Construct the landmark-relative certificate following the steps
+       above, selecting the landmark subtree that covers the entry and
+       using no signatures.  The result copies every field of the
+       standalone certificate except the signatureValue: its MTCProof
+       instead describes the selected landmark subtree and its inclusion
+       proof, and has an empty signatures field.
+
+   To use such a certificate, the party configures certificate selection
+   as for any landmark-relative certificate (Section 8 describes this
+   for TLS).  The certificate's landmark trust anchor ID and its single-
+   log landmark group (Section 8.2.1) follow directly from the CA ID,
+   log number, and landmark number.  However, if the PKI also uses
+   timestamped landmark groups (Section 8.2.2) spanning multiple CAs,
+   configuring the corresponding group inclusions requires knowledge of
+   those group definitions, which is not derivable from the issuance log
+   and must be obtained out of band.
+
+   The CA does not need to perform any per-entry work to enable this:
+   the landmark sequence and inclusion proof hashes are exactly those
+   already published by the issuance log.  [MTC-TLOG] specifies this
+   construction for log ecosystems based on [TLOG-TILES], including
+   where to fetch the landmark sequence and the inclusion proof hashes.
 
 6.5.  Size Estimates
 
@@ -2173,9 +2244,9 @@ Table of Contents
       structure, but the relying party MAY incorporate trusted subtrees
       from out-of-band information.
 
-   *  The revoked serial number ranges include the half-open range [0,
-      minSerial), but the relying party MAY incorporate additional
-      ranges from out-of-band information.
+   *  The revoked serial number ranges include the half-open ranges [0,
+      minSerial) and [maxSerial+1, 2^64), but the relying party MAY
+      incorporate additional ranges from out-of-band information.
 
 7.2.  Verifying Certificate Signatures
 
@@ -2370,8 +2441,8 @@ Table of Contents
 
    As an optional optimization, a relying party MAY incorporate a
    periodically updated, predistributed list of trusted subtrees from
-   one or more of the CA's issuance logs.  This allows the relying party
-   to accept landmark-relative certificates (Section 6.4) constructed
+   the CA's current issuance log.  This allows the relying party to
+   accept landmark-relative certificates (Section 6.4) constructed
    against those subtrees.
 
    Each trusted subtree contains:
@@ -2443,7 +2514,13 @@ Table of Contents
    unavailable entries.  This gives assurance that, even if some
    unavailable entry had not yet expired, the relying party will not
    trust it.  It also allows monitors to start monitoring a log without
-   processing expired entries.
+   processing expired entries.  If using the format defined in
+   Section 5.5, this can be configured with the minSerial value.
+
+   A relying party with transparency requirements additionally SHOULD
+   revoke all log numbers above some threshold to bound monitoring
+   overhead.  If using the format defined in Section 5.5, this can be
+   configured with the maxSerial value.  See Section 12.2.2.
 
    A misbehaving CA might correctly construct a globally consistent log,
    but refuse to make some entries or intermediate nodes available.
@@ -2658,14 +2735,53 @@ Table of Contents
    This section describes how to issue Merkle Tree certificates using
    ACME [RFC8555].
 
+9.1.  Optional Certificates
+
+   Section 7.4.2 of [RFC8555] describes how an ACME server uses the
+   "alternate" link relation [RFC8288] to serve multiple certificate
+   chains for an ACME order.  An ACME client might fetch all of them and
+   deploy them in the authenticating party.  Different relying parties
+   need different chains, so the ACME client might reasonably treat any
+   unavailable alternate as an error.
+
+   This behavior is not ideal for a landmark-relative certificate, which
+   is available asynchronously and is not intended to delay the
+   corresponding standalone certificate.  This section defines the
+   "acme-optional-alternate" link relation.  When serving a certificate,
+   an ACME server MAY provide one or more link relation header fields of
+   type "acme-optional-alternate". "acme-optional-alternate" identifies
+   an alternate certificate chain, but one that is optional.  Relying
+   parties that accept the optional alternate are expected to also
+   accept either the original certificate chain or chains served under
+   the "alternate" link relation.  If the certificate chain is not yet
+   available, the "acme-optional-alternate" URL SHOULD serve an HTTP 202
+   (Accepted) response, with a Retry-After header (Section 10.2.3 of
+   [RFC9110]) estimating when it will become available.
+
+   An ACME client MAY fetch these URLs to collect additional alternate
+   certificate chains.  If the resource is unavailable, the ACME client
+   SHOULD NOT fail the overall transaction.  If the resource returns an
+   HTTP 202 (Accepted) response, the ACME client SHOULD retry the
+   request later, according to the Retry-After header, but this process
+   SHOULD be independent of deploying other chains in the ACME order.
+   In particular, if deploying a new service, the ACME client SHOULD NOT
+   block deployment on optional alternates.
+
+   If renewing certificates, the ACME client MAY opt to wait for
+   optional alternates to simplify certificate replacement, but only
+   while the previous certificates remain valid.
+
+9.2.  Using ACME with Merkle Tree Certificates
+
    When downloading the certificate (Section 7.4.2 of [RFC8555]), ACME
    clients supporting Merkle Tree certificates SHOULD send "application/
    pem-certificate-chain-with-properties" in their Accept header
    (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
    certificates SHOULD then respond with that content type and include
    trust anchor ID information as described in Section 7 of
-   [I-D.ietf-tls-trust-anchor-ids].  Section 8 decribes the trust anchor
-   ID assignments for standalone and landmark-relative certificates.
+   [I-D.ietf-tls-trust-anchor-ids].  Section 8 describes the trust
+   anchor ID assignments for standalone and landmark-relative
+   certificates.
 
    When processing an order for a Merkle Tree certificate, the ACME
    server moves the order to the "valid" state after the corresponding
@@ -2675,19 +2791,11 @@ Table of Contents
    in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
-   alternate URL for the landmark-relative certificate, as described
-   Section 7.4.2 of [RFC8555].  Before the landmark-relative certificate
-   is available, the alternate URL SHOULD return a HTTP 503 (Service
-   Unavailable) response, with a Retry-After header (Section 10.2.3 of
-   [RFC9110]) estimating when the certificate will become available.
-   Once the next landmark is allocated, the ACME server constructs a
-   landmark-relative certificate, as described in Section 6.4 and serves
-   it from the alternate URL.
-
-   ACME clients supporting Merkle Tree certificates SHOULD support
-   fetching alternate chains.  If an alternate chain returns an HTTP 503
-   with a Retry-After header, as described above, the client SHOULD
-   retry the request at the specified time.
+   "acme-optional-alternate" URL for the landmark-relative certificate.
+   It initially serves an HTTP 202 response, as described in
+   Section 9.1.  Once the next landmark is allocated, the ACME server
+   constructs a landmark-relative certificate, as described in
+   Section 6.4, and serves it from the URL.
 
    As an alternative to fetching the landmark-relative certificate from
    the ACME server, a client with access to the issuance log and the
@@ -2707,7 +2815,8 @@ Table of Contents
 
    Section 5.2.2 does not constrain the API to the one defined in
    [RFC6962] or [RFC9162].  If the PKI uses a tile-based protocol, such
-   as [TLOG-TILES], the issuance log benefits from the improved caching
+   as [TLOG-TILES] (profiled for Merkle Tree Certificates in
+   [MTC-TLOG]), the issuance log benefits from the improved caching
    properties of such designs.
 
    Unlike a CT log, an issuance log does not have public submission
@@ -3007,6 +3116,81 @@ Table of Contents
       sufficient to determine the serial number, so relying parties can
       then react by revoking the undisclosed entries (Section 7.5), and
       likely removing the CA.
+
+12.2.1.  Log Failures
+
+   Merkle Tree Certificates introduce additional state to PKI
+   deployments and thus new kinds of operational failures.  CAs are
+   required to only sign subtree hashes that are consistent with a
+   single append-only view of each issuance log.  A CA might violate
+   this as a result of operational failures.  For example:
+
+   *  A CA loses some state and signs subtree hashes from two
+      inconsistent copies of the log
+
+   *  A CA miscalculates some hash and signs a subtree hash that cannot
+      be computed from some underlying sequence of entries
+
+   As described in Section 12.2, PKIs can use additional cosigners to
+   provide transparency guarantees even in the face of such CA
+   violations.  In doing so, individual cosigners may be locked to only
+   one of two views of the log or unable to sign further checkpoints
+   because some hash's preimage is unknown.  It may then no longer be
+   possible to add entries to the log that are trusted by existing
+   relying parties.
+
+   Whether by accident or compromise, these violations are ultimately CA
+   failures.  However, it is useful for the CA instance to remain
+   functional during and after incident management:
+
+   *  While the incident is diagnosed, authenticating parties may still
+      need new certificates.
+
+   *  If relying parties consider the CA operator and the CA instance
+      still trustworthy, repairing the incident without changing the CA
+      requires less overhead.
+
+   *  If relying parties consider either the CA operator or the CA
+      instance no longer trustworthy and in need of replacement, the CA
+      may still be needed to serve older, unupdated relying parties.
+
+   This is mitigated by a CA instance consisting of a series of issuance
+   logs (Section 5.2).  After a log failure, the CA SHOULD increment its
+   current issuance log to restore availability.  Both the underlying
+   log failure and the use of a new issuance log will be visible to
+   monitors and SHOULD be treated as a PKI incident.  Such PKI incidents
+   can be handled by some combination of:
+
+   *  Revoking the diverging log indices (Section 7.5)
+
+   *  Reevaluating trusted CAs and, if necessary, removing the old CA
+      instance and switching to a new CA instance
+
+   In the latter case, the CA operator MAY continue to operate the
+   removed CA instance if, for example, there remain unupdated relying
+   parties that require it.
+
+12.2.2.  Limiting Issuance Logs
+
+   While multiple issuance logs help mitigate log failures, as described
+   in Section 12.2.1, they introduce transparency risks.  If a CA
+   violates the requirement to only use one issuance log at a time, it
+   might add an entry in some far future log number.  To be accepted in
+   transparency-enforcing relying parties, the log state must still be
+   cosigned.  However, monitors may not know which log numbers to
+   monitor.
+
+   PKIs with transparency requirements SHOULD mitigate this by only
+   accepting a limited range of log numbers in relying parties,
+   transparency cosigners, or both.  This limit MAY be set to a fixed
+   value or a rolling value that is updated whenever the CA switches its
+   current log.  Fixed values require committing to a limit of
+   recoverable log failures over the lifetime of a CA.
+
+   Log number limits in relying parties can be implemented by revoking
+   all serial numbers above some threshold.  (See Section 7.5.)  If
+   using the format described in Section 5.5, this can be implemented
+   with the maxSerial field.
 
 12.3.  Public Key Hashes
 
@@ -3316,6 +3500,21 @@ Table of Contents
 
                                  Table 4
 
+13.5.  Link Relation Type
+
+   IANA is requested to add the following entry to the "Link Relation
+   Types" registry [RFC8288]:
+
+   Relation Name:  acme-optional-alternate
+
+   Description:  Refers to an optional alternate certificate chain,
+      which may not be available immediately.  Relying parties that
+      accept the alternate are expected to also accept the original
+      certificate, so it is not an error if the alternate is
+      unavailable.
+
+   Reference:  [this-RFC], Section 9.1
+
 14.  References
 
 14.1.  Normative References
@@ -3363,6 +3562,10 @@ Table of Contents
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8288]  Nottingham, M., "Web Linking", RFC 8288,
+              DOI 10.17487/RFC8288, October 2017,
+              <https://www.rfc-editor.org/rfc/rfc8288>.
 
    [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
@@ -3602,10 +3805,14 @@ Appendix A.  ASN.1 Module
        CRITICALITY TRUE
    }
 
+   -- This is 2^64-1, the maximum possible serial number in this protocol.
+   mtcMaxSerial INTEGER ::= 18446744073709551615
+
    MTCCertificationAuthority ::= SEQUENCE {
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER
+       minSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    END
@@ -4143,9 +4350,9 @@ Acknowledgements
    contributed over the history of these protocols.
 
    The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson,
-   Aaron Gable, Nick Harper, Russ Housley, Dennis Jackson, Ilari
-   Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton, Michael
-   Richardson, Ryan Sleevi, and Emily Stark for many valuable
+   Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis
+   Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton,
+   Michael Richardson, Ryan Sleevi, and Emily Stark for many valuable
    discussions and insights which led to this document, as well as
    feedback and contributions to the document itself.  We wish to thank
    Mia Celeste in particular, whose implementation of an earlier draft
@@ -4364,6 +4571,13 @@ Since draft-ietf-plants-merkle-tree-certs-04
       Considerations
 
    *  Added subtree test vector appendix
+
+   *  Define a CA's current issuance log and rules around that
+
+   *  Switch the ACME construction to a new link relation and change the
+      HTTP status code
+
+   *  Add a maxSerial field to the CA format
 
 Authors' Addresses
 
