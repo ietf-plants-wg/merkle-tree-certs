@@ -615,14 +615,16 @@ Subtree consistency proofs contain sufficient nodes to reconstruct both the subt
 
 ### Generating a Subtree Consistency Proof
 
-The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}, in terms of a helper function that tracks whether the subtree hash is known:
+The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}, in terms of a helper function:
 
 ~~~pseudocode
 SUBTREE_PROOF(start, end, D_n) =
     SUBTREE_SUBPROOF(start, end, D_n, true)
 ~~~
 
-If `start = 0` and `end = n`, the subtree is the root:
+The boolean parameter tracks whether the first hash in the proof will be omitted by the base case. The first hash is omitted when it's equal to the original subtree hash `MTH(D[start:end])`, since the verifier will already know that hash. That happens when the original subtree's root is a node in the Merkle Tree constructed from `D_n`, or equivalently, when the original subtree is full or has `end = n`.
+
+If `start = 0` and `end = n`, the subtree is the root (base case):
 
 ~~~pseudocode
 SUBTREE_SUBPROOF(0, n, D_n, true) = {}
@@ -2301,7 +2303,7 @@ Note that the truncated inclusion proof may include nodes from lower levels, if 
 
 ## Consistency Proof Verification {#consistency-proof-verification-explain}
 
-The procedure in {{verifying-a-subtree-consistency-proof}} is structured similarly to inclusion proof evaluation ({{inclusion-proof-evaluation-explain}}). It iteratively builds two hashes, `fr` and `sr`, which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
+The procedure in {{verifying-a-subtree-consistency-proof}} is structured similarly to inclusion proof evaluation ({{inclusion-proof-evaluation-explain}}). It iteratively builds two hashes, `fr` (first root) and `sr` (second root), which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
 
 Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third number) to follow, respectively, the paths to `start`, `end - 1` (the last element of the subtree), and `n - 1` (the last element of the tree).
 
