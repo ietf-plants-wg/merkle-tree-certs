@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 7 January 2027                                       Apple Inc.
+Expires: 10 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             6 July 2026
+                                                             9 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 January 2027.
+   This Internet-Draft will expire on 10 January 2027.
 
 Copyright Notice
 
@@ -795,12 +795,19 @@ Table of Contents
 
    The subtree consistency proof, SUBTREE_PROOF(start, end, D_n) is
    defined similarly to Section 2.1.4.1 of [RFC9162], in terms of a
-   helper function that tracks whether the subtree hash is known:
+   helper function:
 
    SUBTREE_PROOF(start, end, D_n) =
        SUBTREE_SUBPROOF(start, end, D_n, true)
 
-   If start = 0 and end = n, the subtree is the root:
+   The boolean parameter tracks whether the first hash in the proof will
+   be omitted by the base case.  The first hash is omitted when it's
+   equal to the original subtree hash MTH(D[start:end]), since the
+   verifier will already know that hash.  That happens when the original
+   subtree's root is a node in the Merkle Tree constructed from D_n, or
+   equivalently, when the original subtree is full or has end = n.
+
+   If start = 0 and end = n, the subtree is the root (base case):
 
    SUBTREE_SUBPROOF(0, n, D_n, true) = {}
    SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
@@ -4094,9 +4101,10 @@ B.5.  Consistency Proof Verification
 
    The procedure in Section 4.4.3 is structured similarly to inclusion
    proof evaluation (Appendix B.3).  It iteratively builds two hashes,
-   fr and sr, which are expected to equal node_hash and root_hash,
-   respectively.  Everything hashed into fr is also hashed into sr, so
-   success demonstrates that root_hash contains node_hash.
+   fr (first root) and sr (second root), which are expected to equal
+   node_hash and root_hash, respectively.  Everything hashed into fr is
+   also hashed into sr, so success demonstrates that root_hash contains
+   node_hash.
 
    Step 2 initializes fn (first number), sn (second number), and tn
    (third number) to follow, respectively, the paths to start, end - 1
