@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-07T04:09:26.967257+00:00",
+  "timestamp": "2026-07-09T04:03:41.308566+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18206,18 +18206,26 @@
       "labels": [],
       "body": "- Make explicit that a landmark consists of a number and a tree size, and that both subtrees of a given landmark share that landmark number.\r\n- Give an exact algorithm for selecting the landmark and subtree, with explicit wait and abort conditions for the cases where no allocated landmark yet covers the entry index, or where every landmark that once covered it has aged out.\r\n- Add a paragraph clarifying that landmark-relative certificate construction is not specific to the CA: any party that can read the issuance log and the landmark sequence can construct one from the standalone cert. Reference MTC-TLOG as an example for tile-based log ecosystems.\r\n- Note that a client MAY construct the landmark-relative certificate itself from the standalone certificate, as an alternative to fetching it from the ACME server's alternate URL.\r\n- Add an informative reference to MTC-TLOG (c2sp.org/mtc-tlog).\r\n\r\nCloses #246, #253. Also depends on https://github.com/C2SP/C2SP/pull/269.",
       "createdAt": "2026-06-16T16:46:27Z",
-      "updatedAt": "2026-07-01T20:50:43Z",
+      "updatedAt": "2026-07-08T21:21:01Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "609ad10710a6872f5fc108815667e4aec66a05c8",
+      "baseRefOid": "69a29c7f017d8fd418a6f2e3cedd2ceb05208de6",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "lvalenta/client-constructed-landmark-relative",
-      "headRefOid": "86a307d9831057569e7eecf6f1b1a670fe699133",
+      "headRefOid": "32bd21857af30adacb3e32ba0851cd14f970bac5",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sorry for the delay--this should be ready for another pass now.",
+          "createdAt": "2026-07-08T21:21:01Z",
+          "updatedAt": "2026-07-08T21:21:01Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABEsXehQ",
@@ -18268,6 +18276,46 @@
               "body": "Heh, yeah I wasn't sure how to handle that and just settled on getting both PRs into good shape and merging at the same time \ud83e\udd37 But if this one is otherwise ready to merge first happy to just drop the MTC-TLOG references.\n\nNext step is updating this PR to add more detail on constructing landmark-relative certs based on https://github.com/C2SP/C2SP/pull/269/changes#r3506669159.",
               "createdAt": "2026-07-01T20:50:34Z",
               "updatedAt": "2026-07-01T20:50:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABFaIpgQ",
+          "commit": {
+            "abbreviatedOid": "6d6c235"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-08T21:08:01Z",
+          "updatedAt": "2026-07-08T21:08:02Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Sprinkled a few more references around",
+              "createdAt": "2026-07-08T21:08:01Z",
+              "updatedAt": "2026-07-08T21:08:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABFaJ0Pw",
+          "commit": {
+            "abbreviatedOid": "6d6c235"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-08T21:11:31Z",
+          "updatedAt": "2026-07-08T21:11:31Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "> Next step is updating this PR to add more detail on constructing landmark-relative certs based on https://github.com/C2SP/C2SP/pull/269/changes#r3506669159.\n\nDone!",
+              "createdAt": "2026-07-08T21:11:31Z",
+              "updatedAt": "2026-07-08T21:11:31Z"
             }
           ]
         }
