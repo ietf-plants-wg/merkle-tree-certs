@@ -297,10 +297,10 @@ Cosignature:
 : A signature from either the CA or other cosigner, over some checkpoint or subtree.
 
 Landmark:
-: One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for landmark-relative certificates.
+: One of a sequence of tree sizes, infrequently chosen and used to calculate landmark subtrees for predistribution to relying parties.
 
 Landmark subtree:
-: A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and landmark-relative certificates.
+: One of the (up to two) subtrees determined by an interval between two landmarks. Predistributed and used as the basis for landmark-relative certificates.
 
 Standalone certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
