@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 10 January 2027                                      Apple Inc.
+Expires: 11 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             9 July 2026
+                                                            10 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 January 2027.
+   This Internet-Draft will expire on 11 January 2027.
 
 Copyright Notice
 
@@ -360,13 +360,13 @@ Table of Contents
    Cosignature:  A signature from either the CA or other cosigner, over
       some checkpoint or subtree.
 
-   Landmark:  One of an infrequent subset of tree sizes that can be used
-      to predistribute trusted subtrees to relying parties for landmark-
-      relative certificates.
+   Landmark:  One of a sequence of tree sizes, infrequently chosen and
+      used to calculate landmark subtrees for predistribution to relying
+      parties.
 
-   Landmark subtree:  A subtree determined by a landmark.  Landmark
-      subtrees are common points of reference between relying parties
-      and landmark-relative certificates.
+   Landmark subtree:  One of the (up to two) subtrees determined by an
+      interval between two landmarks.  Predistributed and used as the
+      basis for landmark-relative certificates.
 
    Standalone certificate:  A certificate containing an inclusion proof
       to some subtree, and several cosignatures over that subtree.
