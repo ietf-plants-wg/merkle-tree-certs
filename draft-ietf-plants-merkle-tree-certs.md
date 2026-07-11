@@ -228,7 +228,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
-This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}. It extends the numeric types defined in {{Section 3.3 of !RFC8446}} with a big-endian, 48-bit integer:
+This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC9846}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}. It extends the numeric types defined in {{Section 3.3 of !RFC9846}} with a big-endian, 48-bit integer:
 
 ~~~tls-presentation
 uint8 uint48[6];
@@ -418,7 +418,7 @@ Landmark-relative certificates are constructed and used as follows. {{fig-landma
 
 3. In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.
 
-4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in {{certificate-renewal}}.
+4. During the application protocol, such as TLS {{?RFC9846}}, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in {{certificate-renewal}}.
 
 # Subtrees
 
@@ -1134,7 +1134,7 @@ A single cosigner, with a single cosigner ID and public key, MAY generate cosign
 
 ### Signature Format
 
-A cosigner computes a *subtree signature* for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
+A cosigner computes a *subtree signature* for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
@@ -1310,7 +1310,7 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
 
 For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of `id-alg-mtcProof`.
 
-The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
+The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
 ~~~tls-presentation
 /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
@@ -1366,7 +1366,7 @@ This document does not prescribe the specific cosigner roles, or a particular pr
 
 ## Landmark-Relative Certificates
 
-A *landmark-relative certificate* is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC8446}}.
+A *landmark-relative certificate* is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC9846}}.
 
 ### Landmark Tree Sizes
 
@@ -1413,7 +1413,7 @@ Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-r
 2. Determine the landmark's subtrees and select the one that contains the entry.
 3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
 
-Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
 
 ## Size Estimates
 
@@ -1572,7 +1572,7 @@ This criteria can be checked given:
 
 This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.
 
-The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
 
 ## Revoked Ranges
 
@@ -1596,7 +1596,7 @@ Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subj
 * Whether the authenticating party should send a standalone or landmark-relative certificate
 * What the relying party should communicate to the authenticating party to help it make this decision
 
-Certificate selection in TLS, described in {{Section 4.4.2.2 and Section 4.4.2.3 of !RFC8446}}, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.
+Certificate selection in TLS, described in {{Section 4.5.1.2 of !RFC9846}}, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.
 
 ## Standalone Certificates {#standalone-certificates-tls}
 
@@ -1870,7 +1870,7 @@ This situation is analogous to the addition of a new X.509 extension. When relyi
 
 ## Certificate Malleability
 
-An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER {{X.690}}, such as {{Section 4.4.2 of ?RFC8446}}. This aligns with {{Section 4.1.1.3 of ?RFC5280}}, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.
+An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER {{X.690}}, such as {{Section 4.5.1 of ?RFC9846}}. This aligns with {{Section 4.1.1.3 of ?RFC5280}}, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.
 
 When the signature verification process in {{verifying-certificate-signatures}} first transforms the TBSCertificate into a TBSCertificateLogEntry, it preserves this non-malleability. There is a unique valid DER encoding for every abstract TBSCertificate structure, so malleability of the DER-encoded TBSCertificate reduces to malleability of the TBSCertificate value:
 
