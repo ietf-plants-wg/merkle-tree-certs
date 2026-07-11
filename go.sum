@@ -1,4 +1,4 @@
 filippo.io/mldsa v0.0.0-20260215214346-43d0283efc3e h1:VsUbObBMxXlc23Eb9VeeJYE4jvTs87qa5RqSN2U5FJU=
 filippo.io/mldsa v0.0.0-20260215214346-43d0283efc3e/go.mod h1:32qQ5yj3R24Eu03iWFWchdC3OB653wPvoepWejkefbY=
-golang.org/x/crypto v0.49.0 h1:+Ng2ULVvLHnJ/ZFEq4KdcDd/cfjrrjjNSXNzxg0Y4U4=
-golang.org/x/crypto v0.49.0/go.mod h1:ErX4dUh2UM+CFYiXZRTcMpEcN8b/1gxEuv3nODoYtCA=
+golang.org/x/crypto v0.54.0 h1:YLIA59K4fiNzHzjnZt2tUJQjQtUWfWbeHBqKtk3eScw=
+golang.org/x/crypto v0.54.0/go.mod h1:KWL8ny2AZdGR2cWmzeHrp2azQPGogOv+HeQaVEXC2dk=
