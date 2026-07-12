@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-09T04:03:41.308566+00:00",
+  "timestamp": "2026-07-12T03:41:46.261706+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18961,6 +18961,116 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 267,
+      "id": "PR_kwDOJIBkVc7v8tbo",
+      "title": "wordsmith Subtree Consistency Proof",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/267",
+      "state": "MERGED",
+      "author": "jsha",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Explain the boolean parameter better; give mnemonics for `fr` and `sr`.",
+      "createdAt": "2026-07-09T23:28:01Z",
+      "updatedAt": "2026-07-09T23:32:02Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "69a29c7f017d8fd418a6f2e3cedd2ceb05208de6",
+      "headRepository": "jsha/merkle-tree-certs",
+      "headRefName": "wordsmith-scp",
+      "headRefOid": "79236abf952254a3bb7f49e096fe77a7396ff23b",
+      "closedAt": "2026-07-09T23:32:02Z",
+      "mergedAt": "2026-07-09T23:32:02Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "6be3260faecafb6318bafe4bf9715f8a822e91f7"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABFjQGow",
+          "commit": {
+            "abbreviatedOid": "79236ab"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-09T23:31:08Z",
+          "updatedAt": "2026-07-09T23:31:08Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 268,
+      "id": "PR_kwDOJIBkVc7wWf4L",
+      "title": "wordsmith definition of landmark and landmark subtree",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/268",
+      "state": "MERGED",
+      "author": "jsha",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Rationale: the previous definition said landmark subtrees were determined by a single landmark, which is imprecise. They're determined by the interval between two. Also, it's clarifying to know up front that there are commonly two subtrees per interval, not one as someone might guess.\r\n\r\nAlso rework the definition of landmark slightly to emphasize that they are meaningful primarily as members of a sequence.\r\n\r\nThis may clear up some confusion I had when first reading the spec, and have heard from others, about whether a landmark _is_ a subtree.",
+      "createdAt": "2026-07-10T21:13:08Z",
+      "updatedAt": "2026-07-10T21:15:22Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6be3260faecafb6318bafe4bf9715f8a822e91f7",
+      "headRepository": "jsha/merkle-tree-certs",
+      "headRefName": "wordsmith-landmark-subtree",
+      "headRefOid": "79d736713c0dffeb9ea40adc06c9d137c11304f9",
+      "closedAt": "2026-07-10T21:15:22Z",
+      "mergedAt": "2026-07-10T21:15:22Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "06f48b594062fee6f7488c8a288a8375d947d37d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABFqdd8w",
+          "commit": {
+            "abbreviatedOid": "79d7367"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-10T21:15:15Z",
+          "updatedAt": "2026-07-10T21:15:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 269,
+      "id": "PR_kwDOJIBkVc7wnC_M",
+      "title": "Update citations from RFC 8446 to RFC 9846",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/269",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-11T20:14:43Z",
+      "updatedAt": "2026-07-11T20:14:43Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "06f48b594062fee6f7488c8a288a8375d947d37d",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "cite-9846",
+      "headRefOid": "91095829661051bce9c4eaa21bf1a958943cd5bb",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
