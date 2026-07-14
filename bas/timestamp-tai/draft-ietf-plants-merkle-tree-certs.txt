@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 15 December 2026                                     Apple Inc.
+Expires: 15 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            13 June 2026
+                                                            14 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 December 2026.
+   This Internet-Draft will expire on 15 January 2027.
 
 Copyright Notice
 
@@ -132,6 +132,8 @@ Table of Contents
        8.2.1.  Single-Log Landmark Groups
        8.2.2.  Timestamped Landmark Groups
    9.  ACME Extensions
+     9.1.  Optional Certificates
+     9.2.  Using ACME with Merkle Tree Certificates
    10. Deployment Considerations
      10.1.  Operational Costs
        10.1.1.  Certification Authority Costs
@@ -144,6 +146,8 @@ Table of Contents
    12. Security Considerations
      12.1.  Authenticity
      12.2.  Transparency
+       12.2.1.  Log Failures
+       12.2.2.  Limiting Issuance Logs
      12.3.  Public Key Hashes
      12.4.  Non-Repudiation
      12.5.  Extensibility
@@ -156,6 +160,7 @@ Table of Contents
      13.2.  Algorithm
      13.3.  Certificate Extension
      13.4.  Relative Distinguished Name Attribute
+     13.5.  Link Relation Type
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -166,6 +171,11 @@ Table of Contents
      B.3.  Inclusion Proof Evaluation
      B.4.  Consistency Proof Structure
      B.5.  Consistency Proof Verification
+   Appendix C.  Subtree Test Vectors
+     C.1.  Subtree Hashes
+     C.2.  Subtree Inclusion Proofs
+     C.3.  Subtree Consistency Proofs
+     C.4.  Efficient Covering Subtrees
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -350,13 +360,13 @@ Table of Contents
    Cosignature:  A signature from either the CA or other cosigner, over
       some checkpoint or subtree.
 
-   Landmark:  One of an infrequent subset of tree sizes that can be used
-      to predistribute trusted subtrees to relying parties for landmark-
-      relative certificates.
+   Landmark:  One of a sequence of tree sizes, infrequently chosen and
+      used to calculate landmark subtrees for predistribution to relying
+      parties.
 
-   Landmark subtree:  A subtree determined by a landmark.  Landmark
-      subtrees are common points of reference between relying parties
-      and landmark-relative certificates.
+   Landmark subtree:  One of the (up to two) subtrees determined by an
+      interval between two landmarks.  Predistributed and used as the
+      basis for landmark-relative certificates.
 
    Standalone certificate:  A certificate containing an inclusion proof
       to some subtree, and several cosignatures over that subtree.
@@ -549,6 +559,9 @@ Table of Contents
    However, every interval of a Merkle Tree can be efficiently covered
    by two subtrees.  Section 4.5 describes how to determine these
    subtrees.
+
+   Appendix C provides test vectors for the algorithms defined in this
+   section.
 
 4.1.  Definition of a Subtree
 
@@ -782,12 +795,19 @@ Table of Contents
 
    The subtree consistency proof, SUBTREE_PROOF(start, end, D_n) is
    defined similarly to Section 2.1.4.1 of [RFC9162], in terms of a
-   helper function that tracks whether the subtree hash is known:
+   helper function:
 
    SUBTREE_PROOF(start, end, D_n) =
        SUBTREE_SUBPROOF(start, end, D_n, true)
 
-   If start = 0 and end = n, the subtree is the root:
+   The boolean parameter tracks whether the first hash in the proof will
+   be omitted by the base case.  The first hash is omitted when it's
+   equal to the original subtree hash MTH(D[start:end]), since the
+   verifier will already know that hash.  That happens when the original
+   subtree's root is a node in the Merkle Tree constructed from D_n, or
+   equivalently, when the original subtree is full or has end = n.
+
+   If start = 0 and end = n, the subtree is the root (base case):
 
    SUBTREE_SUBPROOF(0, n, D_n, true) = {}
    SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
@@ -1127,7 +1147,8 @@ Table of Contents
       size of its output in bytes is referred to as HASH_SIZE.
 
    *  A series of issuance logs (Section 5.2), which contain all
-      statements the CA has certified.
+      statements the CA has certified.  One issuance log is designated
+      as the current log.
 
    *  A CA cosigner (Section 5.4), which signs subtrees of issuance logs
       to certify their contents.
@@ -1199,7 +1220,7 @@ Table of Contents
 
    A CA operates a series of issuance logs, each identified by a
    positive integer _log number_. Log numbers are numbered consecutively
-   starting from 1.  Each log number MUST be at most 65535 (2^16-1).
+   from 1 to at most 65535 (2^16-1).
 
    Each issuance log has a _log ID_, which is a trust anchor ID
    constructed by concatenating the following OID components:
@@ -1213,9 +1234,10 @@ Table of Contents
    A log ID specifies both the CA and the log number in a single ID.
 
    Each issuance log describes an append-only sequence of _entries_
-   (Section 5.2.1), identified consecutively by an index value, starting
-   from zero.  Each entry is an assertion that the CA has certified.
-   The entries in the issuance log are represented as a Merkle Tree,
+   (Section 5.2.1).  Each entry is identified by an integer _index_,
+   assigned consecutively starting from zero.  Indices are at most
+   2^48-1.  Each entry is an assertion that the CA has certified.  The
+   entries in the issuance log are represented as a Merkle Tree,
    described in Section 2.1 of [RFC9162].
 
    Each log additionally maintains a _minimum index_ value, which is the
@@ -1232,6 +1254,14 @@ Table of Contents
    committed to the log at the time.  Its contents can be described by
    the Merkle Tree Hash (Section 2.1.1 of [RFC9162]) of entries zero
    through tree_size - 1.
+
+   At any point in time, one of the CA's issuance logs is its _current_
+   log.  Initially, this is log 1.  A CA MUST NOT append to any log that
+   is not the current log.  Logs before the current log may have
+   historical entries.  Logs after the current log MUST be empty.  A CA
+   MAY increment its current log number as part of recovering from
+   certain operational failures.  See Section 12.2.1 for further
+   discussion.
 
 5.2.1.  Log Entries
 
@@ -1727,10 +1757,14 @@ Table of Contents
    -- From draft-ietf-tls-trust-anchor-ids
    TrustAnchorID ::= RELATIVE-OID
 
+   -- This is 2^64-1, the maximum possible serial number in this protocol.
+   mtcMaxSerial INTEGER ::= 18446744073709551615
+
    MTCCertificationAuthority ::= SEQUENCE {
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER
+       minSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    For initial experimentation, early implementations of this design
@@ -1746,11 +1780,9 @@ Table of Contents
 
    *  sigAlg is the CA cosigner's signature algorithm (Section 5.3.3).
 
-   *  minSerial is an integer describing the minimum allowed serial
-      number from this CA.  Since the serial number encodes both the log
-      number (Section 5.2) and the entry index into a specific log, it
-      can be used to set a minimum allowed log number or a minimum
-      allowed index in a particular log (Section 5.2.3).
+   *  minSerial and maxSerial describe the minimum and maximum allowed
+      serial numbers from this CA, respectively.  See Section 7.5 for
+      discussion on setting these values.
 
    If this extension is present, the key described in
    subjectPublicKeyInfo is a CA cosigner key and subject to the usage
@@ -2163,9 +2195,9 @@ Table of Contents
       structure, but the relying party MAY incorporate trusted subtrees
       from out-of-band information.
 
-   *  The revoked serial number ranges include the half-open range [0,
-      minSerial), but the relying party MAY incorporate additional
-      ranges from out-of-band information.
+   *  The revoked serial number ranges include the half-open ranges [0,
+      minSerial) and [maxSerial+1, 2^64), but the relying party MAY
+      incorporate additional ranges from out-of-band information.
 
 7.2.  Verifying Certificate Signatures
 
@@ -2360,8 +2392,8 @@ Table of Contents
 
    As an optional optimization, a relying party MAY incorporate a
    periodically updated, predistributed list of trusted subtrees from
-   one or more of the CA's issuance logs.  This allows the relying party
-   to accept landmark-relative certificates (Section 6.4) constructed
+   the CA's current issuance log.  This allows the relying party to
+   accept landmark-relative certificates (Section 6.4) constructed
    against those subtrees.
 
    Each trusted subtree contains:
@@ -2433,7 +2465,13 @@ Table of Contents
    unavailable entries.  This gives assurance that, even if some
    unavailable entry had not yet expired, the relying party will not
    trust it.  It also allows monitors to start monitoring a log without
-   processing expired entries.
+   processing expired entries.  If using the format defined in
+   Section 5.5, this can be configured with the minSerial value.
+
+   A relying party with transparency requirements additionally SHOULD
+   revoke all log numbers above some threshold to bound monitoring
+   overhead.  If using the format defined in Section 5.5, this can be
+   configured with the maxSerial value.  See Section 12.2.2.
 
    A misbehaving CA might correctly construct a globally consistent log,
    but refuse to make some entries or intermediate nodes available.
@@ -2643,10 +2681,62 @@ Table of Contents
       of [I-D.ietf-tls-trust-anchor-ids] to recover from any signaling
       failures.
 
+8.2.2.1.  Universal Timestamped Landmark Group
+
+   For the case where a relying party wants to express the active
+   landmarks it has available, without detailing which CAs in
+   particular, we provide the _universal timestamped landmark group_ as
+   follows.
+
+   *  The identifying OID arc of the group is id-mtc-timestamp
+      (44363.47.3).
+
+   *  Version v of the group expresses that the relying party may be
+      assumed to be up-to-date with active landmarks published before v
+      hours after the Epoch.
+
 9.  ACME Extensions
 
    This section describes how to issue Merkle Tree certificates using
    ACME [RFC8555].
+
+9.1.  Optional Certificates
+
+   Section 7.4.2 of [RFC8555] describes how an ACME server uses the
+   "alternate" link relation [RFC8288] to serve multiple certificate
+   chains for an ACME order.  An ACME client might fetch all of them and
+   deploy them in the authenticating party.  Different relying parties
+   need different chains, so the ACME client might reasonably treat any
+   unavailable alternate as an error.
+
+   This behavior is not ideal for a landmark-relative certificate, which
+   is available asynchronously and is not intended to delay the
+   corresponding standalone certificate.  This section defines the
+   "acme-optional-alternate" link relation.  When serving a certificate,
+   an ACME server MAY provide one or more link relation header fields of
+   type "acme-optional-alternate". "acme-optional-alternate" identifies
+   an alternate certificate chain, but one that is optional.  Relying
+   parties that accept the optional alternate are expected to also
+   accept either the original certificate chain or chains served under
+   the "alternate" link relation.  If the certificate chain is not yet
+   available, the "acme-optional-alternate" URL SHOULD serve an HTTP 202
+   (Accepted) response, with a Retry-After header (Section 10.2.3 of
+   [RFC9110]) estimating when it will become available.
+
+   An ACME client MAY fetch these URLs to collect additional alternate
+   certificate chains.  If the resource is unavailable, the ACME client
+   SHOULD NOT fail the overall transaction.  If the resource returns an
+   HTTP 202 (Accepted) response, the ACME client SHOULD retry the
+   request later, according to the Retry-After header, but this process
+   SHOULD be independent of deploying other chains in the ACME order.
+   In particular, if deploying a new service, the ACME client SHOULD NOT
+   block deployment on optional alternates.
+
+   If renewing certificates, the ACME client MAY opt to wait for
+   optional alternates to simplify certificate replacement, but only
+   while the previous certificates remain valid.
+
+9.2.  Using ACME with Merkle Tree Certificates
 
    When downloading the certificate (Section 7.4.2 of [RFC8555]), ACME
    clients supporting Merkle Tree certificates SHOULD send "application/
@@ -2654,8 +2744,9 @@ Table of Contents
    (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
    certificates SHOULD then respond with that content type and include
    trust anchor ID information as described in Section 7 of
-   [I-D.ietf-tls-trust-anchor-ids].  Section 8 decribes the trust anchor
-   ID assignments for standalone and landmark-relative certificates.
+   [I-D.ietf-tls-trust-anchor-ids].  Section 8 describes the trust
+   anchor ID assignments for standalone and landmark-relative
+   certificates.
 
    When processing an order for a Merkle Tree certificate, the ACME
    server moves the order to the "valid" state after the corresponding
@@ -2665,19 +2756,11 @@ Table of Contents
    in Section 6.3.
 
    The standalone certificate response SHOULD additionally carry an
-   alternate URL for the landmark-relative certificate, as described
-   Section 7.4.2 of [RFC8555].  Before the landmark-relative certificate
-   is available, the alternate URL SHOULD return a HTTP 503 (Service
-   Unavailable) response, with a Retry-After header (Section 10.2.3 of
-   [RFC9110]) estimating when the certificate will become available.
-   Once the next landmark is allocated, the ACME server constructs a
-   landmark-relative certificate, as described in Section 6.4 and serves
-   it from the alternate URL.
-
-   ACME clients supporting Merkle Tree certificates SHOULD support
-   fetching alternate chains.  If an alternate chain returns an HTTP 503
-   with a Retry-After header, as described above, the client SHOULD
-   retry the request at the specified time.
+   "acme-optional-alternate" URL for the landmark-relative certificate.
+   It initially serves an HTTP 202 response, as described in
+   Section 9.1.  Once the next landmark is allocated, the ACME server
+   constructs a landmark-relative certificate, as described in
+   Section 6.4, and serves it from the URL.
 
 10.  Deployment Considerations
 
@@ -2992,6 +3075,81 @@ Table of Contents
       then react by revoking the undisclosed entries (Section 7.5), and
       likely removing the CA.
 
+12.2.1.  Log Failures
+
+   Merkle Tree Certificates introduce additional state to PKI
+   deployments and thus new kinds of operational failures.  CAs are
+   required to only sign subtree hashes that are consistent with a
+   single append-only view of each issuance log.  A CA might violate
+   this as a result of operational failures.  For example:
+
+   *  A CA loses some state and signs subtree hashes from two
+      inconsistent copies of the log
+
+   *  A CA miscalculates some hash and signs a subtree hash that cannot
+      be computed from some underlying sequence of entries
+
+   As described in Section 12.2, PKIs can use additional cosigners to
+   provide transparency guarantees even in the face of such CA
+   violations.  In doing so, individual cosigners may be locked to only
+   one of two views of the log or unable to sign further checkpoints
+   because some hash's preimage is unknown.  It may then no longer be
+   possible to add entries to the log that are trusted by existing
+   relying parties.
+
+   Whether by accident or compromise, these violations are ultimately CA
+   failures.  However, it is useful for the CA instance to remain
+   functional during and after incident management:
+
+   *  While the incident is diagnosed, authenticating parties may still
+      need new certificates.
+
+   *  If relying parties consider the CA operator and the CA instance
+      still trustworthy, repairing the incident without changing the CA
+      requires less overhead.
+
+   *  If relying parties consider either the CA operator or the CA
+      instance no longer trustworthy and in need of replacement, the CA
+      may still be needed to serve older, unupdated relying parties.
+
+   This is mitigated by a CA instance consisting of a series of issuance
+   logs (Section 5.2).  After a log failure, the CA SHOULD increment its
+   current issuance log to restore availability.  Both the underlying
+   log failure and the use of a new issuance log will be visible to
+   monitors and SHOULD be treated as a PKI incident.  Such PKI incidents
+   can be handled by some combination of:
+
+   *  Revoking the diverging log indices (Section 7.5)
+
+   *  Reevaluating trusted CAs and, if necessary, removing the old CA
+      instance and switching to a new CA instance
+
+   In the latter case, the CA operator MAY continue to operate the
+   removed CA instance if, for example, there remain unupdated relying
+   parties that require it.
+
+12.2.2.  Limiting Issuance Logs
+
+   While multiple issuance logs help mitigate log failures, as described
+   in Section 12.2.1, they introduce transparency risks.  If a CA
+   violates the requirement to only use one issuance log at a time, it
+   might add an entry in some far future log number.  To be accepted in
+   transparency-enforcing relying parties, the log state must still be
+   cosigned.  However, monitors may not know which log numbers to
+   monitor.
+
+   PKIs with transparency requirements SHOULD mitigate this by only
+   accepting a limited range of log numbers in relying parties,
+   transparency cosigners, or both.  This limit MAY be set to a fixed
+   value or a rolling value that is updated whenever the CA switches its
+   current log.  Fixed values require committing to a limit of
+   recoverable log failures over the lifetime of a CA.
+
+   Log number limits in relying parties can be implemented by revoking
+   all serial numbers above some threshold.  (See Section 7.5.)  If
+   using the format described in Section 5.5, this can be implemented
+   with the maxSerial field.
+
 12.3.  Public Key Hashes
 
    Unlike Certificate Transparency, the mechanisms in this document do
@@ -3300,6 +3458,21 @@ Table of Contents
 
                                  Table 4
 
+13.5.  Link Relation Type
+
+   IANA is requested to add the following entry to the "Link Relation
+   Types" registry [RFC8288]:
+
+   Relation Name:  acme-optional-alternate
+
+   Description:  Refers to an optional alternate certificate chain,
+      which may not be available immediately.  Relying parties that
+      accept the alternate are expected to also accept the original
+      certificate, so it is not an error if the alternate is
+      unavailable.
+
+   Reference:  [this-RFC], Section 9.1
+
 14.  References
 
 14.1.  Normative References
@@ -3348,6 +3521,10 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
+   [RFC8288]  Nottingham, M., "Web Linking", RFC 8288,
+              DOI 10.17487/RFC8288, October 2017,
+              <https://www.rfc-editor.org/rfc/rfc8288>.
+
    [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
               <https://www.rfc-editor.org/rfc/rfc8446>.
@@ -3387,6 +3564,10 @@ Table of Contents
               (DER)", ISO/IEC 8824-1:2021 , February 2021.
 
 14.2.  Informative References
+
+   [Accumulated]
+              Valsorda, F., "Accumulated Test Vectors", October 2024,
+              <https://words.filippo.io/accumulated/>.
 
    [APPLE-CT] Apple, "Apple's Certificate Transparency policy", 5 March
               2021, <https://support.apple.com/en-us/HT205280>.
@@ -3579,10 +3760,14 @@ Appendix A.  ASN.1 Module
        CRITICALITY TRUE
    }
 
+   -- This is 2^64-1, the maximum possible serial number in this protocol.
+   mtcMaxSerial INTEGER ::= 18446744073709551615
+
    MTCCertificationAuthority ::= SEQUENCE {
        logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER
+       minSerial INTEGER (0..mtcMaxSerial),
+       maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    END
@@ -3930,9 +4115,10 @@ B.5.  Consistency Proof Verification
 
    The procedure in Section 4.4.3 is structured similarly to inclusion
    proof evaluation (Appendix B.3).  It iteratively builds two hashes,
-   fr and sr, which are expected to equal node_hash and root_hash,
-   respectively.  Everything hashed into fr is also hashed into sr, so
-   success demonstrates that root_hash contains node_hash.
+   fr (first root) and sr (second root), which are expected to equal
+   node_hash and root_hash, respectively.  Everything hashed into fr is
+   also hashed into sr, so success demonstrates that root_hash contains
+   node_hash.
 
    Step 2 initializes fn (first number), sn (second number), and tn
    (third number) to follow, respectively, the paths to start, end - 1
@@ -3978,6 +4164,140 @@ B.5.  Consistency Proof Verification
    proof for the truncated subtree [fn, sn + 1) and truncated tree tn +
    1.
 
+Appendix C.  Subtree Test Vectors
+
+   The following are "accumulated" [Accumulated] test vectors for the
+   various subtree algorithms defined in Section 4.
+
+   They are hash values of the outputs of all possible inputs for each
+   algorithm, for trees of sizes up to 130.  They can be used to verify
+   that an implementation matches the specification, without having to
+   include a large number of individual test vectors.
+
+   For all the test vectors, a tree D_n of size n is constructed with
+   leaf values d[0] = 0x00, d[1] = 0x01, .... The hash function used is
+   SHA-256.  The hash values are encoded in hexadecimal.
+
+C.1.  Subtree Hashes
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1, if [start, end) is a valid subtree, add to the rolling
+   hash the ASCII string [START, END) HASH followed by a newline
+   (U+000A), where START and END are the decimal representations of
+   start and end, respectively, and HASH is the hexadecimal encoding of
+   MTH(D[start:end]), according to Section 4.
+
+   The final hash value is
+
+   94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               subtree_hash = MTH(D[start:end])
+               h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
+   assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+
+C.2.  Subtree Inclusion Proofs
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1, if [start, end) is a valid subtree, for each value of
+   index from start to end - 1, add to the rolling hash the ASCII string
+   INDEX [START, END), then, for each hash in the inclusion proof
+   (Section 4.3) for d[index] in the subtree [start, end), a space
+   (U+0020) followed by the hexadecimal encoding of that hash, and
+   finally a newline (U+000A), where INDEX is the decimal representation
+   of index, and START and END are the decimal representations of start
+   and end, respectively.
+
+   The final hash value is
+
+   ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               for index in range(start, end):
+                   inclusion_proof = get_inclusion_proof(D, start, end, index)
+                   line = f'{index} [{start}, {end})'
+                   for p in inclusion_proof:
+                       line += f' {p.hex()}'
+                   h.update(f'{line}\n'.encode())
+   assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
+
+C.3.  Subtree Consistency Proofs
+
+   For each value of n from 0 to 130, and each value of end from 1 to n,
+   and each value of start from 0 to end - 1, if [start, end) is a valid
+   subtree, add to the rolling hash the ASCII string [START, END) N,
+   then, for each hash in the consistency proof (Section 4.4) for the
+   subtree [start, end) and tree of size n, a space (U+0020) followed by
+   the hexadecimal encoding of that hash, and finally a newline
+   (U+000A), where START and END are the decimal representations of
+   start and end, respectively, and N is the decimal representation of
+   n.
+
+   The final hash value is
+
+   c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for n in range(131):
+       for end in range(1, n + 1):
+           for start in range(end):
+               if valid_subtree(start, end):
+                   consistency_proof = get_consistency_proof(D, n, start, end)
+                   line = f'[{start}, {end}) {n}'
+                   for p in consistency_proof:
+                       line += f' {p.hex()}'
+                   h.update(f'{line}\n'.encode())
+   assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+
+C.4.  Efficient Covering Subtrees
+
+   For each value of end from 1 to 130, and each value of start from 0
+   to end - 1:
+
+   *  if [start, end) is a valid subtree, add to the rolling hash the
+      ASCII string [START, END) followed by a newline (U+000A), where
+      START and END are the decimal representations of start and end,
+      respectively;
+
+   *  otherwise, add to the rolling hash the ASCII string [LEFT_START,
+      LEFT_END) [RIGHT_START, RIGHT_END) followed by a newline (U+000A),
+      where LEFT_START, LEFT_END, RIGHT_START, and RIGHT_END are the
+      decimal representations of the start and end of the left and right
+      subtrees, respectively, that efficiently cover (Section 4.5)
+      [start, end).
+
+   The final hash value is
+
+   e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
+
+   In Python, this can be expressed as:
+
+   import hashlib
+   h = hashlib.sha256()
+   for end in range(1, 131):
+       for start in range(end):
+           if valid_subtree(start, end):
+               h.update(f'[{start}, {end})\n'.encode())
+           else:
+               left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+               h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+   assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
+
 Acknowledgements
 
    This document stands on the shoulders of giants and builds upon
@@ -3986,9 +4306,9 @@ Acknowledgements
    contributed over the history of these protocols.
 
    The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson,
-   Aaron Gable, Nick Harper, Russ Housley, Dennis Jackson, Ilari
-   Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton, Michael
-   Richardson, Ryan Sleevi, and Emily Stark for many valuable
+   Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis
+   Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton,
+   Michael Richardson, Ryan Sleevi, and Emily Stark for many valuable
    discussions and insights which led to this document, as well as
    feedback and contributions to the document itself.  We wish to thank
    Mia Celeste in particular, whose implementation of an earlier draft
@@ -4205,6 +4525,15 @@ Since draft-ietf-plants-merkle-tree-certs-04
 
    *  Discuss the implications of subordinate CAs in Security
       Considerations
+
+   *  Added subtree test vector appendix
+
+   *  Define a CA's current issuance log and rules around that
+
+   *  Switch the ACME construction to a new link relation and change the
+      HTTP status code
+
+   *  Add a maxSerial field to the CA format
 
 Authors' Addresses
 
