@@ -972,38 +972,38 @@ At any point in time, one of the CA's issuance logs is its *current* log. Initia
 
 ### Log Entries
 
-Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentation syntax below. A MerkleTreeCertEntry describes certificate information that the CA has validated and certified.
+Each entry in the log is an MTCLogEntry, defined with the TLS presentation syntax below. An MTCLogEntry describes certificate information that the CA has validated and certified.
 
 ~~~tls-presentation
 struct {} Empty;
 
-enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
+enum { (2^16-1) } MTCLogEntryExtensionType;
 
 struct {
-    MerkleTreeCertEntryExtensionType extension_type;
+    MTCLogEntryExtensionType extension_type;
     opaque extension_data<0..2^16-1>;
-} MerkleTreeCertEntryExtension;
+} MTCLogEntryExtension;
 
 enum {
     null_entry(0), tbs_cert_entry(1), (2^16-1)
-} MerkleTreeCertEntryType;
+} MTCLogEntryType;
 
 struct {
-    MerkleTreeCertEntryExtension extensions<0..2^16-1>;
-    MerkleTreeCertEntryType type;
+    MTCLogEntryExtension extensions<0..2^16-1>;
+    MTCLogEntryType type;
     select (type) {
        case null_entry: Empty;
        case tbs_cert_entry: opaque tbs_cert_entry_data[N];
        /* May be extended with future types. */
     }
-} MerkleTreeCertEntry;
+} MTCLogEntry;
 ~~~
 
 Field `extensions` is the list of tag-length-value extensions associated with the log entry. The extensions list MUST be appear in ascending order by `extension_type` and MUST NOT contain two extensions with the same `extension_type`.
 
 When `type` is `null_entry`, the entry does not represent any information. Entries at any index in the log MAY have type `null_entry`.
 
-When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.
+When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. An MTCLogEntry is expected to be decoded in contexts where the total length of the entry is known.
 
 `tbs_cert_entry_data` contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER {{X.690}} encoding of a TBSCertificateLogEntry, defined below. Equivalently, `tbs_cert_entry_data` contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in {{verifying-certificate-signatures}}.
 
@@ -1037,9 +1037,9 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
-MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType or MerkleTreeCertEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
+MTCLogEntry is an extensible structure. Future documents may define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
-A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
+An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
 ### Publishing Logs
 
@@ -1261,7 +1261,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 
 For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`.
 
-The fields of a MTCCertificationAuthority structure are defined as follows:
+The fields of an MTCCertificationAuthority structure are defined as follows:
 
 * `logHash` describes the hash algorithm used by all logs operated by this CA. For example, if the hash is SHA-256, it would be `mda-sha256` as defined in {{Section 8 of !RFC5912}}.
 
@@ -1324,7 +1324,7 @@ struct {
 } MTCSignature;
 
 struct {
-    MerkleTreeCertEntryExtension extensions<0..2^16-1>;
+    MTCLogEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
@@ -1481,7 +1481,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
    1. Set `subjectPublicKeyAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
    1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
-1. Construct a MerkleTreeCertEntry as follows:
+1. Construct an MTCLogEntry as follows:
    1. Set `type` to `tbs_cert_entry`.
    1. Set `extensions` to the MTCProof's `extensions` value.
    1. Set `tbs_cert_entry_data` to the TBSCertificateLogEntry, encoded as described in {{log-entries}}.
@@ -1504,7 +1504,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
-In this procedure, `entry_hash` can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
+In this procedure, `entry_hash` can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MTCLogEntry in memory:
 
 1. Initialize a hash instance.
 1. Write the octet 0x00 to the hash. This is the domain separator for leaf nodes.
@@ -1848,11 +1848,11 @@ The transparency ecosystem does not retain unhashed public keys, so it also may 
 
 ## Extensibility
 
-MerkleTreeCertEntry ({{log-entries}}) contain several extension points:
+MTCLogEntry ({{log-entries}}) contain several extension points:
 
 * New X.509 extensions can be added to TBSCertificateLogEntry.
-* New MerkleTreeCertEntryType values define new formats for the entry contents.
-* New MerkleTreeCertEntryExtensionType values define new entry extension fields.
+* New MTCLogEntryType values define new formats for the entry contents.
+* New MTCLogEntryExtensionType values define new entry extension fields.
 
 X.509 extensions apply to Merkle Tree Certificates without any modifications. The two entry-level extension points are new to this protocol. Older CAs, cosigners, relying parties, and monitors may encounter unrecognized entries:
 
@@ -1860,7 +1860,7 @@ Different cosigner roles interact with extensions differently. Some roles, e.g. 
 
 {{certification-authority-cosigners}} forbids a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 CA can never sign an unrecognized X.509 extension.
 
-Unrecognized entry types do not impact older relying parties. In {{verifying-certificate-signatures}}, the relying party constructs the MerkleTreeCertEntry that it expects. The unrecognized entry will have a different `type` value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.
+Unrecognized entry types do not impact older relying parties. In {{verifying-certificate-signatures}}, the relying party constructs the MTCLogEntry that it expects. The unrecognized entry will have a different `type` value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.
 
 However, unrecognized entry extensions will be ignored by relying parties, analogously to a non-critical X.509 extension. Entry extensions thus SHOULD be defined so that this is safe.
 
@@ -1898,7 +1898,7 @@ Some non-conforming X.509 implementations use a BER {{X.690}} parser instead of 
 
 These additional checks are redundant in X.509 implementations that use a conforming DER parser.
 
-{{log-entries}} requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates are new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.
+{{log-entries}} requires that the TBSCertificateLogEntry in an MTCLogEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates are new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.
 
 The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tree Certificates, similar to an ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.
 
@@ -2644,3 +2644,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Switch the ACME construction to a new link relation and change the HTTP status code
 
 - Add a maxSerial field to the CA format
+
+## Since draft-ietf-plants-merkle-tree-certs-05
+{:numbered="false"}
+
+- Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be consistent with MTCProof, shorter, and help disambiguate the many English meanings of "entry"
