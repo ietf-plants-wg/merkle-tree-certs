@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-12T03:41:46.261706+00:00",
+  "timestamp": "2026-07-16T03:25:48.781875+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -19058,7 +19058,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-07-11T20:14:43Z",
-      "updatedAt": "2026-07-11T20:14:43Z",
+      "updatedAt": "2026-07-16T01:47:34Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "06f48b594062fee6f7488c8a288a8375d947d37d",
@@ -19070,7 +19070,148 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGLi3FQ",
+          "commit": {
+            "abbreviatedOid": "9109582"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "TIL about this RFC (I haven't checked in on the TLS wg in too long). LGTM!",
+          "createdAt": "2026-07-16T01:47:34Z",
+          "updatedAt": "2026-07-16T01:47:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 270,
+      "id": "PR_kwDOJIBkVc7xmmk9",
+      "title": "Add special landmark group that expresses just timestamp",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/270",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-07-14T14:49:38Z",
+      "updatedAt": "2026-07-14T16:47:31Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7c8c7c55cfc626d63026cb403c089a84467baff9",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "bas/timestamp-tai",
+      "headRefOid": "6352cb09a38fd6d4ff756b35c2766cde2e265154",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABF-FBZQ",
+          "commit": {
+            "abbreviatedOid": "6352cb0"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-14T14:55:54Z",
+          "updatedAt": "2026-07-14T14:55:54Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "As in other places where we use a `44353.47.*` OID, it's worth noting here that `44363.47.3` is temporary and will eventually be replaced by a relative OID allocated by IANA.",
+              "createdAt": "2026-07-14T14:55:54Z",
+              "updatedAt": "2026-07-14T14:55:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABF-rqAg",
+          "commit": {
+            "abbreviatedOid": "6352cb0"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-14T16:04:40Z",
+          "updatedAt": "2026-07-14T16:04:40Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Where should IANA allocate it? (See other allocations.) I think it might be fine to leave as is.",
+              "createdAt": "2026-07-14T16:04:40Z",
+              "updatedAt": "2026-07-14T16:04:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABF_CEtQ",
+          "commit": {
+            "abbreviatedOid": "6352cb0"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-14T16:47:30Z",
+          "updatedAt": "2026-07-14T16:47:31Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "I'm suggesting structuring thee text this way:\r\n\r\nhttps://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#section-5.1-7\r\n\r\n> The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a CA with ID `32473.1` would be represented in syntax of {{?RFC4514}} as:\r\n> \r\n> ~~~\r\n> 1.3.6.1.5.5.7.25.TBD=#0d0481fd5901\r\n> ~~~\r\n> \r\n> For initial experimentation, early implementations of this design will:\r\n> \r\n> 1. Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. `32473.1`.\r\n> \r\n> 1. Use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`.\r\n> \r\n> For example, the distinguished name for a CA with ID `32473.1` would be represented in syntax of {{?RFC4514}} as:\r\n> \r\n> ~~~\r\n> 1.3.6.1.4.1.44363.47.1=#0c0733323437332e31\r\n> ~~~\r\n> ",
+              "createdAt": "2026-07-14T16:47:30Z",
+              "updatedAt": "2026-07-14T16:47:31Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 271,
+      "id": "PR_kwDOJIBkVc7yP_hg",
+      "title": "Rename MerkleTreeCertEntry type to MTCLogEntry",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/271",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Elsewhere we have MTCProof and MTCSignature. For consistency, let's either abbreviate the entry types or expand the proof types.\r\n\r\nI'm inclined to abbreviate. Particularly with MerkleTreeCertEntryExtensionType, the unabbreviated form is a mouthful. That also gives us length budget to say \"MTCLogEntry\" instead of \"MTCEntry\", which seems worthwhile. \"Entry\" has several English meanings while \"log entry\" is a bit more specific.",
+      "createdAt": "2026-07-15T22:58:47Z",
+      "updatedAt": "2026-07-16T01:41:49Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7c8c7c55cfc626d63026cb403c089a84467baff9",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "mtc-log-entry-rename",
+      "headRefOid": "0c3cb2e72798460d699c607e94032de1161859fa",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGLgjcA",
+          "commit": {
+            "abbreviatedOid": "0c3cb2e"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-16T01:41:48Z",
+          "updatedAt": "2026-07-16T01:41:48Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
