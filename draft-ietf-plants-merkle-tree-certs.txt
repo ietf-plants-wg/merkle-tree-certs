@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 12 January 2027                                      Apple Inc.
+Expires: 17 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            11 July 2026
+                                                            16 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 January 2027.
+   This Internet-Draft will expire on 17 January 2027.
 
 Copyright Notice
 
@@ -265,9 +265,9 @@ Table of Contents
    capitals, as shown here.
 
    This document additionally uses the TLS presentation language defined
-   in Section 3 of [RFC8446], as well as the notation defined in
+   in Section 3 of [RFC9846], as well as the notation defined in
    Section 2.1.1 of [RFC9162].  It extends the numeric types defined in
-   Section 3.3 of [RFC8446] with a big-endian, 48-bit integer:
+   Section 3.3 of [RFC9846] with a big-endian, 48-bit integer:
 
    uint8 uint48[6];
 
@@ -532,7 +532,7 @@ Table of Contents
        requirements.  This occurs periodically in the background,
        separate from the application protocol.
 
-   4.  During the application protocol, such as TLS [RFC8446], if the
+   4.  During the application protocol, such as TLS [RFC9846], if the
        relying party already supports the landmark subtree, the
        authenticating party can present the landmark-relative
        certificate.  Otherwise, it presents a standalone certificate.
@@ -1547,7 +1547,7 @@ Table of Contents
 
    A cosigner computes a _subtree signature_ for a subtree in a log by
    signing a CosignedMessage, defined below using the TLS presentation
-   language (Section 3 of [RFC8446]):
+   language (Section 3 of [RFC9846]):
 
    opaque HashValue[HASH_SIZE];
 
@@ -1866,7 +1866,7 @@ Table of Contents
    will use the OID 1.3.6.1.4.1.44363.47.0 instead of id-alg-mtcProof.
 
    The signatureValue contains an MTCProof structure, defined below
-   using the TLS presentation language (Section 3 of [RFC8446]):
+   using the TLS presentation language (Section 3 of [RFC9846]):
 
    /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
    opaque TrustAnchorID<1..2^8-1>;
@@ -1985,7 +1985,7 @@ Table of Contents
    SHOULD deploy a corresponding standalone certificate alongside any
    landmark-relative certificate, and use some application-protocol-
    specific mechanism to select between the two.  Section 8 discusses
-   such a mechanism for TLS [RFC8446].
+   such a mechanism for TLS [RFC9846].
 
 6.4.1.  Landmark Tree Sizes
 
@@ -2103,7 +2103,7 @@ Table of Contents
    (Section 7.4 defines how relying parties are configured.)  The trust
    anchor ID of the landmark may be used as an efficient identifier in
    the application protocol.  Section 8 discusses how to do this in TLS
-   [RFC8446].
+   [RFC9846].
 
 6.5.  Size Estimates
 
@@ -2444,7 +2444,7 @@ Table of Contents
    mechanisms, to allow an authenticating party to select a landmark-
    relative certificate.  The trust anchor IDs of the landmarks may be
    used as efficient identifiers in the application protocol.  Section 8
-   discusses how to do this in TLS [RFC8446].
+   discusses how to do this in TLS [RFC9846].
 
 7.5.  Revoked Ranges
 
@@ -2512,14 +2512,14 @@ Table of Contents
    *  What the relying party should communicate to the authenticating
       party to help it make this decision
 
-   Certificate selection in TLS, described in Section 4.4.2.2 and
-   Section 4.4.2.3 of [RFC8446], incorporates both explicit relying-
-   party-provided information in the ClientHello and CertificateRequest
-   messages and implicit deployment-specific assumptions.  This section
-   describes a RECOMMENDED integration of Merkle Tree certificates into
-   TLS trust anchor IDs ([I-D.ietf-tls-trust-anchor-ids]), but
-   applications MAY use application-specific criteria in addition to, or
-   instead of, this recommendation.
+   Certificate selection in TLS, described in Section 4.5.1.2 of
+   [RFC9846], incorporates both explicit relying-party-provided
+   information in the ClientHello and CertificateRequest messages and
+   implicit deployment-specific assumptions.  This section describes a
+   RECOMMENDED integration of Merkle Tree certificates into TLS trust
+   anchor IDs ([I-D.ietf-tls-trust-anchor-ids]), but applications MAY
+   use application-specific criteria in addition to, or instead of, this
+   recommendation.
 
 8.1.  Standalone Certificates
 
@@ -3235,7 +3235,7 @@ Table of Contents
    An ASN.1 structure like X.509’s Certificate is an abstract data type
    that is independent of its serialization.  There are multiple
    encoding rules for ASN.1.  Commonly, protocols use DER [X.690], such
-   as Section 4.4.2 of [RFC8446].  This aligns with Section 4.1.1.3 of
+   as Section 4.5.1 of [RFC9846].  This aligns with Section 4.1.1.3 of
    [RFC5280], which says X.509 signatures are computed over the DER-
    encoded TBSCertificate.  After signature verification, applications
    can assume the DER-encoded TBSCertificate is not malleable.
@@ -3511,10 +3511,6 @@ Table of Contents
               DOI 10.17487/RFC8288, October 2017,
               <https://www.rfc-editor.org/rfc/rfc8288>.
 
-   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
-              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
-              <https://www.rfc-editor.org/rfc/rfc8446>.
-
    [RFC8555]  Barnes, R., Hoffman-Andrews, J., McCarney, D., and J.
               Kasten, "Automatic Certificate Management Environment
               (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
@@ -3528,6 +3524,10 @@ Table of Contents
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
+
+   [RFC9846]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 9846, DOI 10.17487/RFC9846, July 2026,
+              <https://www.rfc-editor.org/rfc/rfc9846>.
 
    [RFC9881]  Massimo, J., Kampanakis, P., Turner, S., and B. E.
               Westerbaan, "Internet X.509 Public Key Infrastructure --

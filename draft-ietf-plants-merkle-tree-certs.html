@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 12 January 2027</td>
+<td class="center">Expires 17 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-11" class="published">11 July 2026</time>
+<time datetime="2026-07-16" class="published">16 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-12">12 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-17">17 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 17 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1590,7 +1590,7 @@ svg {
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span>
 when, and only when, they appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">This document additionally uses the TLS presentation language defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, as well as the notation defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. It extends the numeric types defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> with a big-endian, 48-bit integer:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document additionally uses the TLS presentation language defined in <span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, as well as the notation defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. It extends the numeric types defined in <span><a href="https://rfc-editor.org/rfc/rfc9846#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span> with a big-endian, 48-bit integer:<a href="#section-2-2" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-2-3">
 <pre>
 uint8 uint48[6];
@@ -2019,7 +2019,7 @@ uint8 uint48[6];
           <p id="section-3-9.3.1">In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.<a href="#section-3-9.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.4">
-          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
@@ -4320,7 +4320,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
           <h4 id="name-signature-format">
 <a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a href="#name-signature-format" class="section-name selfRef">Signature Format</a>
           </h4>
-<p id="section-5.3.1-1">A cosigner computes a <em>subtree signature</em> for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-1">A cosigner computes a <em>subtree signature</em> for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>):<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-5.3.1-2">
 <pre>
 opaque HashValue[HASH_SIZE];
@@ -4545,7 +4545,7 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
 </pre><a href="#section-6.2-6" class="pilcrow">¶</a>
 </div>
 <p id="section-6.2-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of <code>id-alg-mtcProof</code>.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
-<p id="section-6.2-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-6.2-8" class="pilcrow">¶</a></p>
+<p id="section-6.2-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>):<a href="#section-6.2-8" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-6.2-9">
 <pre>
 /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
@@ -4619,7 +4619,7 @@ struct {
         <h3 id="name-landmark-relative-certifica">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-landmark-relative-certifica" class="section-name selfRef">Landmark-Relative Certificates</a>
         </h3>
-<p id="section-6.4-1">A <em>landmark-relative certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">A <em>landmark-relative certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <div id="landmark-tree-sizes">
 <section id="section-6.4.1">
           <h4 id="name-landmark-tree-sizes">
@@ -4694,7 +4694,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
               <p id="section-6.4.4-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) using the selected subtree and no signatures.<a href="#section-6.4.4-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.4.4-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4972,7 +4972,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         </ul>
 <p id="section-7.4-7">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-7" class="pilcrow">¶</a></p>
 <p id="section-7.4-8">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-8" class="pilcrow">¶</a></p>
-<p id="section-7.4-9">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
+<p id="section-7.4-9">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revoked-ranges">
@@ -5007,7 +5007,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           <p id="section-8-2.3.1">What the relying party should communicate to the authenticating party to help it make this decision<a href="#section-8-2.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-8-3">Certificate selection in TLS, described in Section <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2.2" class="relref">4.4.2.2</a> and Section <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2.3" class="relref">4.4.2.3</a> of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.<a href="#section-8-3" class="pilcrow">¶</a></p>
+<p id="section-8-3">Certificate selection in TLS, described in <span><a href="https://rfc-editor.org/rfc/rfc9846#section-4.5.1.2" class="relref">Section 4.5.1.2</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.<a href="#section-8-3" class="pilcrow">¶</a></p>
 <div id="standalone-certificates-tls">
 <section id="section-8.1">
         <h3 id="name-standalone-certificates-2">
@@ -5378,7 +5378,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-certificate-malleability">
 <a href="#section-12.6" class="section-number selfRef">12.6. </a><a href="#name-certificate-malleability" class="section-name selfRef">Certificate Malleability</a>
         </h3>
-<p id="section-12.6-1">An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span>, such as <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. This aligns with <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.1.3" class="relref">Section 4.1.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.<a href="#section-12.6-1" class="pilcrow">¶</a></p>
+<p id="section-12.6-1">An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span>, such as <span><a href="https://rfc-editor.org/rfc/rfc9846#section-4.5.1" class="relref">Section 4.5.1</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>. This aligns with <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.1.3" class="relref">Section 4.1.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.<a href="#section-12.6-1" class="pilcrow">¶</a></p>
 <p id="section-12.6-2">When the signature verification process in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a> first transforms the TBSCertificate into a TBSCertificateLogEntry, it preserves this non-malleability. There is a unique valid DER encoding for every abstract TBSCertificate structure, so malleability of the DER-encoded TBSCertificate reduces to malleability of the TBSCertificate value:<a href="#section-12.6-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.6-3.1">
@@ -5630,10 +5630,6 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <dd>
 <span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Web Linking"</span>, <span class="seriesInfo">RFC 8288</span>, <span class="seriesInfo">DOI 10.17487/RFC8288</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8288">https://www.rfc-editor.org/rfc/rfc8288</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8446">[RFC8446]</dt>
-        <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC8555">[RFC8555]</dt>
         <dd>
 <span class="refAuthor">Barnes, R.</span>, <span class="refAuthor">Hoffman-Andrews, J.</span>, <span class="refAuthor">McCarney, D.</span>, and <span class="refAuthor">J. Kasten</span>, <span class="refTitle">"Automatic Certificate Management Environment (ACME)"</span>, <span class="seriesInfo">RFC 8555</span>, <span class="seriesInfo">DOI 10.17487/RFC8555</span>, <time datetime="2019-03" class="refDate">March 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8555">https://www.rfc-editor.org/rfc/rfc8555</a>&gt;</span>. </dd>
@@ -5645,6 +5641,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="RFC9162">[RFC9162]</dt>
         <dd>
 <span class="refAuthor">Laurie, B.</span>, <span class="refAuthor">Messeri, E.</span>, and <span class="refAuthor">R. Stradling</span>, <span class="refTitle">"Certificate Transparency Version 2.0"</span>, <span class="seriesInfo">RFC 9162</span>, <span class="seriesInfo">DOI 10.17487/RFC9162</span>, <time datetime="2021-12" class="refDate">December 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9162">https://www.rfc-editor.org/rfc/rfc9162</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9846">[RFC9846]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9846</span>, <span class="seriesInfo">DOI 10.17487/RFC9846</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9846">https://www.rfc-editor.org/rfc/rfc9846</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9881">[RFC9881]</dt>
         <dd>
