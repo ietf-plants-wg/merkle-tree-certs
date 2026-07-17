@@ -106,7 +106,7 @@ func TestEfficientCoveringSubtreeVectors(t *testing.T) {
 	h := sha256.New()
 	for end := 1; end <= subtreeVectorMax; end++ {
 		for start := 0; start < end; start++ {
-			if IsValidSubtree(start, end) {
+			if end-start == 1 {
 				fmt.Fprintf(h, "[%d, %d)\n", start, end)
 				continue
 			}
@@ -117,7 +117,7 @@ func TestEfficientCoveringSubtreeVectors(t *testing.T) {
 			fmt.Fprintf(h, "[%d, %d) [%d, %d)\n", start1, end1, start2, end2)
 		}
 	}
-	const want = "e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd"
+	const want = "1934dd9461c254b535c951661bb0d714ceec56720f06d5e6bf810cb058e6e3af"
 	if got := fmt.Sprintf("%x", h.Sum(nil)); got != want {
 		t.Errorf("efficient covering subtree vector = %s, want %s", got, want)
 	}

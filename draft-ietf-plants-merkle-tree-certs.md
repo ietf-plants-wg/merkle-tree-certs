@@ -820,7 +820,7 @@ This section defines a procedure for selecting up to two subtrees, given any non
 
 The subtrees are selected as follows:
 
-1. If `end - start` is one, return a single subtree, `[start, end)`.
+1. If `end - start` equals 1, return a single subtree, `[start, end)`.
 
 2. Otherwise, run the following to return a pair of subtrees:
 
@@ -2418,13 +2418,13 @@ assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b82
 
 For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`:
 
-* if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END)` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively;
+* if `[start, end)` has size 1, add to the rolling hash the ASCII string `[START, END)` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively;
 * otherwise, add to the rolling hash the ASCII string `[LEFT_START, LEFT_END) [RIGHT_START, RIGHT_END)` followed by a newline (U+000A), where `LEFT_START`, `LEFT_END`, `RIGHT_START`, and `RIGHT_END` are the decimal representations of the start and end of the left and right subtrees, respectively, that efficiently cover ({{arbitrary-intervals}}) `[start, end)`.
 
 The final hash value is
 
 ~~~
-e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
+1934dd9461c254b535c951661bb0d714ceec56720f06d5e6bf810cb058e6e3af
 ~~~
 
 In Python, this can be expressed as:
@@ -2434,12 +2434,12 @@ import hashlib
 h = hashlib.sha256()
 for end in range(1, 131):
     for start in range(end):
-        if valid_subtree(start, end):
+        if end - start == 1:
             h.update(f'[{start}, {end})\n'.encode())
         else:
             left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
             h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
-assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
+assert h.hexdigest() == '1934dd9461c254b535c951661bb0d714ceec56720f06d5e6bf810cb058e6e3af'
 ~~~
 
 # Acknowledgements
@@ -2649,3 +2649,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be consistent with MTCProof, shorter, and help disambiguate the many English meanings of "entry"
+
+- Fixed one of the accumulated test vectors to better reflect one of the edge cases in subtree covering.
