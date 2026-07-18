@@ -10,6 +10,13 @@ const HashSize = sha256.Size
 
 type HashValue = [HashSize]byte
 
+func HashEmpty() HashValue {
+	h := sha256.New()
+	var ret HashValue
+	h.Sum(ret[:0])
+	return ret
+}
+
 func HashLeaf(b []byte) HashValue {
 	h := sha256.New()
 	h.Write([]byte{0})
@@ -30,8 +37,11 @@ func HashNode(left, right *HashValue) HashValue {
 }
 
 func IsValidSubtree(start, end int) bool {
-	if 0 > start || start >= end {
+	if 0 > start || start > end {
 		return false
+	}
+	if start == end {
+		return true
 	}
 	ceil := uint(1) << (bits.UintSize - bits.LeadingZeros(uint(end-start-1)))
 	return uint(start)&(ceil-1) == 0
@@ -73,6 +83,9 @@ func (mt *MerkleTree) SubtreeHash(start, end int) (HashValue, error) {
 	}
 	if end > mt.Size() {
 		return HashValue{}, fmt.Errorf("subtree [%d, %d) contains more elements than tree of size %d", start, end, mt.Size())
+	}
+	if start == end {
+		return HashEmpty(), nil
 	}
 	// Start at the largest complete subtree on the right edge.
 	last := end - 1
@@ -138,6 +151,9 @@ func (mt *MerkleTree) SubtreeConsistencyProof(start, end, n int) ([]byte, error)
 	if n > mt.Size() {
 		return nil, fmt.Errorf("tree of size %d is larger than the Merkle Tree of size %d", n, mt.Size())
 	}
+	if start == end {
+		return nil, nil
+	}
 	return mt.subtreeSubproof(start, end, 0, n, true)
 }
 
@@ -193,14 +209,14 @@ func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi int, known bool) ([]byt
 }
 
 func SubtreesForInterval(start, end int) (start1, end1, start2, end2 int, err error) {
-	if 0 > start || start >= end {
+	if 0 > start || start > end {
 		err = fmt.Errorf("invalid interval [%d, %d)", start, end)
 		return
 	}
-	if end-start == 1 {
+	if end-start <= 1 {
 		start1 = start
-		start2 = start
 		end1 = end
+		start2 = end
 		end2 = end
 		return
 	}

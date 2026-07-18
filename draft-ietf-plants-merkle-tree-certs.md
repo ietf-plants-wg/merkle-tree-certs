@@ -300,7 +300,7 @@ Landmark:
 : One of a sequence of tree sizes, infrequently chosen and used to calculate landmark subtrees for predistribution to relying parties.
 
 Landmark subtree:
-: One of the (up to two) subtrees determined by an interval between two landmarks. Predistributed and used as the basis for landmark-relative certificates.
+: One of the two subtrees determined by an interval between two landmarks. Predistributed and used as the basis for landmark-relative certificates.
 
 Standalone certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
@@ -436,10 +436,12 @@ Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Sectio
 
 A *subtree* of this Merkle Tree is itself a Merkle Tree, defined by `MTH(D[start:end])`. `start` and `end` are integers such that:
 
-*  `0 <= start < end <= n`
+*  `0 <= start <= end <= n`
 * `start` is a multiple of `BIT_CEIL(end - start)`
 
-The second condition ensures that `MTH(D[start:end])`, built over `D[start:end]` as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See {{subtrees-explain}} for more details. Note that, if `start` is zero, this second condition is always true.
+The second condition ensures that `MTH(D[start:end])`, built over `D[start:end]` as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See {{subtrees-explain}} for more details.
+
+For all `x`, `[0, x)` is a valid subtree (0 is a multiple of everything), and `[x, x)` is a valid subtree (`BIT_CEIL(0)` is 1).
 
 The *size* of the subtree is `end - start`.
 
@@ -615,7 +617,15 @@ Subtree consistency proofs contain sufficient nodes to reconstruct both the subt
 
 ### Generating a Subtree Consistency Proof
 
-The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}, in terms of a helper function:
+The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}.
+
+If `start = end`, the consistency proof is empty:
+
+~~~pseudocode
+SUBTREE_PROOF(start, start, D_n) = {}
+~~~
+
+Otherwise, `start < end` and `SUBTREE_PROOF` is defined by a helper function:
 
 ~~~pseudocode
 SUBTREE_PROOF(start, end, D_n) =
@@ -756,7 +766,12 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 <!-- If changing this procedure, remember to update {{consistency-proof-verification-explain}} -->
 
-1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start < end <= n`.
+1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start <= end <= n`.
+1. If `start` equals `end`, check the following conditions:
+   * `proof` is an empty array.
+   * `node_hash` is equal to `HASH()`, the hash of the empty string.
+
+   If either condition does not hold, stop and fail the proof verification. If both hold, stop and accept the proof.
 1. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
 1. If `sn` is `tn`, then:
    1. Until `fn` is `sn`, right-shift `fn`, `sn`, and `tn` equally.
@@ -812,17 +827,17 @@ While one subtree can be inefficient, two subtrees are sufficient to efficiently
 
 ### Selecting Two Subtrees
 
-This section defines a procedure for selecting up to two subtrees, given any non-empty interval (`start < end`). Combined, the subtrees contain `[start, end)` with bounded excess elements. The procedure either returns `[start, end)` as a subtree, or two subtrees, `left` and `right`, that satisfy the following properties:
+This section defines a procedure for selecting two subtrees given any interval. Combined, the subtrees contain `[start, end)` with bounded excess elements. The procedure returns two subtrees, `left` and `right`, that satisfy the following properties:
 
 * The two subtrees cover adjacent intervals. That is, `left.end = right.start`.
 * The two subtrees together contain the entire interval `[start, end)`. There are no extra entries after `end`, but there may be extra entries before `start`. That is, `left.start <= start` and `end = right.end`.
-* The extra entries before `start` are less than half of `left`. That is, `start - left.start < left.end - start`.
+* If the interval is not empty, the extra entries before `start` are less than half of `left`. That is, `start - left.start < left.end - start`.
 
 The subtrees are selected as follows:
 
-1. If `end - start` equals 1, return a single subtree, `[start, end)`.
+1. If `end - start` is less than or equal to 1, return the subtrees `[start, end)` and `[end, end)`.
 
-2. Otherwise, run the following to return a pair of subtrees:
+2. Otherwise:
 
    1. Let `last` be `end - 1`, the last index in `[start, end)`.
 
@@ -847,11 +862,11 @@ The following Python code implements this procedure:
 
 ~~~python
 def find_subtrees(start, end):
-    """ Returns a list of one or two subtrees that efficiently
-    cover [start, end). """
-    assert start < end
-    if end - start == 1:
-        return [(start, end),]
+    """ Returns a pair of subtrees that efficiently cover
+    [start, end). """
+    assert start <= end
+    if end - start <= 1:
+        return (start, end), (end, end)
     last = end - 1
     # Find where start and last's tree paths diverge. The two
     # subtrees will be on either side of the split.
@@ -862,7 +877,7 @@ def find_subtrees(start, end):
     # path leaves the right edge of its new subtree.
     left_split = (~start & mask).bit_length()
     left_start = start & ~((1 << left_split) - 1)
-    return [(left_start, mid), (mid, end)]
+    return (left_start, mid), (mid, end)
 ~~~
 
 {{fig-subtree-pair-example}} shows the subtrees which cover `[5, 13)` in a Merkle Tree of 13 elements in wavy lines. The two subtrees selected are `[4, 8)` and `[8, 13)`. Note that the subtrees cover a slightly larger interval than `[5, 13)`.
@@ -1374,11 +1389,11 @@ To issue landmark-relative certificates, a CA must additionally maintain a *land
 
 Each landmark specifies a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
-Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
+Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
 
 As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer `max_active_landmarks` parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.
 
-The most recent `max_active_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_active_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
+The most recent `max_active_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_active_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in at least one landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
 
 It is RECOMMENDED that landmarks be allocated following the procedure described in {{allocating-landmarks}}. If landmarks are allocated incorrectly (e.g. past landmarks change, or `max_active_landmarks` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
 
@@ -2339,12 +2354,12 @@ For all the test vectors, a tree `D_n` of size `n` is constructed with leaf valu
 
 ## Subtree Hashes
 
-For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) HASH` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `HASH` is the hexadecimal encoding of `MTH(D[start:end])`, according to {{subtrees}}.
+For each value of `end` from 0 to 130, and each value of `start` from 0 to `end`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) HASH` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `HASH` is the hexadecimal encoding of `MTH(D[start:end])`, according to {{subtrees}}.
 
 The final hash value is
 
 ~~~
-94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81
 ~~~
 
 In Python, this can be expressed as:
@@ -2352,17 +2367,17 @@ In Python, this can be expressed as:
 ~~~python
 import hashlib
 h = hashlib.sha256()
-for end in range(1, 131):
-    for start in range(end):
+for end in range(0, 131):
+    for start in range(end + 1):
         if valid_subtree(start, end):
             subtree_hash = MTH(D[start:end])
             h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
-assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+assert h.hexdigest() == 'b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81'
 ~~~
 
 ## Subtree Inclusion Proofs {#subtree-inclusion-proof-vectors}
 
-For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, for each value of `index` from `start` to `end - 1`, add to the rolling hash the ASCII string `INDEX [START, END)`, then, for each hash in the inclusion proof ({{subtree-inclusion-proofs}}) for `d[index]` in the subtree `[start, end)`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `INDEX` is the decimal representation of `index`, and `START` and `END` are the decimal representations of `start` and `end`, respectively.
+For each value of `end` from 0 to 130, and each value of `start` from 0 to `end`, if `[start, end)` is a valid subtree, for each value of `index` from `start` to `end - 1`, add to the rolling hash the ASCII string `INDEX [START, END)`, then, for each hash in the inclusion proof ({{subtree-inclusion-proofs}}) for `d[index]` in the subtree `[start, end)`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `INDEX` is the decimal representation of `index`, and `START` and `END` are the decimal representations of `start` and `end`, respectively.
 
 The final hash value is
 
@@ -2375,8 +2390,8 @@ In Python, this can be expressed as:
 ~~~python
 import hashlib
 h = hashlib.sha256()
-for end in range(1, 131):
-    for start in range(end):
+for end in range(0, 131):
+    for start in range(end + 1):
         if valid_subtree(start, end):
             for index in range(start, end):
                 inclusion_proof = get_inclusion_proof(D, start, end, index)
@@ -2389,12 +2404,12 @@ assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3
 
 ## Subtree Consistency Proofs {#subtree-consistency-proof-vectors}
 
-For each value of `n` from 0 to 130, and each value of `end` from 1 to `n`, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) N`, then, for each hash in the consistency proof ({{subtree-consistency-proofs}}) for the subtree `[start, end)` and tree of size `n`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `N` is the decimal representation of `n`.
+For each value of `n` from 0 to 130, and each value of `end` from 0 to `n`, and each value of `start` from 0 to `end`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) N`, then, for each hash in the consistency proof ({{subtree-consistency-proofs}}) for the subtree `[start, end)` and tree of size `n`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `N` is the decimal representation of `n`.
 
 The final hash value is
 
 ~~~
-c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74
 ~~~
 
 In Python, this can be expressed as:
@@ -2403,28 +2418,25 @@ In Python, this can be expressed as:
 import hashlib
 h = hashlib.sha256()
 for n in range(131):
-    for end in range(1, n + 1):
-        for start in range(end):
+    for end in range(0, n + 1):
+        for start in range(end + 1):
             if valid_subtree(start, end):
                 consistency_proof = get_consistency_proof(D, n, start, end)
                 line = f'[{start}, {end}) {n}'
                 for p in consistency_proof:
                     line += f' {p.hex()}'
                 h.update(f'{line}\n'.encode())
-assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74'
 ~~~
 
 ## Efficient Covering Subtrees
 
-For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`:
-
-* if `[start, end)` has size 1, add to the rolling hash the ASCII string `[START, END)` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively;
-* otherwise, add to the rolling hash the ASCII string `[LEFT_START, LEFT_END) [RIGHT_START, RIGHT_END)` followed by a newline (U+000A), where `LEFT_START`, `LEFT_END`, `RIGHT_START`, and `RIGHT_END` are the decimal representations of the start and end of the left and right subtrees, respectively, that efficiently cover ({{arbitrary-intervals}}) `[start, end)`.
+For each value of `end` from 0 to 130, and each value of `start` from 0 to `end`, add to the rolling hash the ASCII string `[LEFT_START, LEFT_END) [RIGHT_START, RIGHT_END)` followed by a newline (U+000A), where `LEFT_START`, `LEFT_END`, `RIGHT_START`, and `RIGHT_END` are the decimal representations of the start and end of the left and right subtrees, respectively, that efficiently cover ({{arbitrary-intervals}}) `[start, end)`.
 
 The final hash value is
 
 ~~~
-1934dd9461c254b535c951661bb0d714ceec56720f06d5e6bf810cb058e6e3af
+7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0
 ~~~
 
 In Python, this can be expressed as:
@@ -2432,14 +2444,11 @@ In Python, this can be expressed as:
 ~~~python
 import hashlib
 h = hashlib.sha256()
-for end in range(1, 131):
-    for start in range(end):
-        if end - start == 1:
-            h.update(f'[{start}, {end})\n'.encode())
-        else:
-            left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
-            h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
-assert h.hexdigest() == '1934dd9461c254b535c951661bb0d714ceec56720f06d5e6bf810cb058e6e3af'
+for end in range(0, 131):
+    for start in range(end + 1):
+        left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+        h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+assert h.hexdigest() == '7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0'
 ~~~
 
 # Acknowledgements
@@ -2651,3 +2660,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be consistent with MTCProof, shorter, and help disambiguate the many English meanings of "entry"
 
 - Fixed one of the accumulated test vectors to better reflect one of the edge cases in subtree covering.
+
+- Make empty subtrees valid, so the subtree covering function always returns two subtrees.

@@ -88,7 +88,8 @@ func TestSubtreesForInterval(t *testing.T) {
 		start1, end1 int
 		start2, end2 int
 	}{
-		{start: 8, end: 9, start1: 8, end1: 9, start2: 8, end2: 9},
+		{start: 9, end: 9, start1: 9, end1: 9, start2: 9, end2: 9},
+		{start: 8, end: 9, start1: 8, end1: 9, start2: 9, end2: 9},
 		{start: 5, end: 13, start1: 4, end1: 8, start2: 8, end2: 13},
 		{start: 7, end: 9, start1: 7, end1: 8, start2: 8, end2: 9},
 	}
