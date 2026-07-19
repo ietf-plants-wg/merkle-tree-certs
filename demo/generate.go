@@ -86,7 +86,7 @@ func generate(args []string) error {
 	}
 
 	if config.Version >= VersionPlants04 {
-		// Generate an a CA certificate.
+		// Generate a CA certificate.
 		if caCosigner == nil {
 			return fmt.Errorf("CA cosigner %s not found", config.ID)
 		}
@@ -289,11 +289,11 @@ func generate(args []string) error {
 		panic(err)
 	}
 	var signedNote bytes.Buffer
-	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogID(&config)))
+	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogIDForConfig(&config)))
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for _, cosigner := range cosigners {
-		cosig, err := cosigner.Sign(LogID(&config), 0, uint64(len(entries)), &checkpointHash)
+		cosig, err := cosigner.Sign(LogIDForConfig(&config), 0, uint64(len(entries)), &checkpointHash)
 		if err != nil {
 			return err
 		}

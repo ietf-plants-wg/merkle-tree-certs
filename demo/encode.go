@@ -334,14 +334,22 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 	return b.Bytes()
 }
 
-func LogID(config *CAConfig) TrustAnchorID {
-	if config.Version < VersionPlants04 {
+func LogID(version DraftVersion, caID TrustAnchorID, logNumber uint16) TrustAnchorID {
+	if version < VersionPlants04 {
 		// Prior to plants-04, each CA only had one log.
-		return config.ID
+		return caID
 	}
-	logID := appendBase128(slices.Clip(config.ID), 0)
-	logID = appendBase128(logID, uint32(config.LogNumber))
+	logID := appendBase128(slices.Clip(caID), 0)
+	logID = appendBase128(logID, uint32(logNumber))
 	return logID
+}
+
+func LogIDForConfig(config *CAConfig) TrustAnchorID {
+	return LogID(config.Version, config.ID, config.LogNumber)
+}
+
+func compareCosignerIDs(a, b TrustAnchorID) int {
+	return cmp.Or(cmp.Compare(len(a), len(b)), bytes.Compare(a, b))
 }
 
 func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end uint64) ([]byte, error) {
@@ -349,7 +357,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
 
-	logID := LogID(config)
+	logID := LogIDForConfig(config)
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		serial := index
@@ -403,10 +411,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 				// plants-04 canonicalizes the cosigner order.
 				if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
 					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *Cosigner) int {
-						return cmp.Or(
-							cmp.Compare(len(a.ID), len(b.ID)),
-							bytes.Compare(a.ID, b.ID),
-						)
+						return compareCosignerIDs(a.ID, b.ID)
 					})
 				}
 				for _, cosigner := range cosigners {

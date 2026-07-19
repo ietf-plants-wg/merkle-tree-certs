@@ -12,6 +12,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Available commands:\n")
 		fmt.Fprintf(os.Stderr, "  generate - Generate test MTC certificates\n")
+		fmt.Fprintf(os.Stderr, "  verify   - Verify MTC certificates\n")
 	}
 
 	flag.Parse()
@@ -24,6 +25,11 @@ func main() {
 	case "generate":
 		if err := generate(flag.Args()[1:]); err != nil {
 			fmt.Fprintf(os.Stderr, "Error generating certificates: %s\n", err)
+			os.Exit(1)
+		}
+	case "verify":
+		if err := verify(flag.Args()[1:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error verifying certificates: %s\n", err)
 			os.Exit(1)
 		}
 	default:

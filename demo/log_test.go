@@ -6,43 +6,6 @@ import (
 	"testing"
 )
 
-func evaluateSubtreeInclusionProof(index, start, end uint64, entryHash *HashValue, proof []byte) (HashValue, error) {
-	if !IsValidSubtree(start, end) {
-		return HashValue{}, fmt.Errorf("invalid subtree")
-	}
-	if start > index || index >= end {
-		return HashValue{}, fmt.Errorf("index not in subtree")
-	}
-	fn := index - start
-	sn := end - start - 1
-	r := *entryHash
-	for len(proof) != 0 {
-		if len(proof) < HashSize {
-			return HashValue{}, fmt.Errorf("truncated hash in proof")
-		}
-		p := (*HashValue)(proof)
-		proof = proof[HashSize:]
-		if sn == 0 {
-			return HashValue{}, fmt.Errorf("proof too long")
-		}
-		if fn&1 == 1 || fn == sn {
-			r = HashNode(p, &r)
-			for fn&1 == 0 {
-				fn >>= 1
-				sn >>= 1
-			}
-		} else {
-			r = HashNode(&r, p)
-		}
-		fn >>= 1
-		sn >>= 1
-	}
-	if sn != 0 {
-		return HashValue{}, fmt.Errorf("proof too short")
-	}
-	return r, nil
-}
-
 func TestMerkleTree(t *testing.T) {
 	const depth = 9
 	const numEntries = 1 << depth
@@ -69,9 +32,9 @@ func TestMerkleTree(t *testing.T) {
 					t.Errorf("tree.SubtreeInclusionProof(%d, %d, %d) unexpectedly failed: %s", index, start, end, err)
 					continue
 				}
-				r, err := evaluateSubtreeInclusionProof(index, start, end, &entryHash, proof)
+				r, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, proof)
 				if err != nil {
-					t.Errorf("evaluateSubtreeInclusionProof(%d, %d, %d, %x, %x) unexpectedly failed: %s", index, start, end, entryHash[:], proof, err)
+					t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d, %x, %x) unexpectedly failed: %s", index, start, end, entryHash[:], proof, err)
 					continue
 				}
 				if !bytes.Equal(subtreeHash[:], r[:]) {
