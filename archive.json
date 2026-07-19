@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-16T03:25:48.781875+00:00",
+  "timestamp": "2026-07-19T03:37:51.611186+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -19051,24 +19051,26 @@
       "id": "PR_kwDOJIBkVc7wnC_M",
       "title": "Update citations from RFC 8446 to RFC 9846",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/269",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-07-11T20:14:43Z",
-      "updatedAt": "2026-07-16T01:47:34Z",
+      "updatedAt": "2026-07-16T07:37:38Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "06f48b594062fee6f7488c8a288a8375d947d37d",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "cite-9846",
       "headRefOid": "91095829661051bce9c4eaa21bf1a958943cd5bb",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-16T07:37:34Z",
+      "mergedAt": "2026-07-16T07:37:34Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "8f2c9e4d111dd602a051f5694ea27d0d6e506125"
+      },
       "comments": [],
       "reviews": [
         {
@@ -19082,6 +19084,19 @@
           "body": "TIL about this RFC (I haven't checked in on the TLS wg in too long). LGTM!",
           "createdAt": "2026-07-16T01:47:34Z",
           "updatedAt": "2026-07-16T01:47:34Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGNABeA",
+          "commit": {
+            "abbreviatedOid": "9109582"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-16T07:02:04Z",
+          "updatedAt": "2026-07-16T07:02:04Z",
           "comments": []
         }
       ]
@@ -19178,24 +19193,26 @@
       "id": "PR_kwDOJIBkVc7yP_hg",
       "title": "Rename MerkleTreeCertEntry type to MTCLogEntry",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/271",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Elsewhere we have MTCProof and MTCSignature. For consistency, let's either abbreviate the entry types or expand the proof types.\r\n\r\nI'm inclined to abbreviate. Particularly with MerkleTreeCertEntryExtensionType, the unabbreviated form is a mouthful. That also gives us length budget to say \"MTCLogEntry\" instead of \"MTCEntry\", which seems worthwhile. \"Entry\" has several English meanings while \"log entry\" is a bit more specific.",
       "createdAt": "2026-07-15T22:58:47Z",
-      "updatedAt": "2026-07-16T01:41:49Z",
+      "updatedAt": "2026-07-16T07:37:54Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "7c8c7c55cfc626d63026cb403c089a84467baff9",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "mtc-log-entry-rename",
       "headRefOid": "0c3cb2e72798460d699c607e94032de1161859fa",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-16T07:37:51Z",
+      "mergedAt": "2026-07-16T07:37:51Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3f06f9de912f23d258f3531c7358fd49b9cccc09"
+      },
       "comments": [],
       "reviews": [
         {
@@ -19210,8 +19227,172 @@
           "createdAt": "2026-07-16T01:41:48Z",
           "updatedAt": "2026-07-16T01:41:48Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGM-i6A",
+          "commit": {
+            "abbreviatedOid": "0c3cb2e"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-16T06:57:46Z",
+          "updatedAt": "2026-07-16T06:57:46Z",
+          "comments": []
         }
       ]
+    },
+    {
+      "number": 272,
+      "id": "PR_kwDOJIBkVc7ysrZr",
+      "title": "Clarify that the SPKI hash only needs second preimage resistance",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/272",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Adapted from a change in #226. Even if we don't put in a randomizer just yet, let's make it clear that this hash is not dependent on collision resistance.",
+      "createdAt": "2026-07-16T20:32:59Z",
+      "updatedAt": "2026-07-16T20:32:59Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3f06f9de912f23d258f3531c7358fd49b9cccc09",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "spki-hash-preimage",
+      "headRefOid": "2c7d2b65ba9b077ad5f63cf9cf8de5112dbad0f3",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 273,
+      "id": "PR_kwDOJIBkVc7zBc_v",
+      "title": "Clarify certificate inputs to reflect serialNumber requirements and MTCProof",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/273",
+      "state": "OPEN",
+      "author": "phbnf",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR clarifies which inputs are required to compute a Merkle Tree Certificate. It adds the inputs necessary to compute a certificate `serialNumber` and replaces the full subtree with an `MTCProof`.",
+      "createdAt": "2026-07-17T14:28:59Z",
+      "updatedAt": "2026-07-17T14:28:59Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3f06f9de912f23d258f3531c7358fd49b9cccc09",
+      "headRepository": "phbnf/merkle-tree-certs",
+      "headRefName": "certinput",
+      "headRefOid": "1e095c860e91d04ec4d8cc68652d976cd2eb6895",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 274,
+      "id": "PR_kwDOJIBkVc7zDoki",
+      "title": "Fix edge case in accumulated test case",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/274",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The accumulated test for the subtree covering was written as if the single-subtree special case was for [start, end) being a subtree, when it's actually for [start, end) having size 1.\r\n\r\nEither would have worked. The spec mostly arbitrarily picked the latter.",
+      "createdAt": "2026-07-17T16:02:54Z",
+      "updatedAt": "2026-07-17T16:02:54Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3f06f9de912f23d258f3531c7358fd49b9cccc09",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "fix-edge-case",
+      "headRefOid": "deb45aab4bf78c468d52fb478f2015bc613de94e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 275,
+      "id": "PR_kwDOJIBkVc7zUMa8",
+      "title": "Remove the subtree edge case entirely by allowing zero-length subtrees",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/275",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This includes https://github.com/ietf-plants-wg/merkle-tree-certs/pull/274\r\n\r\nInstead of having an rare edge case where landmark intervals of size one return one subtree instead of two, just always return two. In order to do that, we have to say zero-length subtrees are legal.\r\n\r\nThat introduces silly special cases for consistency proofs, but means all our functions have uniform types, which I think is worth it.",
+      "createdAt": "2026-07-18T11:37:39Z",
+      "updatedAt": "2026-07-18T11:38:58Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3f06f9de912f23d258f3531c7358fd49b9cccc09",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "remove-edge-case",
+      "headRefOid": "519e6eead3b9ba22b40c3e58d4ae9eed6cf3b067",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGdXH0g",
+          "commit": {
+            "abbreviatedOid": "519e6ee"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-18T11:38:58Z",
+          "updatedAt": "2026-07-18T11:38:58Z",
+          "comments": [
+            {
+              "originalPosition": 150,
+              "body": "The hash is unchanged because all the extra loop iterations are are vacuous. I added them just to keep it all uniform.",
+              "createdAt": "2026-07-18T11:38:58Z",
+              "updatedAt": "2026-07-18T11:38:58Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 276,
+      "id": "PR_kwDOJIBkVc7zaIRe",
+      "title": "Remove unused definition from ASN.1 block",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/276",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This is a remnant of when there was a cosigner ID in the structure. Now the cosigner ID is implicit from the CA name.",
+      "createdAt": "2026-07-18T20:58:34Z",
+      "updatedAt": "2026-07-18T20:58:34Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3f06f9de912f23d258f3531c7358fd49b9cccc09",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "cleanup-definition",
+      "headRefOid": "c959fe6e6307000ff038c6af7344e759855f0c3f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
