@@ -38,8 +38,8 @@ func writeProofLine(w io.Writer, prefix string, proof []byte) {
 func TestSubtreeHashVectors(t *testing.T) {
 	tree := subtreeVectorTree()
 	h := sha256.New()
-	for end := 1; end <= subtreeVectorMax; end++ {
-		for start := 0; start < end; start++ {
+	for end := 0; end <= subtreeVectorMax; end++ {
+		for start := 0; start <= end; start++ {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
@@ -50,7 +50,7 @@ func TestSubtreeHashVectors(t *testing.T) {
 			fmt.Fprintf(h, "[%d, %d) %x\n", start, end, subtreeHash[:])
 		}
 	}
-	const want = "94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f"
+	const want = "b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81"
 	if got := fmt.Sprintf("%x", h.Sum(nil)); got != want {
 		t.Errorf("subtree hash vector = %s, want %s", got, want)
 	}
@@ -59,8 +59,8 @@ func TestSubtreeHashVectors(t *testing.T) {
 func TestSubtreeInclusionProofVectors(t *testing.T) {
 	tree := subtreeVectorTree()
 	h := sha256.New()
-	for end := 1; end <= subtreeVectorMax; end++ {
-		for start := 0; start < end; start++ {
+	for end := 0; end <= subtreeVectorMax; end++ {
+		for start := 0; start <= end; start++ {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
@@ -83,8 +83,8 @@ func TestSubtreeConsistencyProofVectors(t *testing.T) {
 	tree := subtreeVectorTree()
 	h := sha256.New()
 	for n := 0; n <= subtreeVectorMax; n++ {
-		for end := 1; end <= n; end++ {
-			for start := 0; start < end; start++ {
+		for end := 0; end <= n; end++ {
+			for start := 0; start <= end; start++ {
 				if !IsValidSubtree(start, end) {
 					continue
 				}
@@ -96,7 +96,7 @@ func TestSubtreeConsistencyProofVectors(t *testing.T) {
 			}
 		}
 	}
-	const want = "c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d"
+	const want = "10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74"
 	if got := fmt.Sprintf("%x", h.Sum(nil)); got != want {
 		t.Errorf("subtree consistency proof vector = %s, want %s", got, want)
 	}
@@ -104,12 +104,8 @@ func TestSubtreeConsistencyProofVectors(t *testing.T) {
 
 func TestEfficientCoveringSubtreeVectors(t *testing.T) {
 	h := sha256.New()
-	for end := 1; end <= subtreeVectorMax; end++ {
-		for start := 0; start < end; start++ {
-			if IsValidSubtree(start, end) {
-				fmt.Fprintf(h, "[%d, %d)\n", start, end)
-				continue
-			}
+	for end := 0; end <= subtreeVectorMax; end++ {
+		for start := 0; start <= end; start++ {
 			start1, end1, start2, end2, err := SubtreesForInterval(start, end)
 			if err != nil {
 				t.Fatalf("SubtreesForInterval(%d, %d): %v", start, end, err)
@@ -117,7 +113,7 @@ func TestEfficientCoveringSubtreeVectors(t *testing.T) {
 			fmt.Fprintf(h, "[%d, %d) [%d, %d)\n", start1, end1, start2, end2)
 		}
 	}
-	const want = "e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd"
+	const want = "7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0"
 	if got := fmt.Sprintf("%x", h.Sum(nil)); got != want {
 		t.Errorf("efficient covering subtree vector = %s, want %s", got, want)
 	}
