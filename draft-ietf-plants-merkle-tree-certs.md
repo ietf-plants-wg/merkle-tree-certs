@@ -300,7 +300,7 @@ Landmark:
 : One of a sequence of tree sizes, infrequently chosen and used to calculate landmark subtrees for predistribution to relying parties.
 
 Landmark subtree:
-: One of the two subtrees determined by an interval between two landmarks. Predistributed and used as the basis for landmark-relative certificates.
+: One of the two (possibly empty) subtrees determined by an interval between two landmarks. Predistributed and used as the basis for landmark-relative certificates.
 
 Standalone certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
