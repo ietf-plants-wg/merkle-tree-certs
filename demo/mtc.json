@@ -1,5 +1,5 @@
 {
-  "Version": "plants-04",
+  "Version": "plants-05",
   "ID": "32473.1",
   "LogNumber": 1,
   "Cosigners": [
@@ -28,7 +28,9 @@
     "NotBefore": "2020-01-01T00:00:00Z",
     "NotAfter": "2030-12-31T23:59:59Z",
     "IsCA": true,
-    "KeyUsage": ["CertSign"]
+    "KeyUsage": ["CertSign"],
+    "MinSerial": {"Log": 1, "Index": 0},
+    "MaxSerial": {"Log": 5, "Index": 281474976710655}
   },
   "Entries": [
     {

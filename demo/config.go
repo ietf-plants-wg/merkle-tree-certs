@@ -24,6 +24,7 @@ const (
 	VersionPlants01
 	VersionPlants02
 	VersionPlants04
+	VersionPlants05
 )
 
 func (v DraftVersion) String() string {
@@ -38,6 +39,8 @@ func (v DraftVersion) String() string {
 		return "plants-02"
 	case VersionPlants04:
 		return "plants-04"
+	case VersionPlants05:
+		return "plants-05"
 	}
 	panic(fmt.Sprintf("unknown version %d", v))
 }
@@ -67,6 +70,8 @@ func DraftVersionFromString(s string) (v DraftVersion, ok bool) {
 		return VersionPlants02, true
 	case "plants-04":
 		return VersionPlants04, true
+	case "plants-05":
+		return VersionPlants05, true
 
 	default:
 		return 0, false
@@ -150,9 +155,14 @@ type CosignerConfig struct {
 	PrivateKey         []byte
 }
 
+type SerialConfig struct {
+	Log   uint16
+	Index uint64
+}
+
 type CACertConfig struct {
 	CertConfigBase
-	MinSerial uint64
+	MinSerial, MaxSerial SerialConfig
 }
 
 type CertConfigBase struct {

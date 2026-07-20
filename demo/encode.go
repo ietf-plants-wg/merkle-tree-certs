@@ -128,8 +128,10 @@ func addSubject(b *cryptobyte.Builder, entry *EntryConfig) {
 }
 
 type mtcCAInfo struct {
+	version   DraftVersion
 	cosigner  *Cosigner
 	minSerial uint64
+	maxSerial uint64
 }
 
 func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAInfo) {
@@ -242,6 +244,9 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 							}
 						})
 						seq.AddASN1Uint64(mtcCA.minSerial)
+						if mtcCA.version >= VersionPlants05 {
+							seq.AddASN1Uint64(mtcCA.maxSerial)
+						}
 					})
 				})
 			})
@@ -423,6 +428,15 @@ func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 		return nil, err
 	}
 
+	if config.CACert.MinSerial.Index >= 1<<48 {
+		return nil, fmt.Errorf("invalid MinSerial index")
+	}
+	if config.CACert.MaxSerial.Index >= 1<<48 {
+		return nil, fmt.Errorf("invalid MaxSerial index")
+	}
+	minSerial := (uint64(config.CACert.MinSerial.Log) << 48) | config.CACert.MinSerial.Index
+	maxSerial := (uint64(config.CACert.MaxSerial.Log) << 48) | config.CACert.MaxSerial.Index
+
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		cert.AddASN1(cbasn1.SEQUENCE, func(tbs *cryptobyte.Builder) {
@@ -433,9 +447,12 @@ func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 			addValidity(tbs, &config.CACert.CertConfigBase)
 			addX509Name(tbs, config.ID) // Subject
 			tbs.AddBytes(spki)
+
 			addExtensions(tbs, &config.CACert.CertConfigBase, &mtcCAInfo{
+				version:   config.Version,
 				cosigner:  cosigner,
-				minSerial: config.CACert.MinSerial,
+				minSerial: minSerial,
+				maxSerial: maxSerial,
 			})
 		})
 		addUnsignedSigAlg(cert)
