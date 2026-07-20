@@ -1755,9 +1755,6 @@ Table of Contents
        CRITICALITY TRUE
    }
 
-   -- From draft-ietf-tls-trust-anchor-ids
-   TrustAnchorID ::= RELATIVE-OID
-
    -- This is 2^64-1, the maximum possible serial number in this protocol.
    mtcMaxSerial INTEGER ::= 18446744073709551615
 
