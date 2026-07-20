@@ -4539,10 +4539,10 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-6.1-2.2.1">A subject public key whose hash matches the TBSCertificateLogEntry<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-2.3">
-            <p id="section-6.1-2.3.1">A subtree (<a href="#subtrees" class="auto internal xref">Section 4</a>) that contains the log entry<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.3.1">The <code>log_number</code> and the zero-based entry <code>index</code> of that log entry within the issuance log, used to construct the certificate's <code>serialNumber</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>).<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-2.4">
-            <p id="section-6.1-2.4.1">Zero or more signatures (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) over the subtree, which together satisfy relying party requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.4.1">An <code>MTCProof</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) proving the entry's inclusion in a subtree, along with zero or more signatures (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) over that subtree, which together satisfy relying party requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-6.1-3">For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. <a href="#certificate-format" class="auto internal xref">Section 6.2</a> defines how the certificate is constructed based on those choices. <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a> and <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a> define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.<a href="#section-6.1-3" class="pilcrow">¶</a></p>

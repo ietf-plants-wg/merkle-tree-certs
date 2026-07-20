@@ -1831,10 +1831,14 @@ Table of Contents
 
    *  A subject public key whose hash matches the TBSCertificateLogEntry
 
-   *  A subtree (Section 4) that contains the log entry
+   *  The log_number and the zero-based entry index of that log entry
+      within the issuance log, used to construct the certificate's
+      serialNumber (Section 6.2).
 
-   *  Zero or more signatures (Section 5.3) over the subtree, which
-      together satisfy relying party requirements (Section 7.3)
+   *  An MTCProof (Section 6.2) proving the entry's inclusion in a
+      subtree, along with zero or more signatures (Section 5.3) over
+      that subtree, which together satisfy relying party requirements
+      (Section 7.3)
 
    For any given TBSCertificateLogEntry, there are multiple possible
    certificates that may prove the entry is certified by the CA and
