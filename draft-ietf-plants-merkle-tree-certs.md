@@ -1796,7 +1796,7 @@ A key security requirement of any PKI scheme is that relying parties only accept
 
 Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.
 
-Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.
+The subject public key is itself also hashed before incorporating into the log. This hash depends on second-preimage resistance. To authorize the wrong public key for some existing log entry (e.g. one that describes a target's identity), an attacker must find some other public key with the same hash. While an attacker able to compute collisions might find two public keys with the same hash, that hash will not be in any existing log entry. The attacker would need to be authorized to request certification of a new entry with this hash. Such an attacker could only certify colliding pairs of public keys for its own identities.
 
 ## Transparency
 
