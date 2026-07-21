@@ -1391,9 +1391,9 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 To issue landmark-relative certificates, a CA must additionally maintain a *landmark sequence*, which is a sequence of *landmarks*.
 
-Each landmark specifies a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
+Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. Landmark zero MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
-Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
+The landmark sequence determines *landmark subtrees* for each landmark: for each landmark `L`, other than number zero, let `tree_size` be `L`'s tree size and `prev_tree_size` be that of `L - 1`. The landmark subtrees for `L` are the two subtrees that cover `[prev_tree_size, tree_size)`, as described in {{arbitrary-intervals}}. Landmark zero has no landmark subtrees.
 
 As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer `max_active_landmarks` parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.
 
@@ -1420,7 +1420,7 @@ CAs SHOULD publish their active landmarks, so that relying parties can configure
   This line MUST satisfy the following, otherwise it is invalid:
   * `num_active_landmarks <= max_active_landmarks`
   * `num_active_landmarks <= last_landmark`
-* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be strictly monotonically decreasing and lower or equal to the log's latest tree size.
+* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, representing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The tree sizes MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.
 
 It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}} with content type `text/plain; charset=utf-8`.
 
@@ -2668,3 +2668,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Make empty subtrees valid, so the subtree covering function always returns two subtrees.
 
 - Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.
+
+- Clarify that a landmark consists of both a number and a tree size, and that a landmark's subtrees share its landmark number.
