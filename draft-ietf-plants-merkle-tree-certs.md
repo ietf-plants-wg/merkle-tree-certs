@@ -1384,7 +1384,7 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 ### Landmark Tree Sizes
 
-To issue landmark-relative certificates, a CA MUST additionally maintain a *landmark sequence*, which is a sequence of *landmarks*.
+A CA that issues landmark-relative certificates MUST additionally maintain a *landmark sequence*. A landmark sequence is a sequence of *landmarks*, defined below:
 
 Each landmark specifies a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
