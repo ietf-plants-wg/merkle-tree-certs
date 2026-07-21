@@ -3969,7 +3969,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
           </h4>
 <p id="section-5.2.2-1">This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See <a href="#transparency" class="auto internal xref">Section 12.2</a>.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-2">This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-3">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs; <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> defines such a profile for Merkle Tree Certificates. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="log-pruning">
@@ -5179,7 +5179,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-10.1.1" class="section-number selfRef">10.1.1. </a><a href="#name-certification-authority-cost" class="section-name selfRef">Certification Authority Costs</a>
           </h4>
 <p id="section-10.1.1-1">While Merkle Tree certificates expect CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>:<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-10.1.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> (profiled for Merkle Tree Certificates in <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span>), the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. Costs are thus expected to scale with the CA's own issuance.<a href="#section-10.1.1-3" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-4">A CA only needs to produce a digital signature for every checkpoint, rather than for every certificate. The lower signature rate requirements could allow more secure and/or economical key storage choices.<a href="#section-10.1.1-4" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-5">Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.<a href="#section-10.1.1-5" class="pilcrow">¶</a></p>
@@ -5743,6 +5743,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="MerkleTown">[MerkleTown]</dt>
         <dd>
 <span class="refAuthor">Cloudflare, Inc.</span>, <span class="refTitle">"Merkle Town"</span>, <time datetime="2023-03-07" class="refDate">7 March 2023</time>, <span>&lt;<a href="https://ct.cloudflare.com/">https://ct.cloudflare.com/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MTC-TLOG">[MTC-TLOG]</dt>
+        <dd>
+<span class="refAuthor">C2SP</span>, <span class="refTitle">"Merkle Tree Certificates With Tiled Transparency Logs"</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://c2sp.org/mtc-tlog">https://c2sp.org/mtc-tlog</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4514">[RFC4514]</dt>
         <dd>
@@ -7390,6 +7394,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.17-1.3">
             <p id="appendix-E.17-1.3.1">Make empty subtrees valid, so the subtree covering function always returns two subtrees.<a href="#appendix-E.17-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.4">
+            <p id="appendix-E.17-1.4.1">Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.<a href="#appendix-E.17-1.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
