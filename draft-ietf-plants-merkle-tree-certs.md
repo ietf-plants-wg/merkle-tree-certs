@@ -1302,7 +1302,7 @@ A Merkle Tree Certificate is constructed from the following inputs:
 * The `log_number` and the zero-based entry `index` of that log entry within the issuance log, used to construct the certificate's `serialNumber` ({{certificate-format}}).
 * An `MTCProof` ({{certificate-format}}) proving the entry's inclusion in a subtree, along with zero or more signatures ({{cosigners}}) over that subtree, which together satisfy relying party requirements ({{trusted-cosigners}})
 
-For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified and publicly logged by the the issuing CA indicated in its TBSCertificateLogEntry, varying by choice of subtree and signatures. {{certificate-format}} defines how the certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.
+By varying the choice of subtree and signatures, there can be multiple ways to prove the entry is in the log, and thus certified by the CA. {{certificate-format}} defines how a certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.
 
 ## Certificate Format
 
