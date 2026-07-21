@@ -2013,18 +2013,19 @@ Table of Contents
    To issue landmark-relative certificates, a CA must additionally
    maintain a _landmark sequence_, which is a sequence of _landmarks_.
 
-   Each landmark specifies a tree size, used as a common point of
-   reference across the ecosystem for optimizing certificates.
-   Landmarks are numbered consecutively from zero.  The first landmark,
-   numbered zero, MUST have a tree size of zero.  The sequence of tree
-   sizes MUST be append-only and strictly monotonically increasing.
+   Each landmark consists of a number, used as an identifier for the
+   landmark, and a tree size, used as a common point of reference across
+   the ecosystem for optimizing certificates.  Landmarks are numbered
+   consecutively from zero.  Landmark zero MUST have a tree size of
+   zero.  The sequence of tree sizes MUST be append-only and strictly
+   monotonically increasing.
 
-   Landmarks determine _landmark subtrees_: for each landmark, other
-   than number zero, let tree_size be the landmark's tree size and
-   prev_tree_size be that of the previous landmark.  As described in
-   Section 4.5, select the two subtrees that cover [prev_tree_size,
-   tree_size).  Each of those subtrees is a landmark subtree.  Landmark
-   zero has no landmark subtrees.
+   The landmark sequence determines _landmark subtrees_ for each
+   landmark: for each landmark L, other than number zero, let tree_size
+   be L's tree size and prev_tree_size be that of L - 1.  The landmark
+   subtrees for L are the two subtrees that cover [prev_tree_size,
+   tree_size), as described in Section 4.5.  Landmark zero has no
+   landmark subtrees.
 
    As the issuance log grows, CAs continuously allocate new landmarks.
    This allocation balances minimizing landmark-relative certificate
@@ -2095,11 +2096,11 @@ Table of Contents
       -  num_active_landmarks <= last_landmark
 
    *  num_active_landmarks + 1 lines each containing a single non-
-      negative decimal integer, containing a tree size.  Numbered from
+      negative decimal integer, representing a tree size.  Numbered from
       zero to num_active_landmarks, line i contains the tree size for
-      landmark last_landmark - i.  The integers MUST be strictly
-      monotonically decreasing and lower or equal to the log's latest
-      tree size.
+      landmark last_landmark - i.  The tree sizes MUST be strictly
+      monotonically decreasing and less than or equal to the log's
+      latest tree size.
 
    It is RECOMMENDED that this format be published as an HTTP resource
    [RFC9110] with content type text/plain; charset=utf-8.
@@ -4556,6 +4557,9 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Add an informative reference to the MTC-TLOG profile (c2sp.org/
       mtc-tlog) and mention it where tile-based logs are discussed.
+
+   *  Clarify that a landmark consists of both a number and a tree size,
+      and that a landmark's subtrees share its landmark number.
 
 Authors' Addresses
 
