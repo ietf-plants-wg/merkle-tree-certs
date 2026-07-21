@@ -1682,6 +1682,14 @@ The relying party can mitigate this in a number of ways:
 
 * A client relying party can send the newer timestamp and, in the event the unreachable CA did issue recent landmark-relative certificates, rely on the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}} to recover from any signaling failures.
 
+#### Universal Timestamped Landmark Group
+
+For the case where a relying party wants to express the active landmarks it has available, without detailing which CAs in particular, we provide the *universal timestamped landmark group* as follows.
+
+* The identifying OID arc of the group is `id-mtc-timestamp` (`44363.47.3`).
+
+* Version `v` of the group expresses that the relying party may be assumed to be up-to-date with active landmarks published before `v` hours after the Epoch.
+
 # ACME Extensions
 
 This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
