@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 21 January 2027                                      Apple Inc.
+Expires: 22 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            20 July 2026
+                                                            21 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 January 2027.
+   This Internet-Draft will expire on 22 January 2027.
 
 Copyright Notice
 
@@ -3025,10 +3025,16 @@ Table of Contents
    succeeds.  This requires using a collision-resistant hash in the
    Merkle Tree construction.
 
-   Log entries contain public key hashes.  It must additionally be
-   computationally infeasible to compute a public key whose hash matches
-   the entry, other than the intended public key.  This also requires a
-   collision-resistant hash.
+   The subject public key is itself also hashed before incorporating
+   into the log.  This hash depends on second-preimage resistance.  To
+   authorize the wrong public key for some existing log entry (e.g. one
+   that describes a target's identity), an attacker must find some other
+   public key with the same hash.  While an attacker able to compute
+   collisions might find two public keys with the same hash, that hash
+   will not be in any existing log entry.  The attacker would need to be
+   authorized to request certification of a new entry with this hash.
+   Such an attacker could only certify colliding pairs of public keys
+   for its own identities.
 
 12.2.  Transparency
 
