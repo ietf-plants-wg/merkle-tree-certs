@@ -1406,7 +1406,8 @@ Table of Contents
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
-   For example, a log ecosystem could use [TLOG-TILES] to serve logs.
+   For example, a log ecosystem could use [TLOG-TILES] to serve logs;
+   [MTC-TLOG] defines such a profile for Merkle Tree Certificates.
    [TLOG-TILES] improves on [RFC6962] and [RFC9162] by exposing the log
    as a collection of cacheable, immutable "tiles".  This works well
    with a variety of common HTTP [RFC9110] serving architectures.  It
@@ -2781,7 +2782,8 @@ Table of Contents
 
    Section 5.2.2 does not constrain the API to the one defined in
    [RFC6962] or [RFC9162].  If the PKI uses a tile-based protocol, such
-   as [TLOG-TILES], the issuance log benefits from the improved caching
+   as [TLOG-TILES] (profiled for Merkle Tree Certificates in
+   [MTC-TLOG]), the issuance log benefits from the improved caching
    properties of such designs.
 
    Unlike a CT log, an issuance log does not have public submission
@@ -3636,6 +3638,9 @@ Table of Contents
    [MerkleTown]
               Cloudflare, Inc., "Merkle Town", 7 March 2023,
               <https://ct.cloudflare.com/>.
+
+   [MTC-TLOG] C2SP, "Merkle Tree Certificates With Tiled Transparency
+              Logs", July 2026, <https://c2sp.org/mtc-tlog>.
 
    [RFC4514]  Zeilenga, K., Ed., "Lightweight Directory Access Protocol
               (LDAP): String Representation of Distinguished Names",
@@ -4549,6 +4554,9 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Make empty subtrees valid, so the subtree covering function always
       returns two subtrees.
+
+   *  Add an informative reference to the MTC-TLOG profile (c2sp.org/
+      mtc-tlog) and mention it where tile-based logs are discussed.
 
    *  Clarify that a landmark consists of both a number and a tree size,
       and that a landmark's subtrees share its landmark number.
