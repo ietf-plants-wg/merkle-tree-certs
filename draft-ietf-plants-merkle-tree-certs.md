@@ -1434,6 +1434,16 @@ Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-r
 
 Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
 
+The procedure above is not specific to the CA. Any party with access to the issuance log, the landmark sequence, and the certificate inputs ({{certificate-inputs}}) can construct a landmark-relative certificate. In particular, a party holding a standalone certificate ({{standalone-certificates}}) can construct a landmark-relative certificate for the corresponding entry as follows:
+
+1. Recover the certificate inputs ({{certificate-inputs}}) from the standalone certificate. The TBSCertificateLogEntry fields and subject public key are those of the standalone certificate, and the log entry's `extensions` are carried in the standalone certificate's MTCProof ({{certificate-format}}). The CA ID is the certificate's issuer ({{ca-ids}}), and the log number and entry index are recovered from the serial number, which is `(log_number << 48) | index` ({{certificate-format}}).
+2. Obtain the CA's landmark sequence, for example from its published active landmarks ({{publishing-landmarks}}).
+3. Construct the landmark-relative certificate by following the construction procedure at the beginning of this section. Produce the required subtree inclusion proof ({{subtree-inclusion-proofs}}) by reading the necessary hashes directly from the issuance log ({{issuance-logs}}); a party that is aware of a mirror of the issuance log MAY read these hashes from the mirror instead. The result copies every field of the standalone certificate except the `signatureValue`, whose MTCProof retains the log entry's `extensions`, sets `start`, `end`, and `inclusion_proof` for the selected landmark subtree, and has an empty `signatures` field.
+
+To use such a certificate, the party configures certificate selection as for any landmark-relative certificate ({{use-in-tls}} describes this for TLS). The certificate's landmark trust anchor ID and its single-log landmark group ({{single-log-landmark-groups}}) follow directly from the CA ID, log number, and landmark number. However, if the PKI also uses trust anchor groups that span multiple CAs, such as timestamped landmark groups ({{timestamped-landmark-groups}}), configuring the corresponding group inclusions requires those groups' definitions and any additional inputs they require; for timestamped landmark groups, this includes the timestamp at which the landmark was allocated, used to select the group version. This information is not derivable from the issuance log and must be obtained out of band.
+
+The CA does not need to perform any per-entry work to enable this: the landmark sequence and inclusion proof hashes are exactly those already published by the issuance log. {{MTC-TLOG}} specifies this construction for log ecosystems based on {{TLOG-TILES}}, including where to fetch the landmark sequence and the inclusion proof hashes.
+
 ## Size Estimates
 
 The inclusion proofs in standalone and landmark-relative certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.
@@ -1710,6 +1720,8 @@ When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients s
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
 The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. It initially serves an HTTP 202 response, as described in {{optional-certificates}}. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the URL.
+
+As an alternative to fetching the landmark-relative certificate from the ACME server, a client with access to the issuance log and the landmark sequence MAY construct it itself from the standalone certificate, as described in {{constructing-landmark-relative-certificates}}.
 
 # Deployment Considerations
 
@@ -2670,3 +2682,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.
 
 - Clarify that a landmark consists of both a number and a tree size, and that a landmark's subtrees share its landmark number.
+
+- Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.
