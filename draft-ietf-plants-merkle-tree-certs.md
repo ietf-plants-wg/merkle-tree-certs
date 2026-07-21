@@ -156,6 +156,13 @@ informative:
     - name: Christopher Patton
     - name: Bas Westerbaan
 
+  MTC-TLOG:
+    title: Merkle Tree Certificates With Tiled Transparency Logs
+    target: https://c2sp.org/mtc-tlog
+    date: July 2026
+    author:
+      org: C2SP
+
   TLOG-TILES:
     title: Tiled Transparency Logs
     target: https://c2sp.org/tlog-tiles
@@ -1062,7 +1069,7 @@ This protocol aims to enable monitors to detect misissued certificates by observ
 
 This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
-For example, a log ecosystem could use {{TLOG-TILES}} to serve logs. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
+For example, a log ecosystem could use {{TLOG-TILES}} to serve logs; {{MTC-TLOG}} defines such a profile for Merkle Tree Certificates. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
 
 ### Log Pruning
 
@@ -1712,7 +1719,7 @@ The standalone certificate response SHOULD additionally carry an "acme-optional-
 
 While Merkle Tree certificates expect CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from {{?RFC6962}} or {{?RFC9162}}:
 
-{{publishing-logs}} does not constrain the API to the one defined in {{?RFC6962}} or {{?RFC9162}}. If the PKI uses a tile-based protocol, such as {{TLOG-TILES}}, the issuance log benefits from the improved caching properties of such designs.
+{{publishing-logs}} does not constrain the API to the one defined in {{?RFC6962}} or {{?RFC9162}}. If the PKI uses a tile-based protocol, such as {{TLOG-TILES}} (profiled for Merkle Tree Certificates in {{MTC-TLOG}}), the issuance log benefits from the improved caching properties of such designs.
 
 Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. Costs are thus expected to scale with the CA's own issuance.
 
@@ -2659,3 +2666,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Fixed one of the accumulated test vectors to better reflect one of the edge cases in subtree covering.
 
 - Make empty subtrees valid, so the subtree covering function always returns two subtrees.
+
+- Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.
