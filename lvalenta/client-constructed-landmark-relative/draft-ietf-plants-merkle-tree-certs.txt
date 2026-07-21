@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 9 January 2027                                       Apple Inc.
+Expires: 22 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             8 July 2026
+                                                            21 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 January 2027.
+   This Internet-Draft will expire on 22 January 2027.
 
 Copyright Notice
 
@@ -194,6 +194,7 @@ Table of Contents
      Since draft-ietf-plants-merkle-tree-certs-02
      Since draft-ietf-plants-merkle-tree-certs-03
      Since draft-ietf-plants-merkle-tree-certs-04
+     Since draft-ietf-plants-merkle-tree-certs-05
    Authors' Addresses
 
 1.  Introduction
@@ -265,9 +266,9 @@ Table of Contents
    capitals, as shown here.
 
    This document additionally uses the TLS presentation language defined
-   in Section 3 of [RFC8446], as well as the notation defined in
+   in Section 3 of [RFC9846], as well as the notation defined in
    Section 2.1.1 of [RFC9162].  It extends the numeric types defined in
-   Section 3.3 of [RFC8446] with a big-endian, 48-bit integer:
+   Section 3.3 of [RFC9846] with a big-endian, 48-bit integer:
 
    uint8 uint48[6];
 
@@ -360,13 +361,13 @@ Table of Contents
    Cosignature:  A signature from either the CA or other cosigner, over
       some checkpoint or subtree.
 
-   Landmark:  One of an infrequent subset of tree sizes that can be used
-      to predistribute trusted subtrees to relying parties for landmark-
-      relative certificates.
+   Landmark:  One of a sequence of tree sizes, infrequently chosen and
+      used to calculate landmark subtrees for predistribution to relying
+      parties.
 
-   Landmark subtree:  A subtree determined by a landmark.  Landmark
-      subtrees are common points of reference between relying parties
-      and landmark-relative certificates.
+   Landmark subtree:  One of the two (possibly empty) subtrees
+      determined by an interval between two landmarks.  Predistributed
+      and used as the basis for landmark-relative certificates.
 
    Standalone certificate:  A certificate containing an inclusion proof
       to some subtree, and several cosignatures over that subtree.
@@ -532,7 +533,7 @@ Table of Contents
        requirements.  This occurs periodically in the background,
        separate from the application protocol.
 
-   4.  During the application protocol, such as TLS [RFC8446], if the
+   4.  During the application protocol, such as TLS [RFC9846], if the
        relying party already supports the landmark subtree, the
        authenticating party can present the landmark-relative
        certificate.  Otherwise, it presents a standalone certificate.
@@ -572,15 +573,17 @@ Table of Contents
    A _subtree_ of this Merkle Tree is itself a Merkle Tree, defined by
    MTH(D[start:end]). start and end are integers such that:
 
-   *  0 <= start < end <= n
+   *  0 <= start <= end <= n
 
    *  start is a multiple of BIT_CEIL(end - start)
 
    The second condition ensures that MTH(D[start:end]), built over
    D[start:end] as an independent list, is sufficiently aligned with the
    original Merkle Tree to support subtree consistency proofs.  See
-   Appendix B.2 for more details.  Note that, if start is zero, this
-   second condition is always true.
+   Appendix B.2 for more details.
+
+   For all x, [0, x) is a valid subtree (0 is a multiple of everything),
+   and [x, x) is a valid subtree (BIT_CEIL(0) is 1).
 
    The _size_ of the subtree is end - start.
 
@@ -794,13 +797,26 @@ Table of Contents
 4.4.1.  Generating a Subtree Consistency Proof
 
    The subtree consistency proof, SUBTREE_PROOF(start, end, D_n) is
-   defined similarly to Section 2.1.4.1 of [RFC9162], in terms of a
-   helper function that tracks whether the subtree hash is known:
+   defined similarly to Section 2.1.4.1 of [RFC9162].
+
+   If start = end, the consistency proof is empty:
+
+   SUBTREE_PROOF(start, start, D_n) = {}
+
+   Otherwise, start < end and SUBTREE_PROOF is defined by a helper
+   function:
 
    SUBTREE_PROOF(start, end, D_n) =
        SUBTREE_SUBPROOF(start, end, D_n, true)
 
-   If start = 0 and end = n, the subtree is the root:
+   The boolean parameter tracks whether the first hash in the proof will
+   be omitted by the base case.  The first hash is omitted when it's
+   equal to the original subtree hash MTH(D[start:end]), since the
+   verifier will already know that hash.  That happens when the original
+   subtree's root is a node in the Merkle Tree constructed from D_n, or
+   equivalently, when the original subtree is full or has end = n.
+
+   If start = 0 and end = n, the subtree is the root (base case):
 
    SUBTREE_SUBPROOF(0, n, D_n, true) = {}
    SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
@@ -938,29 +954,38 @@ Table of Contents
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
        that end <= n.  If either do not hold, fail proof verification.
-       These checks imply 0 <= start < end <= n.
+       These checks imply 0 <= start <= end <= n.
 
-   2.  Set fn to start, sn to end - 1, and tn to n - 1.
+   2.  If start equals end, check the following conditions:
 
-   3.  If sn is tn, then:
+       *  proof is an empty array.
+
+       *  node_hash is equal to HASH(), the hash of the empty string.
+
+       If either condition does not hold, stop and fail the proof
+       verification.  If both hold, stop and accept the proof.
+
+   3.  Set fn to start, sn to end - 1, and tn to n - 1.
+
+   4.  If sn is tn, then:
 
        1.  Until fn is sn, right-shift fn, sn, and tn equally.
 
-   4.  Otherwise:
+   5.  Otherwise:
 
        1.  Until fn is sn or LSB(sn) is not set, right-shift fn, sn, and
            tn equally.
 
-   5.  If fn is sn, set fr and sr to node_hash.
+   6.  If fn is sn, set fr and sr to node_hash.
 
-   6.  Otherwise:
+   7.  Otherwise:
 
        1.  If proof is an empty array, stop and fail verification.
 
        2.  Remove the first value of the proof array and set fr and sr
            to the removed value.
 
-   7.  For each value c in the proof array:
+   8.  For each value c in the proof array:
 
        1.  If tn is 0, then stop the iteration and fail the proof
            verification.
@@ -979,7 +1004,7 @@ Table of Contents
 
        4.  Right-shift fn, sn, and tn once more.
 
-   8.  Compare tn to 0, fr to node_hash, and sr to root_hash.  If any
+   9.  Compare tn to 0, fr to node_hash, and sr to root_hash.  If any
        are not equal, fail the proof verification.  If all are equal,
        accept the proof.
 
@@ -1025,11 +1050,10 @@ Table of Contents
 
 4.5.1.  Selecting Two Subtrees
 
-   This section defines a procedure for selecting up to two subtrees,
-   given any non-empty interval (start < end).  Combined, the subtrees
-   contain [start, end) with bounded excess elements.  The procedure
-   either returns [start, end) as a subtree, or two subtrees, left and
-   right, that satisfy the following properties:
+   This section defines a procedure for selecting two subtrees given any
+   interval.  Combined, the subtrees contain [start, end) with bounded
+   excess elements.  The procedure returns two subtrees, left and right,
+   that satisfy the following properties:
 
    *  The two subtrees cover adjacent intervals.  That is, left.end =
       right.start.
@@ -1039,14 +1063,16 @@ Table of Contents
       extra entries before start.  That is, left.start <= start and end
       = right.end.
 
-   *  The extra entries before start are less than half of left.  That
-      is, start - left.start < left.end - start.
+   *  If the interval is not empty, the extra entries before start are
+      less than half of left.  That is, start - left.start < left.end -
+      start.
 
    The subtrees are selected as follows:
 
-   1.  If end - start is one, return a single subtree, [start, end).
+   1.  If end - start is less than or equal to 1, return the subtrees
+       [start, end) and [end, end).
 
-   2.  Otherwise, run the following to return a pair of subtrees:
+   2.  Otherwise:
 
        1.  Let last be end - 1, the last index in [start, end).
 
@@ -1084,11 +1110,11 @@ Table of Contents
    The following Python code implements this procedure:
 
    def find_subtrees(start, end):
-       """ Returns a list of one or two subtrees that efficiently
-       cover [start, end). """
-       assert start < end
-       if end - start == 1:
-           return [(start, end),]
+       """ Returns a pair of subtrees that efficiently cover
+       [start, end). """
+       assert start <= end
+       if end - start <= 1:
+           return (start, end), (end, end)
        last = end - 1
        # Find where start and last's tree paths diverge. The two
        # subtrees will be on either side of the split.
@@ -1099,7 +1125,7 @@ Table of Contents
        # path leaves the right edge of its new subtree.
        left_split = (~start & mask).bit_length()
        left_start = start & ~((1 << left_split) - 1)
-       return [(left_start, mid), (mid, end)]
+       return (left_start, mid), (mid, end)
 
    Figure 10 shows the subtrees which cover [5, 13) in a Merkle Tree of
    13 elements in wavy lines.  The two subtrees selected are [4, 8) and
@@ -1258,32 +1284,32 @@ Table of Contents
 
 5.2.1.  Log Entries
 
-   Each entry in the log is a MerkleTreeCertEntry, defined with the TLS
-   presentation syntax below.  A MerkleTreeCertEntry describes
-   certificate information that the CA has validated and certified.
+   Each entry in the log is an MTCLogEntry, defined with the TLS
+   presentation syntax below.  An MTCLogEntry describes certificate
+   information that the CA has validated and certified.
 
    struct {} Empty;
 
-   enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
+   enum { (2^16-1) } MTCLogEntryExtensionType;
 
    struct {
-       MerkleTreeCertEntryExtensionType extension_type;
+       MTCLogEntryExtensionType extension_type;
        opaque extension_data<0..2^16-1>;
-   } MerkleTreeCertEntryExtension;
+   } MTCLogEntryExtension;
 
    enum {
        null_entry(0), tbs_cert_entry(1), (2^16-1)
-   } MerkleTreeCertEntryType;
+   } MTCLogEntryType;
 
    struct {
-       MerkleTreeCertEntryExtension extensions<0..2^16-1>;
-       MerkleTreeCertEntryType type;
+       MTCLogEntryExtension extensions<0..2^16-1>;
+       MTCLogEntryType type;
        select (type) {
           case null_entry: Empty;
           case tbs_cert_entry: opaque tbs_cert_entry_data[N];
           /* May be extended with future types. */
        }
-   } MerkleTreeCertEntry;
+   } MTCLogEntry;
 
    Field extensions is the list of tag-length-value extensions
    associated with the log entry.  The extensions list MUST be appear in
@@ -1295,8 +1321,8 @@ Table of Contents
    null_entry.
 
    When type is tbs_cert_entry, N is the number of bytes needed to
-   consume the rest of the input.  A MerkleTreeCertEntry is expected to
-   be decoded in contexts where the total length of the entry is known.
+   consume the rest of the input.  An MTCLogEntry is expected to be
+   decoded in contexts where the total length of the entry is known.
 
    tbs_cert_entry_data contains the contents octets (i.e. excluding the
    initial identifier and length octets) of the DER [X.690] encoding of
@@ -1353,16 +1379,16 @@ Table of Contents
    Note the subject's public key algorithm is incorporated into both
    subjectPublicKeyAlgorithm and subjectPublicKeyInfoHash.
 
-   MerkleTreeCertEntry is an extensible structure.  Future documents may
-   define new values for MerkleTreeCertEntryType or
-   MerkleTreeCertEntryExtensionType, with corresponding semantics.  See
-   Section 5.4 and Section 12.5 for additional discussion.
+   MTCLogEntry is an extensible structure.  Future documents may define
+   new values for MTCLogEntryType or MTCLogEntryExtensionType, with
+   corresponding semantics.  See Section 5.4 and Section 12.5 for
+   additional discussion.
 
-   A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2^16-1) bytes.
-   Doing so may exceed size limits in common log-serving protocols, such
-   as [TLOG-TILES].  TBSCertificateLogEntry does not include signatures
-   and hashes public keys, so post-quantum algorithms do not contribute
-   to this size.
+   An MTCLogEntry's size SHOULD NOT exceed 65535 (2^16-1) bytes.  Doing
+   so may exceed size limits in common log-serving protocols, such as
+   [TLOG-TILES].  TBSCertificateLogEntry does not include signatures and
+   hashes public keys, so post-quantum algorithms do not contribute to
+   this size.
 
 5.2.2.  Publishing Logs
 
@@ -1541,7 +1567,7 @@ Table of Contents
 
    A cosigner computes a _subtree signature_ for a subtree in a log by
    signing a CosignedMessage, defined below using the TLS presentation
-   language (Section 3 of [RFC8446]):
+   language (Section 3 of [RFC9846]):
 
    opaque HashValue[HASH_SIZE];
 
@@ -1748,9 +1774,6 @@ Table of Contents
        CRITICALITY TRUE
    }
 
-   -- From draft-ietf-tls-trust-anchor-ids
-   TrustAnchorID ::= RELATIVE-OID
-
    -- This is 2^64-1, the maximum possible serial number in this protocol.
    mtcMaxSerial INTEGER ::= 18446744073709551615
 
@@ -1765,7 +1788,7 @@ Table of Contents
    will use the OID 1.3.6.1.4.1.44363.47.2 instead of id-pe-
    mtcCertificationAuthority.
 
-   The fields of a MTCCertificationAuthority structure are defined as
+   The fields of an MTCCertificationAuthority structure are defined as
    follows:
 
    *  logHash describes the hash algorithm used by all logs operated by
@@ -1809,10 +1832,14 @@ Table of Contents
 
    *  A subject public key whose hash matches the TBSCertificateLogEntry
 
-   *  A subtree (Section 4) that contains the log entry
+   *  The log_number and the zero-based entry index of that log entry
+      within the issuance log, used to construct the certificate's
+      serialNumber (Section 6.2).
 
-   *  Zero or more signatures (Section 5.3) over the subtree, which
-      together satisfy relying party requirements (Section 7.3)
+   *  An MTCProof (Section 6.2) proving the entry's inclusion in a
+      subtree, along with zero or more signatures (Section 5.3) over
+      that subtree, which together satisfy relying party requirements
+      (Section 7.3)
 
    For any given TBSCertificateLogEntry, there are multiple possible
    certificates that may prove the entry is certified by the CA and
@@ -1860,7 +1887,7 @@ Table of Contents
    will use the OID 1.3.6.1.4.1.44363.47.0 instead of id-alg-mtcProof.
 
    The signatureValue contains an MTCProof structure, defined below
-   using the TLS presentation language (Section 3 of [RFC8446]):
+   using the TLS presentation language (Section 3 of [RFC9846]):
 
    /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
    opaque TrustAnchorID<1..2^8-1>;
@@ -1873,7 +1900,7 @@ Table of Contents
    } MTCSignature;
 
    struct {
-       MerkleTreeCertEntryExtension extensions<0..2^16-1>;
+       MTCLogEntryExtension extensions<0..2^16-1>;
        uint48 start;
        uint48 end;
        HashValue inclusion_proof<0..2^16-1>;
@@ -1979,7 +2006,7 @@ Table of Contents
    SHOULD deploy a corresponding standalone certificate alongside any
    landmark-relative certificate, and use some application-protocol-
    specific mechanism to select between the two.  Section 8 discusses
-   such a mechanism for TLS [RFC8446].
+   such a mechanism for TLS [RFC9846].
 
 6.4.1.  Landmark Tree Sizes
 
@@ -1989,16 +2016,16 @@ Table of Contents
    Each landmark consists of a number, used as an identifier for the
    landmark, and a tree size, used as a common point of reference across
    the ecosystem for optimizing certificates.  Landmarks are numbered
-   consecutively from zero.  The first landmark, numbered zero, MUST
-   have a tree size of zero.  The sequence of tree sizes MUST be append-
-   only and strictly monotonically increasing.
+   consecutively from zero.  Landmark zero MUST have a tree size of
+   zero.  The sequence of tree sizes MUST be append-only and strictly
+   monotonically increasing.
 
    The landmark sequence determines _landmark subtrees_ for each
    landmark: for each landmark L, other than number zero, let tree_size
    be L's tree size and prev_tree_size be that of L - 1.  The landmark
-   subtrees for L are the one or two subtrees that cover
-   [prev_tree_size, tree_size), as described in Section 4.5.  Landmark
-   zero has no landmark subtrees.
+   subtrees for L are the two subtrees that cover [prev_tree_size,
+   tree_size), as described in Section 4.5.  Landmark zero has no
+   landmark subtrees.
 
    As the issuance log grows, CAs continuously allocate new landmarks.
    This allocation balances minimizing landmark-relative certificate
@@ -2012,7 +2039,7 @@ Table of Contents
    only active landmarks contain unexpired certificates.  The active
    landmark subtrees are those determined by the active landmarks.
    There are at most 2 * max_active_landmarks active landmark subtrees
-   at any time.  Every unexpired entry will be contained in one or more
+   at any time.  Every unexpired entry will be contained in at least one
    landmark subtree, or between the last landmark subtree and the latest
    checkpoint.  Active landmark subtrees are predistributed to the
    relying party as trusted subtrees, as described in Section 7.4.
@@ -2069,9 +2096,9 @@ Table of Contents
       -  num_active_landmarks <= last_landmark
 
    *  num_active_landmarks + 1 lines each containing a single non-
-      negative decimal integer, containing a tree size.  Numbered from
+      negative decimal integer, representing a tree size.  Numbered from
       zero to num_active_landmarks, line i contains the tree size for
-      landmark last_landmark - i.  The integers MUST be strictly
+      landmark last_landmark - i.  The tree sizes MUST be strictly
       monotonically decreasing and less than or equal to the log's
       latest tree size.
 
@@ -2083,18 +2110,11 @@ Table of Contents
    Given the inputs in Section 6.1 and a landmark sequence, a landmark-
    relative certificate is constructed as follows:
 
-   1.  Let L be the smallest landmark number in the active window whose
-       tree size is strictly greater than the entry index i.  Because
-       the landmark sequence is strictly monotonically increasing, L -
-       1's tree size is less than or equal to i.  If no such L has been
-       allocated yet (i is greater than or equal to last_landmark's tree
-       size), wait for one to be allocated.  If every landmark that once
-       covered the entry is no longer in the active window
-       (last_landmark - num_active_landmarks's tree size is greater than
-       i), abort this process.
+   1.  Wait for the first landmark to be allocated that contains the
+       entry.
 
-   2.  Determine landmark L's subtrees (Section 6.4.1) and select the
-       unique one whose [start, end) interval contains i.
+   2.  Determine the landmark's subtrees and select the one that
+       contains the entry.
 
    3.  Construct a certificate (Section 6.2) using the selected subtree
        and no signatures.
@@ -2105,14 +2125,14 @@ Table of Contents
    (Section 7.4 defines how relying parties are configured.)  The trust
    anchor ID of the landmark may be used as an efficient identifier in
    the application protocol.  Section 8 discusses how to do this in TLS
-   [RFC8446].
+   [RFC9846].
 
    The procedure above is not specific to the CA.  Any party with access
-   to the certificate inputs (Section 6.1), the issuance log, and its
-   landmark sequence can construct a landmark-relative certificate.  In
-   particular, a party holding a standalone certificate (Section 6.3)
-   for an entry can construct a landmark-relative certificate for the
-   same entry, without any CA-specific issuance service, as follows:
+   to the issuance log, the landmark sequence, and the certificate
+   inputs (Section 6.1) can construct a landmark-relative certificate.
+   In particular, a party holding a standalone certificate (Section 6.3)
+   can construct a landmark-relative certificate for the corresponding
+   entry as follows:
 
    1.  Recover the certificate inputs (Section 6.1) from the standalone
        certificate.  The TBSCertificateLogEntry fields and subject
@@ -2126,17 +2146,16 @@ Table of Contents
    2.  Obtain the CA's landmark sequence, for example from its published
        active landmarks (Section 6.4.3).
 
-   3.  Produce the subtree inclusion proof (Section 4.3) by reading the
-       necessary hashes directly from the issuance log (Section 5.2).  A
+   3.  Construct the landmark-relative certificate by following the
+       construction procedure at the beginning of this section.  Produce
+       the required subtree inclusion proof (Section 4.3) by reading the
+       necessary hashes directly from the issuance log (Section 5.2); a
        party that is aware of a mirror of the issuance log MAY read
-       these hashes from the mirror instead.
-
-   4.  Construct the landmark-relative certificate following the steps
-       above, selecting the landmark subtree that covers the entry and
-       using no signatures.  The result copies every field of the
-       standalone certificate except the signatureValue: its MTCProof
-       instead describes the selected landmark subtree and its inclusion
-       proof, and has an empty signatures field.
+       these hashes from the mirror instead.  The result copies every
+       field of the standalone certificate except the signatureValue,
+       whose MTCProof retains the log entry's extensions, sets start,
+       end, and inclusion_proof for the selected landmark subtree, and
+       has an empty signatures field.
 
    To use such a certificate, the party configures certificate selection
    as for any landmark-relative certificate (Section 8 describes this
@@ -2145,11 +2164,11 @@ Table of Contents
    log number, and landmark number.  However, if the PKI also uses trust
    anchor groups that span multiple CAs, such as timestamped landmark
    groups (Section 8.2.2), configuring the corresponding group
-   inclusions requires those groups' definitions and any inputs they
-   entail; for timestamped landmark groups, this includes the timestamp
-   at which the landmark was allocated, used to select the group
-   version.  This information is not derivable from the issuance log and
-   must be obtained out of band.
+   inclusions requires those groups' definitions and any additional
+   inputs they require; for timestamped landmark groups, this includes
+   the timestamp at which the landmark was allocated, used to select the
+   group version.  This information is not derivable from the issuance
+   log and must be obtained out of band.
 
    The CA does not need to perform any per-entry work to enable this:
    the landmark sequence and inclusion proof hashes are exactly those
@@ -2292,7 +2311,7 @@ Table of Contents
         3.  Set subjectPublicKeyInfoHash to the hash of the DER encoding
             of subjectPublicKeyInfo.
 
-   8.   Construct a MerkleTreeCertEntry as follows:
+   8.   Construct an MTCLogEntry as follows:
 
         1.  Set type to tbs_cert_entry.
 
@@ -2344,7 +2363,7 @@ Table of Contents
 
    In this procedure, entry_hash can equivalently be computed in a
    single pass from the DER-encoded TBSCertificate, without storing the
-   full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
+   full TBSCertificateLogEntry or MTCLogEntry in memory:
 
    1.   Initialize a hash instance.
 
@@ -2496,7 +2515,7 @@ Table of Contents
    mechanisms, to allow an authenticating party to select a landmark-
    relative certificate.  The trust anchor IDs of the landmarks may be
    used as efficient identifiers in the application protocol.  Section 8
-   discusses how to do this in TLS [RFC8446].
+   discusses how to do this in TLS [RFC9846].
 
 7.5.  Revoked Ranges
 
@@ -2564,14 +2583,14 @@ Table of Contents
    *  What the relying party should communicate to the authenticating
       party to help it make this decision
 
-   Certificate selection in TLS, described in Section 4.4.2.2 and
-   Section 4.4.2.3 of [RFC8446], incorporates both explicit relying-
-   party-provided information in the ClientHello and CertificateRequest
-   messages and implicit deployment-specific assumptions.  This section
-   describes a RECOMMENDED integration of Merkle Tree certificates into
-   TLS trust anchor IDs ([I-D.ietf-tls-trust-anchor-ids]), but
-   applications MAY use application-specific criteria in addition to, or
-   instead of, this recommendation.
+   Certificate selection in TLS, described in Section 4.5.1.2 of
+   [RFC9846], incorporates both explicit relying-party-provided
+   information in the ClientHello and CertificateRequest messages and
+   implicit deployment-specific assumptions.  This section describes a
+   RECOMMENDED integration of Merkle Tree certificates into TLS trust
+   anchor IDs ([I-D.ietf-tls-trust-anchor-ids]), but applications MAY
+   use application-specific criteria in addition to, or instead of, this
+   recommendation.
 
 8.1.  Standalone Certificates
 
@@ -2803,8 +2822,7 @@ Table of Contents
    As an alternative to fetching the landmark-relative certificate from
    the ACME server, a client with access to the issuance log and the
    landmark sequence MAY construct it itself from the standalone
-   certificate, as described in Section 6.4.4.  [MTC-TLOG] describes a
-   concrete procedure for log ecosystems based on [TLOG-TILES].
+   certificate, as described in Section 6.4.4.
 
 10.  Deployment Considerations
 
@@ -3064,10 +3082,16 @@ Table of Contents
    succeeds.  This requires using a collision-resistant hash in the
    Merkle Tree construction.
 
-   Log entries contain public key hashes.  It must additionally be
-   computationally infeasible to compute a public key whose hash matches
-   the entry, other than the intended public key.  This also requires a
-   collision-resistant hash.
+   The subject public key is itself also hashed before incorporating
+   into the log.  This hash depends on second-preimage resistance.  To
+   authorize the wrong public key for some existing log entry (e.g. one
+   that describes a target's identity), an attacker must find some other
+   public key with the same hash.  While an attacker able to compute
+   collisions might find two public keys with the same hash, that hash
+   will not be in any existing log entry.  The attacker would need to be
+   authorized to request certification of a new entry with this hash.
+   Such an attacker could only certify colliding pairs of public keys
+   for its own identities.
 
 12.2.  Transparency
 
@@ -3241,15 +3265,15 @@ Table of Contents
 
 12.5.  Extensibility
 
-   MerkleTreeCertEntry (Section 5.2.1) contain several extension points:
+   MTCLogEntry (Section 5.2.1) contain several extension points:
 
    *  New X.509 extensions can be added to TBSCertificateLogEntry.
 
-   *  New MerkleTreeCertEntryType values define new formats for the
-      entry contents.
+   *  New MTCLogEntryType values define new formats for the entry
+      contents.
 
-   *  New MerkleTreeCertEntryExtensionType values define new entry
-      extension fields.
+   *  New MTCLogEntryExtensionType values define new entry extension
+      fields.
 
    X.509 extensions apply to Merkle Tree Certificates without any
    modifications.  The two entry-level extension points are new to this
@@ -3269,10 +3293,10 @@ Table of Contents
    operated X.509 CA can never sign an unrecognized X.509 extension.
 
    Unrecognized entry types do not impact older relying parties.  In
-   Section 7.2, the relying party constructs the MerkleTreeCertEntry
-   that it expects.  The unrecognized entry will have a different type
-   value, so the proof will never succeed, assuming the underlying hash
-   function remains collision-resistant.
+   Section 7.2, the relying party constructs the MTCLogEntry that it
+   expects.  The unrecognized entry will have a different type value, so
+   the proof will never succeed, assuming the underlying hash function
+   remains collision-resistant.
 
    However, unrecognized entry extensions will be ignored by relying
    parties, analogously to a non-critical X.509 extension.  Entry
@@ -3294,7 +3318,7 @@ Table of Contents
    An ASN.1 structure like X.509’s Certificate is an abstract data type
    that is independent of its serialization.  There are multiple
    encoding rules for ASN.1.  Commonly, protocols use DER [X.690], such
-   as Section 4.4.2 of [RFC8446].  This aligns with Section 4.1.1.3 of
+   as Section 4.5.1 of [RFC9846].  This aligns with Section 4.1.1.3 of
    [RFC5280], which says X.509 signatures are computed over the DER-
    encoded TBSCertificate.  After signature verification, applications
    can assume the DER-encoded TBSCertificate is not malleable.
@@ -3360,12 +3384,12 @@ Table of Contents
    These additional checks are redundant in X.509 implementations that
    use a conforming DER parser.
 
-   Section 5.2.1 requires that the TBSCertificateLogEntry in a
-   MerkleTreeCertEntry be DER-encoded, so applying a stricter parser
-   will be compatible with conforming CAs.  While these existing non-
-   conforming implementations may be unable to switch to a DER parser
-   due to compatibility concerns, Merkle Tree Certificates are new, so
-   there is no existing deployment of malformed BER-encoded
+   Section 5.2.1 requires that the TBSCertificateLogEntry in an
+   MTCLogEntry be DER-encoded, so applying a stricter parser will be
+   compatible with conforming CAs.  While these existing non-conforming
+   implementations may be unable to switch to a DER parser due to
+   compatibility concerns, Merkle Tree Certificates are new, so there is
+   no existing deployment of malformed BER-encoded
    TBSCertificateLogEntry structures.
 
    The above only ensures the TBSCertificate portion is non-malleable.
@@ -3570,10 +3594,6 @@ Table of Contents
               DOI 10.17487/RFC8288, October 2017,
               <https://www.rfc-editor.org/rfc/rfc8288>.
 
-   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
-              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
-              <https://www.rfc-editor.org/rfc/rfc8446>.
-
    [RFC8555]  Barnes, R., Hoffman-Andrews, J., McCarney, D., and J.
               Kasten, "Automatic Certificate Management Environment
               (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
@@ -3587,6 +3607,10 @@ Table of Contents
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
+
+   [RFC9846]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 9846, DOI 10.17487/RFC9846, July 2026,
+              <https://www.rfc-editor.org/rfc/rfc9846>.
 
    [RFC9881]  Massimo, J., Kampanakis, P., Turner, S., and B. E.
               Westerbaan, "Internet X.509 Public Key Infrastructure --
@@ -3670,7 +3694,7 @@ Table of Contents
               <https://ct.cloudflare.com/>.
 
    [MTC-TLOG] C2SP, "Merkle Tree Certificates With Tiled Transparency
-              Logs", June 2026, <https://c2sp.org/mtc-tlog>.
+              Logs", July 2026, <https://c2sp.org/mtc-tlog>.
 
    [RFC4514]  Zeilenga, K., Ed., "Lightweight Directory Access Protocol
               (LDAP): String Representation of Distinguished Names",
@@ -4163,9 +4187,10 @@ B.5.  Consistency Proof Verification
 
    The procedure in Section 4.4.3 is structured similarly to inclusion
    proof evaluation (Appendix B.3).  It iteratively builds two hashes,
-   fr and sr, which are expected to equal node_hash and root_hash,
-   respectively.  Everything hashed into fr is also hashed into sr, so
-   success demonstrates that root_hash contains node_hash.
+   fr (first root) and sr (second root), which are expected to equal
+   node_hash and root_hash, respectively.  Everything hashed into fr is
+   also hashed into sr, so success demonstrates that root_hash contains
+   node_hash.
 
    Step 2 initializes fn (first number), sn (second number), and tn
    (third number) to follow, respectively, the paths to start, end - 1
@@ -4227,34 +4252,34 @@ Appendix C.  Subtree Test Vectors
 
 C.1.  Subtree Hashes
 
-   For each value of end from 1 to 130, and each value of start from 0
-   to end - 1, if [start, end) is a valid subtree, add to the rolling
-   hash the ASCII string [START, END) HASH followed by a newline
-   (U+000A), where START and END are the decimal representations of
-   start and end, respectively, and HASH is the hexadecimal encoding of
+   For each value of end from 0 to 130, and each value of start from 0
+   to end, if [start, end) is a valid subtree, add to the rolling hash
+   the ASCII string [START, END) HASH followed by a newline (U+000A),
+   where START and END are the decimal representations of start and end,
+   respectively, and HASH is the hexadecimal encoding of
    MTH(D[start:end]), according to Section 4.
 
    The final hash value is
 
-   94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+   b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81
 
    In Python, this can be expressed as:
 
    import hashlib
    h = hashlib.sha256()
-   for end in range(1, 131):
-       for start in range(end):
+   for end in range(0, 131):
+       for start in range(end + 1):
            if valid_subtree(start, end):
                subtree_hash = MTH(D[start:end])
                h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
-   assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+   assert h.hexdigest() == 'b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81'
 
 C.2.  Subtree Inclusion Proofs
 
-   For each value of end from 1 to 130, and each value of start from 0
-   to end - 1, if [start, end) is a valid subtree, for each value of
-   index from start to end - 1, add to the rolling hash the ASCII string
-   INDEX [START, END), then, for each hash in the inclusion proof
+   For each value of end from 0 to 130, and each value of start from 0
+   to end, if [start, end) is a valid subtree, for each value of index
+   from start to end - 1, add to the rolling hash the ASCII string INDEX
+   [START, END), then, for each hash in the inclusion proof
    (Section 4.3) for d[index] in the subtree [start, end), a space
    (U+0020) followed by the hexadecimal encoding of that hash, and
    finally a newline (U+000A), where INDEX is the decimal representation
@@ -4269,8 +4294,8 @@ C.2.  Subtree Inclusion Proofs
 
    import hashlib
    h = hashlib.sha256()
-   for end in range(1, 131):
-       for start in range(end):
+   for end in range(0, 131):
+       for start in range(end + 1):
            if valid_subtree(start, end):
                for index in range(start, end):
                    inclusion_proof = get_inclusion_proof(D, start, end, index)
@@ -4282,8 +4307,8 @@ C.2.  Subtree Inclusion Proofs
 
 C.3.  Subtree Consistency Proofs
 
-   For each value of n from 0 to 130, and each value of end from 1 to n,
-   and each value of start from 0 to end - 1, if [start, end) is a valid
+   For each value of n from 0 to 130, and each value of end from 0 to n,
+   and each value of start from 0 to end, if [start, end) is a valid
    subtree, add to the rolling hash the ASCII string [START, END) N,
    then, for each hash in the consistency proof (Section 4.4) for the
    subtree [start, end) and tree of size n, a space (U+0020) followed by
@@ -4294,56 +4319,46 @@ C.3.  Subtree Consistency Proofs
 
    The final hash value is
 
-   c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+   10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74
 
    In Python, this can be expressed as:
 
    import hashlib
    h = hashlib.sha256()
    for n in range(131):
-       for end in range(1, n + 1):
-           for start in range(end):
+       for end in range(0, n + 1):
+           for start in range(end + 1):
                if valid_subtree(start, end):
                    consistency_proof = get_consistency_proof(D, n, start, end)
                    line = f'[{start}, {end}) {n}'
                    for p in consistency_proof:
                        line += f' {p.hex()}'
                    h.update(f'{line}\n'.encode())
-   assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+   assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74'
 
 C.4.  Efficient Covering Subtrees
 
-   For each value of end from 1 to 130, and each value of start from 0
-   to end - 1:
-
-   *  if [start, end) is a valid subtree, add to the rolling hash the
-      ASCII string [START, END) followed by a newline (U+000A), where
-      START and END are the decimal representations of start and end,
-      respectively;
-
-   *  otherwise, add to the rolling hash the ASCII string [LEFT_START,
-      LEFT_END) [RIGHT_START, RIGHT_END) followed by a newline (U+000A),
-      where LEFT_START, LEFT_END, RIGHT_START, and RIGHT_END are the
-      decimal representations of the start and end of the left and right
-      subtrees, respectively, that efficiently cover (Section 4.5)
-      [start, end).
+   For each value of end from 0 to 130, and each value of start from 0
+   to end, add to the rolling hash the ASCII string [LEFT_START,
+   LEFT_END) [RIGHT_START, RIGHT_END) followed by a newline (U+000A),
+   where LEFT_START, LEFT_END, RIGHT_START, and RIGHT_END are the
+   decimal representations of the start and end of the left and right
+   subtrees, respectively, that efficiently cover (Section 4.5) [start,
+   end).
 
    The final hash value is
 
-   e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
+   7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0
 
    In Python, this can be expressed as:
 
    import hashlib
    h = hashlib.sha256()
-   for end in range(1, 131):
-       for start in range(end):
-           if valid_subtree(start, end):
-               h.update(f'[{start}, {end})\n'.encode())
-           else:
-               left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
-               h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
-   assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
+   for end in range(0, 131):
+       for start in range(end + 1):
+           left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+           h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+   assert h.hexdigest() == '7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0'
 
 Acknowledgements
 
@@ -4581,6 +4596,27 @@ Since draft-ietf-plants-merkle-tree-certs-04
       HTTP status code
 
    *  Add a maxSerial field to the CA format
+
+Since draft-ietf-plants-merkle-tree-certs-05
+
+   *  Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be
+      consistent with MTCProof, shorter, and help disambiguate the many
+      English meanings of "entry"
+
+   *  Fixed one of the accumulated test vectors to better reflect one of
+      the edge cases in subtree covering.
+
+   *  Make empty subtrees valid, so the subtree covering function always
+      returns two subtrees.
+
+   *  Add an informative reference to the MTC-TLOG profile (c2sp.org/
+      mtc-tlog) and mention it where tile-based logs are discussed.
+
+   *  Clarify that a landmark consists of both a number and a tree size,
+      and that a landmark's subtrees share its landmark number.
+
+   *  Describe how a party holding a standalone certificate can
+      construct the corresponding landmark-relative certificate itself.
 
 Authors' Addresses
 

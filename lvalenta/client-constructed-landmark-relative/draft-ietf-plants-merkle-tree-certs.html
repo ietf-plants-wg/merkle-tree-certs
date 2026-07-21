@@ -24,7 +24,7 @@
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.0
+    platformdirs 4.10.1
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 9 January 2027</td>
+<td class="center">Expires 22 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-08" class="published">8 July 2026</time>
+<time datetime="2026-07-21" class="published">21 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-09">9 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-22">22 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1547,6 +1547,9 @@ svg {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.16">
                 <p id="section-toc.1-1.19.2.16.1"><a href="#appendix-E.16" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-04</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.17">
+                <p id="section-toc.1-1.19.2.17.1"><a href="#appendix-E.17" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-t" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-05</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
@@ -1590,7 +1593,7 @@ svg {
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span>
 when, and only when, they appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">This document additionally uses the TLS presentation language defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, as well as the notation defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. It extends the numeric types defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> with a big-endian, 48-bit integer:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document additionally uses the TLS presentation language defined in <span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, as well as the notation defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. It extends the numeric types defined in <span><a href="https://rfc-editor.org/rfc/rfc9846#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span> with a big-endian, 48-bit integer:<a href="#section-2-2" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-2-3">
 <pre>
 uint8 uint48[6];
@@ -1688,12 +1691,12 @@ uint8 uint48[6];
           <dd class="break"></dd>
 <dt id="section-2.1-4.13">Landmark:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.14">
-            <p id="section-2.1-4.14.1">One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for landmark-relative certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.14.1">One of a sequence of tree sizes, infrequently chosen and used to calculate landmark subtrees for predistribution to relying parties.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.15">Landmark subtree:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.16">
-            <p id="section-2.1-4.16.1">A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and landmark-relative certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.16.1">One of the two (possibly empty) subtrees determined by an interval between two landmarks. Predistributed and used as the basis for landmark-relative certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.17">Standalone certificate:</dt>
@@ -2019,7 +2022,7 @@ uint8 uint48[6];
           <p id="section-3-9.3.1">In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.<a href="#section-3-9.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.4">
-          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
@@ -2042,16 +2045,17 @@ uint8 uint48[6];
 <p id="section-4.1-2">A <em>subtree</em> of this Merkle Tree is itself a Merkle Tree, defined by <code>MTH(D[start:end])</code>. <code>start</code> and <code>end</code> are integers such that:<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4.1-3.1">
-            <p id="section-4.1-3.1.1"><code>0 &lt;= start &lt; end &lt;= n</code><a href="#section-4.1-3.1.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-3.1.1"><code>0 &lt;= start &lt;= end &lt;= n</code><a href="#section-4.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.1-3.2">
             <p id="section-4.1-3.2.1"><code>start</code> is a multiple of <code>BIT_CEIL(end - start)</code><a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-4.1-4">The second condition ensures that <code>MTH(D[start:end])</code>, built over <code>D[start:end]</code> as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See <a href="#subtrees-explain" class="auto internal xref">Appendix B.2</a> for more details. Note that, if <code>start</code> is zero, this second condition is always true.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
-<p id="section-4.1-5">The <em>size</em> of the subtree is <code>end - start</code>.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
-<p id="section-4.1-6">In the context of a single Merkle Tree, this document denotes subtree <code>MTH(D[start:end])</code> by half-open interval <code>[start, end)</code>. It contains the entries whose indices are in that half-open interval.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
-<p id="section-4.1-7">As a Merkle Tree grows, its subtrees remain unchanged. That is, if <code>end &lt;= m &lt;= n</code>, the subtree <code>[start, end)</code> of <code>MTH(D[0:m])</code> and the subtree <code>[start, end)</code> of <code>MTH(D_n)</code> are both valid and identical.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">The second condition ensures that <code>MTH(D[start:end])</code>, built over <code>D[start:end]</code> as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See <a href="#subtrees-explain" class="auto internal xref">Appendix B.2</a> for more details.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">For all <code>x</code>, <code>[0, x)</code> is a valid subtree (0 is a multiple of everything), and <code>[x, x)</code> is a valid subtree (<code>BIT_CEIL(0)</code> is 1).<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1-6">The <em>size</em> of the subtree is <code>end - start</code>.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
+<p id="section-4.1-7">In the context of a single Merkle Tree, this document denotes subtree <code>MTH(D[start:end])</code> by half-open interval <code>[start, end)</code>. It contains the entries whose indices are in that half-open interval.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
+<p id="section-4.1-8">As a Merkle Tree grows, its subtrees remain unchanged. That is, if <code>end &lt;= m &lt;= n</code>, the subtree <code>[start, end)</code> of <code>MTH(D[0:m])</code> and the subtree <code>[start, end)</code> of <code>MTH(D_n)</code> are both valid and identical.<a href="#section-4.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-subtrees">
@@ -2730,63 +2734,71 @@ Otherwise:<a href="#section-4.3.2-2.4.2.2.3" class="pilcrow">¶</a></p>
           <h4 id="name-generating-a-subtree-consis">
 <a href="#section-4.4.1" class="section-number selfRef">4.4.1. </a><a href="#name-generating-a-subtree-consis" class="section-name selfRef">Generating a Subtree Consistency Proof</a>
           </h4>
-<p id="section-4.4.1-1">The subtree consistency proof, <code>SUBTREE_PROOF(start, end, D_n)</code> is defined similarly to <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4.1" class="relref">Section 2.1.4.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, in terms of a helper function that tracks whether the subtree hash is known:<a href="#section-4.4.1-1" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-2">
+<p id="section-4.4.1-1">The subtree consistency proof, <code>SUBTREE_PROOF(start, end, D_n)</code> is defined similarly to <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4.1" class="relref">Section 2.1.4.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-4.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-2">If <code>start = end</code>, the consistency proof is empty:<a href="#section-4.4.1-2" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-3">
+<pre>
+SUBTREE_PROOF(start, start, D_n) = {}
+</pre><a href="#section-4.4.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-4.4.1-4">Otherwise, <code>start &lt; end</code> and <code>SUBTREE_PROOF</code> is defined by a helper function:<a href="#section-4.4.1-4" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-5">
 <pre>
 SUBTREE_PROOF(start, end, D_n) =
     SUBTREE_SUBPROOF(start, end, D_n, true)
-</pre><a href="#section-4.4.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-5" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4.1-3">If <code>start = 0</code> and <code>end = n</code>, the subtree is the root:<a href="#section-4.4.1-3" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-4">
+<p id="section-4.4.1-6">The boolean parameter tracks whether the first hash in the proof will be omitted by the base case. The first hash is omitted when it's equal to the original subtree hash <code>MTH(D[start:end])</code>, since the verifier will already know that hash. That happens when the original subtree's root is a node in the Merkle Tree constructed from <code>D_n</code>, or equivalently, when the original subtree is full or has <code>end = n</code>.<a href="#section-4.4.1-6" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-7">If <code>start = 0</code> and <code>end = n</code>, the subtree is the root (base case):<a href="#section-4.4.1-7" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-8">
 <pre>
 SUBTREE_SUBPROOF(0, n, D_n, true) = {}
 SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
-</pre><a href="#section-4.4.1-4" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-8" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4.1-5">Otherwise, <code>n &gt; 1</code>. Let <code>k</code> be the largest power of two smaller than <code>n</code>. The consistency proof is defined recursively as:<a href="#section-4.4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-9">Otherwise, <code>n &gt; 1</code>. Let <code>k</code> be the largest power of two smaller than <code>n</code>. The consistency proof is defined recursively as:<a href="#section-4.4.1-9" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.4.1-6.1">
-              <p id="section-4.4.1-6.1.1">If <code>end &lt;= k</code>, the subtree is on the left of <code>k</code>. The proof proves consistency with the left child and includes the right child:<a href="#section-4.4.1-6.1.1" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-6.1.2">
+<li class="normal" id="section-4.4.1-10.1">
+              <p id="section-4.4.1-10.1.1">If <code>end &lt;= k</code>, the subtree is on the left of <code>k</code>. The proof proves consistency with the left child and includes the right child:<a href="#section-4.4.1-10.1.1" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-10.1.2">
 <pre>
 SUBTREE_SUBPROOF(start, end, D_n, b) =
     SUBTREE_SUBPROOF(start, end, D[0:k], b) : MTH(D[k:n])
-</pre><a href="#section-4.4.1-6.1.2" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-10.1.2" class="pilcrow">¶</a>
 </div>
 </li>
-            <li class="normal" id="section-4.4.1-6.2">
-              <p id="section-4.4.1-6.2.1">If <code>k &lt;= start</code>, the subtree is on the right of <code>k</code>. The proof proves consistency with the right child and includes the left child.<a href="#section-4.4.1-6.2.1" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-6.2.2">
+            <li class="normal" id="section-4.4.1-10.2">
+              <p id="section-4.4.1-10.2.1">If <code>k &lt;= start</code>, the subtree is on the right of <code>k</code>. The proof proves consistency with the right child and includes the left child.<a href="#section-4.4.1-10.2.1" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-10.2.2">
 <pre>
 SUBTREE_SUBPROOF(start, end, D_n, b) =
     SUBTREE_SUBPROOF(start - k, end - k, D[k:n], b) : MTH(D[0:k])
-</pre><a href="#section-4.4.1-6.2.2" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-10.2.2" class="pilcrow">¶</a>
 </div>
 </li>
-            <li class="normal" id="section-4.4.1-6.3">
-              <p id="section-4.4.1-6.3.1">Otherwise, <code>start &lt; k &lt; end</code>, which implies <code>start = 0</code>. The proof proves consistency with the right child and includes the left child.<a href="#section-4.4.1-6.3.1" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-6.3.2">
+            <li class="normal" id="section-4.4.1-10.3">
+              <p id="section-4.4.1-10.3.1">Otherwise, <code>start &lt; k &lt; end</code>, which implies <code>start = 0</code>. The proof proves consistency with the right child and includes the left child.<a href="#section-4.4.1-10.3.1" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-10.3.2">
 <pre>
 SUBTREE_SUBPROOF(0, end, D_n, b) =
     SUBTREE_SUBPROOF(0, end - k, D[k:n], false) : MTH(D[0:k])
-</pre><a href="#section-4.4.1-6.3.2" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-10.3.2" class="pilcrow">¶</a>
 </div>
 </li>
           </ul>
-<p id="section-4.4.1-7">When <code>start</code> is zero, this computes a Merkle consistency proof:<a href="#section-4.4.1-7" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-8">
+<p id="section-4.4.1-11">When <code>start</code> is zero, this computes a Merkle consistency proof:<a href="#section-4.4.1-11" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-12">
 <pre>
 SUBTREE_PROOF(0, end, D_n) = PROOF(end, D_n)
-</pre><a href="#section-4.4.1-8" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-12" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4.1-9">When <code>end = start + 1</code>, this computes a Merkle inclusion proof:<a href="#section-4.4.1-9" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-4.4.1-10">
+<p id="section-4.4.1-13">When <code>end = start + 1</code>, this computes a Merkle inclusion proof:<a href="#section-4.4.1-13" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-4.4.1-14">
 <pre>
 SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
-</pre><a href="#section-4.4.1-10" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-14" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4.1-11"><a href="#consistency-proof-structure" class="auto internal xref">Appendix B.4</a> explains the structure of a subtree consistency proof in more detail.<a href="#section-4.4.1-11" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-15"><a href="#consistency-proof-structure" class="auto internal xref">Appendix B.4</a> explains the structure of a subtree consistency proof in more detail.<a href="#section-4.4.1-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-subtree-consistency-proofs">
@@ -3282,76 +3294,89 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 <p id="section-4.4.3-2">Given a Merkle Tree over <code>n</code> elements, a subtree defined by <code>[start, end)</code>, a consistency proof <code>proof</code>, a subtree hash <code>node_hash</code>, and a root hash <code>root_hash</code>:<a href="#section-4.4.3-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.4.3-3">
 <li id="section-4.4.3-3.1">
-              <p id="section-4.4.3-3.1.1">Check that <code>[start, end)</code> is a valid subtree (<a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>), and that <code>end &lt;= n</code>. If either do not hold, fail proof verification. These checks imply <code>0 &lt;= start &lt; end &lt;= n</code>.<a href="#section-4.4.3-3.1.1" class="pilcrow">¶</a></p>
+              <p id="section-4.4.3-3.1.1">Check that <code>[start, end)</code> is a valid subtree (<a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>), and that <code>end &lt;= n</code>. If either do not hold, fail proof verification. These checks imply <code>0 &lt;= start &lt;= end &lt;= n</code>.<a href="#section-4.4.3-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-4.4.3-3.2">
-              <p id="section-4.4.3-3.2.1">Set <code>fn</code> to <code>start</code>, <code>sn</code> to <code>end - 1</code>, and <code>tn</code> to <code>n - 1</code>.<a href="#section-4.4.3-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-4.4.3-3.2.1">If <code>start</code> equals <code>end</code>, check the following conditions:<a href="#section-4.4.3-3.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.4.3-3.2.2.1">
+                  <p id="section-4.4.3-3.2.2.1.1"><code>proof</code> is an empty array.<a href="#section-4.4.3-3.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-4.4.3-3.2.2.2">
+                  <p id="section-4.4.3-3.2.2.2.1"><code>node_hash</code> is equal to <code>HASH()</code>, the hash of the empty string.<a href="#section-4.4.3-3.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              </ul>
+<p id="section-4.4.3-3.2.3">
+If either condition does not hold, stop and fail the proof verification. If both hold, stop and accept the proof.<a href="#section-4.4.3-3.2.3" class="pilcrow">¶</a></p>
 </li>
             <li id="section-4.4.3-3.3">
-              <p id="section-4.4.3-3.3.1">If <code>sn</code> is <code>tn</code>, then:<a href="#section-4.4.3-3.3.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.3.2">
-<li id="section-4.4.3-3.3.2.1">
-                  <p id="section-4.4.3-3.3.2.1.1">Until <code>fn</code> is <code>sn</code>, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.4.3-3.3.2.1.1" class="pilcrow">¶</a></p>
-</li>
-              </ol>
+              <p id="section-4.4.3-3.3.1">Set <code>fn</code> to <code>start</code>, <code>sn</code> to <code>end - 1</code>, and <code>tn</code> to <code>n - 1</code>.<a href="#section-4.4.3-3.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-4.4.3-3.4">
-              <p id="section-4.4.3-3.4.1">Otherwise:<a href="#section-4.4.3-3.4.1" class="pilcrow">¶</a></p>
+              <p id="section-4.4.3-3.4.1">If <code>sn</code> is <code>tn</code>, then:<a href="#section-4.4.3-3.4.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.4.2">
 <li id="section-4.4.3-3.4.2.1">
-                  <p id="section-4.4.3-3.4.2.1.1">Until <code>fn</code> is <code>sn</code> or <code>LSB(sn)</code> is not set, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.4.3-3.4.2.1.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.4.3-3.4.2.1.1">Until <code>fn</code> is <code>sn</code>, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.4.3-3.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
             <li id="section-4.4.3-3.5">
-              <p id="section-4.4.3-3.5.1">If <code>fn</code> is <code>sn</code>, set <code>fr</code> and <code>sr</code> to <code>node_hash</code>.<a href="#section-4.4.3-3.5.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-4.4.3-3.6">
-              <p id="section-4.4.3-3.6.1">Otherwise:<a href="#section-4.4.3-3.6.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.6.2">
-<li id="section-4.4.3-3.6.2.1">
-                  <p id="section-4.4.3-3.6.2.1.1">If <code>proof</code> is an empty array, stop and fail verification.<a href="#section-4.4.3-3.6.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                <li id="section-4.4.3-3.6.2.2">
-                  <p id="section-4.4.3-3.6.2.2.1">Remove the first value of the <code>proof</code> array and set <code>fr</code> and <code>sr</code> to the removed value.<a href="#section-4.4.3-3.6.2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-4.4.3-3.5.1">Otherwise:<a href="#section-4.4.3-3.5.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.5.2">
+<li id="section-4.4.3-3.5.2.1">
+                  <p id="section-4.4.3-3.5.2.1.1">Until <code>fn</code> is <code>sn</code> or <code>LSB(sn)</code> is not set, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.4.3-3.5.2.1.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
+            <li id="section-4.4.3-3.6">
+              <p id="section-4.4.3-3.6.1">If <code>fn</code> is <code>sn</code>, set <code>fr</code> and <code>sr</code> to <code>node_hash</code>.<a href="#section-4.4.3-3.6.1" class="pilcrow">¶</a></p>
+</li>
             <li id="section-4.4.3-3.7">
-              <p id="section-4.4.3-3.7.1">For each value <code>c</code> in the <code>proof</code> array:<a href="#section-4.4.3-3.7.1" class="pilcrow">¶</a></p>
+              <p id="section-4.4.3-3.7.1">Otherwise:<a href="#section-4.4.3-3.7.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.7.2">
 <li id="section-4.4.3-3.7.2.1">
-                  <p id="section-4.4.3-3.7.2.1.1">If <code>tn</code> is <code>0</code>, then stop the iteration and fail the proof verification.<a href="#section-4.4.3-3.7.2.1.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.4.3-3.7.2.1.1">If <code>proof</code> is an empty array, stop and fail verification.<a href="#section-4.4.3-3.7.2.1.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-4.4.3-3.7.2.2">
-                  <p id="section-4.4.3-3.7.2.2.1">If <code>LSB(sn)</code> is set, or if <code>sn</code> is equal to <code>tn</code>, then:<a href="#section-4.4.3-3.7.2.2.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.7.2.2.2">
-<li id="section-4.4.3-3.7.2.2.2.1">
-                      <p id="section-4.4.3-3.7.2.2.2.1.1">If <code>fn &lt; sn</code>, set <code>fr</code> to <code>HASH(0x01 || c || fr)</code>.<a href="#section-4.4.3-3.7.2.2.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                    <li id="section-4.4.3-3.7.2.2.2.2">
-                      <p id="section-4.4.3-3.7.2.2.2.2.1">Set <code>sr</code> to <code>HASH(0x01 || c || sr)</code>.<a href="#section-4.4.3-3.7.2.2.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                    <li id="section-4.4.3-3.7.2.2.2.3">
-                      <p id="section-4.4.3-3.7.2.2.2.3.1">Until <code>LSB(sn)</code> is set, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.4.3-3.7.2.2.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                  </ol>
-</li>
-                <li id="section-4.4.3-3.7.2.3">
-                  <p id="section-4.4.3-3.7.2.3.1">Otherwise:<a href="#section-4.4.3-3.7.2.3.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.7.2.3.2">
-<li id="section-4.4.3-3.7.2.3.2.1">
-                      <p id="section-4.4.3-3.7.2.3.2.1.1">Set <code>sr</code> to <code>HASH(0x01 || sr || c)</code>.<a href="#section-4.4.3-3.7.2.3.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  </ol>
-</li>
-                <li id="section-4.4.3-3.7.2.4">
-                  <p id="section-4.4.3-3.7.2.4.1">Right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> once more.<a href="#section-4.4.3-3.7.2.4.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.4.3-3.7.2.2.1">Remove the first value of the <code>proof</code> array and set <code>fr</code> and <code>sr</code> to the removed value.<a href="#section-4.4.3-3.7.2.2.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
             <li id="section-4.4.3-3.8">
-              <p id="section-4.4.3-3.8.1">Compare <code>tn</code> to <code>0</code>, <code>fr</code> to <code>node_hash</code>, and <code>sr</code> to <code>root_hash</code>. If any are not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.4.3-3.8.1" class="pilcrow">¶</a></p>
+              <p id="section-4.4.3-3.8.1">For each value <code>c</code> in the <code>proof</code> array:<a href="#section-4.4.3-3.8.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.8.2">
+<li id="section-4.4.3-3.8.2.1">
+                  <p id="section-4.4.3-3.8.2.1.1">If <code>tn</code> is <code>0</code>, then stop the iteration and fail the proof verification.<a href="#section-4.4.3-3.8.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.4.3-3.8.2.2">
+                  <p id="section-4.4.3-3.8.2.2.1">If <code>LSB(sn)</code> is set, or if <code>sn</code> is equal to <code>tn</code>, then:<a href="#section-4.4.3-3.8.2.2.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.8.2.2.2">
+<li id="section-4.4.3-3.8.2.2.2.1">
+                      <p id="section-4.4.3-3.8.2.2.2.1.1">If <code>fn &lt; sn</code>, set <code>fr</code> to <code>HASH(0x01 || c || fr)</code>.<a href="#section-4.4.3-3.8.2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-4.4.3-3.8.2.2.2.2">
+                      <p id="section-4.4.3-3.8.2.2.2.2.1">Set <code>sr</code> to <code>HASH(0x01 || c || sr)</code>.<a href="#section-4.4.3-3.8.2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-4.4.3-3.8.2.2.2.3">
+                      <p id="section-4.4.3-3.8.2.2.2.3.1">Until <code>LSB(sn)</code> is set, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.4.3-3.8.2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+</li>
+                <li id="section-4.4.3-3.8.2.3">
+                  <p id="section-4.4.3-3.8.2.3.1">Otherwise:<a href="#section-4.4.3-3.8.2.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4.3-3.8.2.3.2">
+<li id="section-4.4.3-3.8.2.3.2.1">
+                      <p id="section-4.4.3-3.8.2.3.2.1.1">Set <code>sr</code> to <code>HASH(0x01 || sr || c)</code>.<a href="#section-4.4.3-3.8.2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+</li>
+                <li id="section-4.4.3-3.8.2.4">
+                  <p id="section-4.4.3-3.8.2.4.1">Right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> once more.<a href="#section-4.4.3-3.8.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+</li>
+            <li id="section-4.4.3-3.9">
+              <p id="section-4.4.3-3.9.1">Compare <code>tn</code> to <code>0</code>, <code>fr</code> to <code>node_hash</code>, and <code>sr</code> to <code>root_hash</code>. If any are not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.4.3-3.9.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
 <p id="section-4.4.3-4"><a href="#consistency-proof-verification-explain" class="auto internal xref">Appendix B.5</a> explains this procedure in more detail.<a href="#section-4.4.3-4" class="pilcrow">¶</a></p>
@@ -3495,7 +3520,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
           <h4 id="name-selecting-two-subtrees">
 <a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-selecting-two-subtrees" class="section-name selfRef">Selecting Two Subtrees</a>
           </h4>
-<p id="section-4.5.1-1">This section defines a procedure for selecting up to two subtrees, given any non-empty interval (<code>start &lt; end</code>). Combined, the subtrees contain <code>[start, end)</code> with bounded excess elements. The procedure either returns <code>[start, end)</code> as a subtree, or two subtrees, <code>left</code> and <code>right</code>, that satisfy the following properties:<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-1">This section defines a procedure for selecting two subtrees given any interval. Combined, the subtrees contain <code>[start, end)</code> with bounded excess elements. The procedure returns two subtrees, <code>left</code> and <code>right</code>, that satisfy the following properties:<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4.5.1-2.1">
               <p id="section-4.5.1-2.1.1">The two subtrees cover adjacent intervals. That is, <code>left.end = right.start</code>.<a href="#section-4.5.1-2.1.1" class="pilcrow">¶</a></p>
@@ -3504,16 +3529,16 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
               <p id="section-4.5.1-2.2.1">The two subtrees together contain the entire interval <code>[start, end)</code>. There are no extra entries after <code>end</code>, but there may be extra entries before <code>start</code>. That is, <code>left.start &lt;= start</code> and <code>end = right.end</code>.<a href="#section-4.5.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-4.5.1-2.3">
-              <p id="section-4.5.1-2.3.1">The extra entries before <code>start</code> are less than half of <code>left</code>. That is, <code>start - left.start &lt; left.end - start</code>.<a href="#section-4.5.1-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-4.5.1-2.3.1">If the interval is not empty, the extra entries before <code>start</code> are less than half of <code>left</code>. That is, <code>start - left.start &lt; left.end - start</code>.<a href="#section-4.5.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-4.5.1-3">The subtrees are selected as follows:<a href="#section-4.5.1-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.5.1-4">
 <li id="section-4.5.1-4.1">
-              <p id="section-4.5.1-4.1.1">If <code>end - start</code> is one, return a single subtree, <code>[start, end)</code>.<a href="#section-4.5.1-4.1.1" class="pilcrow">¶</a></p>
+              <p id="section-4.5.1-4.1.1">If <code>end - start</code> is less than or equal to 1, return the subtrees <code>[start, end)</code> and <code>[end, end)</code>.<a href="#section-4.5.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-4.5.1-4.2">
-              <p id="section-4.5.1-4.2.1">Otherwise, run the following to return a pair of subtrees:<a href="#section-4.5.1-4.2.1" class="pilcrow">¶</a></p>
+              <p id="section-4.5.1-4.2.1">Otherwise:<a href="#section-4.5.1-4.2.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.5.1-4.2.2">
 <li id="section-4.5.1-4.2.2.1">
                   <p id="section-4.5.1-4.2.2.1.1">Let <code>last</code> be <code>end - 1</code>, the last index in <code>[start, end)</code>.<a href="#section-4.5.1-4.2.2.1.1" class="pilcrow">¶</a></p>
@@ -3551,11 +3576,11 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 <div class="lang-python sourcecode" id="section-4.5.1-7">
 <pre>
 def find_subtrees(start, end):
-    """ Returns a list of one or two subtrees that efficiently
-    cover [start, end). """
-    assert start &lt; end
-    if end - start == 1:
-        return [(start, end),]
+    """ Returns a pair of subtrees that efficiently cover
+    [start, end). """
+    assert start &lt;= end
+    if end - start &lt;= 1:
+        return (start, end), (end, end)
     last = end - 1
     # Find where start and last's tree paths diverge. The two
     # subtrees will be on either side of the split.
@@ -3566,7 +3591,7 @@ def find_subtrees(start, end):
     # path leaves the right edge of its new subtree.
     left_split = (~start &amp; mask).bit_length()
     left_start = start &amp; ~((1 &lt;&lt; left_split) - 1)
-    return [(left_start, mid), (mid, end)]
+    return (left_start, mid), (mid, end)
 </pre><a href="#section-4.5.1-7" class="pilcrow">¶</a>
 </div>
 <p id="section-4.5.1-8"><a href="#fig-subtree-pair-example" class="auto internal xref">Figure 10</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements in wavy lines. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.5.1-8" class="pilcrow">¶</a></p>
@@ -3864,36 +3889,36 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
           <h4 id="name-log-entries">
 <a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-log-entries" class="section-name selfRef">Log Entries</a>
           </h4>
-<p id="section-5.2.1-1">Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentation syntax below. A MerkleTreeCertEntry describes certificate information that the CA has validated and certified.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-1">Each entry in the log is an MTCLogEntry, defined with the TLS presentation syntax below. An MTCLogEntry describes certificate information that the CA has validated and certified.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-5.2.1-2">
 <pre>
 struct {} Empty;
 
-enum { (2^16-1) } MerkleTreeCertEntryExtensionType;
+enum { (2^16-1) } MTCLogEntryExtensionType;
 
 struct {
-    MerkleTreeCertEntryExtensionType extension_type;
+    MTCLogEntryExtensionType extension_type;
     opaque extension_data&lt;0..2^16-1&gt;;
-} MerkleTreeCertEntryExtension;
+} MTCLogEntryExtension;
 
 enum {
     null_entry(0), tbs_cert_entry(1), (2^16-1)
-} MerkleTreeCertEntryType;
+} MTCLogEntryType;
 
 struct {
-    MerkleTreeCertEntryExtension extensions&lt;0..2^16-1&gt;;
-    MerkleTreeCertEntryType type;
+    MTCLogEntryExtension extensions&lt;0..2^16-1&gt;;
+    MTCLogEntryType type;
     select (type) {
        case null_entry: Empty;
        case tbs_cert_entry: opaque tbs_cert_entry_data[N];
        /* May be extended with future types. */
     }
-} MerkleTreeCertEntry;
+} MTCLogEntry;
 </pre><a href="#section-5.2.1-2" class="pilcrow">¶</a>
 </div>
 <p id="section-5.2.1-3">Field <code>extensions</code> is the list of tag-length-value extensions associated with the log entry. The extensions list MUST be appear in ascending order by <code>extension_type</code> and MUST NOT contain two extensions with the same <code>extension_type</code>.<a href="#section-5.2.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-4">When <code>type</code> is <code>null_entry</code>, the entry does not represent any information. Entries at any index in the log MAY have type <code>null_entry</code>.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-5">When <code>type</code> is <code>tbs_cert_entry</code>, <code>N</code> is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-5">When <code>type</code> is <code>tbs_cert_entry</code>, <code>N</code> is the number of bytes needed to consume the rest of the input. An MTCLogEntry is expected to be decoded in contexts where the total length of the entry is known.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-6"><code>tbs_cert_entry_data</code> contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding of a TBSCertificateLogEntry, defined below. Equivalently, <code>tbs_cert_entry_data</code> contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>.<a href="#section-5.2.1-6" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-5.2.1-7">
 <pre>
@@ -3933,8 +3958,8 @@ TBSCertificateLogEntry ::= SEQUENCE {
 </li>
           </ul>
 <p id="section-5.2.1-10">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.2.1-10" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-11">MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType or MerkleTreeCertEntryExtensionType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> and <a href="#extensibility" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-12">A MerkleTreeCertEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.<a href="#section-5.2.1-12" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-11">MTCLogEntry is an extensible structure. Future documents may define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> and <a href="#extensibility" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-12">An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.<a href="#section-5.2.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="publishing-logs">
@@ -4319,7 +4344,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
           <h4 id="name-signature-format">
 <a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a href="#name-signature-format" class="section-name selfRef">Signature Format</a>
           </h4>
-<p id="section-5.3.1-1">A cosigner computes a <em>subtree signature</em> for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-1">A cosigner computes a <em>subtree signature</em> for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>):<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-5.3.1-2">
 <pre>
 opaque HashValue[HASH_SIZE];
@@ -4463,9 +4488,6 @@ ext-mtcCertificationAuthority EXTENSION ::= {
     CRITICALITY TRUE
 }
 
--- From draft-ietf-tls-trust-anchor-ids
-TrustAnchorID ::= RELATIVE-OID
-
 -- This is 2^64-1, the maximum possible serial number in this protocol.
 mtcMaxSerial INTEGER ::= 18446744073709551615
 
@@ -4478,7 +4500,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 </pre><a href="#section-5.5-6" class="pilcrow">¶</a>
 </div>
 <p id="section-5.5-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of <code>id-pe-mtcCertificationAuthority</code>.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
-<p id="section-5.5-8">The fields of a MTCCertificationAuthority structure are defined as follows:<a href="#section-5.5-8" class="pilcrow">¶</a></p>
+<p id="section-5.5-8">The fields of an MTCCertificationAuthority structure are defined as follows:<a href="#section-5.5-8" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.5-9.1">
             <p id="section-5.5-9.1.1"><code>logHash</code> describes the hash algorithm used by all logs operated by this CA. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-5.5-9.1.1" class="pilcrow">¶</a></p>
@@ -4517,10 +4539,10 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-6.1-2.2.1">A subject public key whose hash matches the TBSCertificateLogEntry<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-2.3">
-            <p id="section-6.1-2.3.1">A subtree (<a href="#subtrees" class="auto internal xref">Section 4</a>) that contains the log entry<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.3.1">The <code>log_number</code> and the zero-based entry <code>index</code> of that log entry within the issuance log, used to construct the certificate's <code>serialNumber</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>).<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-2.4">
-            <p id="section-6.1-2.4.1">Zero or more signatures (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) over the subtree, which together satisfy relying party requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.4.1">An <code>MTCProof</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) proving the entry's inclusion in a subtree, along with zero or more signatures (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) over that subtree, which together satisfy relying party requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-6.1-3">For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. <a href="#certificate-format" class="auto internal xref">Section 6.2</a> defines how the certificate is constructed based on those choices. <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a> and <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a> define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
@@ -4544,7 +4566,7 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
 </pre><a href="#section-6.2-6" class="pilcrow">¶</a>
 </div>
 <p id="section-6.2-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of <code>id-alg-mtcProof</code>.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
-<p id="section-6.2-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-6.2-8" class="pilcrow">¶</a></p>
+<p id="section-6.2-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>):<a href="#section-6.2-8" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-6.2-9">
 <pre>
 /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
@@ -4558,7 +4580,7 @@ struct {
 } MTCSignature;
 
 struct {
-    MerkleTreeCertEntryExtension extensions&lt;0..2^16-1&gt;;
+    MTCLogEntryExtension extensions&lt;0..2^16-1&gt;;
     uint48 start;
     uint48 end;
     HashValue inclusion_proof&lt;0..2^16-1&gt;;
@@ -4618,17 +4640,17 @@ struct {
         <h3 id="name-landmark-relative-certifica">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-landmark-relative-certifica" class="section-name selfRef">Landmark-Relative Certificates</a>
         </h3>
-<p id="section-6.4-1">A <em>landmark-relative certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">A <em>landmark-relative certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <div id="landmark-tree-sizes">
 <section id="section-6.4.1">
           <h4 id="name-landmark-tree-sizes">
 <a href="#section-6.4.1" class="section-number selfRef">6.4.1. </a><a href="#name-landmark-tree-sizes" class="section-name selfRef">Landmark Tree Sizes</a>
           </h4>
 <p id="section-6.4.1-1">To issue landmark-relative certificates, a CA must additionally maintain a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-2">Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. The first landmark, numbered zero, MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-3">The landmark sequence determines <em>landmark subtrees</em> for each landmark: for each landmark <code>L</code>, other than number zero, let <code>tree_size</code> be <code>L</code>'s tree size and <code>prev_tree_size</code> be that of <code>L - 1</code>. The landmark subtrees for <code>L</code> are the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>, as described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>. Landmark zero has no landmark subtrees.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-2">Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. Landmark zero MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-3">The landmark sequence determines <em>landmark subtrees</em> for each landmark: for each landmark <code>L</code>, other than number zero, let <code>tree_size</code> be <code>L</code>'s tree size and <code>prev_tree_size</code> be that of <code>L - 1</code>. The landmark subtrees for <code>L</code> are the two subtrees that cover <code>[prev_tree_size, tree_size)</code>, as described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>. Landmark zero has no landmark subtrees.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-4">As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer <code>max_active_landmarks</code> parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.<a href="#section-6.4.1-4" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-5">The most recent <code>max_active_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_active_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.4.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-5">The most recent <code>max_active_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_active_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in at least one landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.4.1-5" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-6">It is RECOMMENDED that landmarks be allocated following the procedure described in <a href="#allocating-landmarks" class="auto internal xref">Section 6.4.2</a>. If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_active_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.4.1-6" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-7">Relying parties will locally retain up to <code>2 * max_active_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_active_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure below, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_active_landmarks</code> of 169. The client state is then 338 hashes, or 10,816 bytes with SHA-256.<a href="#section-6.4.1-7" class="pilcrow">¶</a></p>
 </section>
@@ -4670,7 +4692,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
               </ul>
 </li>
             <li class="normal" id="section-6.4.3-2.2">
-              <p id="section-6.4.3-2.2.1"><code>num_active_landmarks + 1</code> lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The integers MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.3-2.2.1"><code>num_active_landmarks + 1</code> lines each containing a single non-negative decimal integer, representing a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The tree sizes MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-6.4.3-3">It is RECOMMENDED that this format be published as an HTTP resource <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> with content type <code>text/plain; charset=utf-8</code>.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
@@ -4684,17 +4706,17 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-6.4.4-1">Given the inputs in <a href="#certificate-inputs" class="auto internal xref">Section 6.1</a> and a landmark sequence, a landmark-relative certificate is constructed as follows:<a href="#section-6.4.4-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.4.4-2">
 <li id="section-6.4.4-2.1">
-              <p id="section-6.4.4-2.1.1">Let <code>L</code> be the smallest landmark number in the active window whose tree size is strictly greater than the entry index <code>i</code>. Because the landmark sequence is strictly monotonically increasing, <code>L - 1</code>'s tree size is less than or equal to <code>i</code>. If no such <code>L</code> has been allocated yet (<code>i</code> is greater than or equal to <code>last_landmark</code>'s tree size), wait for one to be allocated. If every landmark that once covered the entry is no longer in the active window (<code>last_landmark - num_active_landmarks</code>'s tree size is greater than <code>i</code>), abort this process.<a href="#section-6.4.4-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-2.1.1">Wait for the first landmark to be allocated that contains the entry.<a href="#section-6.4.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-2.2">
-              <p id="section-6.4.4-2.2.1">Determine landmark <code>L</code>'s subtrees (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) and select the unique one whose <code>[start, end)</code> interval contains <code>i</code>.<a href="#section-6.4.4-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-2.2.1">Determine the landmark's subtrees and select the one that contains the entry.<a href="#section-6.4.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-2.3">
               <p id="section-6.4.4-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) using the selected subtree and no signatures.<a href="#section-6.4.4-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.4.4-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
-<p id="section-6.4.4-4">The procedure above is not specific to the CA. Any party with access to the certificate inputs (<a href="#certificate-inputs" class="auto internal xref">Section 6.1</a>), the issuance log, and its landmark sequence can construct a landmark-relative certificate. In particular, a party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) for an entry can construct a landmark-relative certificate for the same entry, without any CA-specific issuance service, as follows:<a href="#section-6.4.4-4" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-4">The procedure above is not specific to the CA. Any party with access to the issuance log, the landmark sequence, and the certificate inputs (<a href="#certificate-inputs" class="auto internal xref">Section 6.1</a>) can construct a landmark-relative certificate. In particular, a party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) can construct a landmark-relative certificate for the corresponding entry as follows:<a href="#section-6.4.4-4" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.4.4-5">
 <li id="section-6.4.4-5.1">
               <p id="section-6.4.4-5.1.1">Recover the certificate inputs (<a href="#certificate-inputs" class="auto internal xref">Section 6.1</a>) from the standalone certificate. The TBSCertificateLogEntry fields and subject public key are those of the standalone certificate, and the log entry's <code>extensions</code> are carried in the standalone certificate's MTCProof (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>). The CA ID is the certificate's issuer (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>), and the log number and entry index are recovered from the serial number, which is <code>(log_number &lt;&lt; 48) | index</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>).<a href="#section-6.4.4-5.1.1" class="pilcrow">¶</a></p>
@@ -4703,13 +4725,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
               <p id="section-6.4.4-5.2.1">Obtain the CA's landmark sequence, for example from its published active landmarks (<a href="#publishing-landmarks" class="auto internal xref">Section 6.4.3</a>).<a href="#section-6.4.4-5.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-5.3">
-              <p id="section-6.4.4-5.3.1">Produce the subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) by reading the necessary hashes directly from the issuance log (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). A party that is aware of a mirror of the issuance log MAY read these hashes from the mirror instead.<a href="#section-6.4.4-5.3.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.4.4-5.4">
-              <p id="section-6.4.4-5.4.1">Construct the landmark-relative certificate following the steps above, selecting the landmark subtree that covers the entry and using no signatures. The result copies every field of the standalone certificate except the <code>signatureValue</code>: its MTCProof instead describes the selected landmark subtree and its inclusion proof, and has an empty <code>signatures</code> field.<a href="#section-6.4.4-5.4.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-5.3.1">Construct the landmark-relative certificate by following the construction procedure at the beginning of this section. Produce the required subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) by reading the necessary hashes directly from the issuance log (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>); a party that is aware of a mirror of the issuance log MAY read these hashes from the mirror instead. The result copies every field of the standalone certificate except the <code>signatureValue</code>, whose MTCProof retains the log entry's <code>extensions</code>, sets <code>start</code>, <code>end</code>, and <code>inclusion_proof</code> for the selected landmark subtree, and has an empty <code>signatures</code> field.<a href="#section-6.4.4-5.3.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.4.4-6">To use such a certificate, the party configures certificate selection as for any landmark-relative certificate (<a href="#use-in-tls" class="auto internal xref">Section 8</a> describes this for TLS). The certificate's landmark trust anchor ID and its single-log landmark group (<a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>) follow directly from the CA ID, log number, and landmark number. However, if the PKI also uses trust anchor groups that span multiple CAs, such as timestamped landmark groups (<a href="#timestamped-landmark-groups" class="auto internal xref">Section 8.2.2</a>), configuring the corresponding group inclusions requires those groups' definitions and any inputs they entail; for timestamped landmark groups, this includes the timestamp at which the landmark was allocated, used to select the group version. This information is not derivable from the issuance log and must be obtained out of band.<a href="#section-6.4.4-6" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-6">To use such a certificate, the party configures certificate selection as for any landmark-relative certificate (<a href="#use-in-tls" class="auto internal xref">Section 8</a> describes this for TLS). The certificate's landmark trust anchor ID and its single-log landmark group (<a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>) follow directly from the CA ID, log number, and landmark number. However, if the PKI also uses trust anchor groups that span multiple CAs, such as timestamped landmark groups (<a href="#timestamped-landmark-groups" class="auto internal xref">Section 8.2.2</a>), configuring the corresponding group inclusions requires those groups' definitions and any additional inputs they require; for timestamped landmark groups, this includes the timestamp at which the landmark was allocated, used to select the group version. This information is not derivable from the issuance log and must be obtained out of band.<a href="#section-6.4.4-6" class="pilcrow">¶</a></p>
 <p id="section-6.4.4-7">The CA does not need to perform any per-entry work to enable this: the landmark sequence and inclusion proof hashes are exactly those already published by the issuance log. <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> specifies this construction for log ecosystems based on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, including where to fetch the landmark sequence and the inclusion proof hashes.<a href="#section-6.4.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4833,7 +4852,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             </ol>
 </li>
           <li id="section-7.2-2.8">
-            <p id="section-7.2-2.8.1">Construct a MerkleTreeCertEntry as follows:<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.8.1">Construct an MTCLogEntry as follows:<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.2-2.8.2">
 <li id="section-7.2-2.8.2.1">
                 <p id="section-7.2-2.8.2.1.1">Set <code>type</code> to <code>tbs_cert_entry</code>.<a href="#section-7.2-2.8.2.1.1" class="pilcrow">¶</a></p>
@@ -4879,7 +4898,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </li>
         </ol>
 <p id="section-7.2-3">This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<p id="section-7.2-4">In this procedure, <code>entry_hash</code> can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">In this procedure, <code>entry_hash</code> can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MTCLogEntry in memory:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.2-5">
 <li id="section-7.2-5.1">
             <p id="section-7.2-5.1.1">Initialize a hash instance.<a href="#section-7.2-5.1.1" class="pilcrow">¶</a></p>
@@ -4988,7 +5007,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         </ul>
 <p id="section-7.4-7">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-7" class="pilcrow">¶</a></p>
 <p id="section-7.4-8">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-8" class="pilcrow">¶</a></p>
-<p id="section-7.4-9">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
+<p id="section-7.4-9">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revoked-ranges">
@@ -5023,7 +5042,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           <p id="section-8-2.3.1">What the relying party should communicate to the authenticating party to help it make this decision<a href="#section-8-2.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-8-3">Certificate selection in TLS, described in Section <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2.2" class="relref">4.4.2.2</a> and Section <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2.3" class="relref">4.4.2.3</a> of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.<a href="#section-8-3" class="pilcrow">¶</a></p>
+<p id="section-8-3">Certificate selection in TLS, described in <span><a href="https://rfc-editor.org/rfc/rfc9846#section-4.5.1.2" class="relref">Section 4.5.1.2</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.<a href="#section-8-3" class="pilcrow">¶</a></p>
 <div id="standalone-certificates-tls">
 <section id="section-8.1">
         <h3 id="name-standalone-certificates-2">
@@ -5154,7 +5173,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-9.2-1">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7" class="relref">Section 7</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> describes the trust anchor ID assignments for standalone and landmark-relative certificates.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <p id="section-9.2-2">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
 <p id="section-9.2-3">The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. It initially serves an HTTP 202 response, as described in <a href="#optional-certificates" class="auto internal xref">Section 9.1</a>. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>, and serves it from the URL.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
-<p id="section-9.2-4">As an alternative to fetching the landmark-relative certificate from the ACME server, a client with access to the issuance log and the landmark sequence MAY construct it itself from the standalone certificate, as described in <a href="#constructing-landmark-relative-certificates" class="auto internal xref">Section 6.4.4</a>. <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> describes a concrete procedure for log ecosystems based on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+<p id="section-9.2-4">As an alternative to fetching the landmark-relative certificate from the ACME server, a client with access to the issuance log and the landmark sequence MAY construct it itself from the standalone certificate, as described in <a href="#constructing-landmark-relative-certificates" class="auto internal xref">Section 6.4.4</a>.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5273,7 +5292,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </li>
         </ul>
 <p id="section-12.1-3">Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
-<p id="section-12.1-4">Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.<a href="#section-12.1-4" class="pilcrow">¶</a></p>
+<p id="section-12.1-4">The subject public key is itself also hashed before incorporating into the log. This hash depends on second-preimage resistance. To authorize the wrong public key for some existing log entry (e.g. one that describes a target's identity), an attacker must find some other public key with the same hash. While an attacker able to compute collisions might find two public keys with the same hash, that hash will not be in any existing log entry. The attacker would need to be authorized to request certification of a new entry with this hash. Such an attacker could only certify colliding pairs of public keys for its own identities.<a href="#section-12.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="transparency">
@@ -5369,22 +5388,22 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-extensibility">
 <a href="#section-12.5" class="section-number selfRef">12.5. </a><a href="#name-extensibility" class="section-name selfRef">Extensibility</a>
         </h3>
-<p id="section-12.5-1">MerkleTreeCertEntry (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>) contain several extension points:<a href="#section-12.5-1" class="pilcrow">¶</a></p>
+<p id="section-12.5-1">MTCLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>) contain several extension points:<a href="#section-12.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.5-2.1">
             <p id="section-12.5-2.1.1">New X.509 extensions can be added to TBSCertificateLogEntry.<a href="#section-12.5-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-12.5-2.2">
-            <p id="section-12.5-2.2.1">New MerkleTreeCertEntryType values define new formats for the entry contents.<a href="#section-12.5-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-12.5-2.2.1">New MTCLogEntryType values define new formats for the entry contents.<a href="#section-12.5-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-12.5-2.3">
-            <p id="section-12.5-2.3.1">New MerkleTreeCertEntryExtensionType values define new entry extension fields.<a href="#section-12.5-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-12.5-2.3.1">New MTCLogEntryExtensionType values define new entry extension fields.<a href="#section-12.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-12.5-3">X.509 extensions apply to Merkle Tree Certificates without any modifications. The two entry-level extension points are new to this protocol. Older CAs, cosigners, relying parties, and monitors may encounter unrecognized entries:<a href="#section-12.5-3" class="pilcrow">¶</a></p>
 <p id="section-12.5-4">Different cosigner roles interact with extensions differently. Some roles, e.g. <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> and <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, do not interpret entry contents. Unrecognized extensions do not impact these roles. Other roles, such as CA cosigners, have semantics that depend on the entry contents. If a cosigner role interprets log entry contents, it MUST define how it interacts with unrecognized types and extensions.<a href="#section-12.5-4" class="pilcrow">¶</a></p>
 <p id="section-12.5-5"><a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> forbids a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 CA can never sign an unrecognized X.509 extension.<a href="#section-12.5-5" class="pilcrow">¶</a></p>
-<p id="section-12.5-6">Unrecognized entry types do not impact older relying parties. In <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>, the relying party constructs the MerkleTreeCertEntry that it expects. The unrecognized entry will have a different <code>type</code> value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.<a href="#section-12.5-6" class="pilcrow">¶</a></p>
+<p id="section-12.5-6">Unrecognized entry types do not impact older relying parties. In <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>, the relying party constructs the MTCLogEntry that it expects. The unrecognized entry will have a different <code>type</code> value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.<a href="#section-12.5-6" class="pilcrow">¶</a></p>
 <p id="section-12.5-7">However, unrecognized entry extensions will be ignored by relying parties, analogously to a non-critical X.509 extension. Entry extensions thus SHOULD be defined so that this is safe.<a href="#section-12.5-7" class="pilcrow">¶</a></p>
 <p id="section-12.5-8">If a monitor observes an entry with unknown type or entry extension, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.<a href="#section-12.5-8" class="pilcrow">¶</a></p>
 <p id="section-12.5-9">This situation is analogous to the addition of a new X.509 extension. When relying parties add support for log entry types or new X.509 extensions, they SHOULD coordinate with monitors to ensure the transparency ecosystem is able to monitor the new formats.<a href="#section-12.5-9" class="pilcrow">¶</a></p>
@@ -5395,7 +5414,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-certificate-malleability">
 <a href="#section-12.6" class="section-number selfRef">12.6. </a><a href="#name-certificate-malleability" class="section-name selfRef">Certificate Malleability</a>
         </h3>
-<p id="section-12.6-1">An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span>, such as <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. This aligns with <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.1.3" class="relref">Section 4.1.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.<a href="#section-12.6-1" class="pilcrow">¶</a></p>
+<p id="section-12.6-1">An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span>, such as <span><a href="https://rfc-editor.org/rfc/rfc9846#section-4.5.1" class="relref">Section 4.5.1</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>. This aligns with <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.1.3" class="relref">Section 4.1.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.<a href="#section-12.6-1" class="pilcrow">¶</a></p>
 <p id="section-12.6-2">When the signature verification process in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a> first transforms the TBSCertificate into a TBSCertificateLogEntry, it preserves this non-malleability. There is a unique valid DER encoding for every abstract TBSCertificate structure, so malleability of the DER-encoded TBSCertificate reduces to malleability of the TBSCertificate value:<a href="#section-12.6-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.6-3.1">
@@ -5431,7 +5450,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </li>
         </ul>
 <p id="section-12.6-7">These additional checks are redundant in X.509 implementations that use a conforming DER parser.<a href="#section-12.6-7" class="pilcrow">¶</a></p>
-<p id="section-12.6-8"><a href="#log-entries" class="auto internal xref">Section 5.2.1</a> requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates are new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.<a href="#section-12.6-8" class="pilcrow">¶</a></p>
+<p id="section-12.6-8"><a href="#log-entries" class="auto internal xref">Section 5.2.1</a> requires that the TBSCertificateLogEntry in an MTCLogEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates are new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.<a href="#section-12.6-8" class="pilcrow">¶</a></p>
 <p id="section-12.6-9">The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tree Certificates, similar to an ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.<a href="#section-12.6-9" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -5647,10 +5666,6 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <dd>
 <span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Web Linking"</span>, <span class="seriesInfo">RFC 8288</span>, <span class="seriesInfo">DOI 10.17487/RFC8288</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8288">https://www.rfc-editor.org/rfc/rfc8288</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8446">[RFC8446]</dt>
-        <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC8555">[RFC8555]</dt>
         <dd>
 <span class="refAuthor">Barnes, R.</span>, <span class="refAuthor">Hoffman-Andrews, J.</span>, <span class="refAuthor">McCarney, D.</span>, and <span class="refAuthor">J. Kasten</span>, <span class="refTitle">"Automatic Certificate Management Environment (ACME)"</span>, <span class="seriesInfo">RFC 8555</span>, <span class="seriesInfo">DOI 10.17487/RFC8555</span>, <time datetime="2019-03" class="refDate">March 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8555">https://www.rfc-editor.org/rfc/rfc8555</a>&gt;</span>. </dd>
@@ -5662,6 +5677,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="RFC9162">[RFC9162]</dt>
         <dd>
 <span class="refAuthor">Laurie, B.</span>, <span class="refAuthor">Messeri, E.</span>, and <span class="refAuthor">R. Stradling</span>, <span class="refTitle">"Certificate Transparency Version 2.0"</span>, <span class="seriesInfo">RFC 9162</span>, <span class="seriesInfo">DOI 10.17487/RFC9162</span>, <time datetime="2021-12" class="refDate">December 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9162">https://www.rfc-editor.org/rfc/rfc9162</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9846">[RFC9846]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9846</span>, <span class="seriesInfo">DOI 10.17487/RFC9846</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9846">https://www.rfc-editor.org/rfc/rfc9846</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9881">[RFC9881]</dt>
         <dd>
@@ -5742,7 +5761,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dd class="break"></dd>
 <dt id="MTC-TLOG">[MTC-TLOG]</dt>
         <dd>
-<span class="refAuthor">C2SP</span>, <span class="refTitle">"Merkle Tree Certificates With Tiled Transparency Logs"</span>, <time datetime="2026-06" class="refDate">June 2026</time>, <span>&lt;<a href="https://c2sp.org/mtc-tlog">https://c2sp.org/mtc-tlog</a>&gt;</span>. </dd>
+<span class="refAuthor">C2SP</span>, <span class="refTitle">"Merkle Tree Certificates With Tiled Transparency Logs"</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://c2sp.org/mtc-tlog">https://c2sp.org/mtc-tlog</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4514">[RFC4514]</dt>
         <dd>
@@ -6857,7 +6876,7 @@ END
         <h3 id="name-consistency-proof-verificat">
 <a href="#appendix-B.5" class="section-number selfRef">B.5. </a><a href="#name-consistency-proof-verificat" class="section-name selfRef">Consistency Proof Verification</a>
         </h3>
-<p id="appendix-B.5-1">The procedure in <a href="#verifying-a-subtree-consistency-proof" class="auto internal xref">Section 4.4.3</a> is structured similarly to inclusion proof evaluation (<a href="#inclusion-proof-evaluation-explain" class="auto internal xref">Appendix B.3</a>). It iteratively builds two hashes, <code>fr</code> and <code>sr</code>, which are expected to equal <code>node_hash</code> and <code>root_hash</code>, respectively. Everything hashed into <code>fr</code> is also hashed into <code>sr</code>, so success demonstrates that <code>root_hash</code> contains <code>node_hash</code>.<a href="#appendix-B.5-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.5-1">The procedure in <a href="#verifying-a-subtree-consistency-proof" class="auto internal xref">Section 4.4.3</a> is structured similarly to inclusion proof evaluation (<a href="#inclusion-proof-evaluation-explain" class="auto internal xref">Appendix B.3</a>). It iteratively builds two hashes, <code>fr</code> (first root) and <code>sr</code> (second root), which are expected to equal <code>node_hash</code> and <code>root_hash</code>, respectively. Everything hashed into <code>fr</code> is also hashed into <code>sr</code>, so success demonstrates that <code>root_hash</code> contains <code>node_hash</code>.<a href="#appendix-B.5-1" class="pilcrow">¶</a></p>
 <p id="appendix-B.5-2">Step 2 initializes <code>fn</code> (first number), <code>sn</code> (second number), and <code>tn</code> (third number) to follow, respectively, the paths to <code>start</code>, <code>end - 1</code> (the last element of the subtree), and <code>n - 1</code> (the last element of the tree).<a href="#appendix-B.5-2" class="pilcrow">¶</a></p>
 <p id="appendix-B.5-3">Steps 3 and 4 then skip to the starting node, described in <a href="#consistency-proof-structure" class="auto internal xref">Appendix B.4</a>. The starting node may be:<a href="#appendix-B.5-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -6905,11 +6924,11 @@ END
         <h3 id="name-subtree-hashes">
 <a href="#appendix-C.1" class="section-number selfRef">C.1. </a><a href="#name-subtree-hashes" class="section-name selfRef">Subtree Hashes</a>
         </h3>
-<p id="appendix-C.1-1">For each value of <code>end</code> from 1 to 130, and each value of <code>start</code> from 0 to <code>end - 1</code>, if <code>[start, end)</code> is a valid subtree, add to the rolling hash the ASCII string <code>[START, END) HASH</code> followed by a newline (U+000A), where <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively, and <code>HASH</code> is the hexadecimal encoding of <code>MTH(D[start:end])</code>, according to <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#appendix-C.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-C.1-1">For each value of <code>end</code> from 0 to 130, and each value of <code>start</code> from 0 to <code>end</code>, if <code>[start, end)</code> is a valid subtree, add to the rolling hash the ASCII string <code>[START, END) HASH</code> followed by a newline (U+000A), where <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively, and <code>HASH</code> is the hexadecimal encoding of <code>MTH(D[start:end])</code>, according to <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#appendix-C.1-1" class="pilcrow">¶</a></p>
 <p id="appendix-C.1-2">The final hash value is<a href="#appendix-C.1-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-C.1-3">
 <pre>
-94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f
+b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81
 </pre><a href="#appendix-C.1-3" class="pilcrow">¶</a>
 </div>
 <p id="appendix-C.1-4">In Python, this can be expressed as:<a href="#appendix-C.1-4" class="pilcrow">¶</a></p>
@@ -6917,12 +6936,12 @@ END
 <pre>
 import hashlib
 h = hashlib.sha256()
-for end in range(1, 131):
-    for start in range(end):
+for end in range(0, 131):
+    for start in range(end + 1):
         if valid_subtree(start, end):
             subtree_hash = MTH(D[start:end])
             h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
-assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1e1190007f'
+assert h.hexdigest() == 'b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81'
 </pre><a href="#appendix-C.1-5" class="pilcrow">¶</a>
 </div>
 </section>
@@ -6932,7 +6951,7 @@ assert h.hexdigest() == '94a95384a8c69acea9b50d035a58285b3a777cb7a724005faa5e1f1
         <h3 id="name-subtree-inclusion-proofs-2">
 <a href="#appendix-C.2" class="section-number selfRef">C.2. </a><a href="#name-subtree-inclusion-proofs-2" class="section-name selfRef">Subtree Inclusion Proofs</a>
         </h3>
-<p id="appendix-C.2-1">For each value of <code>end</code> from 1 to 130, and each value of <code>start</code> from 0 to <code>end - 1</code>, if <code>[start, end)</code> is a valid subtree, for each value of <code>index</code> from <code>start</code> to <code>end - 1</code>, add to the rolling hash the ASCII string <code>INDEX [START, END)</code>, then, for each hash in the inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for <code>d[index]</code> in the subtree <code>[start, end)</code>, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where <code>INDEX</code> is the decimal representation of <code>index</code>, and <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively.<a href="#appendix-C.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-C.2-1">For each value of <code>end</code> from 0 to 130, and each value of <code>start</code> from 0 to <code>end</code>, if <code>[start, end)</code> is a valid subtree, for each value of <code>index</code> from <code>start</code> to <code>end - 1</code>, add to the rolling hash the ASCII string <code>INDEX [START, END)</code>, then, for each hash in the inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for <code>d[index]</code> in the subtree <code>[start, end)</code>, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where <code>INDEX</code> is the decimal representation of <code>index</code>, and <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively.<a href="#appendix-C.2-1" class="pilcrow">¶</a></p>
 <p id="appendix-C.2-2">The final hash value is<a href="#appendix-C.2-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-C.2-3">
 <pre>
@@ -6944,8 +6963,8 @@ ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f
 <pre>
 import hashlib
 h = hashlib.sha256()
-for end in range(1, 131):
-    for start in range(end):
+for end in range(0, 131):
+    for start in range(end + 1):
         if valid_subtree(start, end):
             for index in range(start, end):
                 inclusion_proof = get_inclusion_proof(D, start, end, index)
@@ -6963,11 +6982,11 @@ assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3
         <h3 id="name-subtree-consistency-proofs-2">
 <a href="#appendix-C.3" class="section-number selfRef">C.3. </a><a href="#name-subtree-consistency-proofs-2" class="section-name selfRef">Subtree Consistency Proofs</a>
         </h3>
-<p id="appendix-C.3-1">For each value of <code>n</code> from 0 to 130, and each value of <code>end</code> from 1 to <code>n</code>, and each value of <code>start</code> from 0 to <code>end - 1</code>, if <code>[start, end)</code> is a valid subtree, add to the rolling hash the ASCII string <code>[START, END) N</code>, then, for each hash in the consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>) for the subtree <code>[start, end)</code> and tree of size <code>n</code>, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively, and <code>N</code> is the decimal representation of <code>n</code>.<a href="#appendix-C.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-C.3-1">For each value of <code>n</code> from 0 to 130, and each value of <code>end</code> from 0 to <code>n</code>, and each value of <code>start</code> from 0 to <code>end</code>, if <code>[start, end)</code> is a valid subtree, add to the rolling hash the ASCII string <code>[START, END) N</code>, then, for each hash in the consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>) for the subtree <code>[start, end)</code> and tree of size <code>n</code>, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively, and <code>N</code> is the decimal representation of <code>n</code>.<a href="#appendix-C.3-1" class="pilcrow">¶</a></p>
 <p id="appendix-C.3-2">The final hash value is<a href="#appendix-C.3-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-C.3-3">
 <pre>
-c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
+10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74
 </pre><a href="#appendix-C.3-3" class="pilcrow">¶</a>
 </div>
 <p id="appendix-C.3-4">In Python, this can be expressed as:<a href="#appendix-C.3-4" class="pilcrow">¶</a></p>
@@ -6976,15 +6995,15 @@ c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d
 import hashlib
 h = hashlib.sha256()
 for n in range(131):
-    for end in range(1, n + 1):
-        for start in range(end):
+    for end in range(0, n + 1):
+        for start in range(end + 1):
             if valid_subtree(start, end):
                 consistency_proof = get_consistency_proof(D, n, start, end)
                 line = f'[{start}, {end}) {n}'
                 for p in consistency_proof:
                     line += f' {p.hex()}'
                 h.update(f'{line}\n'.encode())
-assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b8209edd083d'
+assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74'
 </pre><a href="#appendix-C.3-5" class="pilcrow">¶</a>
 </div>
 </section>
@@ -6994,35 +7013,24 @@ assert h.hexdigest() == 'c586ebbb73a5621baf2140095d87dde934e3b6503a562a1a5215b82
         <h3 id="name-efficient-covering-subtrees">
 <a href="#appendix-C.4" class="section-number selfRef">C.4. </a><a href="#name-efficient-covering-subtrees" class="section-name selfRef">Efficient Covering Subtrees</a>
         </h3>
-<p id="appendix-C.4-1">For each value of <code>end</code> from 1 to 130, and each value of <code>start</code> from 0 to <code>end - 1</code>:<a href="#appendix-C.4-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="appendix-C.4-2.1">
-            <p id="appendix-C.4-2.1.1">if <code>[start, end)</code> is a valid subtree, add to the rolling hash the ASCII string <code>[START, END)</code> followed by a newline (U+000A), where <code>START</code> and <code>END</code> are the decimal representations of <code>start</code> and <code>end</code>, respectively;<a href="#appendix-C.4-2.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="appendix-C.4-2.2">
-            <p id="appendix-C.4-2.2.1">otherwise, add to the rolling hash the ASCII string <code>[LEFT_START, LEFT_END) [RIGHT_START, RIGHT_END)</code> followed by a newline (U+000A), where <code>LEFT_START</code>, <code>LEFT_END</code>, <code>RIGHT_START</code>, and <code>RIGHT_END</code> are the decimal representations of the start and end of the left and right subtrees, respectively, that efficiently cover (<a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>) <code>[start, end)</code>.<a href="#appendix-C.4-2.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="appendix-C.4-3">The final hash value is<a href="#appendix-C.4-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-C.4-4">
+<p id="appendix-C.4-1">For each value of <code>end</code> from 0 to 130, and each value of <code>start</code> from 0 to <code>end</code>, add to the rolling hash the ASCII string <code>[LEFT_START, LEFT_END) [RIGHT_START, RIGHT_END)</code> followed by a newline (U+000A), where <code>LEFT_START</code>, <code>LEFT_END</code>, <code>RIGHT_START</code>, and <code>RIGHT_END</code> are the decimal representations of the start and end of the left and right subtrees, respectively, that efficiently cover (<a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>) <code>[start, end)</code>.<a href="#appendix-C.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-C.4-2">The final hash value is<a href="#appendix-C.4-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-C.4-3">
 <pre>
-e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd
-</pre><a href="#appendix-C.4-4" class="pilcrow">¶</a>
+7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0
+</pre><a href="#appendix-C.4-3" class="pilcrow">¶</a>
 </div>
-<p id="appendix-C.4-5">In Python, this can be expressed as:<a href="#appendix-C.4-5" class="pilcrow">¶</a></p>
-<div class="lang-python sourcecode" id="appendix-C.4-6">
+<p id="appendix-C.4-4">In Python, this can be expressed as:<a href="#appendix-C.4-4" class="pilcrow">¶</a></p>
+<div class="lang-python sourcecode" id="appendix-C.4-5">
 <pre>
 import hashlib
 h = hashlib.sha256()
-for end in range(1, 131):
-    for start in range(end):
-        if valid_subtree(start, end):
-            h.update(f'[{start}, {end})\n'.encode())
-        else:
-            left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
-            h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
-assert h.hexdigest() == 'e0aecb912a10c57d753b6ecc64db73217f9bc4ed10fcb4e9062be3b6fbe1ebfd'
-</pre><a href="#appendix-C.4-6" class="pilcrow">¶</a>
+for end in range(0, 131):
+    for start in range(end + 1):
+        left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
+        h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
+assert h.hexdigest() == '7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0'
+</pre><a href="#appendix-C.4-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -7383,6 +7391,33 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.16-1.7">
             <p id="appendix-E.16-1.7.1">Add a maxSerial field to the CA format<a href="#appendix-E.16-1.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-ietf-plants-merkle-tree-certs-05">
+<section id="appendix-E.17">
+        <h3 id="name-since-draft-ietf-plants-merkle-t">
+<a href="#name-since-draft-ietf-plants-merkle-t" class="section-name selfRef">Since draft-ietf-plants-merkle-tree-certs-05</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.17-1.1">
+            <p id="appendix-E.17-1.1.1">Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be consistent with MTCProof, shorter, and help disambiguate the many English meanings of "entry"<a href="#appendix-E.17-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.2">
+            <p id="appendix-E.17-1.2.1">Fixed one of the accumulated test vectors to better reflect one of the edge cases in subtree covering.<a href="#appendix-E.17-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.3">
+            <p id="appendix-E.17-1.3.1">Make empty subtrees valid, so the subtree covering function always returns two subtrees.<a href="#appendix-E.17-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.4">
+            <p id="appendix-E.17-1.4.1">Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.<a href="#appendix-E.17-1.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.5">
+            <p id="appendix-E.17-1.5.1">Clarify that a landmark consists of both a number and a tree size, and that a landmark's subtrees share its landmark number.<a href="#appendix-E.17-1.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.6">
+            <p id="appendix-E.17-1.6.1">Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.<a href="#appendix-E.17-1.6.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
