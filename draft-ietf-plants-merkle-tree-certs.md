@@ -430,7 +430,7 @@ Not all intervals can form subtrees. Subtrees are limited to intervals that can 
 
 {{subtree-test-vectors}} provides test vectors for the algorithms defined in this section.
 
-## Definition of a Subtree {#sec-subtree}
+## Definition of a Subtree
 
 Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Section 2.1.1 of !RFC9162}} defines the Merkle Tree via the Merkle Tree Hash `MTH(D_n)`.
 
@@ -1039,13 +1039,13 @@ Note the subject's public key algorithm is incorporated into both `subjectPublic
 
 MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
-An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so might exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}, so implementer SHOULD be caution about any limits imposed by the protocls and log providers that they intend to use. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
+An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Implementers SHOULD CONSIDER that log-serving protocols, or the underlying transport mechanisms they use, could have lower limits. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
 ### Publishing Logs
 
 This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
 
-This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications could have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization which could, for example, require an authentication mechanism. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
+This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications could have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
 For example, a log ecosystem could use {{TLOG-TILES}} to serve logs. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
 
@@ -1166,7 +1166,7 @@ This is equivalent to the concatenation of:
 
 For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
 
-`start` and `end` MUST define a valid subtree of the log {{sec-subtree}}, and `subtree_hash` MUST be the subtree's hash value {{sec-subtree}} in the cosigner's view of the log.
+`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. See {{definition-of-a-subtree}}.
 
 If `timestamp` is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally, if `timestamp` is non-zero, the following MUST be true:
 
@@ -2339,7 +2339,7 @@ They are hash values of the outputs of all possible inputs for each algorithm, f
 
 For all the test vectors, a tree `D_n` of size `n` is constructed with leaf values `d[0] = 0x00, d[1] = 0x01, ...`. The hash function used is SHA-256. The hash values are encoded in hexadecimal.
 
-## Subtree Hashes {#subtree-hashes}
+## Subtree Hashes
 
 For each value of `end` from 1 to 130, and each value of `start` from 0 to `end - 1`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) HASH` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `HASH` is the hexadecimal encoding of `MTH(D[start:end])`, according to {{subtrees}}.
 
