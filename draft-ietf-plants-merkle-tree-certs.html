@@ -4418,9 +4418,8 @@ struct {
           <h4 id="name-signature-algorithms">
 <a href="#section-5.3.3" class="section-number selfRef">5.3.3. </a><a href="#name-signature-algorithms" class="section-name selfRef">Signature Algorithms</a>
           </h4>
-<p id="section-5.3.3-1">The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used.<a href="#section-5.3.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3.3-2">In this document, any PKIX signature algorithm MAY be used, such as the ML-DSA algorithms defined in <span>[<a href="#RFC9881" class="cite xref">RFC9881</a>]</span>. The signature is generated as in PKIX, except that the input is the structure defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. In particular, in ML-DSA algorithms, the context string MUST be an empty string, as in <span><a href="https://rfc-editor.org/rfc/rfc9881#section-3" class="relref">Section 3</a> of [<a href="#RFC9881" class="cite xref">RFC9881</a>]</span>.<a href="#section-5.3.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.3.3-3">Other documents or deployments MAY define other signature schemes and formats. Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.<a href="#section-5.3.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.3.3-1">The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. Signatures are computed over the CosignedMessage described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>.<a href="#section-5.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3.3-2">Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.<a href="#section-5.3.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5666,10 +5665,6 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="RFC9846">[RFC9846]</dt>
         <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9846</span>, <span class="seriesInfo">DOI 10.17487/RFC9846</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9846">https://www.rfc-editor.org/rfc/rfc9846</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC9881">[RFC9881]</dt>
-        <dd>
-<span class="refAuthor">Massimo, J.</span>, <span class="refAuthor">Kampanakis, P.</span>, <span class="refAuthor">Turner, S.</span>, and <span class="refAuthor">B. E. Westerbaan</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure -- Algorithm Identifiers for the Module-Lattice-Based Digital Signature Algorithm (ML-DSA)"</span>, <span class="seriesInfo">RFC 9881</span>, <span class="seriesInfo">DOI 10.17487/RFC9881</span>, <time datetime="2025-10" class="refDate">October 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9881">https://www.rfc-editor.org/rfc/rfc9881</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9925">[RFC9925]</dt>
         <dd>
