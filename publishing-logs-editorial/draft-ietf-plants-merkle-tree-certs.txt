@@ -1406,8 +1406,8 @@ Table of Contents
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
-   For example, [MTC-TLOG] defines a profile for Merkle tree
-   Certificates based on [TLOG-TILES].
+   For example, [MTC-TLOG] defines a profile for Merkle Tree
+   Certificates that uses [TLOG-TILES].
 
 5.2.3.  Log Pruning
 
