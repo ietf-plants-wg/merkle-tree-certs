@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 22 January 2027                                      Apple Inc.
+Expires: 23 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            21 July 2026
+                                                            22 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 January 2027.
+   This Internet-Draft will expire on 23 January 2027.
 
 Copyright Notice
 
@@ -1406,13 +1406,8 @@ Table of Contents
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
-   For example, a log ecosystem could use [TLOG-TILES] to serve logs;
-   [MTC-TLOG] defines such a profile for Merkle Tree Certificates.
-   [TLOG-TILES] improves on [RFC6962] and [RFC9162] by exposing the log
-   as a collection of cacheable, immutable "tiles".  This works well
-   with a variety of common HTTP [RFC9110] serving architectures.  It
-   also allows log clients to request arbitrary tree nodes, so log
-   clients can fetch the structures described in Section 4.
+   For example, [MTC-TLOG] defines a profile for Merkle Tree
+   Certificates that uses [TLOG-TILES].
 
 5.2.3.  Log Pruning
 
