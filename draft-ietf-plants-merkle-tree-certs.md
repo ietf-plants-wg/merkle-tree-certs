@@ -1213,11 +1213,9 @@ Subtree signatures can be used to sign timestamped log checkpoints with a non-ze
 
 ### Signature Algorithms
 
-The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used.
+The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. Signatures are computed over the CosignedMessage described in {{signature-format}}.
 
-In this document, any PKIX signature algorithm MAY be used, such as the ML-DSA algorithms defined in {{!RFC9881}}. The signature is generated as in PKIX, except that the input is the structure defined in {{signature-format}}. In particular, in ML-DSA algorithms, the context string MUST be an empty string, as in {{Section 3 of !RFC9881}}.
-
-Other documents or deployments MAY define other signature schemes and formats. Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
+Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
 
 ## Certification Authority Cosigners
 
