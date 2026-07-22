@@ -1069,7 +1069,7 @@ This protocol aims to enable monitors to detect misissued certificates by observ
 
 This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
-For example, a log ecosystem could use {{TLOG-TILES}} to serve logs; {{MTC-TLOG}} defines such a profile for Merkle Tree Certificates. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
+For example, {{MTC-TLOG}} defines a profile for Merkle Tree Certificates that uses {{TLOG-TILES}}.
 
 ### Log Pruning
 
