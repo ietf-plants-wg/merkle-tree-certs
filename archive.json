@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-21T03:31:50.947953+00:00",
+  "timestamp": "2026-07-23T03:35:21.903994+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -52,6 +52,11 @@
       "name": "charter",
       "description": "",
       "color": "0D813E"
+    },
+    {
+      "name": "demo",
+      "description": "The demo tool, not part of the spec itself",
+      "color": "f0d809"
     }
   ],
   "issues": [
@@ -456,15 +461,15 @@
       "id": "I_kwDOJIBkVc5hitMX",
       "title": "Flesh out ACME interface",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/13",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Filing this to capture TODO in the doc",
       "createdAt": "2023-03-22T20:58:34Z",
-      "updatedAt": "2026-04-08T12:43:31Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T14:06:08Z",
+      "closedAt": "2026-07-21T14:06:08Z",
       "comments": [
         {
           "author": "aarongable",
@@ -3670,15 +3675,15 @@
       "id": "I_kwDOJIBkVc8AAAABFme1Yw",
       "title": "Expand on how to determine a landmark subtree for an entry index from the landmark sequence",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/253",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "lukevalenta",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Give a more exact description for how to determine a landmark subtree for an entry from the landmark sequence. The current text at https://github.com/ietf-plants-wg/merkle-tree-certs/blob/main/draft-ietf-plants-merkle-tree-certs.md#constructing-landmark-relative-certificates says:\n```\nGiven a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark-relative certificate is constructed as follows:\n\nWait for the first landmark to be allocated that contains the entry.\n\nDetermine the landmark's subtrees and select the one that contains the entry.\n\nConstruct a certificate ([Section 6.1](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-04.html#certificate-format)) using the selected subtree and no signatures.\n```\n\nWe can give a little more detail here and define an exact algorithm to derive the unique landmark subtree (if one exists for the entry) and corresponding landmark number. It's also slightly confusing to say a landmark 'contains' an entry, since we're really looking for an interval `[prev_tree_size, tree_size)` that contains the entry index.\n\nAlso worth stating that both landmark subtrees share the same landmark number, since that's a potential point of confusion.",
       "createdAt": "2026-06-16T03:45:46Z",
-      "updatedAt": "2026-06-16T03:45:46Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T14:07:16Z",
+      "closedAt": "2026-07-21T14:07:16Z",
       "comments": []
     },
     {
@@ -3776,6 +3781,86 @@
           "updatedAt": "2026-07-03T04:50:38Z"
         }
       ]
+    },
+    {
+      "number": 279,
+      "id": "I_kwDOJIBkVc8AAAABJj_SOA",
+      "title": "Go through Mike's review of the draft",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/279",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@ounsworth sent a review to https://mailarchive.ietf.org/arch/msg/plants/_i-jui8E-iAR82TGxP8tLveJqqY/ (Thanks!)\n\nFiling this so we don't forgot to go through it and incorporate suggestions.",
+      "createdAt": "2026-07-21T07:57:00Z",
+      "updatedAt": "2026-07-22T11:08:00Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ounsworth",
+          "authorAssociation": "NONE",
+          "body": "The big TL;DR of my review is that I read the document with an intentionally pedantic eye to see if the internal definitions are consistent.\nI got all twisted up over the definitions of \"landmark\" and \"checkpoint\" which I found were conceptually easy enough to understand, but not formally-enough defined to allow me to properly unroll down to a concrete byte encoding what is meant by sentences like \"if the entry is included in a landmark\" (when the formal definition of \"landmark\" is a single uint64), or \"sign the checkpoint\" (when I could not find a byte serialization or struct def'n of \"checkpoint\" at all).\n\nBy the time I got to Section 6, I was so confused that I stopped reading.\n\nProbably this will be fixed by some simple tightening up of the definitions at the top.\n\nOnce you've spun a new version, I'll have another go at it.",
+          "createdAt": "2026-07-22T11:06:39Z",
+          "updatedAt": "2026-07-22T11:08:00Z"
+        }
+      ]
+    },
+    {
+      "number": 282,
+      "id": "I_kwDOJIBkVc8AAAABJm5IZA",
+      "title": "Generate CertificatePropertyList in demo tool",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/282",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "davidben"
+      ],
+      "labels": [
+        "demo"
+      ],
+      "body": "",
+      "createdAt": "2026-07-21T14:04:24Z",
+      "updatedAt": "2026-07-21T14:05:20Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 283,
+      "id": "I_kwDOJIBkVc8AAAABJm5Stg",
+      "title": "Include a certificate verifier in the demo tool",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/283",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "davidben"
+      ],
+      "labels": [
+        "demo"
+      ],
+      "body": "",
+      "createdAt": "2026-07-21T14:04:40Z",
+      "updatedAt": "2026-07-21T14:05:20Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 285,
+      "id": "I_kwDOJIBkVc8AAAABJnPzPQ",
+      "title": "TLS certificate_authorities should not match a landmark-relative certificate",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/285",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "An MTC CA has both a trust anchor ID and an X.509 name, so it _could_ use either `trust_anchors` or `certificate_authorities`, in principle.\n\nHowever, both the standalone and landmark-relative form of the certificate have the _same_ issuer name. But while a `certificate_authorities` match is broadly sufficient for the standalone certificate, it's not sufficient for the landmark-relative certificate. That needs a finer-grained trust anchor match (the landmark itself).\n\nPossible fixes here:\n1. Say that landmark-relative and standalone certificate have different issuer names in the X.509 representation. Put the landmark number in the landmark-relative certificate's issuer.\n2. Say that _authenticating parties_ somehow know to ignore `certificate_authorities` for the landmark-relative certificate, but the standalone certificate can match.\n3. Say that _authenticating parties_ somehow know to never match `certificate_authorities` to an MTC, landmark-relative or standalone\n4. Say that _relying parties_ never send an MTC CA's X.509 name in `certificate_authorities`, only `trust_anchors`.\n\n(1) seems natural in that it restores an X.509 invariant around certificate matching. But it breaks a _different_ X.509 invariant. Certificates are revoked and referenced via (issuer, serial) tuples, but we want the two certificates to be revoked together.\n\n(2) requires that TLS server software distinguish the two forms. While they could either parse out the certificate, or we introduce a new certificate property, this seems needlessly fiddly.\n\n(3) is less fiddly, but does mean \"this credential requires _some_ kind of issuer match\" and \"this credential requires specifically a `trust_anchors` match\" are now different settings on the credential, and different certificate properties. (Our stack currently uses the same setting, but it should be easy to split them.)\n\nAt that point, if they never apply to MTCs, we may as well do (4), since the relying party necessarily needs to know it's offering MTCs anyway.",
+      "createdAt": "2026-07-21T14:45:32Z",
+      "updatedAt": "2026-07-21T14:45:58Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -18217,17 +18302,19 @@
       "state": "OPEN",
       "author": "lukevalenta",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "lukevalenta"
+      ],
       "labels": [],
-      "body": "- Make explicit that a landmark consists of a number and a tree size, and that both subtrees of a given landmark share that landmark number.\r\n- Give an exact algorithm for selecting the landmark and subtree, with explicit wait and abort conditions for the cases where no allocated landmark yet covers the entry index, or where every landmark that once covered it has aged out.\r\n- Add a paragraph clarifying that landmark-relative certificate construction is not specific to the CA: any party that can read the issuance log and the landmark sequence can construct one from the standalone cert. Reference MTC-TLOG as an example for tile-based log ecosystems.\r\n- Note that a client MAY construct the landmark-relative certificate itself from the standalone certificate, as an alternative to fetching it from the ACME server's alternate URL.\r\n- Add an informative reference to MTC-TLOG (c2sp.org/mtc-tlog).\r\n\r\nCloses #246, #253. Also depends on https://github.com/C2SP/C2SP/pull/269.",
+      "body": "Describe that any party with access to the issuance log and landmark sequence can construct a landmark-relative certificate for a standalone cert they hold.\r\n\r\n(closes #246, relates to https://github.com/C2SP/C2SP/pull/269)",
       "createdAt": "2026-06-16T16:46:27Z",
-      "updatedAt": "2026-07-08T21:21:01Z",
+      "updatedAt": "2026-07-21T15:00:35Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "69a29c7f017d8fd418a6f2e3cedd2ceb05208de6",
+      "baseRefOid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "lvalenta/client-constructed-landmark-relative",
-      "headRefOid": "32bd21857af30adacb3e32ba0851cd14f970bac5",
+      "headRefOid": "c7beff46a644530eafeab7fcd7df80b8d2ac3f71",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -19263,26 +19350,42 @@
       "id": "PR_kwDOJIBkVc7ysrZr",
       "title": "Clarify that the SPKI hash only needs second preimage resistance",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/272",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Adapted from a change in #226. Even if we don't put in a randomizer just yet, let's make it clear that this hash is not dependent on collision resistance.",
       "createdAt": "2026-07-16T20:32:59Z",
-      "updatedAt": "2026-07-16T20:32:59Z",
+      "updatedAt": "2026-07-21T08:44:23Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "3f06f9de912f23d258f3531c7358fd49b9cccc09",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "spki-hash-preimage",
       "headRefOid": "2c7d2b65ba9b077ad5f63cf9cf8de5112dbad0f3",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-21T08:44:18Z",
+      "mergedAt": "2026-07-21T08:44:18Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "1b090f98c08a3445c1b71f85f6c1b7aac5f1d95a"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGrA3CQ",
+          "commit": {
+            "abbreviatedOid": "2c7d2b6"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T08:33:46Z",
+          "updatedAt": "2026-07-21T08:33:46Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 273,
@@ -19533,19 +19636,442 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-07-20T20:31:27Z",
-      "updatedAt": "2026-07-20T20:31:27Z",
+      "updatedAt": "2026-07-22T15:15:09Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "00fd4fc714418cad4e8f8a6bb943350ba50dcac6",
       "headRepository": "ounsworth/merkle-tree-certs",
       "headRefName": "main",
-      "headRefOid": "a81741503477534ad4e70ce8ff96765c72062680",
+      "headRefOid": "05abf635ab2f19aea2bb3e72deaa03d538a8036d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGqYXcA",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks! That makes things a bit clearer! Some comments below.",
+          "createdAt": "2026-07-21T06:59:17Z",
+          "updatedAt": "2026-07-21T07:47:31Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "caution -> cautios, protocls -> protocols.\nThough \"should be cautious about\" reads like [SHOULD CONSIDER](https://www.rfc-editor.org/rfc/rfc6919.html#section-2). :-)\n\nI dunno, I guess we should sort out what we're actually trying to say here. Previously it was:\n* You probably don't want to exceed 65535. You probably are using tlog-tiles, and that is limited there\n* PS: Don't worry about PQ stuff\n\nAnd I suppose the point here is that there's an implicit \"you should honor the limits or whatever other things impose on you\" that's... honestly tautological but perhaps a glue thought missing between them.\n\nBut also maybe this is too complicated and we just keep it simple:\n\n```suggestion\nAn MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.\n```\n\nThat:\n1. Makes you compatible with tlog-tiles, but that's not normative text and the little FYI seems to be too complicated.\n2. Hints that, if you're building a log protocol that's not tlog, you should maybe try to accommodate 65535\n\nAnd then if hypothetically someone were building something new on top of MTCs and needed a different limit, they can sort that out then. We don't need to say \"if you have other limits, you have other limits\".\n\nThoughts?",
+              "createdAt": "2026-07-21T06:59:17Z",
+              "updatedAt": "2026-07-21T07:47:31Z"
+            },
+            {
+              "originalPosition": 24,
+              "body": "Nit: I was always taught that \"which\" needs a comma, but \ud83e\udd37 \n\nNot sure about the second half. Talking about authenticating twice in the same sentence, but with different meaning, seems confusing. Do we need to elaborate on \"private to the organization\"? Whether it's auth or network-level or whatever can probably be left for people to choose.",
+              "createdAt": "2026-07-21T07:29:18Z",
+              "updatedAt": "2026-07-21T07:47:31Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "I think this will render as \"`start` and `end` MUST define a valid subtree of the log Section 1.2.3\". I.e. just stick \"Section 1.2.3\" directly inline in the text. I usually put parens like `({{sec-subtree}})` or write `See {{sec-subtree}}`.\n\nAlthough these are both citing the same section. It's annoying that our specs don't allow more lightweight links everywhere but, failing that, perhaps:\n\n```suggestion\n`start` and `end` MUST define a valid subtree of the log , and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. See {{sec-subtree}}.\n```",
+              "createdAt": "2026-07-21T07:31:54Z",
+              "updatedAt": "2026-07-21T07:47:31Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "(This works, but we also just automatically get section references. I.e. we can already just cite {{definition-of-a-subtree}}. A bit verbose but does save the effort of coming up with two names for every section.)",
+              "createdAt": "2026-07-21T07:32:40Z",
+              "updatedAt": "2026-07-21T07:47:31Z"
+            },
+            {
+              "originalPosition": 72,
+              "body": "Re losing the tlog-witness ref, straddling the \"tlog is an important example, but not a requirement\" line is tricky, but I've often found writing too abstract to be confusing. WDYT about adding a sentence like this to the middle bullet point.\n\n> {{TLOG-WITNESS}} is an example of such a cosigner.",
+              "createdAt": "2026-07-21T07:35:16Z",
+              "updatedAt": "2026-07-21T07:47:31Z"
+            },
+            {
+              "originalPosition": 107,
+              "body": "Hmm. This says something subtly different:\r\n* That the entry is specifically publicly logged by the CA\r\n* That you determine the issuing CA from the TBSCertificateLogEntry rather than being one of the inputs above\r\n\r\nI think both of these aren't quite right. It *might* be that you deploy MTCs where the CA doesn't make its log available, but pushes to mirrors which do make it available. This is kinda silly, but maybe your PKI has CAs with very low serving capacity.\r\n\r\nBut the original text wasn't right either because maybe your PKI doesn't *want* to log them *publicly*.\r\n\r\nThe second is also odd. Yes, there is an `issuer` field in the log entry, but it's [not really used](https://mailarchive.ietf.org/arch/msg/plants/bwW5ljl-rdRqfRvqfZnFNCiL408/).\r\n\r\nWDYT if we just simplified this down to:\r\n\r\n```suggestion\r\nBy varying the choice of subtree and signatures, there can be multiple ways to prove the entry is in the log, and thus certified by the CA. {{certificate-format}} defines how a certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.\r\n```\r\n\r\nI.e. we're just referring back up to the list of inputs above.",
+              "createdAt": "2026-07-21T07:44:15Z",
+              "updatedAt": "2026-07-21T07:50:07Z"
+            },
+            {
+              "originalPosition": 116,
+              "body": "Elsewhere we say that the landmark sequence is optional, but this suggests it's unconditionally required. Perhaps:\n\n\n```suggestion\nA CA that issues landmark-relative certificates MUST additionally maintain a *landmark sequence*. A landmark sequence is a sequence of *landmarks*, defined below:\n```",
+              "createdAt": "2026-07-21T07:46:15Z",
+              "updatedAt": "2026-07-21T07:47:31Z"
+            },
+            {
+              "originalPosition": 125,
+              "body": "(This is implicit from the section title.)",
+              "createdAt": "2026-07-21T07:46:34Z",
+              "updatedAt": "2026-07-21T07:47:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGtAZKA",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-21T13:00:12Z",
+          "updatedAt": "2026-07-21T13:00:13Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "Yeah, I agree this is a weird non-normative \"but what about the ~children~ TLOG\" sentence that mostly doesn't do anything. I'll give you another commit that goes halfway to Deleted.",
+              "createdAt": "2026-07-21T13:00:12Z",
+              "updatedAt": "2026-07-21T13:00:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGtLDaA",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-21T13:18:50Z",
+          "updatedAt": "2026-07-21T13:18:50Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "Agree. Reverted.",
+              "createdAt": "2026-07-21T13:18:50Z",
+              "updatedAt": "2026-07-21T13:18:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGtMwDQ",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-21T13:21:26Z",
+          "updatedAt": "2026-07-21T13:21:26Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "Yup, that's better.\r\n\r\nBy the way, does the {{name-of-section}} syntax work for all kramdown, or did you have to do something in the preamble to make that work?",
+              "createdAt": "2026-07-21T13:21:26Z",
+              "updatedAt": "2026-07-21T13:21:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGtPeZQ",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-21T13:25:37Z",
+          "updatedAt": "2026-07-21T13:25:37Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "I'm not going to make a change here.\r\n\r\nTo me, this:\r\n\r\n> {{TLOG-WITNESS}} is an example of such a cosigner.\r\n\r\ndoesn't add any value to the spec. To me, that reads like gratuitious marketing in a similar way that \r\n\r\n> ML-DSA private keys MAY be reperesented in the BOTH struct. {{openssl}} is an example of such a library\r\n\r\nreally adds nothing useful or actionable to the spec. But also, I don't really care if you want to put it back.",
+              "createdAt": "2026-07-21T13:25:37Z",
+              "updatedAt": "2026-07-21T13:25:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABG3hL-g",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-22T15:08:20Z",
+          "updatedAt": "2026-07-22T15:08:21Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "> By the way, does the {{name-of-section}} syntax work for all kramdown, or did you have to do something in the preamble to make that work?\r\n\r\nAs far as I know, it works for all of kramdown.",
+              "createdAt": "2026-07-22T15:08:21Z",
+              "updatedAt": "2026-07-22T15:08:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABG3hprg",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-22T15:09:11Z",
+          "updatedAt": "2026-07-22T15:09:12Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "Fair enough. I was thinking less marketing here and more \"people get confused when I talk in the abstract, so here's an example\".",
+              "createdAt": "2026-07-22T15:09:12Z",
+              "updatedAt": "2026-07-22T15:09:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABG3h3XQ",
+          "commit": {
+            "abbreviatedOid": "a817415"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-07-22T15:09:34Z",
+          "updatedAt": "2026-07-22T15:09:35Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "(But I don't feel strongly either way. Happy to leave it out.)",
+              "createdAt": "2026-07-22T15:09:34Z",
+              "updatedAt": "2026-07-22T15:09:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABG3iviA",
+          "commit": {
+            "abbreviatedOid": "05abf63"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "One last comment but otherwise looks good. Thanks for this!",
+          "createdAt": "2026-07-22T15:11:15Z",
+          "updatedAt": "2026-07-22T15:15:09Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Hahaha. I'm pretty sure RFC 6919 is a joke that you're not actually meant to use. :-)\n\nI dunno, is the issue just that it's a SHOULD NOT instead of a MUST NOT and thus things are wishy-washy? Why don't we just cut to the chase then and do:\n\n```suggestion\nAn MTCLogEntry's size MUST NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.\n```\n\nWould that work better? Now we just unambiguously say 2^16-1 is the limit, no ambiguity about it. Would that remove the need for the awkward middle sentence for you?",
+              "createdAt": "2026-07-22T15:11:15Z",
+              "updatedAt": "2026-07-22T15:15:09Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 280,
+      "id": "PR_kwDOJIBkVc70Xs8O",
+      "title": "Clarify what a landmark is",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/280",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "Make explicit that a landmark consists of a number and a tree size, and that both subtrees of a given landmark share that landmark number.\r\n\r\n(split out from #254, closes #253)",
+      "createdAt": "2026-07-21T13:11:50Z",
+      "updatedAt": "2026-07-21T14:07:15Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "08a9da21aca817504b99d6b5c00619c2b25dc53e",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "lvalenta/clarify-landmark-definition",
+      "headRefOid": "cfc163fe56052fc811a2f18ed6269b0295025002",
+      "closedAt": "2026-07-21T14:07:15Z",
+      "mergedAt": "2026-07-21T14:07:15Z",
+      "mergedBy": "lukevalenta",
+      "mergeCommit": {
+        "oid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGtoSoA",
+          "commit": {
+            "abbreviatedOid": "cfc163f"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T14:03:49Z",
+          "updatedAt": "2026-07-21T14:03:49Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 281,
+      "id": "PR_kwDOJIBkVc70YtRm",
+      "title": "Add MTC-TLOG informative reference",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/281",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and cite it where tile-based transparency logs are discussed in the log-serving and operational cost sections.\r\n\r\n(split from #254)",
+      "createdAt": "2026-07-21T13:44:23Z",
+      "updatedAt": "2026-07-21T14:02:16Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "1b090f98c08a3445c1b71f85f6c1b7aac5f1d95a",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "lvalenta/mtc-tlog-reference",
+      "headRefOid": "9cd57b8bae4cfca15769f746f3da4ba5683f463b",
+      "closedAt": "2026-07-21T14:02:16Z",
+      "mergedAt": "2026-07-21T14:02:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "08a9da21aca817504b99d6b5c00619c2b25dc53e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABGtnLKQ",
+          "commit": {
+            "abbreviatedOid": "9cd57b8"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-21T14:02:08Z",
+          "updatedAt": "2026-07-21T14:02:08Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 284,
+      "id": "PR_kwDOJIBkVc70aj8-",
+      "title": "Detail landmark-relative certificate construction",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/284",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "Give an exact procedure for selecting the landmark and covering subtree when constructing a landmark-relative certificate.\r\n\r\n(split from #254)",
+      "createdAt": "2026-07-21T14:44:30Z",
+      "updatedAt": "2026-07-21T14:44:30Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "lvalenta/exact-landmark-relative-construction",
+      "headRefOid": "dc632c8909f1afe9b0c864d2866217784fcb8149",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 286,
+      "id": "PR_kwDOJIBkVc70yiuf",
+      "title": "Simplify signature discussion",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/286",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Mentioning PKIX here seems to just be confusing. Just say this is how you sign a thing. The PKIX connection already comes in later in the Representing Certification Authorities section.\r\n\r\nIssue #279",
+      "createdAt": "2026-07-22T09:27:00Z",
+      "updatedAt": "2026-07-22T17:38:37Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "sigalg-editorial",
+      "headRefOid": "04ce524bb9ade4ba1883b870d904b777c1746b01",
+      "closedAt": "2026-07-22T17:38:34Z",
+      "mergedAt": "2026-07-22T17:38:34Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "d641a8ce42d7963e61668b6e74995c7623d4ad3a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABG4VF9g",
+          "commit": {
+            "abbreviatedOid": "04ce524"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-22T16:49:29Z",
+          "updatedAt": "2026-07-22T16:49:29Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 287,
+      "id": "PR_kwDOJIBkVc70yr8c",
+      "title": "Just mention mtc-tlog and tlog-tiles, no need to elaborate",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/287",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Issue #279",
+      "createdAt": "2026-07-22T09:32:59Z",
+      "updatedAt": "2026-07-22T17:38:14Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "publishing-logs-editorial",
+      "headRefOid": "bae8fa69d4b57cdde670b155451ee6a3b095e7d0",
+      "closedAt": "2026-07-22T17:38:11Z",
+      "mergedAt": "2026-07-22T17:38:11Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e3864e1ba40e37063ea661021a3f88b4373e6615"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABG4VWNw",
+          "commit": {
+            "abbreviatedOid": "bae8fa6"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-22T16:50:04Z",
+          "updatedAt": "2026-07-22T16:50:04Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
