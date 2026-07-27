@@ -222,7 +222,7 @@ This achieves the following:
 
 * Log entries do not scale with public key and signature sizes. Entries replace public keys with hashes and do not contain signatures, while preserving non-repudiability ({{non-repudiation}}).
 
-* To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.
+* Long-expired entries can be revoked from relying parties in bulk (see {{revoked-ranges}}). This allows logging and monitoring infrastructure to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.
 
 * After a processing delay, authenticating parties can obtain a second "landmark-relative" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.
 
@@ -984,8 +984,6 @@ A log ID specifies both the CA and the log number in a single ID.
 
 Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
-Each log additionally maintains a *minimum index* value, which is the index of the first log entry which is available. See {{log-pruning}}. This value changes over the lifetime of the log.
-
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
@@ -1069,78 +1067,9 @@ This protocol aims to enable monitors to detect misissued certificates by observ
 
 This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications could have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
+If a serving protocol supports serving only a portion of the log, relying party policies SHOULD include requirements on which portions to serve.
+
 For example, {{MTC-TLOG}} defines a profile for Merkle Tree Certificates that uses {{TLOG-TILES}}.
-
-### Log Pruning
-
-Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be *pruned*, as described in this section.
-
-Pruning makes some prefix of the log unavailable, without changing the tree structure. It is a technique to reduce the serving cost of long-lived logs, by dropping entries that have long expired. {{log-availability}} discusses policies on when pruning MAY be performed. This section discusses how it is done and the impact on log structure.
-
-An issuance log is pruned by updating its *minimum index* parameter ({{issuance-logs}}). The minimum index is the index of the first log entry that the log publishes. (See {{publishing-logs}}.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.
-
-An entry is said to be *available* if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree `[start, end)` is said to be available if `end` is greater than the minimum index.
-
-Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:
-
-* Signatures over the latest checkpoint by the CA's cosigners ({{certification-authority-cosigners}})
-* Any individual available log entry ({{log-entries}})
-* The hash value of any available checkpoint
-* An inclusion proof ({{Section 2.1.3 of !RFC9162}}) for any available entry to any containing checkpoint
-* A consistency proof ({{Section 2.1.4 of !RFC9162}}) between any two available checkpoints
-* The hash value of any available subtree ({{subtrees}})
-* A subtree inclusion proof ({{subtree-inclusion-proofs}}) for any available entry in any containing subtree
-* A subtree consistency proof ({{subtree-consistency-proofs}}) between any available subtree to any containing checkpoint
-
-Meeting these requirements requires a log to retain some information about pruned entries. Given a node `[start, end)` in the Merkle Tree, if `end` is less than or equal to the minimum index, the node's children MAY be discarded in favor of the node's hash.
-
-{{fig-prune-tree}} shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.
-
-~~~aasvg
-                +-----------------------------+
-                |            [0, 13)          |
-                +-----------------------------+
-                   /                       \
-       +----------------+             +----------------+
-       |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +----------------+
-        /              \                 /          |
-   +--------+      +--------+      +---------+      |
-   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +--------+      +---------+      |
-    /      \        /      \         /      \       |
-+-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-+-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-  / \     / \     / \     / \     / \      / \      |
-+=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
-+=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-
-
-                +-----------------------------+
-                |            [0, 13)          |
-                +-----------------------------+
-                   /                       \
-       +----------------+             +----------------+
-       |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +----------------+
-        /              \                 /          |
-   +--------+      +--------+      +---------+      |
-   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +--------+      +---------+      |
-                    /      \         /      \       |
-                +-----+ +-----+ +------+ +-------+  |
-                |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-                +-----+ +-----+ +------+ +-------+  |
-                          / \     / \      / \      |
-                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
-                        |6| |7| |8| |9| |10| |11| |12|
-                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
-~~~
-{: #fig-prune-tree title="An example showing the minimum nodes that must be available after pruning"}
-
-Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in {{fig-prune-tree}}, the log's serving protocol MAY instead serve `[0, 2)` and `[2, 4)`, with the log client computing `[0, 4)` from those values.
 
 ## Cosigners
 
@@ -1595,9 +1524,15 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 ## Revoked Ranges
 
-For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
+For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. This can be used to revoke both ranges of entries in an issuance log and ranges of issuance logs, even if the contents are not known.
 
-When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `minSerial` value.
+When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all serial numbers before the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `minSerial` value.
+
+This revocation allows the rest of a PKI to disregard old entries, even if they are not known to be expired. In particular:
+
+* A relying party could permit a CA to skip serving old entries (see {{publishing-logs}}) if long-expired and revoked.
+
+* Newly-established monitors can skip processing long-expired and revoked entries.
 
 A relying party with transparency requirements additionally SHOULD revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `maxSerial` value. See {{limiting-issuance-logs}}.
 
@@ -1727,7 +1662,7 @@ A CA only needs to produce a digital signature for every checkpoint, rather than
 
 Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.
 
-Log pruning ({{log-pruning}}) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.
+Explicit revocation of old entries ({{revoked-ranges}}) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.
 
 Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetch data from mirrors instead of CAs directly. In PKIs that deploy mirrors as part of cosigner policies, relying parties could set few availability requirements on CAs, as described in {{log-availability}}.
 
@@ -1735,7 +1670,7 @@ Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetc
 
 The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as {{TLOG-WITNESS}}, requires very little state and can be run with low cost.
 
-A mirroring cosigner, such as {{TLOG-MIRROR}}, performs a role comparable to CT logs, but several of the cost-saving properties in {{certification-authority-costs}} also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.
+A mirroring cosigner, such as {{TLOG-MIRROR}}, performs a role comparable to CT logs, but several of the cost-saving properties in {{certification-authority-costs}} also apply: improved protocols, smaller entries, less frequent signatures, and partial log serving. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.
 
 ### Monitor Costs
 
@@ -1755,17 +1690,11 @@ Relying party policies also impact monitor operation. If a relying party accepts
 
 ## Log Availability
 
-CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log has been pruned ({{log-pruning}}). If some resources are unavailable, they may not be visible to monitors.
+CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log does not serve long-expired entries. If some resources are unavailable, they may not be visible to monitors.
 
 As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish availability policies. These policies SHOULD be adhered to by trusted CAs and mirrors, and enforced by relying party vendors as a condition of trust. Exact availability policies for these services are out of scope for this document, but this section provides some general guidance.
 
-Availability policies SHOULD specify how long an entry must be made available, before a CA or mirror is permitted to prune the entry. It is RECOMMENDED to define this using a *retention period*, which is some time after the entry has expired. In such a policy, an entry could only be pruned if it, and all preceding entries, have already expired for the retention period. Policies MAY opt to set different retention periods between CAs and mirrors. Permitting limited log retention is analogous to the CT practice of temporal sharding {{CHROME-CT}}, except that a pruned issuance log remains compatible with older, unupdated relying parties.
-
-Such policies impact monitors. If the retention period is, e.g. 6 months, this means that monitors are expected to check entries of interest within 6 months. It also means that a new monitor may only be aware of a 6 month history of entries issued for a particular domain.
-
-If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in {{revoked-ranges}}: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.
-
-The log pruning process simply makes some resources unavailable. Availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.
+Availability policies MAY permit CAs and mirrors to stop serving old, long-expired entries. If so, such policies SHOULD, at minimum, require CAs and mirrors to retain entries until they have been revoked in up-to-date relying parties. See {{revoked-ranges}} for details. This is analogous to the CT practice of temporal sharding {{CHROME-CT}}, except the issuance log remains compatible with older, unupdated relying parties.
 
 PKIs that require mirror cosignatures ({{trusted-cosigners}}) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.
 
@@ -1815,7 +1744,7 @@ A CA might violate the append-only property of its log and present different vie
 
 If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the range of inconsistent serials ({{revoked-ranges}}), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.
 
-A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy ({{log-availability}}). The impact depends on the relying party's cosigner policy:
+A CA might correctly construct its log, but refuse to serve some unauthorized entry. The impact depends on the relying party's cosigner policy:
 
 * If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it.
 
@@ -2670,3 +2599,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.
 
 - Clarify that a landmark consists of both a number and a tree size, and that a landmark's subtrees share its landmark number.
+
+- Prune the pruning discussion. It's really a property of the log serving protocol and is better described in {{MTC-TLOG}} and {{TLOG-TILES}}
