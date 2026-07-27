@@ -1054,7 +1054,7 @@ Note the subject's public key algorithm is incorporated into both `subjectPublic
 
 MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
-An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Implementers SHOULD CONSIDER that log-serving protocols, or the underlying transport mechanisms they use, could have lower limits. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
+An MTCLogEntry's size MUST NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
 ### Publishing Logs
 
