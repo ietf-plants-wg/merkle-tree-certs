@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 23 January 2027</td>
+<td class="center">Expires 28 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-22" class="published">22 July 2026</time>
+<time datetime="2026-07-27" class="published">27 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-23">23 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-28">28 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 23 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3958,8 +3958,8 @@ TBSCertificateLogEntry ::= SEQUENCE {
 </li>
           </ul>
 <p id="section-5.2.1-10">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.2.1-10" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-11">MTCLogEntry is an extensible structure. Future documents may define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> and <a href="#extensibility" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-12">An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.<a href="#section-5.2.1-12" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-11">MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> and <a href="#extensibility" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-12">An MTCLogEntry's size MUST NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.<a href="#section-5.2.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="publishing-logs">
@@ -3968,7 +3968,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
 <a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-publishing-logs" class="section-name selfRef">Publishing Logs</a>
           </h4>
 <p id="section-5.2.2-1">This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See <a href="#transparency" class="auto internal xref">Section 12.2</a>.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-2">This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications could have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-3">For example, <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> defines a profile for Merkle Tree Certificates that uses <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3978,7 +3978,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
 <a href="#section-5.2.3" class="section-number selfRef">5.2.3. </a><a href="#name-log-pruning" class="section-name selfRef">Log Pruning</a>
           </h4>
 <p id="section-5.2.3-1">Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be <em>pruned</em>, as described in this section.<a href="#section-5.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-2">Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. <a href="#log-availability" class="auto internal xref">Section 10.3</a> discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.<a href="#section-5.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.2.3-2">Pruning makes some prefix of the log unavailable, without changing the tree structure. It is a technique to reduce the serving cost of long-lived logs, by dropping entries that have long expired. <a href="#log-availability" class="auto internal xref">Section 10.3</a> discusses policies on when pruning MAY be performed. This section discusses how it is done and the impact on log structure.<a href="#section-5.2.3-2" class="pilcrow">¶</a></p>
 <p id="section-5.2.3-3">An issuance log is pruned by updating its <em>minimum index</em> parameter (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). The minimum index is the index of the first log entry that the log publishes. (See <a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a>.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.<a href="#section-5.2.3-3" class="pilcrow">¶</a></p>
 <p id="section-5.2.3-4">An entry is said to be <em>available</em> if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree <code>[start, end)</code> is said to be available if <code>end</code> is greater than the minimum index.<a href="#section-5.2.3-4" class="pilcrow">¶</a></p>
 <p id="section-5.2.3-5">Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:<a href="#section-5.2.3-5" class="pilcrow">¶</a></p>
@@ -4335,7 +4335,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-cosigners" class="section-name selfRef">Cosigners</a>
         </h3>
 <p id="section-5.3-1">This section defines a log <em>cosigner</em>. A cosigner follows some append-only view of the log and signs subtrees (<a href="#subtrees" class="auto internal xref">Section 4</a>) consistent with that view. The signatures generated by a cosigner are known as <em>cosignatures</em>. All subtrees signed by a cosigner MUST be consistent with each other. The cosigner may be external to the log, in which case it might ensure consistency by checking consistency proofs. The cosigner may be operated together with the log, in which case it can trust its log state.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">A cosignature MAY implicitly make additional statements about a subtree, determined by the cosigner's role. This document defines one concrete cosigner role, a CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>), to authenticate the log and certify entries. Other documents and specific deployments may define other cosigner roles, to perform different functions in a PKI. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> defines a cosigner that only checks the log is append-only, and <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> defines a cosigner that mirrors a log.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">A cosignature MAY implicitly make additional statements about a subtree, determined by the cosigner's role. This document defines one concrete cosigner role, a CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>), to authenticate the log and certify entries. Other documents and specific deployments MAY define other cosigner roles, to perform different functions in a PKI. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> defines a cosigner that only checks the log is append-only, and <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> defines a cosigner that mirrors a log.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
 <p id="section-5.3-3">Each cosigner has a public key and a <em>cosigner ID</em>, which uniquely identifies the cosigner. The cosigner ID is a trust anchor ID <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. By identifying the cosigner, the cosigner ID specifies the public key, signature algorithm, and any additional statements made by the cosigner's signatures. If a single operator performs multiple cosigner roles in an ecosystem, each role MUST use a distinct cosigner ID and SHOULD use a distinct key.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 <p id="section-5.3-4">Following the principle of key separation <span>[<a href="#KeyReuse" class="cite xref">KeyReuse</a>]</span>, cosigner keys SHOULD NOT be used for purposes outside this document. Additional uses MAY be defined but MUST NOT overlap with the signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. See <a href="#signature-domain-separation" class="auto internal xref">Section 12.8</a> for additional discussion.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
 <p id="section-5.3-5">A single cosigner, with a single cosigner ID and public key, MAY generate cosignatures for multiple logs. In this case, signed subtrees only need to be consistent with others for the same log.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
@@ -4381,7 +4381,7 @@ struct {
 </li>
           </ul>
 <p id="section-5.3.1-9">For example, the trust anchor ID 32473.1 would be encoded as the ASCII string <code>oid/1.3.6.1.4.1.32473.1</code>.<a href="#section-5.3.1-9" class="pilcrow">¶</a></p>
-<p id="section-5.3.1-10"><code>start</code> and <code>end</code> MUST define a valid subtree of the log, and <code>subtree_hash</code> MUST be the subtree's hash value in the cosigner's view of the log.<a href="#section-5.3.1-10" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-10"><code>start</code> and <code>end</code> MUST define a valid subtree of the log, and <code>subtree_hash</code> MUST be the subtree's hash value in the cosigner's view of the log. See <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>.<a href="#section-5.3.1-10" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-11">If <code>timestamp</code> is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>. Additionally, if <code>timestamp</code> is non-zero, the following MUST be true:<a href="#section-5.3.1-11" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.3.1-12.1">
@@ -4391,7 +4391,7 @@ struct {
               <p id="section-5.3.1-12.2.1"><code>end</code> MUST be the size of the largest consistent tree that the cosigner has observed for the log.<a href="#section-5.3.1-12.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-5.3.1-13"><code>timestamp</code> MAY be zero, in which case no additional constraints are placed on <code>start</code> or <code>end</code>, and no statement is made about the signing time or largest observed tree.<a href="#section-5.3.1-13" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-13"><code>timestamp</code> MAY be zero, in which case no additional constraints are placed on <code>start</code> or <code>end</code> (beyond being a valid subtree), and no statement is made about the signing time or largest observed tree.<a href="#section-5.3.1-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="signature-semantics">
@@ -4399,18 +4399,21 @@ struct {
           <h4 id="name-signature-semantics">
 <a href="#section-5.3.2" class="section-number selfRef">5.3.2. </a><a href="#name-signature-semantics" class="section-name selfRef">Signature Semantics</a>
           </h4>
-<p id="section-5.3.2-1">Before signing a subtree of some log, the cosigner MUST ensure that <code>subtree_hash</code> is consistent with its view of the log. Different cosigner roles may obtain this assurance differently. For example:<a href="#section-5.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.3.2-1">Before signing a subtree of some log, the cosigner MUST ensure that <code>subtree_hash</code> is consistent with its view of the log. Different cosigner roles will obtain this assurance differently. For example:<a href="#section-5.3.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.3.2-2.1">
-              <p id="section-5.3.2-2.1.1">A cosigner may maintain a full copy of the log, e.g. if it's the log operator. The cosigner can then compute <code>subtree_hash</code> from this copy.<a href="#section-5.3.2-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-5.3.2-2.1.1">A cosigner MAY maintain a full copy of the log, e.g. if it's the log operator. The cosigner can then compute <code>subtree_hash</code> from this copy.<a href="#section-5.3.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-5.3.2-2.2">
-              <p id="section-5.3.2-2.2.1">A cosigner may maintain the hash of the largest consistent tree observed by the log. The cosigner can then check <code>subtree_hash</code> with a subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>).<a href="#section-5.3.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-5.3.2-2.2.1">A cosigner MAY maintain the hash of the largest consistent tree observed by the log. The cosigner can then check <code>subtree_hash</code> with a subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>).<a href="#section-5.3.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-5.3.2-2.3">
+              <p id="section-5.3.2-2.3.1">A cosigner MAY maintain any other representation of the log which allows it to verify the consistency of the log.<a href="#section-5.3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-5.3.2-3">In both cases, the cosigner MUST ensure that, as it updates its view of the log, the old and new views are consistent. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> defines a cosigner that checks consistency proofs (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) between the two views.<a href="#section-5.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.3.2-3">In all cases, the cosigner MUST ensure that, as it updates its view of the log, the old and new views are consistent.<a href="#section-5.3.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.3.2-4">When a cosigner signs a subtree, it is held separately responsible <em>both</em> for the subtree being consistent with its other signatures, <em>and</em> for the cosigner-specific additional statements. That is, if a cosigner signs an inconsistent subtree, it is held responsible for its additional statements on all entries in the inconsistent subtree, even if some other signed subtree exists that asserts different entries.<a href="#section-5.3.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.3.2-5">Subtree signatures can be used to sign timestamped log checkpoints with a non-zero <code>timestamp</code>. A signature with a non-zero <code>timestamp</code> asserts the complete state of the cosigner's view of the log at a given time. These signatures are not directly used in Merkle Tree Certificates (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI. This may include log serving or integrating an issuance log into a transparency ecosystem. For example, <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> and <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> use such signatures.<a href="#section-5.3.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.3.2-5">Subtree signatures can be used to sign timestamped log checkpoints by using a non-zero <code>timestamp</code>. A signature with a non-zero <code>timestamp</code> asserts the complete state of the cosigner's view of the log at a given time. These signatures are not directly used in Merkle Tree Certificates (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI, such as log serving or integrating an issuance log into a transparency ecosystem. For example, <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> and <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> use such signatures.<a href="#section-5.3.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="signature-algorithms">
@@ -4440,7 +4443,7 @@ struct {
             <p id="section-5.4-4.2.1">To certify an entry of type <code>tbs_cert_entry</code> is to certify the TBSCertificateLogEntry, as defined in <a href="#log-entries" class="auto internal xref">Section 5.2.1</a>.<a href="#section-5.4-4.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.4-5">Entries are extensible. Future documents MAY define <code>type</code> and <code>extension_type</code> values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with <code>type</code> or <code>extension_type</code> that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. <a href="#extensibility" class="auto internal xref">Section 12.5</a> further discusses security implications of such extensions.<a href="#section-5.4-5" class="pilcrow">¶</a></p>
+<p id="section-5.4-5">Entries are extensible. Future documents MAY define <code>type</code> and <code>extension_type</code> values and the semantics of the data that they contain. A CA MUST NOT sign a subtree if it contains an entry with <code>type</code> or <code>extension_type</code> that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. <a href="#extensibility" class="auto internal xref">Section 12.5</a> further discusses security implications of such extensions.<a href="#section-5.4-5" class="pilcrow">¶</a></p>
 <p id="section-5.4-6">If the CA issues certificate revocation lists (CRLs) <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> or Online Certificate Status Protocol (OCSP) responses <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See <a href="#signature-domain-separation" class="auto internal xref">Section 12.8</a> for a discussion of domain separation.<a href="#section-5.4-6" class="pilcrow">¶</a></p>
 <p id="section-5.4-7">If the CA operator additionally operates a directly-signing X.509 CA, that CA key MUST be distinct from any Merkle Tree CA cosigner keys. In particular, a CA cosigner key MUST NOT be used to directly sign TBSCertificate structures. A CA cosigner key issues certificates by signing subtrees.<a href="#section-5.4-7" class="pilcrow">¶</a></p>
 </section>
@@ -4513,7 +4516,7 @@ MTCCertificationAuthority ::= SEQUENCE {
         </ul>
 <p id="section-5.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>. In particular, it MUST NOT be used to directly sign TBSCertificate structures.<a href="#section-5.5-10" class="pilcrow">¶</a></p>
 <p id="section-5.5-11">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.<a href="#section-5.5-11" class="pilcrow">¶</a></p>
-<p id="section-5.5-12">A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-5.5-12" class="pilcrow">¶</a></p>
+<p id="section-5.5-12">A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate SHOULD be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-5.5-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4544,7 +4547,7 @@ MTCCertificationAuthority ::= SEQUENCE {
             <p id="section-6.1-2.4.1">An <code>MTCProof</code> (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) proving the entry's inclusion in a subtree, along with zero or more signatures (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) over that subtree, which together satisfy relying party requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.1-3">For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. <a href="#certificate-format" class="auto internal xref">Section 6.2</a> defines how the certificate is constructed based on those choices. <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a> and <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a> define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">By varying the choice of subtree and signatures, there can be multiple ways to prove the entry is in the log, and thus certified by the CA. <a href="#certificate-format" class="auto internal xref">Section 6.2</a> defines how a certificate is constructed based on those choices. <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a> and <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a> define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="certificate-format">
@@ -4645,7 +4648,7 @@ struct {
           <h4 id="name-landmark-tree-sizes">
 <a href="#section-6.4.1" class="section-number selfRef">6.4.1. </a><a href="#name-landmark-tree-sizes" class="section-name selfRef">Landmark Tree Sizes</a>
           </h4>
-<p id="section-6.4.1-1">To issue landmark-relative certificates, a CA must additionally maintain a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-1">A CA that issues landmark-relative certificates MUST additionally maintain a <em>landmark sequence</em>. A landmark sequence is a sequence of <em>landmarks</em>, defined below:<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-2">Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. Landmark zero MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-3">The landmark sequence determines <em>landmark subtrees</em> for each landmark: for each landmark <code>L</code>, other than number zero, let <code>tree_size</code> be <code>L</code>'s tree size and <code>prev_tree_size</code> be that of <code>L - 1</code>. The landmark subtrees for <code>L</code> are the two subtrees that cover <code>[prev_tree_size, tree_size)</code>, as described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>. Landmark zero has no landmark subtrees.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-4">As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer <code>max_active_landmarks</code> parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.<a href="#section-6.4.1-4" class="pilcrow">¶</a></p>
