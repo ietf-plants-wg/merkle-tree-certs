@@ -1428,8 +1428,8 @@ It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}}
 
 Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-relative certificate is constructed as follows:
 
-1. Wait for the first landmark to be allocated that contains the entry.
-2. Determine the landmark's subtrees and select the one that contains the entry.
+1. Let `L` be the smallest landmark number in the active window whose tree size is strictly greater than the entry index `i`. Because the landmark sequence is strictly monotonically increasing, `L - 1`'s tree size is less than or equal to `i`. If no such `L` has been allocated yet (`i` is greater than or equal to `last_landmark`'s tree size), wait for one to be allocated. If every landmark that once covered the entry is no longer in the active window (`last_landmark - num_active_landmarks`'s tree size is greater than `i`), abort this process.
+2. Determine landmark `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `i`.
 3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
 
 Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
@@ -2670,3 +2670,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.
 
 - Clarify that a landmark consists of both a number and a tree size, and that a landmark's subtrees share its landmark number.
+
+- Give an exact procedure for selecting the landmark and covering subtree when constructing a landmark-relative certificate.
