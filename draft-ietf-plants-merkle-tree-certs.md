@@ -1340,14 +1340,14 @@ opaque HashValue[HASH_SIZE];
 struct {
     TrustAnchorID cosigner_id;
     opaque signature<0..2^16-1>;
-} MTCSignature;
+} SubtreeSignature;
 
 struct {
     MTCLogEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
-    MTCSignature signatures<0..2^16-1>;
+    SubtreeSignature signatures<0..2^16-1>;
 } MTCProof;
 ~~~
 
