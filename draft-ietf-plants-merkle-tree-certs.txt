@@ -103,7 +103,6 @@ Table of Contents
      5.2.  Issuance Logs
        5.2.1.  Log Entries
        5.2.2.  Publishing Logs
-       5.2.3.  Log Pruning
      5.3.  Cosigners
        5.3.1.  Signature Format
        5.3.2.  Signature Semantics
@@ -241,10 +240,10 @@ Table of Contents
       Entries replace public keys with hashes and do not contain
       signatures, while preserving non-repudiability (Section 12.4).
 
-   *  To bound growth, long-expired entries can be pruned from logs and
-      mirrors without interrupting existing clients.  This allows log
-      sizes to scale by retention policies, not the lifetime of the log,
-      even as certificate lifetimes decrease.
+   *  Long-expired entries can be revoked from relying parties in bulk
+      (see Section 7.5).  This allows logging and monitoring
+      infrastructure to scale by retention policies, not the lifetime of
+      the log, even as certificate lifetimes decrease.
 
    *  After a processing delay, authenticating parties can obtain a
       second "landmark-relative" certificate for the same log entry.
@@ -1259,10 +1258,6 @@ Table of Contents
    entries in the issuance log are represented as a Merkle Tree,
    described in Section 2.1 of [RFC9162].
 
-   Each log additionally maintains a _minimum index_ value, which is the
-   index of the first log entry which is available.  See Section 5.2.3.
-   This value changes over the lifetime of the log.
-
    Unlike [RFC6962] and [RFC9162], an issuance log does not have a
    public submission interface.  The log only contains entries which the
    log operator, i.e. the CA, chose to add.  As entries are added, the
@@ -1404,120 +1399,12 @@ Table of Contents
    availability, as part of their policies on which CAs to support.  See
    also Section 10.3.
 
+   If a serving protocol supports serving only a portion of the log,
+   relying party policies SHOULD include requirements on which portions
+   to serve.
+
    For example, [MTC-TLOG] defines a profile for Merkle Tree
    Certificates that uses [TLOG-TILES].
-
-5.2.3.  Log Pruning
-
-   Over time, an issuance log's entries will expire and likely be
-   replaced as certificates are renewed.  As this happens, the total
-   size of the log grows, even if the unexpired subset remains fixed.
-   To mitigate this, issuance logs MAY be _pruned_, as described in this
-   section.
-
-   Pruning makes some prefix of the log unavailable, without changing
-   the tree structure.  It is a technique to reduce the serving cost of
-   long-lived logs, by dropping entries that have long expired.
-   Section 10.3 discusses policies on when pruning MAY be performed.
-   This section discusses how it is done and the impact on log
-   structure.
-
-   An issuance log is pruned by updating its _minimum index_ parameter
-   (Section 5.2).  The minimum index is the index of the first log entry
-   that the log publishes.  (See Section 5.2.2.)  It MUST be less than
-   or equal to the tree size of the log's current checkpoint, and also
-   satisfy any availability policies set by relying parties who trust
-   the CA.
-
-   An entry is said to be _available_ if its index is greater than or
-   equal to the minimum index.  A checkpoint is said to be available if
-   its tree size is greater than the minimum index.  A subtree [start,
-   end) is said to be available if end is greater than the minimum
-   index.
-
-   Log protocols MUST serve enough information to allow a log client to
-   efficiently obtain the following:
-
-   *  Signatures over the latest checkpoint by the CA's cosigners
-      (Section 5.4)
-
-   *  Any individual available log entry (Section 5.2.1)
-
-   *  The hash value of any available checkpoint
-
-   *  An inclusion proof (Section 2.1.3 of [RFC9162]) for any available
-      entry to any containing checkpoint
-
-   *  A consistency proof (Section 2.1.4 of [RFC9162]) between any two
-      available checkpoints
-
-   *  The hash value of any available subtree (Section 4)
-
-   *  A subtree inclusion proof (Section 4.3) for any available entry in
-      any containing subtree
-
-   *  A subtree consistency proof (Section 4.4) between any available
-      subtree to any containing checkpoint
-
-   Meeting these requirements requires a log to retain some information
-   about pruned entries.  Given a node [start, end) in the Merkle Tree,
-   if end is less than or equal to the minimum index, the node's
-   children MAY be discarded in favor of the node's hash.
-
-   Figure 11 shows an example pruned tree with 13 elements, where the
-   minimum index is 7.  It shows the original tree, followed by the
-   pruned tree.  The pruned tree depicts the nodes that MUST be
-   available or computable.  Note that entry 6 MAY be discarded, only
-   the hash of entry 6 must be available.
-
-                   +-----------------------------+
-                   |            [0, 13)          |
-                   +-----------------------------+
-                      /                       \
-          +----------------+             +----------------+
-          |     [0, 8)     |             |     [8, 13)    |
-          +----------------+             +----------------+
-           /              \                 /          |
-      +--------+      +--------+      +---------+      |
-      | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-      +--------+      +--------+      +---------+      |
-       /      \        /      \         /      \       |
-   +-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-   |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-   +-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-     / \     / \     / \     / \     / \      / \      |
-   +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-   |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
-   +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-
-
-                   +-----------------------------+
-                   |            [0, 13)          |
-                   +-----------------------------+
-                      /                       \
-          +----------------+             +----------------+
-          |     [0, 8)     |             |     [8, 13)    |
-          +----------------+             +----------------+
-           /              \                 /          |
-      +--------+      +--------+      +---------+      |
-      | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-      +--------+      +--------+      +---------+      |
-                       /      \         /      \       |
-                   +-----+ +-----+ +------+ +-------+  |
-                   |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-                   +-----+ +-----+ +------+ +-------+  |
-                             / \     / \      / \      |
-                           +-+ +=+ +=+ +=+ +==+ +==+ +==+
-                           |6| |7| |8| |9| |10| |11| |12|
-                           +-+ +=+ +=+ +=+ +==+ +==+ +==+
-
-        Figure 11: An example showing the minimum nodes that must be
-                          available after pruning
-
-   Logs MAY retain additional nodes, or expect log clients to compute
-   required nodes from other nodes.  For example, in Figure 11, the
-   log's serving protocol MAY instead serve [0, 2) and [2, 4), with the
-   log client computing [0, 4) from those values.
 
 5.3.  Cosigners
 
@@ -2468,24 +2355,25 @@ Table of Contents
 7.5.  Revoked Ranges
 
    For each supported Merkle Tree CA, the relying party maintains a list
-   of revoked ranges of serial numbers.  A serial number combines a log
-   number and a log index.  A relying party can thus efficiently revoke
-   both ranges of entries of an issuance log, and ranges of issuance
-   logs, even if the contents are not necessarily known.  This may be
-   used to mitigate the security consequences of misbehavior by a CA, or
-   other parties in the ecosystem.
+   of revoked ranges of serial numbers.  This can be used to revoke both
+   ranges of entries in an issuance log and ranges of issuance logs,
+   even if the contents are not known.
 
    When a relying party is first configured to trust an issuance log, it
-   SHOULD be configured to revoke all entries from zero up to but not
-   including the first available unexpired certificate at the time.
-   This revocation SHOULD be periodically updated as entries expire and
-   logs are pruned (Section 5.2.3).  In particular, when CAs prune
-   entries, relying parties SHOULD be updated to revoke all newly
-   unavailable entries.  This gives assurance that, even if some
-   unavailable entry had not yet expired, the relying party will not
-   trust it.  It also allows monitors to start monitoring a log without
-   processing expired entries.  If using the format defined in
-   Section 5.5, this can be configured with the minSerial value.
+   SHOULD be configured to revoke all serial numbers before the first
+   available unexpired certificate at the time.  This revocation SHOULD
+   be periodically updated as entries expire.  If using the format
+   defined in Section 5.5, this can be configured with the minSerial
+   value.
+
+   This revocation allows the rest of a PKI to disregard old entries,
+   even if they are not known to be expired.  In particular:
+
+   *  A relying party could permit a CA to skip serving old entries (see
+      Section 5.2.2) if long-expired and revoked.
+
+   *  Newly-established monitors can skip processing long-expired and
+      revoked entries.
 
    A relying party with transparency requirements additionally SHOULD
    revoke all log numbers above some threshold to bound monitoring
@@ -2801,9 +2689,9 @@ Table of Contents
    signatures.  Likewise, a subtree is only signed if contained in
    another signed checkpoint.
 
-   Log pruning (Section 5.2.3) allows a long-lived log to serve only the
-   more recent entries, scaling with the size of the retention window,
-   rather than the log's total lifetime.
+   Explicit revocation of old entries (Section 7.5) allows a long-lived
+   log to serve only the more recent entries, scaling with the size of
+   the retention window, rather than the log's total lifetime.
 
    Mirrors of the log can also reduce CA bandwidth costs, because
    monitors can fetch data from mirrors instead of CAs directly.  In
@@ -2820,9 +2708,9 @@ Table of Contents
    A mirroring cosigner, such as [TLOG-MIRROR], performs a role
    comparable to CT logs, but several of the cost-saving properties in
    Section 10.1.1 also apply: improved protocols, smaller entries, less
-   frequent signatures, and log pruning.  While a mirror does need to
-   accommodate another party's (the CA's) growth rate, it grows only
-   from new issuances from that one CA.  If one CA's issuance rate
+   frequent signatures, and partial log serving.  While a mirror does
+   need to accommodate another party's (the CA's) growth rate, it grows
+   only from new issuances from that one CA.  If one CA's issuance rate
    exceeds the mirror's capacity, that does not impact the mirror's
    copies of other CAs.  Mirrors also do not need to defend against a
    client uploading a large number of existing certificates all at once.
@@ -2883,8 +2771,8 @@ Table of Contents
 
    CAs and mirrors are expected to serve their log contents over HTTP.
    It is possible for the contents to be unavailable, either due to
-   temporary service outage or because the log has been pruned
-   (Section 5.2.3).  If some resources are unavailable, they may not be
+   temporary service outage or because the log does not serve long-
+   expired entries.  If some resources are unavailable, they may not be
    visible to monitors.
 
    As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish
@@ -2894,38 +2782,13 @@ Table of Contents
    are out of scope for this document, but this section provides some
    general guidance.
 
-   Availability policies SHOULD specify how long an entry must be made
-   available, before a CA or mirror is permitted to prune the entry.  It
-   is RECOMMENDED to define this using a _retention period_, which is
-   some time after the entry has expired.  In such a policy, an entry
-   could only be pruned if it, and all preceding entries, have already
-   expired for the retention period.  Policies MAY opt to set different
-   retention periods between CAs and mirrors.  Permitting limited log
-   retention is analogous to the CT practice of temporal sharding
-   [CHROME-CT], except that a pruned issuance log remains compatible
-   with older, unupdated relying parties.
-
-   Such policies impact monitors.  If the retention period is, e.g. 6
-   months, this means that monitors are expected to check entries of
-   interest within 6 months.  It also means that a new monitor may only
-   be aware of a 6 month history of entries issued for a particular
-   domain.
-
-   If historical data is not available to verify the retention period,
-   such as information in another mirror or a trusted summary of
-   expiration dates of entries, it may not be possible to confirm
-   correct behavior.  This is mitigated by the revocation process
-   described in Section 7.5: if a CA were to prune a forward-dated entry
-   and, in the 6 months when the entry was available, no monitor noticed
-   the unusual expiry, an updated relying party would not accept it
-   anyway.
-
-   The log pruning process simply makes some resources unavailable.
-   Availability policies SHOULD constrain log pruning in the same way as
-   general resource availability.  That is, if it would be a policy
-   violation for the log to fail to serve a resource, it should also be
-   a policy violation for the log to prune such that the resource is
-   removed, and vice versa.
+   Availability policies MAY permit CAs and mirrors to stop serving old,
+   long-expired entries.  If so, such policies SHOULD, at minimum,
+   require CAs and mirrors to retain entries until they have been
+   revoked in up-to-date relying parties.  See Section 7.5 for details.
+   This is analogous to the CT practice of temporal sharding
+   [CHROME-CT], except the issuance log remains compatible with older,
+   unupdated relying parties.
 
    PKIs that require mirror cosignatures (Section 7.3) can impose
    minimal to no availability requirements on CAs without compromising
@@ -3070,9 +2933,8 @@ Table of Contents
    entries in both views will also be visible.
 
    A CA might correctly construct its log, but refuse to serve some
-   unauthorized entry, e.g. by feigning an outage or pruning the log
-   outside the retention policy (Section 10.3).  The impact depends on
-   the relying party's cosigner policy:
+   unauthorized entry.  The impact depends on the relying party's
+   cosigner policy:
 
    *  If the relying party requires cosignatures from trusted mirrors,
       the entry will either be visible to monitors in the mirrors, or
@@ -3792,7 +3654,7 @@ B.1.  Binary Representations
    representation of a leaf's index gives the path to that leaf.  The
    leaf is a left child if the least-significant bit is unset and a
    right child if it is set.  The next bit indicates the direction of
-   the parent node, and so on.  Figure 12 demonstrates this in a Merkle
+   the parent node, and so on.  Figure 11 demonstrates this in a Merkle
    Tree of size 8:
 
           +----------------+
@@ -3811,7 +3673,7 @@ B.1.  Binary Representations
    |0| |1| |2| |3| |4| |5| |6| |7|  level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-                Figure 12: An example Merkle Tree of size 8
+                Figure 11: An example Merkle Tree of size 8
 
    The binary representation of 4 is 0b100.  It is the left (0) child of
    [4, 6), which is the left (0) child of [4, 8), which is the right (1)
@@ -3831,7 +3693,7 @@ B.1.  Binary Representations
    that the paths from the root to leaves 4 and 6 diverge when going
    from level 2 to level 1.
 
-   This can be generalized to arbitrary-sized Merkle Trees.  Figure 13
+   This can be generalized to arbitrary-sized Merkle Trees.  Figure 12
    depicts a Merkle Tree of size 6:
 
           +--------------+
@@ -3850,7 +3712,7 @@ B.1.  Binary Representations
    |0| |1| |2| |3| |4| |5|   level 0
    +-+ +-+ +-+ +-+ +-+ +-+
 
-                Figure 13: An example Merkle Tree of size 6
+                Figure 12: An example Merkle Tree of size 6
 
    When the size of a Merkle Tree is not a power of two, some levels on
    the rightmost edge of the tree are skipped.  The rightmost edge is
@@ -3863,7 +3725,7 @@ B.1.  Binary Representations
    path are where there _would_ have been a right child, had there been
    enough elements to construct one.  Without a right child, the hash
    operation is skipped and a skipped node has the same value as its
-   singular child.  Figure 14 depicts this for a tree of size 6.
+   singular child.  Figure 13 depicts this for a tree of size 6.
 
           +----------------+
           |     [0, 6)     |        level 3
@@ -3881,7 +3743,7 @@ B.1.  Binary Representations
    |0| |1| |2| |3| |4| |5| | | | |  level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-      Figure 14: An example Merkle Tree of size 6, viewed as a subset
+      Figure 13: An example Merkle Tree of size 6, viewed as a subset
                             of a tree of size 8
 
    Zero bits also indicate skipped nodes in paths that have not yet
@@ -3900,7 +3762,7 @@ B.2.  Subtrees
    However, those smaller trees may not have the same structure as the
    original tree.
 
-   Figure 15 shows a Merkle Tree of size 8, and a tree built over
+   Figure 14 shows a Merkle Tree of size 8, and a tree built over
    elements [1, 5).  When [1, 5) is considered as an independent,
    4-element sequence, it does not align with the portion of the overall
    tree that covers [1, 5).  The two trees do not share any intermediate
@@ -3936,7 +3798,7 @@ B.2.  Subtrees
        |1| |2| |3| |4|              level 0
        +-+ +-+ +-+ +-+
 
-                   Figure 15: An example misaligned tree
+                   Figure 14: An example misaligned tree
 
    The numerical constraints on start and end in Section 4.1 restrict
    subtrees to ensure that they are properly aligned with the original
@@ -4031,7 +3893,7 @@ B.4.  Consistency Proof Structure
    A Merkle consistency proof, defined in Section 2.1.4 of [RFC9162],
    applies these same optimizations.
 
-   Figure 16 depicts a subtree consistency proof between the subtree [0,
+   Figure 15 depicts a subtree consistency proof between the subtree [0,
    6) and the Merkle Tree of size 8.  The consistency proof begins at
    level 1, or node [4, 6).  The inclusion proof portion is similarly
    truncated to start at level 1: [6, 8) and [0, 4).  If the consistency
@@ -4071,12 +3933,12 @@ B.4.  Consistency Proof Structure
    |0| |1| |2| |3| |4| |5| |6| |7|   level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-       Figure 16: A subtree consistency proof that starts at level 1
+       Figure 15: A subtree consistency proof that starts at level 1
                              instead of level 0
 
    Note that the truncated inclusion proof may include nodes from lower
    levels, if the corresponding level was skipped on the right edge.
-   Figure 17 depicts a subtree consistency proof between the subtree [0,
+   Figure 16 depicts a subtree consistency proof between the subtree [0,
    6) and the Merkle Tree of size 7.  As above, the starting node is [4,
    6) at level 1.  The inclusion proof portion includes leaf 6 at level
    0.  This is because leaf 6 is taking the place of its skipped parent
@@ -4116,7 +3978,7 @@ B.4.  Consistency Proof Structure
    |0| |1| |2| |3| |4| |5| |6|     level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-     Figure 17: The interaction between inclusion proof truncation and
+     Figure 16: The interaction between inclusion proof truncation and
                                skipped levels
 
 B.5.  Consistency Proof Verification
@@ -4553,6 +4415,10 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Give an exact procedure for selecting the landmark and covering
       subtree when constructing a landmark-relative certificate.
+
+   *  Prune the pruning discussion.  It's really a property of the log
+      serving protocol and is better described in [MTC-TLOG] and
+      [TLOG-TILES]
 
 Authors' Addresses
 

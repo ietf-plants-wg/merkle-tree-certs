@@ -1240,9 +1240,6 @@ svg {
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
                     <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-publishing-logs" class="internal xref">Publishing Logs</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.3">
-                    <p id="section-toc.1-1.5.2.2.2.3.1"><a href="#section-5.2.3" class="auto internal xref">5.2.3</a>.  <a href="#name-log-pruning" class="internal xref">Log Pruning</a></p>
-</li>
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
@@ -1575,7 +1572,7 @@ svg {
           <p id="section-1-7.1.1">Log entries do not scale with public key and signature sizes. Entries replace public keys with hashes and do not contain signatures, while preserving non-repudiability (<a href="#non-repudiation" class="auto internal xref">Section 12.4</a>).<a href="#section-1-7.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-7.2">
-          <p id="section-1-7.2.1">To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-7.2.1">Long-expired entries can be revoked from relying parties in bulk (see <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>). This allows logging and monitoring infrastructure to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-7.3">
           <p id="section-1-7.3.1">After a processing delay, authenticating parties can obtain a second "landmark-relative" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.<a href="#section-1-7.3.1" class="pilcrow">¶</a></p>
@@ -3880,10 +3877,9 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
         </ul>
 <p id="section-5.2-4">A log ID specifies both the CA and the log number in a single ID.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 <p id="section-5.2-5">Each issuance log describes an append-only sequence of <em>entries</em> (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>). Each entry is identified by an integer <em>index</em>, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.2-6">Each log additionally maintains a <em>minimum index</em> value, which is the index of the first log entry which is available. See <a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>. This value changes over the lifetime of the log.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
-<p id="section-5.2-7">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
-<p id="section-5.2-8">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5.2-8" class="pilcrow">¶</a></p>
-<p id="section-5.2-9">At any point in time, one of the CA's issuance logs is its <em>current</em> log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures. See <a href="#log-failures" class="auto internal xref">Section 12.2.1</a> for further discussion.<a href="#section-5.2-9" class="pilcrow">¶</a></p>
+<p id="section-5.2-6">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+<p id="section-5.2-7">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
+<p id="section-5.2-8">At any point in time, one of the CA's issuance logs is its <em>current</em> log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures. See <a href="#log-failures" class="auto internal xref">Section 12.2.1</a> for further discussion.<a href="#section-5.2-8" class="pilcrow">¶</a></p>
 <div id="log-entries">
 <section id="section-5.2.1">
           <h4 id="name-log-entries">
@@ -3969,362 +3965,8 @@ TBSCertificateLogEntry ::= SEQUENCE {
           </h4>
 <p id="section-5.2.2-1">This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See <a href="#transparency" class="auto internal xref">Section 12.2</a>.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-2">This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications could have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.2-3">For example, <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> defines a profile for Merkle Tree Certificates that uses <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="log-pruning">
-<section id="section-5.2.3">
-          <h4 id="name-log-pruning">
-<a href="#section-5.2.3" class="section-number selfRef">5.2.3. </a><a href="#name-log-pruning" class="section-name selfRef">Log Pruning</a>
-          </h4>
-<p id="section-5.2.3-1">Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be <em>pruned</em>, as described in this section.<a href="#section-5.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-2">Pruning makes some prefix of the log unavailable, without changing the tree structure. It is a technique to reduce the serving cost of long-lived logs, by dropping entries that have long expired. <a href="#log-availability" class="auto internal xref">Section 10.3</a> discusses policies on when pruning MAY be performed. This section discusses how it is done and the impact on log structure.<a href="#section-5.2.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-3">An issuance log is pruned by updating its <em>minimum index</em> parameter (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). The minimum index is the index of the first log entry that the log publishes. (See <a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a>.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.<a href="#section-5.2.3-3" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-4">An entry is said to be <em>available</em> if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree <code>[start, end)</code> is said to be available if <code>end</code> is greater than the minimum index.<a href="#section-5.2.3-4" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-5">Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:<a href="#section-5.2.3-5" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-5.2.3-6.1">
-              <p id="section-5.2.3-6.1.1">Signatures over the latest checkpoint by the CA's cosigners (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>)<a href="#section-5.2.3-6.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.2">
-              <p id="section-5.2.3-6.2.1">Any individual available log entry (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>)<a href="#section-5.2.3-6.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.3">
-              <p id="section-5.2.3-6.3.1">The hash value of any available checkpoint<a href="#section-5.2.3-6.3.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.4">
-              <p id="section-5.2.3-6.4.1">An inclusion proof (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3" class="relref">Section 2.1.3</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) for any available entry to any containing checkpoint<a href="#section-5.2.3-6.4.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.5">
-              <p id="section-5.2.3-6.5.1">A consistency proof (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) between any two available checkpoints<a href="#section-5.2.3-6.5.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.6">
-              <p id="section-5.2.3-6.6.1">The hash value of any available subtree (<a href="#subtrees" class="auto internal xref">Section 4</a>)<a href="#section-5.2.3-6.6.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.7">
-              <p id="section-5.2.3-6.7.1">A subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for any available entry in any containing subtree<a href="#section-5.2.3-6.7.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5.2.3-6.8">
-              <p id="section-5.2.3-6.8.1">A subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>) between any available subtree to any containing checkpoint<a href="#section-5.2.3-6.8.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-5.2.3-7">Meeting these requirements requires a log to retain some information about pruned entries. Given a node <code>[start, end)</code> in the Merkle Tree, if <code>end</code> is less than or equal to the minimum index, the node's children MAY be discarded in favor of the node's hash.<a href="#section-5.2.3-7" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-8"><a href="#fig-prune-tree" class="auto internal xref">Figure 11</a> shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.<a href="#section-5.2.3-8" class="pilcrow">¶</a></p>
-<span id="name-an-example-showing-the-mini"></span><div id="fig-prune-tree">
-<figure id="figure-11">
-            <div id="section-5.2.3-9.1">
-              <div class="alignLeft art-svg artwork" id="section-5.2.3-9.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="672" width="456" viewBox="0 0 456 672" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-                  <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
-                  <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
-                  <path d="M 24,288 L 24,320" fill="none" stroke="black"></path>
-                  <path d="M 32,160 L 32,192" fill="none" stroke="black"></path>
-                  <path d="M 32,496 L 32,528" fill="none" stroke="black"></path>
-                  <path d="M 40,288 L 40,320" fill="none" stroke="black"></path>
-                  <path d="M 56,224 L 56,256" fill="none" stroke="black"></path>
-                  <path d="M 56,288 L 56,320" fill="none" stroke="black"></path>
-                  <path d="M 64,96 L 64,128" fill="none" stroke="black"></path>
-                  <path d="M 64,432 L 64,464" fill="none" stroke="black"></path>
-                  <path d="M 72,224 L 72,256" fill="none" stroke="black"></path>
-                  <path d="M 72,288 L 72,320" fill="none" stroke="black"></path>
-                  <path d="M 88,288 L 88,320" fill="none" stroke="black"></path>
-                  <path d="M 104,160 L 104,192" fill="none" stroke="black"></path>
-                  <path d="M 104,288 L 104,320" fill="none" stroke="black"></path>
-                  <path d="M 104,496 L 104,528" fill="none" stroke="black"></path>
-                  <path d="M 120,224 L 120,256" fill="none" stroke="black"></path>
-                  <path d="M 120,288 L 120,320" fill="none" stroke="black"></path>
-                  <path d="M 136,32 L 136,64" fill="none" stroke="black"></path>
-                  <path d="M 136,224 L 136,256" fill="none" stroke="black"></path>
-                  <path d="M 136,288 L 136,320" fill="none" stroke="black"></path>
-                  <path d="M 136,368 L 136,400" fill="none" stroke="black"></path>
-                  <path d="M 136,560 L 136,592" fill="none" stroke="black"></path>
-                  <path d="M 152,288 L 152,320" fill="none" stroke="black"></path>
-                  <path d="M 160,160 L 160,192" fill="none" stroke="black"></path>
-                  <path d="M 160,496 L 160,528" fill="none" stroke="black"></path>
-                  <path d="M 168,288 L 168,320" fill="none" stroke="black"></path>
-                  <path d="M 184,224 L 184,256" fill="none" stroke="black"></path>
-                  <path d="M 184,288 L 184,320" fill="none" stroke="black"></path>
-                  <path d="M 184,560 L 184,592" fill="none" stroke="black"></path>
-                  <path d="M 200,96 L 200,128" fill="none" stroke="black"></path>
-                  <path d="M 200,224 L 200,256" fill="none" stroke="black"></path>
-                  <path d="M 200,288 L 200,320" fill="none" stroke="black"></path>
-                  <path d="M 200,432 L 200,464" fill="none" stroke="black"></path>
-                  <path d="M 200,560 L 200,592" fill="none" stroke="black"></path>
-                  <path d="M 200,624 L 200,656" fill="none" stroke="black"></path>
-                  <path d="M 216,288 L 216,320" fill="none" stroke="black"></path>
-                  <path d="M 216,624 L 216,656" fill="none" stroke="black"></path>
-                  <path d="M 232,160 L 232,192" fill="none" stroke="black"></path>
-                  <path d="M 232,288 L 232,320" fill="none" stroke="black"></path>
-                  <path d="M 232,496 L 232,528" fill="none" stroke="black"></path>
-                  <path d="M 232,624 L 232,656" fill="none" stroke="black"></path>
-                  <path d="M 248,224 L 248,256" fill="none" stroke="black"></path>
-                  <path d="M 248,288 L 248,320" fill="none" stroke="black"></path>
-                  <path d="M 248,560 L 248,592" fill="none" stroke="black"></path>
-                  <path d="M 248,624 L 248,656" fill="none" stroke="black"></path>
-                  <path d="M 264,224 L 264,256" fill="none" stroke="black"></path>
-                  <path d="M 264,288 L 264,320" fill="none" stroke="black"></path>
-                  <path d="M 264,560 L 264,592" fill="none" stroke="black"></path>
-                  <path d="M 264,624 L 264,656" fill="none" stroke="black"></path>
-                  <path d="M 280,288 L 280,320" fill="none" stroke="black"></path>
-                  <path d="M 280,624 L 280,656" fill="none" stroke="black"></path>
-                  <path d="M 288,160 L 288,192" fill="none" stroke="black"></path>
-                  <path d="M 288,496 L 288,528" fill="none" stroke="black"></path>
-                  <path d="M 296,288 L 296,320" fill="none" stroke="black"></path>
-                  <path d="M 296,624 L 296,656" fill="none" stroke="black"></path>
-                  <path d="M 312,96 L 312,128" fill="none" stroke="black"></path>
-                  <path d="M 312,288 L 312,320" fill="none" stroke="black"></path>
-                  <path d="M 312,432 L 312,464" fill="none" stroke="black"></path>
-                  <path d="M 312,624 L 312,656" fill="none" stroke="black"></path>
-                  <path d="M 320,224 L 320,256" fill="none" stroke="black"></path>
-                  <path d="M 320,560 L 320,592" fill="none" stroke="black"></path>
-                  <path d="M 328,288 L 328,320" fill="none" stroke="black"></path>
-                  <path d="M 328,624 L 328,656" fill="none" stroke="black"></path>
-                  <path d="M 336,224 L 336,256" fill="none" stroke="black"></path>
-                  <path d="M 336,560 L 336,592" fill="none" stroke="black"></path>
-                  <path d="M 352,288 L 352,320" fill="none" stroke="black"></path>
-                  <path d="M 352,624 L 352,656" fill="none" stroke="black"></path>
-                  <path d="M 368,160 L 368,192" fill="none" stroke="black"></path>
-                  <path d="M 368,288 L 368,320" fill="none" stroke="black"></path>
-                  <path d="M 368,496 L 368,528" fill="none" stroke="black"></path>
-                  <path d="M 368,624 L 368,656" fill="none" stroke="black"></path>
-                  <path d="M 376,32 L 376,64" fill="none" stroke="black"></path>
-                  <path d="M 376,368 L 376,400" fill="none" stroke="black"></path>
-                  <path d="M 392,288 L 392,320" fill="none" stroke="black"></path>
-                  <path d="M 392,624 L 392,656" fill="none" stroke="black"></path>
-                  <path d="M 400,224 L 400,256" fill="none" stroke="black"></path>
-                  <path d="M 400,560 L 400,592" fill="none" stroke="black"></path>
-                  <path d="M 408,288 L 408,320" fill="none" stroke="black"></path>
-                  <path d="M 408,624 L 408,656" fill="none" stroke="black"></path>
-                  <path d="M 424,136 L 424,272" fill="none" stroke="black"></path>
-                  <path d="M 424,472 L 424,608" fill="none" stroke="black"></path>
-                  <path d="M 432,288 L 432,320" fill="none" stroke="black"></path>
-                  <path d="M 432,624 L 432,656" fill="none" stroke="black"></path>
-                  <path d="M 448,96 L 448,128" fill="none" stroke="black"></path>
-                  <path d="M 448,432 L 448,464" fill="none" stroke="black"></path>
-                  <path d="M 136,32 L 376,32" fill="none" stroke="black"></path>
-                  <path d="M 136,64 L 376,64" fill="none" stroke="black"></path>
-                  <path d="M 64,96 L 200,96" fill="none" stroke="black"></path>
-                  <path d="M 312,96 L 448,96" fill="none" stroke="black"></path>
-                  <path d="M 64,128 L 200,128" fill="none" stroke="black"></path>
-                  <path d="M 312,128 L 448,128" fill="none" stroke="black"></path>
-                  <path d="M 32,160 L 104,160" fill="none" stroke="black"></path>
-                  <path d="M 160,160 L 232,160" fill="none" stroke="black"></path>
-                  <path d="M 288,160 L 368,160" fill="none" stroke="black"></path>
-                  <path d="M 32,192 L 104,192" fill="none" stroke="black"></path>
-                  <path d="M 160,192 L 232,192" fill="none" stroke="black"></path>
-                  <path d="M 288,192 L 368,192" fill="none" stroke="black"></path>
-                  <path d="M 8,224 L 56,224" fill="none" stroke="black"></path>
-                  <path d="M 72,224 L 120,224" fill="none" stroke="black"></path>
-                  <path d="M 136,224 L 184,224" fill="none" stroke="black"></path>
-                  <path d="M 200,224 L 248,224" fill="none" stroke="black"></path>
-                  <path d="M 264,224 L 320,224" fill="none" stroke="black"></path>
-                  <path d="M 336,224 L 400,224" fill="none" stroke="black"></path>
-                  <path d="M 8,256 L 56,256" fill="none" stroke="black"></path>
-                  <path d="M 72,256 L 120,256" fill="none" stroke="black"></path>
-                  <path d="M 136,256 L 184,256" fill="none" stroke="black"></path>
-                  <path d="M 200,256 L 248,256" fill="none" stroke="black"></path>
-                  <path d="M 264,256 L 320,256" fill="none" stroke="black"></path>
-                  <path d="M 336,256 L 400,256" fill="none" stroke="black"></path>
-                  <path d="M 8,286 L 24,286" fill="none" stroke="black"></path>
-                  <path d="M 8,290 L 24,290" fill="none" stroke="black"></path>
-                  <path d="M 40,286 L 56,286" fill="none" stroke="black"></path>
-                  <path d="M 40,290 L 56,290" fill="none" stroke="black"></path>
-                  <path d="M 72,286 L 88,286" fill="none" stroke="black"></path>
-                  <path d="M 72,290 L 88,290" fill="none" stroke="black"></path>
-                  <path d="M 104,286 L 120,286" fill="none" stroke="black"></path>
-                  <path d="M 104,290 L 120,290" fill="none" stroke="black"></path>
-                  <path d="M 136,286 L 152,286" fill="none" stroke="black"></path>
-                  <path d="M 136,290 L 152,290" fill="none" stroke="black"></path>
-                  <path d="M 168,286 L 184,286" fill="none" stroke="black"></path>
-                  <path d="M 168,290 L 184,290" fill="none" stroke="black"></path>
-                  <path d="M 200,286 L 216,286" fill="none" stroke="black"></path>
-                  <path d="M 200,290 L 216,290" fill="none" stroke="black"></path>
-                  <path d="M 232,286 L 248,286" fill="none" stroke="black"></path>
-                  <path d="M 232,290 L 248,290" fill="none" stroke="black"></path>
-                  <path d="M 264,286 L 280,286" fill="none" stroke="black"></path>
-                  <path d="M 264,290 L 280,290" fill="none" stroke="black"></path>
-                  <path d="M 296,286 L 312,286" fill="none" stroke="black"></path>
-                  <path d="M 296,290 L 312,290" fill="none" stroke="black"></path>
-                  <path d="M 328,286 L 352,286" fill="none" stroke="black"></path>
-                  <path d="M 328,290 L 352,290" fill="none" stroke="black"></path>
-                  <path d="M 368,286 L 392,286" fill="none" stroke="black"></path>
-                  <path d="M 368,290 L 392,290" fill="none" stroke="black"></path>
-                  <path d="M 408,286 L 432,286" fill="none" stroke="black"></path>
-                  <path d="M 408,290 L 432,290" fill="none" stroke="black"></path>
-                  <path d="M 8,318 L 24,318" fill="none" stroke="black"></path>
-                  <path d="M 8,322 L 24,322" fill="none" stroke="black"></path>
-                  <path d="M 40,318 L 56,318" fill="none" stroke="black"></path>
-                  <path d="M 40,322 L 56,322" fill="none" stroke="black"></path>
-                  <path d="M 72,318 L 88,318" fill="none" stroke="black"></path>
-                  <path d="M 72,322 L 88,322" fill="none" stroke="black"></path>
-                  <path d="M 104,318 L 120,318" fill="none" stroke="black"></path>
-                  <path d="M 104,322 L 120,322" fill="none" stroke="black"></path>
-                  <path d="M 136,318 L 152,318" fill="none" stroke="black"></path>
-                  <path d="M 136,322 L 152,322" fill="none" stroke="black"></path>
-                  <path d="M 168,318 L 184,318" fill="none" stroke="black"></path>
-                  <path d="M 168,322 L 184,322" fill="none" stroke="black"></path>
-                  <path d="M 200,318 L 216,318" fill="none" stroke="black"></path>
-                  <path d="M 200,322 L 216,322" fill="none" stroke="black"></path>
-                  <path d="M 232,318 L 248,318" fill="none" stroke="black"></path>
-                  <path d="M 232,322 L 248,322" fill="none" stroke="black"></path>
-                  <path d="M 264,318 L 280,318" fill="none" stroke="black"></path>
-                  <path d="M 264,322 L 280,322" fill="none" stroke="black"></path>
-                  <path d="M 296,318 L 312,318" fill="none" stroke="black"></path>
-                  <path d="M 296,322 L 312,322" fill="none" stroke="black"></path>
-                  <path d="M 328,318 L 352,318" fill="none" stroke="black"></path>
-                  <path d="M 328,322 L 352,322" fill="none" stroke="black"></path>
-                  <path d="M 368,318 L 392,318" fill="none" stroke="black"></path>
-                  <path d="M 368,322 L 392,322" fill="none" stroke="black"></path>
-                  <path d="M 408,318 L 432,318" fill="none" stroke="black"></path>
-                  <path d="M 408,322 L 432,322" fill="none" stroke="black"></path>
-                  <path d="M 136,368 L 376,368" fill="none" stroke="black"></path>
-                  <path d="M 136,400 L 376,400" fill="none" stroke="black"></path>
-                  <path d="M 64,432 L 200,432" fill="none" stroke="black"></path>
-                  <path d="M 312,432 L 448,432" fill="none" stroke="black"></path>
-                  <path d="M 64,464 L 200,464" fill="none" stroke="black"></path>
-                  <path d="M 312,464 L 448,464" fill="none" stroke="black"></path>
-                  <path d="M 32,496 L 104,496" fill="none" stroke="black"></path>
-                  <path d="M 160,496 L 232,496" fill="none" stroke="black"></path>
-                  <path d="M 288,496 L 368,496" fill="none" stroke="black"></path>
-                  <path d="M 32,528 L 104,528" fill="none" stroke="black"></path>
-                  <path d="M 160,528 L 232,528" fill="none" stroke="black"></path>
-                  <path d="M 288,528 L 368,528" fill="none" stroke="black"></path>
-                  <path d="M 136,560 L 184,560" fill="none" stroke="black"></path>
-                  <path d="M 200,560 L 248,560" fill="none" stroke="black"></path>
-                  <path d="M 264,560 L 320,560" fill="none" stroke="black"></path>
-                  <path d="M 336,560 L 400,560" fill="none" stroke="black"></path>
-                  <path d="M 136,592 L 184,592" fill="none" stroke="black"></path>
-                  <path d="M 200,592 L 248,592" fill="none" stroke="black"></path>
-                  <path d="M 264,592 L 320,592" fill="none" stroke="black"></path>
-                  <path d="M 336,592 L 400,592" fill="none" stroke="black"></path>
-                  <path d="M 200,624 L 216,624" fill="none" stroke="black"></path>
-                  <path d="M 232,622 L 248,622" fill="none" stroke="black"></path>
-                  <path d="M 232,626 L 248,626" fill="none" stroke="black"></path>
-                  <path d="M 264,622 L 280,622" fill="none" stroke="black"></path>
-                  <path d="M 264,626 L 280,626" fill="none" stroke="black"></path>
-                  <path d="M 296,622 L 312,622" fill="none" stroke="black"></path>
-                  <path d="M 296,626 L 312,626" fill="none" stroke="black"></path>
-                  <path d="M 328,622 L 352,622" fill="none" stroke="black"></path>
-                  <path d="M 328,626 L 352,626" fill="none" stroke="black"></path>
-                  <path d="M 368,622 L 392,622" fill="none" stroke="black"></path>
-                  <path d="M 368,626 L 392,626" fill="none" stroke="black"></path>
-                  <path d="M 408,622 L 432,622" fill="none" stroke="black"></path>
-                  <path d="M 408,626 L 432,626" fill="none" stroke="black"></path>
-                  <path d="M 200,656 L 216,656" fill="none" stroke="black"></path>
-                  <path d="M 232,654 L 248,654" fill="none" stroke="black"></path>
-                  <path d="M 232,658 L 248,658" fill="none" stroke="black"></path>
-                  <path d="M 264,654 L 280,654" fill="none" stroke="black"></path>
-                  <path d="M 264,658 L 280,658" fill="none" stroke="black"></path>
-                  <path d="M 296,654 L 312,654" fill="none" stroke="black"></path>
-                  <path d="M 296,658 L 312,658" fill="none" stroke="black"></path>
-                  <path d="M 328,654 L 352,654" fill="none" stroke="black"></path>
-                  <path d="M 328,658 L 352,658" fill="none" stroke="black"></path>
-                  <path d="M 368,654 L 392,654" fill="none" stroke="black"></path>
-                  <path d="M 368,658 L 392,658" fill="none" stroke="black"></path>
-                  <path d="M 408,654 L 432,654" fill="none" stroke="black"></path>
-                  <path d="M 408,658 L 432,658" fill="none" stroke="black"></path>
-                  <g class="text">
-                    <text x="248" y="52">[0,</text>
-                    <text x="280" y="52">13)</text>
-                    <text x="160" y="84">/</text>
-                    <text x="352" y="84">\</text>
-                    <text x="120" y="116">[0,</text>
-                    <text x="148" y="116">8)</text>
-                    <text x="368" y="116">[8,</text>
-                    <text x="400" y="116">13)</text>
-                    <text x="72" y="148">/</text>
-                    <text x="192" y="148">\</text>
-                    <text x="336" y="148">/</text>
-                    <text x="56" y="180">[0,</text>
-                    <text x="84" y="180">4)</text>
-                    <text x="184" y="180">[4,</text>
-                    <text x="212" y="180">8)</text>
-                    <text x="312" y="180">[8,</text>
-                    <text x="344" y="180">12)</text>
-                    <text x="40" y="212">/</text>
-                    <text x="96" y="212">\</text>
-                    <text x="168" y="212">/</text>
-                    <text x="224" y="212">\</text>
-                    <text x="304" y="212">/</text>
-                    <text x="360" y="212">\</text>
-                    <text x="32" y="244">[0,2)</text>
-                    <text x="96" y="244">[2,4)</text>
-                    <text x="160" y="244">[4,6)</text>
-                    <text x="224" y="244">[6,8)</text>
-                    <text x="292" y="244">[8,10)</text>
-                    <text x="368" y="244">[10,12)</text>
-                    <text x="24" y="276">/</text>
-                    <text x="40" y="276">\</text>
-                    <text x="88" y="276">/</text>
-                    <text x="104" y="276">\</text>
-                    <text x="152" y="276">/</text>
-                    <text x="168" y="276">\</text>
-                    <text x="216" y="276">/</text>
-                    <text x="232" y="276">\</text>
-                    <text x="280" y="276">/</text>
-                    <text x="296" y="276">\</text>
-                    <text x="352" y="276">/</text>
-                    <text x="368" y="276">\</text>
-                    <text x="16" y="308">0</text>
-                    <text x="48" y="308">1</text>
-                    <text x="80" y="308">2</text>
-                    <text x="112" y="308">3</text>
-                    <text x="144" y="308">4</text>
-                    <text x="176" y="308">5</text>
-                    <text x="208" y="308">6</text>
-                    <text x="240" y="308">7</text>
-                    <text x="272" y="308">8</text>
-                    <text x="304" y="308">9</text>
-                    <text x="340" y="308">10</text>
-                    <text x="380" y="308">11</text>
-                    <text x="420" y="308">12</text>
-                    <text x="248" y="388">[0,</text>
-                    <text x="280" y="388">13)</text>
-                    <text x="160" y="420">/</text>
-                    <text x="352" y="420">\</text>
-                    <text x="120" y="452">[0,</text>
-                    <text x="148" y="452">8)</text>
-                    <text x="368" y="452">[8,</text>
-                    <text x="400" y="452">13)</text>
-                    <text x="72" y="484">/</text>
-                    <text x="192" y="484">\</text>
-                    <text x="336" y="484">/</text>
-                    <text x="56" y="516">[0,</text>
-                    <text x="84" y="516">4)</text>
-                    <text x="184" y="516">[4,</text>
-                    <text x="212" y="516">8)</text>
-                    <text x="312" y="516">[8,</text>
-                    <text x="344" y="516">12)</text>
-                    <text x="168" y="548">/</text>
-                    <text x="224" y="548">\</text>
-                    <text x="304" y="548">/</text>
-                    <text x="360" y="548">\</text>
-                    <text x="160" y="580">[4,6)</text>
-                    <text x="224" y="580">[6,8)</text>
-                    <text x="292" y="580">[8,10)</text>
-                    <text x="368" y="580">[10,12)</text>
-                    <text x="216" y="612">/</text>
-                    <text x="232" y="612">\</text>
-                    <text x="280" y="612">/</text>
-                    <text x="296" y="612">\</text>
-                    <text x="352" y="612">/</text>
-                    <text x="368" y="612">\</text>
-                    <text x="208" y="644">6</text>
-                    <text x="240" y="644">7</text>
-                    <text x="272" y="644">8</text>
-                    <text x="304" y="644">9</text>
-                    <text x="340" y="644">10</text>
-                    <text x="380" y="644">11</text>
-                    <text x="420" y="644">12</text>
-                  </g>
-                </svg><a href="#section-5.2.3-9.1.1" class="pilcrow">¶</a>
-</div>
-</div>
-<figcaption><a href="#figure-11" class="selfRef">Figure 11</a>:
-<a href="#name-an-example-showing-the-mini" class="selfRef">An example showing the minimum nodes that must be available after pruning</a>
-            </figcaption></figure>
-</div>
-<p id="section-5.2.3-10">Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in <a href="#fig-prune-tree" class="auto internal xref">Figure 11</a>, the log's serving protocol MAY instead serve <code>[0, 2)</code> and <code>[2, 4)</code>, with the log client computing <code>[0, 4)</code> from those values.<a href="#section-5.2.3-10" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-3">If a serving protocol supports serving only a portion of the log, relying party policies SHOULD include requirements on which portions to serve.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-4">For example, <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> defines a profile for Merkle Tree Certificates that uses <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-5.2.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5003,12 +4645,21 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-revoked-ranges">
 <a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-revoked-ranges" class="section-name selfRef">Revoked Ranges</a>
         </h3>
-<p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>minSerial</code> value.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
-<p id="section-7.5-3">A relying party with transparency requirements additionally SHOULD revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>maxSerial</code> value. See <a href="#limiting-issuance-logs" class="auto internal xref">Section 12.2.2</a>.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
-<p id="section-7.5-4">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
-<p id="section-7.5-5">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
-<p id="section-7.5-6">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-6" class="pilcrow">¶</a></p>
+<p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. This can be used to revoke both ranges of entries in an issuance log and ranges of issuance logs, even if the contents are not known.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all serial numbers before the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>minSerial</code> value.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-3">This revocation allows the rest of a PKI to disregard old entries, even if they are not known to be expired. In particular:<a href="#section-7.5-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.5-4.1">
+            <p id="section-7.5-4.1.1">A relying party could permit a CA to skip serving old entries (see <a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a>) if long-expired and revoked.<a href="#section-7.5-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.5-4.2">
+            <p id="section-7.5-4.2.1">Newly-established monitors can skip processing long-expired and revoked entries.<a href="#section-7.5-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.5-5">A relying party with transparency requirements additionally SHOULD revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>maxSerial</code> value. See <a href="#limiting-issuance-logs" class="auto internal xref">Section 12.2.2</a>.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
+<p id="section-7.5-6">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-6" class="pilcrow">¶</a></p>
+<p id="section-7.5-7">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-7" class="pilcrow">¶</a></p>
+<p id="section-7.5-8">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5185,7 +4836,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-10.1.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. Costs are thus expected to scale with the CA's own issuance.<a href="#section-10.1.1-3" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-4">A CA only needs to produce a digital signature for every checkpoint, rather than for every certificate. The lower signature rate requirements could allow more secure and/or economical key storage choices.<a href="#section-10.1.1-4" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-5">Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.<a href="#section-10.1.1-5" class="pilcrow">¶</a></p>
-<p id="section-10.1.1-6">Log pruning (<a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.<a href="#section-10.1.1-6" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-6">Explicit revocation of old entries (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.<a href="#section-10.1.1-6" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-7">Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetch data from mirrors instead of CAs directly. In PKIs that deploy mirrors as part of cosigner policies, relying parties could set few availability requirements on CAs, as described in <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-10.1.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -5195,7 +4846,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-10.1.2" class="section-number selfRef">10.1.2. </a><a href="#name-cosigner-costs" class="section-name selfRef">Cosigner Costs</a>
           </h4>
 <p id="section-10.1.2-1">The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, requires very little state and can be run with low cost.<a href="#section-10.1.2-1" class="pilcrow">¶</a></p>
-<p id="section-10.1.2-2">A mirroring cosigner, such as <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>, performs a role comparable to CT logs, but several of the cost-saving properties in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a> also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.<a href="#section-10.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-10.1.2-2">A mirroring cosigner, such as <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>, performs a role comparable to CT logs, but several of the cost-saving properties in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a> also apply: improved protocols, smaller entries, less frequent signatures, and partial log serving. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.<a href="#section-10.1.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="monitor-costs">
@@ -5225,16 +4876,13 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-log-availability">
 <a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-log-availability" class="section-name selfRef">Log Availability</a>
         </h3>
-<p id="section-10.3-1">CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log has been pruned (<a href="#log-pruning" class="auto internal xref">Section 5.2.3</a>). If some resources are unavailable, they may not be visible to monitors.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
+<p id="section-10.3-1">CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log does not serve long-expired entries. If some resources are unavailable, they may not be visible to monitors.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
 <p id="section-10.3-2">As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish availability policies. These policies SHOULD be adhered to by trusted CAs and mirrors, and enforced by relying party vendors as a condition of trust. Exact availability policies for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
-<p id="section-10.3-3">Availability policies SHOULD specify how long an entry must be made available, before a CA or mirror is permitted to prune the entry. It is RECOMMENDED to define this using a <em>retention period</em>, which is some time after the entry has expired. In such a policy, an entry could only be pruned if it, and all preceding entries, have already expired for the retention period. Policies MAY opt to set different retention periods between CAs and mirrors. Permitting limited log retention is analogous to the CT practice of temporal sharding <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, except that a pruned issuance log remains compatible with older, unupdated relying parties.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
-<p id="section-10.3-4">Such policies impact monitors. If the retention period is, e.g. 6 months, this means that monitors are expected to check entries of interest within 6 months. It also means that a new monitor may only be aware of a 6 month history of entries issued for a particular domain.<a href="#section-10.3-4" class="pilcrow">¶</a></p>
-<p id="section-10.3-5">If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.<a href="#section-10.3-5" class="pilcrow">¶</a></p>
-<p id="section-10.3-6">The log pruning process simply makes some resources unavailable. Availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
-<p id="section-10.3-7">PKIs that require mirror cosignatures (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
-<p id="section-10.3-8">However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized issuance, if the entries are not available in another mirror. This does compromise transparency goals. As such, availability policies SHOULD set availability expectations on mirrors. This can also be mitigated by using multiple mirrors, either directly enforced in cosigner requirements, or by keeping mirrors up-to-date with each other.<a href="#section-10.3-8" class="pilcrow">¶</a></p>
-<p id="section-10.3-9">In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs SHOULD set availability requirements on CAs.<a href="#section-10.3-9" class="pilcrow">¶</a></p>
-<p id="section-10.3-10">In each of these cases, the serial numbers of unavailable entries are known. Availability failures can thus be mitigated by revocation, as described in <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>, likely as a first step in a broader distrust.<a href="#section-10.3-10" class="pilcrow">¶</a></p>
+<p id="section-10.3-3">Availability policies MAY permit CAs and mirrors to stop serving old, long-expired entries. If so, such policies SHOULD, at minimum, require CAs and mirrors to retain entries until they have been revoked in up-to-date relying parties. See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> for details. This is analogous to the CT practice of temporal sharding <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, except the issuance log remains compatible with older, unupdated relying parties.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
+<p id="section-10.3-4">PKIs that require mirror cosignatures (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-10.3-4" class="pilcrow">¶</a></p>
+<p id="section-10.3-5">However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized issuance, if the entries are not available in another mirror. This does compromise transparency goals. As such, availability policies SHOULD set availability expectations on mirrors. This can also be mitigated by using multiple mirrors, either directly enforced in cosigner requirements, or by keeping mirrors up-to-date with each other.<a href="#section-10.3-5" class="pilcrow">¶</a></p>
+<p id="section-10.3-6">In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs SHOULD set availability requirements on CAs.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
+<p id="section-10.3-7">In each of these cases, the serial numbers of unavailable entries are known. Availability failures can thus be mitigated by revocation, as described in <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>, likely as a first step in a broader distrust.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="certificate-renewal">
@@ -5291,7 +4939,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-12.2-2">Compared to Certificate Transparency, some of the responsibilities of a log have moved to the CA. All signatures generated by the CA in this system are assertions about some view of the CA's issuance log. However, a CA does not need to function correctly to ensure transparency properties. Relying parties are expected to require a quorum of additional cosigners, which together enforce properties of the log (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) and prevent or detect CA misbehavior:<a href="#section-12.2-2" class="pilcrow">¶</a></p>
 <p id="section-12.2-3">A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.<a href="#section-12.2-3" class="pilcrow">¶</a></p>
 <p id="section-12.2-4">If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the range of inconsistent serials (<a href="#revoked-ranges" class="auto internal xref">Section 7.5</a>), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
-<p id="section-12.2-5">A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy (<a href="#log-availability" class="auto internal xref">Section 10.3</a>). The impact depends on the relying party's cosigner policy:<a href="#section-12.2-5" class="pilcrow">¶</a></p>
+<p id="section-12.2-5">A CA might correctly construct its log, but refuse to serve some unauthorized entry. The impact depends on the relying party's cosigner policy:<a href="#section-12.2-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.2-6.1">
             <p id="section-12.2-6.1.1">If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it.<a href="#section-12.2-6.1.1" class="pilcrow">¶</a></p>
@@ -5909,9 +5557,9 @@ END
         <h3 id="name-binary-representations">
 <a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-binary-representations" class="section-name selfRef">Binary Representations</a>
         </h3>
-<p id="appendix-B.1-1">Within a Merkle Tree whose size is a power of two, the binary representation of a leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. <a href="#fig-merkle-tree-bits-full" class="auto internal xref">Figure 12</a> demonstrates this in a Merkle Tree of size 8:<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-1">Within a Merkle Tree whose size is a power of two, the binary representation of a leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. <a href="#fig-merkle-tree-bits-full" class="auto internal xref">Figure 11</a> demonstrates this in a Merkle Tree of size 8:<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-of-s"></span><div id="fig-merkle-tree-bits-full">
-<figure id="figure-12">
+<figure id="figure-11">
           <div id="appendix-B.1-2.1">
             <div class="alignLeft art-svg artwork" id="appendix-B.1-2.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="272" width="328" viewBox="0 0 328 272" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -6020,16 +5668,16 @@ END
               </svg><a href="#appendix-B.1-2.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-12" class="selfRef">Figure 12</a>:
+<figcaption><a href="#figure-11" class="selfRef">Figure 11</a>:
 <a href="#name-an-example-merkle-tree-of-s" class="selfRef">An example Merkle Tree of size 8</a>
           </figcaption></figure>
 </div>
 <p id="appendix-B.1-3">The binary representation of <code>4</code> is <code>0b100</code>. It is the left (0) child of <code>[4, 6)</code>, which is the left (0) child of <code>[4, 8)</code>, which is the right (1) child of <code>[0, 8)</code>.<a href="#appendix-B.1-3" class="pilcrow">¶</a></p>
 <p id="appendix-B.1-4">Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree <code>[start, end)</code>, the node's level is <code>BIT_WIDTH(end - start - 1)</code>.<a href="#appendix-B.1-4" class="pilcrow">¶</a></p>
 <p id="appendix-B.1-5">Comparing two indices determines the relationship between two paths. The highest differing bit gives the level at which paths from root to leaf diverge. For example, the bit representations of 4 and 6 are <code>0b100</code> and <code>0b110</code>, respectively. The highest differing bit is bit 1. Bits 2 and up are the same between the two indices. This indicates that the paths from the root to leaves 4 and 6 diverge when going from level 2 to level 1.<a href="#appendix-B.1-5" class="pilcrow">¶</a></p>
-<p id="appendix-B.1-6">This can be generalized to arbitrary-sized Merkle Trees. <a href="#fig-merkle-tree-bits-partial" class="auto internal xref">Figure 13</a> depicts a Merkle Tree of size 6:<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-6">This can be generalized to arbitrary-sized Merkle Trees. <a href="#fig-merkle-tree-bits-partial" class="auto internal xref">Figure 12</a> depicts a Merkle Tree of size 6:<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-of-si"></span><div id="fig-merkle-tree-bits-partial">
-<figure id="figure-13">
+<figure id="figure-12">
           <div id="appendix-B.1-7.1">
             <div class="alignLeft art-svg artwork" id="appendix-B.1-7.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="272" width="272" viewBox="0 0 272 272" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -6114,14 +5762,14 @@ END
               </svg><a href="#appendix-B.1-7.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-13" class="selfRef">Figure 13</a>:
+<figcaption><a href="#figure-12" class="selfRef">Figure 12</a>:
 <a href="#name-an-example-merkle-tree-of-si" class="selfRef">An example Merkle Tree of size 6</a>
           </figcaption></figure>
 </div>
 <p id="appendix-B.1-8">When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. The rightmost edge is the path to the last element. The skipped levels can be seen in its binary representation. Here, the last element is 5, which has binary representation <code>0b101</code>. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.<a href="#appendix-B.1-8" class="pilcrow">¶</a></p>
-<p id="appendix-B.1-9">In a tree of the next power of two size, the skipped nodes in this path are where there <em>would</em> have been a right child, had there been enough elements to construct one. Without a right child, the hash operation is skipped and a skipped node has the same value as its singular child. <a href="#fig-merkle-tree-bits-partial-comparison" class="auto internal xref">Figure 14</a> depicts this for a tree of size 6.<a href="#appendix-B.1-9" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-9">In a tree of the next power of two size, the skipped nodes in this path are where there <em>would</em> have been a right child, had there been enough elements to construct one. Without a right child, the hash operation is skipped and a skipped node has the same value as its singular child. <a href="#fig-merkle-tree-bits-partial-comparison" class="auto internal xref">Figure 13</a> depicts this for a tree of size 6.<a href="#appendix-B.1-9" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-of-siz"></span><div id="fig-merkle-tree-bits-partial-comparison">
-<figure id="figure-14">
+<figure id="figure-13">
           <div id="appendix-B.1-10.1">
             <div class="alignLeft art-svg artwork" id="appendix-B.1-10.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="272" width="328" viewBox="0 0 328 272" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -6227,7 +5875,7 @@ END
               </svg><a href="#appendix-B.1-10.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
+<figcaption><a href="#figure-13" class="selfRef">Figure 13</a>:
 <a href="#name-an-example-merkle-tree-of-siz" class="selfRef">An example Merkle Tree of size 6, viewed as a subset of a tree of size 8</a>
           </figcaption></figure>
 </div>
@@ -6240,9 +5888,9 @@ END
 <a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-subtrees-2" class="section-name selfRef">Subtrees</a>
         </h3>
 <p id="appendix-B.2-1">Given a list of elements and Merkle Tree over them, it is possible to construct a smaller Merkle Tree over any interval of elements. However, those smaller trees may not have the same structure as the original tree.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-2"><a href="#fig-misaligned-tree" class="auto internal xref">Figure 15</a> shows a Merkle Tree of size 8, and a tree built over elements <code>[1, 5)</code>. When <code>[1, 5)</code> is considered as an independent, 4-element sequence, it does not align with the portion of the overall tree that covers <code>[1, 5)</code>. The two trees do not share any intermediate nodes. This prevents constructing subtree consistency proofs (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>).<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-2"><a href="#fig-misaligned-tree" class="auto internal xref">Figure 14</a> shows a Merkle Tree of size 8, and a tree built over elements <code>[1, 5)</code>. When <code>[1, 5)</code> is considered as an independent, 4-element sequence, it does not align with the portion of the overall tree that covers <code>[1, 5)</code>. The two trees do not share any intermediate nodes. This prevents constructing subtree consistency proofs (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.4</a>).<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
 <span id="name-an-example-misaligned-tree"></span><div id="fig-misaligned-tree">
-<figure id="figure-15">
+<figure id="figure-14">
           <div id="appendix-B.2-3.1">
             <div class="alignLeft art-svg artwork" id="appendix-B.2-3.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="480" width="328" viewBox="0 0 328 480" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -6399,7 +6047,7 @@ END
               </svg><a href="#appendix-B.2-3.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
+<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
 <a href="#name-an-example-misaligned-tree" class="selfRef">An example misaligned tree</a>
           </figcaption></figure>
 </div>
@@ -6452,9 +6100,9 @@ END
 </li>
         </ol>
 <p id="appendix-B.4-3">A Merkle consistency proof, defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4" class="relref">Section 2.1.4</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, applies these same optimizations.<a href="#appendix-B.4-3" class="pilcrow">¶</a></p>
-<p id="appendix-B.4-4"><a href="#fig-truncate-consistency-proof" class="auto internal xref">Figure 16</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 8. The consistency proof begins at level 1, or node <code>[4, 6)</code>. The inclusion proof portion is similarly truncated to start at level 1: <code>[6, 8)</code> and <code>[0, 4)</code>. If the consistency proof began at level 0, the starting node would be leaf 5, and the consistency proof would additionally include leaf 4.<a href="#appendix-B.4-4" class="pilcrow">¶</a></p>
+<p id="appendix-B.4-4"><a href="#fig-truncate-consistency-proof" class="auto internal xref">Figure 15</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 8. The consistency proof begins at level 1, or node <code>[4, 6)</code>. The inclusion proof portion is similarly truncated to start at level 1: <code>[6, 8)</code> and <code>[0, 4)</code>. If the consistency proof began at level 0, the starting node would be leaf 5, and the consistency proof would additionally include leaf 4.<a href="#appendix-B.4-4" class="pilcrow">¶</a></p>
 <span id="name-a-subtree-consistency-proof"></span><div id="fig-truncate-consistency-proof">
-<figure id="figure-16">
+<figure id="figure-15">
           <div id="appendix-B.4-5.1">
             <div class="alignLeft art-svg artwork" id="appendix-B.4-5.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="544" width="336" viewBox="0 0 336 544" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -6651,13 +6299,13 @@ END
               </svg><a href="#appendix-B.4-5.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
+<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
 <a href="#name-a-subtree-consistency-proof" class="selfRef">A subtree consistency proof that starts at level 1 instead of level 0</a>
           </figcaption></figure>
 </div>
-<p id="appendix-B.4-6">Note that the truncated inclusion proof may include nodes from lower levels, if the corresponding level was skipped on the right edge. <a href="#fig-truncate-consistency-proof-2" class="auto internal xref">Figure 17</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 7. As above, the starting node is <code>[4, 6)</code> at level 1. The inclusion proof portion includes leaf 6 at level 0. This is because leaf 6 is taking the place of its skipped parent at level 1. (A skipped node can be thought of as a duplicate of its singular child.)<a href="#appendix-B.4-6" class="pilcrow">¶</a></p>
+<p id="appendix-B.4-6">Note that the truncated inclusion proof may include nodes from lower levels, if the corresponding level was skipped on the right edge. <a href="#fig-truncate-consistency-proof-2" class="auto internal xref">Figure 16</a> depicts a subtree consistency proof between the subtree <code>[0, 6)</code> and the Merkle Tree of size 7. As above, the starting node is <code>[4, 6)</code> at level 1. The inclusion proof portion includes leaf 6 at level 0. This is because leaf 6 is taking the place of its skipped parent at level 1. (A skipped node can be thought of as a duplicate of its singular child.)<a href="#appendix-B.4-6" class="pilcrow">¶</a></p>
 <span id="name-the-interaction-between-inc"></span><div id="fig-truncate-consistency-proof-2">
-<figure id="figure-17">
+<figure id="figure-16">
           <div id="appendix-B.4-7.1">
             <div class="alignLeft art-svg artwork" id="appendix-B.4-7.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="544" width="320" viewBox="0 0 320 544" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -6848,7 +6496,7 @@ END
               </svg><a href="#appendix-B.4-7.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-17" class="selfRef">Figure 17</a>:
+<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
 <a href="#name-the-interaction-between-inc" class="selfRef">The interaction between inclusion proof truncation and skipped levels</a>
           </figcaption></figure>
 </div>
@@ -7401,6 +7049,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.17-1.6">
             <p id="appendix-E.17-1.6.1">Give an exact procedure for selecting the landmark and covering subtree when constructing a landmark-relative certificate.<a href="#appendix-E.17-1.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.7">
+            <p id="appendix-E.17-1.7.1">Prune the pruning discussion. It's really a property of the log serving protocol and is better described in <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> and <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span><a href="#appendix-E.17-1.7.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
