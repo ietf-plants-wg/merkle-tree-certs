@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-23T03:35:21.903994+00:00",
+  "timestamp": "2026-07-28T03:23:55.441260+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -19629,25 +19629,35 @@
       "id": "PR_kwDOJIBkVc70CydL",
       "title": "Some minor wording adjustments",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/278",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ounsworth",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-07-20T20:31:27Z",
-      "updatedAt": "2026-07-22T15:15:09Z",
+      "updatedAt": "2026-07-27T17:28:59Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "00fd4fc714418cad4e8f8a6bb943350ba50dcac6",
       "headRepository": "ounsworth/merkle-tree-certs",
       "headRefName": "main",
-      "headRefOid": "05abf635ab2f19aea2bb3e72deaa03d538a8036d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "294f24c9985357ce920cfdbaf1d0af7531650005",
+      "closedAt": "2026-07-27T17:27:24Z",
+      "mergedAt": "2026-07-27T17:27:24Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7a2d5f1234e27ac185d67243fcdd68a4ec6a8513"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Merged and then added you to acknowledgements in https://github.com/ietf-plants-wg/merkle-tree-certs/commit/2e87ea1cdd7ab01d7d08c12dd42714b559943834",
+          "createdAt": "2026-07-27T17:28:59Z",
+          "updatedAt": "2026-07-27T17:28:59Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABGqYXcA",
@@ -19717,7 +19727,7 @@
             "abbreviatedOid": "a817415"
           },
           "author": "ounsworth",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-07-21T13:00:12Z",
@@ -19737,7 +19747,7 @@
             "abbreviatedOid": "a817415"
           },
           "author": "ounsworth",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-07-21T13:18:50Z",
@@ -19757,7 +19767,7 @@
             "abbreviatedOid": "a817415"
           },
           "author": "ounsworth",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-07-21T13:21:26Z",
@@ -19777,7 +19787,7 @@
             "abbreviatedOid": "a817415"
           },
           "author": "ounsworth",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-07-21T13:25:37Z",
@@ -19966,7 +19976,7 @@
       "id": "PR_kwDOJIBkVc70aj8-",
       "title": "Detail landmark-relative certificate construction",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/284",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "lukevalenta",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -19975,19 +19985,35 @@
       "labels": [],
       "body": "Give an exact procedure for selecting the landmark and covering subtree when constructing a landmark-relative certificate.\r\n\r\n(split from #254)",
       "createdAt": "2026-07-21T14:44:30Z",
-      "updatedAt": "2026-07-21T14:44:30Z",
+      "updatedAt": "2026-07-27T19:53:45Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "lvalenta/exact-landmark-relative-construction",
       "headRefOid": "dc632c8909f1afe9b0c864d2866217784fcb8149",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-07-27T19:53:45Z",
+      "mergedAt": "2026-07-27T19:53:45Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "13d267ab4f1f25e5c3259def578c2a5b01b5d612"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABHZA5pA",
+          "commit": {
+            "abbreviatedOid": "dc632c8"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-27T19:53:36Z",
+          "updatedAt": "2026-07-27T19:53:36Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 286,
@@ -20072,6 +20098,82 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 288,
+      "id": "PR_kwDOJIBkVc73DzPu",
+      "title": "Prune the discussion on log pruning",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/288",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This section was a bit confusing and didn't say much, because this draft doesn't define the log serving protocols in the first place. It's scoped to specifically the certificate format.\r\n\r\nAt the time this text was written, log pruning had not yet been upstreamed into tlog-tiles. Now that it has, we can prune most of this and instead anchor on discussion of how to set minSerial. tlog-tiles and mtc-tlog has more precise discussion on how and when to prune.\r\n\r\nIssue #279",
+      "createdAt": "2026-07-27T18:16:00Z",
+      "updatedAt": "2026-07-27T19:28:33Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2e87ea1cdd7ab01d7d08c12dd42714b559943834",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "prune-prune",
+      "headRefOid": "ca491380c00f05cf460799e814dcefc5a438754e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABHY0xeA",
+          "commit": {
+            "abbreviatedOid": "ca49138"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-27T19:28:33Z",
+          "updatedAt": "2026-07-27T19:28:33Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 289,
+      "id": "PR_kwDOJIBkVc73MLvE",
+      "title": "Change MTCSignature to SubtreeSignature",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/289",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This better represents what data the signature is computed over, aligns with the body text (\"`signatures` contains the chosen subtree signatures\"), and reduces confusion given that this field is contained within the object which ends up acting as the signature on an MTC.",
+      "createdAt": "2026-07-28T00:33:24Z",
+      "updatedAt": "2026-07-28T00:37:05Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "13d267ab4f1f25e5c3259def578c2a5b01b5d612",
+      "headRepository": "aarongable/merkle-tree-certs",
+      "headRefName": "patch-2",
+      "headRefOid": "210a83d31a7bea738fe09921cda277b7288555bb",
+      "closedAt": "2026-07-28T00:37:05Z",
+      "mergedAt": "2026-07-28T00:37:05Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a96a066d583c2968b00243b0fc55ec52da1a607c"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oh haha yes that was somewhat unfortunate of naming.",
+          "createdAt": "2026-07-28T00:36:58Z",
+          "updatedAt": "2026-07-28T00:36:58Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
