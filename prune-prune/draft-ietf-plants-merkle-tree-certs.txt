@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 28 January 2027                                      Apple Inc.
+Expires: 29 January 2027                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            27 July 2026
+                                                            28 July 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 January 2027.
+   This Internet-Draft will expire on 29 January 2027.
 
 Copyright Notice
 
@@ -1773,14 +1773,14 @@ Table of Contents
    struct {
        TrustAnchorID cosigner_id;
        opaque signature<0..2^16-1>;
-   } MTCSignature;
+   } SubtreeSignature;
 
    struct {
        MTCLogEntryExtension extensions<0..2^16-1>;
        uint48 start;
        uint48 end;
        HashValue inclusion_proof<0..2^16-1>;
-       MTCSignature signatures<0..2^16-1>;
+       SubtreeSignature signatures<0..2^16-1>;
    } MTCProof;
 
    extensions MUST contain the log entry's extensions value
@@ -1987,11 +1987,18 @@ Table of Contents
    Given the inputs in Section 6.1 and a landmark sequence, a landmark-
    relative certificate is constructed as follows:
 
-   1.  Wait for the first landmark to be allocated that contains the
-       entry.
+   1.  Let L be the smallest landmark number in the active window whose
+       tree size is strictly greater than the entry index i.  Because
+       the landmark sequence is strictly monotonically increasing, L -
+       1's tree size is less than or equal to i.  If no such L has been
+       allocated yet (i is greater than or equal to last_landmark's tree
+       size), wait for one to be allocated.  If every landmark that once
+       covered the entry is no longer in the active window
+       (last_landmark - num_active_landmarks's tree size is greater than
+       i), abort this process.
 
-   2.  Determine the landmark's subtrees and select the one that
-       contains the entry.
+   2.  Determine landmark L's subtrees (Section 6.4.1) and select the
+       unique one whose [start, end) interval contains i.
 
    3.  Construct a certificate (Section 6.2) using the selected subtree
        and no signatures.
@@ -4405,6 +4412,9 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Clarify that a landmark consists of both a number and a tree size,
       and that a landmark's subtrees share its landmark number.
+
+   *  Give an exact procedure for selecting the landmark and covering
+      subtree when constructing a landmark-relative certificate.
 
    *  Prune the pruning discussion.  It's really a property of the log
       serving protocol and is better described in [MTC-TLOG] and
