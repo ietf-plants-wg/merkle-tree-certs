@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-28T03:23:55.441260+00:00",
+  "timestamp": "2026-07-30T03:13:36.277008+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3861,6 +3861,30 @@
       "updatedAt": "2026-07-21T14:45:58Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 290,
+      "id": "I_kwDOJIBkVc8AAAABKjPurw",
+      "title": "How 8.2.1 works via Trust Anchor ID's isn't super clear",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/290",
+      "state": "OPEN",
+      "author": "bob-beck",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "\nBasing this only on what I did, and testing against BoringSSL. \n\n```Landmark-relative certificates SHOULD be configured with this information, as in [Section 3.2](https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3.2) of [[I-D.ietf-tls-trust-anchor-ids](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-05.html#I-D.ietf-tls-trust-anchor-ids)]. A relying party whose latest trusted subtree ([Section 7.4](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-05.html#trusted-subtrees)) in log N is landmark L SHOULD configure the trust_anchors extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks.```\n\nSo this implies that the trust anchors extension advertising the landmark group *implies* support for the standalone certificate for the CA,\nso this is what I have implemented. In my case, let's say we have landmarks and TAI groups defined for logs on a CA 32473.1 - I consider that\nthe CA cert (32473.1) also matches any of those groups. In the end the landmark if it matches ends up served by preference (because it's smaller) but the CA cert is also a match. \n\nConfigring boringssl with a landmark cert preferential to the CA cert, It doesn't seem to do that. and falls back to the RSA ubiquitous cert I configured it with.  If I send boring a landmark corresponding to what it does have it works fine, and sends me the signatureless cert.   looking at the TAI response, it does indicate that it has both a landmark cert and the CA cert.  So what's really supposed to happen here when  the client sends support for a group.? \n\nNew, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384\nProtocol: TLSv1.3\nServer public key is 10496 bit\nThis TLS version forbids renegotiation.\nCompression: NONE\nExpansion: NONE\nNo ALPN negotiated\nEarly data was not sent\nVerify return code: 110 (Merkle Tree Certificate subtree is not trusted)\nAvailable trust anchor IDs:\n    32473.1.1.1.1\n    32473.1\n---\n\nIn the above case I sent a request for a landmark the server did not have The CA cert is 32473.1, but I did not get it back, I got the RSA fallback. \n\n",
+      "createdAt": "2026-07-28T21:10:20Z",
+      "updatedAt": "2026-07-29T02:14:34Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "Or to be compltely clear on that case : The bssl server is configured with two TAI credentials plus an ordinary fallback: \n- a landmark-relative certificate for landmark 1 of log 1 \u2014 trust_anchor_id 32473.1.1.1.1, and a trust_anchor_group_inclusions range with base 32473.1.2.1, min 1, max 2\n- a standalone cosigned certificate \u2014 trust_anchor_id 32473.1, no inclusions\n- an RSA certificate via -cert/-key, as the ubiquitous fallback\n\nThe OpenSSL client trusts CA 32473.1 and is up to date as of landmark 9 of log 1 with a window of 2, so per 8.2.1 it advertises a single ID, the landmark group 32473.1.2.1.9.\n\nThe server has no landmark in that group, but it does have the CA's standalone certificate, but It sends the RSA fallback instead:\n \nSo what's supposed to happen here? 8.2.1 seems to hint that the client does not need to also send the standalone cert's TAI, just the group. ",
+          "createdAt": "2026-07-29T02:14:34Z",
+          "updatedAt": "2026-07-29T02:14:34Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -20104,24 +20128,26 @@
       "id": "PR_kwDOJIBkVc73DzPu",
       "title": "Prune the discussion on log pruning",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/288",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This section was a bit confusing and didn't say much, because this draft doesn't define the log serving protocols in the first place. It's scoped to specifically the certificate format.\r\n\r\nAt the time this text was written, log pruning had not yet been upstreamed into tlog-tiles. Now that it has, we can prune most of this and instead anchor on discussion of how to set minSerial. tlog-tiles and mtc-tlog has more precise discussion on how and when to prune.\r\n\r\nIssue #279",
       "createdAt": "2026-07-27T18:16:00Z",
-      "updatedAt": "2026-07-27T19:28:33Z",
+      "updatedAt": "2026-07-28T13:45:21Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "2e87ea1cdd7ab01d7d08c12dd42714b559943834",
+      "baseRefOid": "a96a066d583c2968b00243b0fc55ec52da1a607c",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "prune-prune",
-      "headRefOid": "ca491380c00f05cf460799e814dcefc5a438754e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "5af7aced860c05ce74e1435e94d41c8961d35cb0",
+      "closedAt": "2026-07-28T13:45:15Z",
+      "mergedAt": "2026-07-28T13:45:15Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c"
+      },
       "comments": [],
       "reviews": [
         {
@@ -20151,7 +20177,7 @@
       "labels": [],
       "body": "This better represents what data the signature is computed over, aligns with the body text (\"`signatures` contains the chosen subtree signatures\"), and reduces confusion given that this field is contained within the object which ends up acting as the signature on an MTC.",
       "createdAt": "2026-07-28T00:33:24Z",
-      "updatedAt": "2026-07-28T00:37:05Z",
+      "updatedAt": "2026-07-28T14:38:32Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "13d267ab4f1f25e5c3259def578c2a5b01b5d612",
