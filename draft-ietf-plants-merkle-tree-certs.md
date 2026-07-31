@@ -222,7 +222,7 @@ This achieves the following:
 
 * Log entries do not scale with public key and signature sizes. Entries replace public keys with hashes and do not contain signatures, while preserving non-repudiability ({{non-repudiation}}).
 
-* To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.
+* Long-expired entries can be revoked from relying parties in bulk (see {{revoked-ranges}}). This allows logging and monitoring infrastructure to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.
 
 * After a processing delay, authenticating parties can obtain a second "landmark-relative" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.
 
@@ -984,8 +984,6 @@ A log ID specifies both the CA and the log number in a single ID.
 
 Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
-Each log additionally maintains a *minimum index* value, which is the index of the first log entry which is available. See {{log-pruning}}. This value changes over the lifetime of the log.
-
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
@@ -1059,94 +1057,25 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
-MTCLogEntry is an extensible structure. Future documents may define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
+MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
-An MTCLogEntry's size SHOULD NOT exceed 65535 (2<sup>16</sup>-1) bytes. Doing so may exceed size limits in common log-serving protocols, such as {{TLOG-TILES}}. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
+An MTCLogEntry's size MUST NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
 ### Publishing Logs
 
 This protocol aims to enable monitors to detect misissued certificates by observing the issuance log. See {{transparency}}.
 
-This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications may have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
+This document does not prescribe a particular method of observing the issuance log. The access protocols do not affect certificate interoperability, and different applications could have different needs. For example, a PKI that authenticates public services might publicly serve issuance logs, while a PKI that authenticates a single organization's intranet services might keep the log private to the organization. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
-For example, a log ecosystem could use {{TLOG-TILES}} to serve logs; {{MTC-TLOG}} defines such a profile for Merkle Tree Certificates. {{TLOG-TILES}} improves on {{?RFC6962}} and {{?RFC9162}} by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP {{?RFC9110}} serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in {{subtrees}}.
+If a serving protocol supports serving only a portion of the log, relying party policies SHOULD include requirements on which portions to serve.
 
-### Log Pruning
-
-Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be *pruned*, as described in this section.
-
-Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. {{log-availability}} discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.
-
-An issuance log is pruned by updating its *minimum index* parameter ({{issuance-logs}}). The minimum index is the index of the first log entry that the log publishes. (See {{publishing-logs}}.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.
-
-An entry is said to be *available* if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree `[start, end)` is said to be available if `end` is greater than the minimum index.
-
-Log protocols MUST serve enough information to allow a log client to efficiently obtain the following:
-
-* Signatures over the latest checkpoint by the CA's cosigners ({{certification-authority-cosigners}})
-* Any individual available log entry ({{log-entries}})
-* The hash value of any available checkpoint
-* An inclusion proof ({{Section 2.1.3 of !RFC9162}}) for any available entry to any containing checkpoint
-* A consistency proof ({{Section 2.1.4 of !RFC9162}}) between any two available checkpoints
-* The hash value of any available subtree ({{subtrees}})
-* A subtree inclusion proof ({{subtree-inclusion-proofs}}) for any available entry in any containing subtree
-* A subtree consistency proof ({{subtree-consistency-proofs}}) between any available subtree to any containing checkpoint
-
-Meeting these requirements requires a log to retain some information about pruned entries. Given a node `[start, end)` in the Merkle Tree, if `end` is less than or equal to the minimum index, the node's children MAY be discarded in favor of the node's hash.
-
-{{fig-prune-tree}} shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.
-
-~~~aasvg
-                +-----------------------------+
-                |            [0, 13)          |
-                +-----------------------------+
-                   /                       \
-       +----------------+             +----------------+
-       |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +----------------+
-        /              \                 /          |
-   +--------+      +--------+      +---------+      |
-   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +--------+      +---------+      |
-    /      \        /      \         /      \       |
-+-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-+-----+ +-----+ +-----+ +-----+ +------+ +-------+  |
-  / \     / \     / \     / \     / \      / \      |
-+=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
-+=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
-
-
-                +-----------------------------+
-                |            [0, 13)          |
-                +-----------------------------+
-                   /                       \
-       +----------------+             +----------------+
-       |     [0, 8)     |             |     [8, 13)    |
-       +----------------+             +----------------+
-        /              \                 /          |
-   +--------+      +--------+      +---------+      |
-   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
-   +--------+      +--------+      +---------+      |
-                    /      \         /      \       |
-                +-----+ +-----+ +------+ +-------+  |
-                |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
-                +-----+ +-----+ +------+ +-------+  |
-                          / \     / \      / \      |
-                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
-                        |6| |7| |8| |9| |10| |11| |12|
-                        +-+ +=+ +=+ +=+ +==+ +==+ +==+
-~~~
-{: #fig-prune-tree title="An example showing the minimum nodes that must be available after pruning"}
-
-Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in {{fig-prune-tree}}, the log's serving protocol MAY instead serve `[0, 2)` and `[2, 4)`, with the log client computing `[0, 4)` from those values.
+For example, {{MTC-TLOG}} defines a profile for Merkle Tree Certificates that uses {{TLOG-TILES}}.
 
 ## Cosigners
 
 This section defines a log *cosigner*. A cosigner follows some append-only view of the log and signs subtrees ({{subtrees}}) consistent with that view. The signatures generated by a cosigner are known as *cosignatures*. All subtrees signed by a cosigner MUST be consistent with each other. The cosigner may be external to the log, in which case it might ensure consistency by checking consistency proofs. The cosigner may be operated together with the log, in which case it can trust its log state.
 
-A cosignature MAY implicitly make additional statements about a subtree, determined by the cosigner's role. This document defines one concrete cosigner role, a CA cosigner ({{certification-authority-cosigners}}), to authenticate the log and certify entries. Other documents and specific deployments may define other cosigner roles, to perform different functions in a PKI. For example, {{TLOG-WITNESS}} defines a cosigner that only checks the log is append-only, and {{TLOG-MIRROR}} defines a cosigner that mirrors a log.
+A cosignature MAY implicitly make additional statements about a subtree, determined by the cosigner's role. This document defines one concrete cosigner role, a CA cosigner ({{certification-authority-cosigners}}), to authenticate the log and certify entries. Other documents and specific deployments MAY define other cosigner roles, to perform different functions in a PKI. For example, {{TLOG-WITNESS}} defines a cosigner that only checks the log is append-only, and {{TLOG-MIRROR}} defines a cosigner that mirrors a log.
 
 Each cosigner has a public key and a *cosigner ID*, which uniquely identifies the cosigner. The cosigner ID is a trust anchor ID {{!I-D.ietf-tls-trust-anchor-ids}}. By identifying the cosigner, the cosigner ID specifies the public key, signature algorithm, and any additional statements made by the cosigner's signatures. If a single operator performs multiple cosigner roles in an ecosystem, each role MUST use a distinct cosigner ID and SHOULD use a distinct key.
 
@@ -1188,36 +1117,36 @@ This is equivalent to the concatenation of:
 
 For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
 
-`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log.
+`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. See {{definition-of-a-subtree}}.
 
 If `timestamp` is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally, if `timestamp` is non-zero, the following MUST be true:
 
 * `start` MUST be zero.
 * `end` MUST be the size of the largest consistent tree that the cosigner has observed for the log.
 
-`timestamp` MAY be zero, in which case no additional constraints are placed on `start` or `end`, and no statement is made about the signing time or largest observed tree.
+`timestamp` MAY be zero, in which case no additional constraints are placed on `start` or `end` (beyond being a valid subtree), and no statement is made about the signing time or largest observed tree.
 
 ### Signature Semantics
 
-Before signing a subtree of some log, the cosigner MUST ensure that `subtree_hash` is consistent with its view of the log. Different cosigner roles may obtain this assurance differently. For example:
+Before signing a subtree of some log, the cosigner MUST ensure that `subtree_hash` is consistent with its view of the log. Different cosigner roles will obtain this assurance differently. For example:
 
-* A cosigner may maintain a full copy of the log, e.g. if it's the log operator. The cosigner can then compute `subtree_hash` from this copy.
+* A cosigner MAY maintain a full copy of the log, e.g. if it's the log operator. The cosigner can then compute `subtree_hash` from this copy.
 
-* A cosigner may maintain the hash of the largest consistent tree observed by the log. The cosigner can then check `subtree_hash` with a subtree consistency proof ({{subtree-consistency-proofs}}).
+* A cosigner MAY maintain the hash of the largest consistent tree observed by the log. The cosigner can then check `subtree_hash` with a subtree consistency proof ({{subtree-consistency-proofs}}).
 
-In both cases, the cosigner MUST ensure that, as it updates its view of the log, the old and new views are consistent. For example, {{TLOG-WITNESS}} defines a cosigner that checks consistency proofs ({{Section 2.1.4 of !RFC9162}}) between the two views.
+* A cosigner MAY maintain any other representation of the log which allows it to verify the consistency of the log.
+
+In all cases, the cosigner MUST ensure that, as it updates its view of the log, the old and new views are consistent.
 
 When a cosigner signs a subtree, it is held separately responsible *both* for the subtree being consistent with its other signatures, *and* for the cosigner-specific additional statements. That is, if a cosigner signs an inconsistent subtree, it is held responsible for its additional statements on all entries in the inconsistent subtree, even if some other signed subtree exists that asserts different entries.
 
-Subtree signatures can be used to sign timestamped log checkpoints with a non-zero `timestamp`. A signature with a non-zero `timestamp` asserts the complete state of the cosigner's view of the log at a given time. These signatures are not directly used in Merkle Tree Certificates ({{certificate-format}}), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI. This may include log serving or integrating an issuance log into a transparency ecosystem. For example, {{TLOG-TILES}} and {{TLOG-WITNESS}} use such signatures.
+Subtree signatures can be used to sign timestamped log checkpoints by using a non-zero `timestamp`. A signature with a non-zero `timestamp` asserts the complete state of the cosigner's view of the log at a given time. These signatures are not directly used in Merkle Tree Certificates ({{certificate-format}}), but cosigners MAY generate them, subject to the rules above, as part of other functions in a PKI, such as log serving or integrating an issuance log into a transparency ecosystem. For example, {{TLOG-TILES}} and {{TLOG-WITNESS}} use such signatures.
 
 ### Signature Algorithms
 
-The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used.
+The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. Signatures are computed over the CosignedMessage described in {{signature-format}}.
 
-In this document, any PKIX signature algorithm MAY be used, such as the ML-DSA algorithms defined in {{!RFC9881}}. The signature is generated as in PKIX, except that the input is the structure defined in {{signature-format}}. In particular, in ML-DSA algorithms, the context string MUST be an empty string, as in {{Section 3 of !RFC9881}}.
-
-Other documents or deployments MAY define other signature schemes and formats. Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
+Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
 
 ## Certification Authority Cosigners
 
@@ -1230,7 +1159,7 @@ What it means to certify an entry depends on the entry type:
 * To certify an entry of type `null_entry` is a no-op. A CA MAY freely certify `null_entry` without being held responsible for any validation.
 * To certify an entry of type `tbs_cert_entry` is to certify the TBSCertificateLogEntry, as defined in {{log-entries}}.
 
-Entries are extensible. Future documents MAY define `type` and `extension_type` values and what it means to certify them. A CA MUST NOT sign a subtree if it contains an entry with `type` or `extension_type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. {{extensibility}} further discusses security implications of such extensions.
+Entries are extensible. Future documents MAY define `type` and `extension_type` values and the semantics of the data that they contain. A CA MUST NOT sign a subtree if it contains an entry with `type` or `extension_type` that it does not recognize. Doing so would certify that the CA has validated the information in some not-yet-defined format. {{extensibility}} further discusses security implications of such extensions.
 
 If the CA issues certificate revocation lists (CRLs) {{!RFC5280}} or Online Certificate Status Protocol (OCSP) responses {{!RFC6960}}, the CA's cosigner key MAY be used to directly sign TBSCertList or OCSP ResponseData structures, respectively, but only for this CA instance. Such uses remain subject to other X.509 constraints, such as the key usage extension, which are out of scope for this document. See {{signature-domain-separation}} for a discussion of domain separation.
 
@@ -1292,7 +1221,7 @@ If this extension is present, the key described in `subjectPublicKeyInfo` is a C
 
 This extension indicates the subtree signature format defined in {{signature-format}}. If a later version of the protocol defines a new format, this SHOULD be represented in CA certificates with a new extension type.
 
-A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate should be an unsigned certificate {{!RFC9925}}.
+A CA certificate using this format SHOULD NOT be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate SHOULD be an unsigned certificate {{!RFC9925}}.
 
 # Certificates
 
@@ -1307,7 +1236,7 @@ A Merkle Tree Certificate is constructed from the following inputs:
 * The `log_number` and the zero-based entry `index` of that log entry within the issuance log, used to construct the certificate's `serialNumber` ({{certificate-format}}).
 * An `MTCProof` ({{certificate-format}}) proving the entry's inclusion in a subtree, along with zero or more signatures ({{cosigners}}) over that subtree, which together satisfy relying party requirements ({{trusted-cosigners}})
 
-For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. {{certificate-format}} defines how the certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.
+By varying the choice of subtree and signatures, there can be multiple ways to prove the entry is in the log, and thus certified by the CA. {{certificate-format}} defines how a certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.
 
 ## Certificate Format
 
@@ -1340,14 +1269,14 @@ opaque HashValue[HASH_SIZE];
 struct {
     TrustAnchorID cosigner_id;
     opaque signature<0..2^16-1>;
-} MTCSignature;
+} SubtreeSignature;
 
 struct {
     MTCLogEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
-    MTCSignature signatures<0..2^16-1>;
+    SubtreeSignature signatures<0..2^16-1>;
 } MTCProof;
 ~~~
 
@@ -1389,7 +1318,7 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 ### Landmark Tree Sizes
 
-To issue landmark-relative certificates, a CA must additionally maintain a *landmark sequence*, which is a sequence of *landmarks*.
+A CA that issues landmark-relative certificates MUST additionally maintain a *landmark sequence*. A landmark sequence is a sequence of *landmarks*, defined below:
 
 Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. Landmark zero MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
@@ -1428,8 +1357,8 @@ It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}}
 
 Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-relative certificate is constructed as follows:
 
-1. Wait for the first landmark to be allocated that contains the entry.
-2. Determine the landmark's subtrees and select the one that contains the entry.
+1. Let `L` be the smallest landmark number in the active window whose tree size is strictly greater than the entry index `i`. Because the landmark sequence is strictly monotonically increasing, `L - 1`'s tree size is less than or equal to `i`. If no such `L` has been allocated yet (`i` is greater than or equal to `last_landmark`'s tree size), wait for one to be allocated. If every landmark that once covered the entry is no longer in the active window (`last_landmark - num_active_landmarks`'s tree size is greater than `i`), abort this process.
+2. Determine landmark `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `i`.
 3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
 
 Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
@@ -1605,9 +1534,15 @@ The relying party SHOULD incorporate its trusted subtree configuration in applic
 
 ## Revoked Ranges
 
-For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. A serial number combines a log number and a log index. A relying party can thus efficiently revoke both ranges of entries of an issuance log, and ranges of issuance logs, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.
+For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of serial numbers. This can be used to revoke both ranges of entries in an issuance log and ranges of issuance logs, even if the contents are not known.
 
-When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `minSerial` value.
+When a relying party is first configured to trust an issuance log, it SHOULD be configured to revoke all serial numbers before the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `minSerial` value.
+
+This revocation allows the rest of a PKI to disregard old entries, even if they are not known to be expired. In particular:
+
+* A relying party could permit a CA to skip serving old entries (see {{publishing-logs}}) if long-expired and revoked.
+
+* Newly-established monitors can skip processing long-expired and revoked entries.
 
 A relying party with transparency requirements additionally SHOULD revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in {{representing-certification-authorities}}, this can be configured with the `maxSerial` value. See {{limiting-issuance-logs}}.
 
@@ -1739,7 +1674,7 @@ A CA only needs to produce a digital signature for every checkpoint, rather than
 
 Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.
 
-Log pruning ({{log-pruning}}) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.
+Explicit revocation of old entries ({{revoked-ranges}}) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.
 
 Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetch data from mirrors instead of CAs directly. In PKIs that deploy mirrors as part of cosigner policies, relying parties could set few availability requirements on CAs, as described in {{log-availability}}.
 
@@ -1747,7 +1682,7 @@ Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetc
 
 The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as {{TLOG-WITNESS}}, requires very little state and can be run with low cost.
 
-A mirroring cosigner, such as {{TLOG-MIRROR}}, performs a role comparable to CT logs, but several of the cost-saving properties in {{certification-authority-costs}} also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.
+A mirroring cosigner, such as {{TLOG-MIRROR}}, performs a role comparable to CT logs, but several of the cost-saving properties in {{certification-authority-costs}} also apply: improved protocols, smaller entries, less frequent signatures, and partial log serving. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.
 
 ### Monitor Costs
 
@@ -1767,17 +1702,11 @@ Relying party policies also impact monitor operation. If a relying party accepts
 
 ## Log Availability
 
-CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log has been pruned ({{log-pruning}}). If some resources are unavailable, they may not be visible to monitors.
+CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log does not serve long-expired entries. If some resources are unavailable, they may not be visible to monitors.
 
 As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish availability policies. These policies SHOULD be adhered to by trusted CAs and mirrors, and enforced by relying party vendors as a condition of trust. Exact availability policies for these services are out of scope for this document, but this section provides some general guidance.
 
-Availability policies SHOULD specify how long an entry must be made available, before a CA or mirror is permitted to prune the entry. It is RECOMMENDED to define this using a *retention period*, which is some time after the entry has expired. In such a policy, an entry could only be pruned if it, and all preceding entries, have already expired for the retention period. Policies MAY opt to set different retention periods between CAs and mirrors. Permitting limited log retention is analogous to the CT practice of temporal sharding {{CHROME-CT}}, except that a pruned issuance log remains compatible with older, unupdated relying parties.
-
-Such policies impact monitors. If the retention period is, e.g. 6 months, this means that monitors are expected to check entries of interest within 6 months. It also means that a new monitor may only be aware of a 6 month history of entries issued for a particular domain.
-
-If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in {{revoked-ranges}}: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.
-
-The log pruning process simply makes some resources unavailable. Availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.
+Availability policies MAY permit CAs and mirrors to stop serving old, long-expired entries. If so, such policies SHOULD, at minimum, require CAs and mirrors to retain entries until they have been revoked in up-to-date relying parties. See {{revoked-ranges}} for details. This is analogous to the CT practice of temporal sharding {{CHROME-CT}}, except the issuance log remains compatible with older, unupdated relying parties.
 
 PKIs that require mirror cosignatures ({{trusted-cosigners}}) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.
 
@@ -1827,7 +1756,7 @@ A CA might violate the append-only property of its log and present different vie
 
 If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the range of inconsistent serials ({{revoked-ranges}}), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.
 
-A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy ({{log-availability}}). The impact depends on the relying party's cosigner policy:
+A CA might correctly construct its log, but refuse to serve some unauthorized entry. The impact depends on the relying party's cosigner policy:
 
 * If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it.
 
@@ -2472,7 +2401,7 @@ assert h.hexdigest() == '7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a
 
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication, X.509, and Certificate Transparency. The authors would like to thank all those who have contributed over the history of these protocols.
 
-The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Chris Patton, Michael Richardson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document, as well as feedback and contributions to the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
+The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Mike Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document, as well as feedback and contributions to the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
 
 The idea to mint tree heads infrequently was originally described by Richard Barnes in {{STH-Discipline}}. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.
 
@@ -2682,5 +2611,9 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Add an informative reference to the MTC-TLOG profile (c2sp.org/mtc-tlog) and mention it where tile-based logs are discussed.
 
 - Clarify that a landmark consists of both a number and a tree size, and that a landmark's subtrees share its landmark number.
+
+- Give an exact procedure for selecting the landmark and covering subtree when constructing a landmark-relative certificate.
+
+- Prune the pruning discussion. It's really a property of the log serving protocol and is better described in {{MTC-TLOG}} and {{TLOG-TILES}}
 
 - Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.
