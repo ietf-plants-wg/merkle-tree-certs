@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-30T03:13:36.277008+00:00",
+  "timestamp": "2026-08-02T03:39:52.788627+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18332,13 +18332,13 @@
       "labels": [],
       "body": "Describe that any party with access to the issuance log and landmark sequence can construct a landmark-relative certificate for a standalone cert they hold.\r\n\r\n(closes #246, relates to https://github.com/C2SP/C2SP/pull/269)",
       "createdAt": "2026-06-16T16:46:27Z",
-      "updatedAt": "2026-07-21T15:00:35Z",
+      "updatedAt": "2026-07-31T19:30:57Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "36cb8512ff62c42d769e4ac98a8e6060c94d528f",
+      "baseRefOid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "lvalenta/client-constructed-landmark-relative",
-      "headRefOid": "c7beff46a644530eafeab7fcd7df80b8d2ac3f71",
+      "headRefOid": "02d3f83e99bda9fd087f0da1d270099affb713af",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
