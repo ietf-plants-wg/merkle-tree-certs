@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-02T03:39:52.788627+00:00",
+  "timestamp": "2026-08-09T02:19:57.692602+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3885,6 +3885,22 @@
           "updatedAt": "2026-07-29T02:14:34Z"
         }
       ]
+    },
+    {
+      "number": 291,
+      "id": "I_kwDOJIBkVc8AAAABL36q0w",
+      "title": "End to end test vector",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/291",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We should have an end to end test vector, with worked intermediate values (tbs cert to entry), maybe generated from the demo tool, so people can more easily test and debug.",
+      "createdAt": "2026-08-07T15:53:23Z",
+      "updatedAt": "2026-08-07T15:53:23Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
