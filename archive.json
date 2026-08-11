@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-09T02:19:57.692602+00:00",
+  "timestamp": "2026-08-11T02:18:13.409893+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3899,6 +3899,22 @@
       "body": "We should have an end to end test vector, with worked intermediate values (tbs cert to entry), maybe generated from the demo tool, so people can more easily test and debug.",
       "createdAt": "2026-08-07T15:53:23Z",
       "updatedAt": "2026-08-07T15:53:23Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 292,
+      "id": "I_kwDOJIBkVc8AAAABMKbBLw",
+      "title": "Add test vectors for maximally large trees",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/292",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The accumulated tests cover all small values, but we also have to worry about overflow conditions at maximally large trees. A CA does not, but other parties may see consistency and inclusion proofs referencing large entries. The use of BIT_CEIL means that we might overflow slightly.\n\nThe good news is that overflow mostly does not exist anymore. The log/index split meant our logs are at most 2^48, not 2^64, and any integer type that people actually use can represent 2^48-1 can also represent 2^48. Nonetheless, we should:\n\n* Have some test cases that go up to end = 2^48-1.\n* Have some test cases for end = 2^64-1 anyway. While not possible in MTC, it is more generally possible and people might reuse the subtree machinery.\n\nFootnote: we currently say log indices go up to 2^48-1. Practically they go up to 2^48-2 because otherwise you cannot express the end value in an MTCProof.",
+      "createdAt": "2026-08-10T14:34:32Z",
+      "updatedAt": "2026-08-10T14:34:32Z",
       "closedAt": null,
       "comments": []
     }
