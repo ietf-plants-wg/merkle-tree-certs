@@ -448,6 +448,21 @@ A *subtree* of this Merkle Tree is itself a Merkle Tree, defined by `MTH(D[start
 
 The second condition ensures that `MTH(D[start:end])`, built over `D[start:end]` as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See {{subtrees-explain}} for more details.
 
+In implementations using fixed-width integers, `BIT_CEIL(end - start)` above may exceed `end` and potentially overflow. For example, if `start` is zero and `end` is 2<sup>63</sup>+1, `BIT_CEIL(end - start)` is 2<sup>64</sup>. The following is an example C++ implementation that handles this condition.
+
+~~~c++
+bool is_valid_subtree(uint64_t start, uint64_t end) {
+  if (start > end) {
+    return false;
+  }
+  uint64_t size = end - start;
+  if (size > (uint64_t{1} << 63)) {
+    return start == 0;  // bit_ceil below will overflow.
+  }
+  return (start & (std::bit_ceil(size) - 1)) == 0;
+}
+~~~
+
 For all `x`, `[0, x)` is a valid subtree (0 is a multiple of everything), and `[x, x)` is a valid subtree (`BIT_CEIL(0)` is 1).
 
 The *size* of the subtree is `end - start`.
@@ -982,7 +997,7 @@ Each issuance log has a *log ID*, which is a trust anchor ID constructed by conc
 
 A log ID specifies both the CA and the log number in a single ID.
 
-Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-2. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+Each issuance log describes an append-only sequence of at most 2<sup>48</sup>-1 *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
@@ -2605,3 +2620,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Prune the pruning discussion. It's really a property of the log serving protocol and is better described in {{MTC-TLOG}} and {{TLOG-TILES}}
 
 - Fix the maximum log index to account for also `end` being 48-bit.
+
+- Discuss a potential overflow in the valid subtree definition
