@@ -982,7 +982,7 @@ Each issuance log has a *log ID*, which is a trust anchor ID constructed by conc
 
 A log ID specifies both the CA and the log number in a single ID.
 
-Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+Each issuance log describes an append-only sequence of *entries* ({{log-entries}}). Each entry is identified by an integer *index*, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-2. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
@@ -2603,3 +2603,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Give an exact procedure for selecting the landmark and covering subtree when constructing a landmark-relative certificate.
 
 - Prune the pruning discussion. It's really a property of the log serving protocol and is better described in {{MTC-TLOG}} and {{TLOG-TILES}}
+
+- Fix the maximum log index to account for also `end` being 48-bit.
