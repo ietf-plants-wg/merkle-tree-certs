@@ -977,7 +977,7 @@ For initial experimentation, early implementations of this design will:
 
 1. Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. `32473.1`.
 
-1. Use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`.
+1. Use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
 For example, the distinguished name for a CA with ID `32473.1` would be represented in syntax of {{?RFC4514}} as:
 
@@ -1222,7 +1222,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 }
 ~~~
 
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`.
+For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of `id-pe-mtcCertificationAuthority`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
 The fields of an MTCCertificationAuthority structure are defined as follows:
 
@@ -1271,7 +1271,7 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
     mechanisms(5) pkix(7) algorithms(6) TBD }
 ~~~
 
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of `id-alg-mtcProof`.
+For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of `id-alg-mtcProof`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
 The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
