@@ -1971,12 +1971,7 @@ IMPORTS
   FROM PKIX1Explicit-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-pkix1-explicit-02(51) }
-  TrustAnchorID
-  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-anchor-ids]
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-trustAnchorIDs-2025(TBD) } ;
+      id-mod-pkix1-explicit-02(51) } ;
 
 TBSCertificateLogEntry ::= SEQUENCE {
     version               [0] EXPLICIT Version DEFAULT v1,
@@ -2006,7 +2001,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     mechanisms(5) pkix(7) rdna(25) TBD }
 
 at-trustAnchorID ATTRIBUTE ::= {
-    TYPE TrustAnchorID
+    TYPE RELATIVE-OID
     IDENTIFIED BY id-rdna-trustAnchorID
 }
 
