@@ -17,14 +17,14 @@
 <meta content="draft-ietf-plants-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.34.0
-    Python 3.14.5
+    Python 3.14.7
     ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.1
+    platformdirs 4.11.3
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -64,7 +64,6 @@
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -113,7 +112,6 @@
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -178,7 +176,6 @@
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -1047,11 +1044,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">July 2026</td>
+<td class="right">August 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 29 January 2027</td>
+<td class="center">Expires 19 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-28" class="published">28 July 2026</time>
+<time datetime="2026-08-18" class="published">18 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-29">29 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-19">19 February 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2049,10 +2046,25 @@ uint8 uint48[6];
 </li>
         </ul>
 <p id="section-4.1-4">The second condition ensures that <code>MTH(D[start:end])</code>, built over <code>D[start:end]</code> as an independent list, is sufficiently aligned with the original Merkle Tree to support subtree consistency proofs. See <a href="#subtrees-explain" class="auto internal xref">Appendix B.2</a> for more details.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
-<p id="section-4.1-5">For all <code>x</code>, <code>[0, x)</code> is a valid subtree (0 is a multiple of everything), and <code>[x, x)</code> is a valid subtree (<code>BIT_CEIL(0)</code> is 1).<a href="#section-4.1-5" class="pilcrow">¶</a></p>
-<p id="section-4.1-6">The <em>size</em> of the subtree is <code>end - start</code>.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
-<p id="section-4.1-7">In the context of a single Merkle Tree, this document denotes subtree <code>MTH(D[start:end])</code> by half-open interval <code>[start, end)</code>. It contains the entries whose indices are in that half-open interval.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
-<p id="section-4.1-8">As a Merkle Tree grows, its subtrees remain unchanged. That is, if <code>end &lt;= m &lt;= n</code>, the subtree <code>[start, end)</code> of <code>MTH(D[0:m])</code> and the subtree <code>[start, end)</code> of <code>MTH(D_n)</code> are both valid and identical.<a href="#section-4.1-8" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">In implementations using fixed-width integers, <code>BIT_CEIL(end - start)</code> above may exceed <code>end</code> and potentially overflow. For example, if <code>start</code> is zero and <code>end</code> is 2<sup>63</sup>+1, <code>BIT_CEIL(end - start)</code> is 2<sup>64</sup>. The following is an example C++ implementation that handles this condition.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<div class="lang-c++ sourcecode" id="section-4.1-6">
+<pre>
+bool is_valid_subtree(uint64_t start, uint64_t end) {
+  if (start &gt; end) {
+    return false;
+  }
+  uint64_t size = end - start;
+  if (size &gt; (uint64_t{1} &lt;&lt; 63)) {
+    return start == 0;  // bit_ceil below will overflow.
+  }
+  return (start &amp; (std::bit_ceil(size) - 1)) == 0;
+}
+</pre><a href="#section-4.1-6" class="pilcrow">¶</a>
+</div>
+<p id="section-4.1-7">For all <code>x</code>, <code>[0, x)</code> is a valid subtree (0 is a multiple of everything), and <code>[x, x)</code> is a valid subtree (<code>BIT_CEIL(0)</code> is 1).<a href="#section-4.1-7" class="pilcrow">¶</a></p>
+<p id="section-4.1-8">The <em>size</em> of the subtree is <code>end - start</code>.<a href="#section-4.1-8" class="pilcrow">¶</a></p>
+<p id="section-4.1-9">In the context of a single Merkle Tree, this document denotes subtree <code>MTH(D[start:end])</code> by half-open interval <code>[start, end)</code>. It contains the entries whose indices are in that half-open interval.<a href="#section-4.1-9" class="pilcrow">¶</a></p>
+<p id="section-4.1-10">As a Merkle Tree grows, its subtrees remain unchanged. That is, if <code>end &lt;= m &lt;= n</code>, the subtree <code>[start, end)</code> of <code>MTH(D[0:m])</code> and the subtree <code>[start, end)</code> of <code>MTH(D_n)</code> are both valid and identical.<a href="#section-4.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-subtrees">
@@ -3876,7 +3888,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 </li>
         </ul>
 <p id="section-5.2-4">A log ID specifies both the CA and the log number in a single ID.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">Each issuance log describes an append-only sequence of <em>entries</em> (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>). Each entry is identified by an integer <em>index</em>, assigned consecutively starting from zero. Indices are at most 2<sup>48</sup>-1. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.2-5">Each issuance log describes an append-only sequence of at most 2<sup>48</sup>-1 <em>entries</em> (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>). Each entry is identified by an integer <em>index</em>, assigned consecutively starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
 <p id="section-5.2-6">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
 <p id="section-5.2-7">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
 <p id="section-5.2-8">At any point in time, one of the CA's issuance logs is its <em>current</em> log. Initially, this is log 1. A CA MUST NOT append to any log that is not the current log. Logs before the current log may have historical entries. Logs after the current log MUST be empty. A CA MAY increment its current log number as part of recovering from certain operational failures. See <a href="#log-failures" class="auto internal xref">Section 12.2.1</a> for further discussion.<a href="#section-5.2-8" class="pilcrow">¶</a></p>
@@ -7052,6 +7064,12 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.17-1.7">
             <p id="appendix-E.17-1.7.1">Prune the pruning discussion. It's really a property of the log serving protocol and is better described in <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> and <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span><a href="#appendix-E.17-1.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.8">
+            <p id="appendix-E.17-1.8.1">Fix the maximum log index to account for also <code>end</code> being 48-bit.<a href="#appendix-E.17-1.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.9">
+            <p id="appendix-E.17-1.9.1">Discuss a potential overflow in the valid subtree definition<a href="#appendix-E.17-1.9.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
