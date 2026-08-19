@@ -203,7 +203,7 @@ type CertificateConfig struct {
 	// are zero-indexed, but there is always a null entry at zero, so they are
 	// effectively one-indexed.)
 	// If Checkpoint is used, the named checkpoint sequence is used.
-	SubtreeStart, SubtreeEnd int
+	SubtreeStart, SubtreeEnd uint64
 	Checkpoint               string
 	// Must refer to a cosigner defined in the CAConfig.
 	Cosigners []TrustAnchorID

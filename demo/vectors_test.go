@@ -38,8 +38,8 @@ func writeProofLine(w io.Writer, prefix string, proof []byte) {
 func TestSubtreeHashVectors(t *testing.T) {
 	tree := subtreeVectorTree()
 	h := sha256.New()
-	for end := 0; end <= subtreeVectorMax; end++ {
-		for start := 0; start <= end; start++ {
+	for end := uint64(0); end <= subtreeVectorMax; end++ {
+		for start := uint64(0); start <= end; start++ {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
@@ -59,8 +59,8 @@ func TestSubtreeHashVectors(t *testing.T) {
 func TestSubtreeInclusionProofVectors(t *testing.T) {
 	tree := subtreeVectorTree()
 	h := sha256.New()
-	for end := 0; end <= subtreeVectorMax; end++ {
-		for start := 0; start <= end; start++ {
+	for end := uint64(0); end <= subtreeVectorMax; end++ {
+		for start := uint64(0); start <= end; start++ {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
@@ -82,9 +82,9 @@ func TestSubtreeInclusionProofVectors(t *testing.T) {
 func TestSubtreeConsistencyProofVectors(t *testing.T) {
 	tree := subtreeVectorTree()
 	h := sha256.New()
-	for n := 0; n <= subtreeVectorMax; n++ {
-		for end := 0; end <= n; end++ {
-			for start := 0; start <= end; start++ {
+	for n := uint64(0); n <= subtreeVectorMax; n++ {
+		for end := uint64(0); end <= n; end++ {
+			for start := uint64(0); start <= end; start++ {
 				if !IsValidSubtree(start, end) {
 					continue
 				}
@@ -104,8 +104,8 @@ func TestSubtreeConsistencyProofVectors(t *testing.T) {
 
 func TestEfficientCoveringSubtreeVectors(t *testing.T) {
 	h := sha256.New()
-	for end := 0; end <= subtreeVectorMax; end++ {
-		for start := 0; start <= end; start++ {
+	for end := uint64(0); end <= subtreeVectorMax; end++ {
+		for start := uint64(0); start <= end; start++ {
 			start1, end1, start2, end2, err := SubtreesForInterval(start, end)
 			if err != nil {
 				t.Fatalf("SubtreesForInterval(%d, %d): %v", start, end, err)

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func evaluateSubtreeInclusionProof(index, start, end int, entryHash *HashValue, proof []byte) (HashValue, error) {
+func evaluateSubtreeInclusionProof(index, start, end uint64, entryHash *HashValue, proof []byte) (HashValue, error) {
 	if !IsValidSubtree(start, end) {
 		return HashValue{}, fmt.Errorf("invalid subtree")
 	}
@@ -53,7 +53,7 @@ func TestMerkleTree(t *testing.T) {
 	}
 	tree := NewMerkleTree(entries)
 
-	for end := 1; end <= numEntries; end++ {
+	for end := uint64(1); end <= numEntries; end++ {
 		// Try all subtrees ending at `end`.
 		for level := range depth {
 			start := ((end - 1) >> level) << level
@@ -84,9 +84,9 @@ func TestMerkleTree(t *testing.T) {
 
 func TestSubtreesForInterval(t *testing.T) {
 	var tests = []struct {
-		start, end   int
-		start1, end1 int
-		start2, end2 int
+		start, end   uint64
+		start1, end1 uint64
+		start2, end2 uint64
 	}{
 		{start: 9, end: 9, start1: 9, end1: 9, start2: 9, end2: 9},
 		{start: 8, end: 9, start1: 8, end1: 9, start2: 9, end2: 9},
