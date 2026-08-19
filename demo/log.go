@@ -36,15 +36,15 @@ func HashNode(left, right *HashValue) HashValue {
 	return ret
 }
 
-func IsValidSubtree(start, end int) bool {
+func IsValidSubtree(start, end uint64) bool {
 	if 0 > start || start > end {
 		return false
 	}
 	if start == end {
 		return true
 	}
-	ceil := uint(1) << (bits.UintSize - bits.LeadingZeros(uint(end-start-1)))
-	return uint(start)&(ceil-1) == 0
+	ceil := uint64(1) << (64 - bits.LeadingZeros64(end-start-1))
+	return start&(ceil-1) == 0
 }
 
 type MerkleTree struct {
@@ -75,9 +75,9 @@ func NewMerkleTree(entries [][]byte) *MerkleTree {
 	return log
 }
 
-func (mt *MerkleTree) Size() int { return len(mt.levels[0]) }
+func (mt *MerkleTree) Size() uint64 { return uint64(len(mt.levels[0])) }
 
-func (mt *MerkleTree) SubtreeHash(start, end int) (HashValue, error) {
+func (mt *MerkleTree) SubtreeHash(start, end uint64) (HashValue, error) {
 	if !IsValidSubtree(start, end) {
 		return HashValue{}, fmt.Errorf("invalid subtree: [%d, %d)", start, end)
 	}
@@ -89,7 +89,7 @@ func (mt *MerkleTree) SubtreeHash(start, end int) (HashValue, error) {
 	}
 	// Start at the largest complete subtree on the right edge.
 	last := end - 1
-	level := bits.TrailingZeros(^uint(last - start))
+	level := bits.TrailingZeros64(^last - start)
 	start >>= level
 	last >>= level
 	ret := mt.levels[level][last]
@@ -106,7 +106,7 @@ func (mt *MerkleTree) SubtreeHash(start, end int) (HashValue, error) {
 	return ret, nil
 }
 
-func (mt *MerkleTree) SubtreeInclusionProof(index, start, end int) ([]byte, error) {
+func (mt *MerkleTree) SubtreeInclusionProof(index, start, end uint64) ([]byte, error) {
 	if !IsValidSubtree(start, end) {
 		return nil, fmt.Errorf("invalid subtree: [%d, %d)", start, end)
 	}
@@ -141,7 +141,7 @@ func (mt *MerkleTree) SubtreeInclusionProof(index, start, end int) ([]byte, erro
 	return proof, nil
 }
 
-func (mt *MerkleTree) SubtreeConsistencyProof(start, end, n int) ([]byte, error) {
+func (mt *MerkleTree) SubtreeConsistencyProof(start, end, n uint64) ([]byte, error) {
 	if !IsValidSubtree(start, end) {
 		return nil, fmt.Errorf("invalid subtree: [%d, %d)", start, end)
 	}
@@ -161,7 +161,7 @@ func (mt *MerkleTree) SubtreeConsistencyProof(start, end, n int) ([]byte, error)
 // known) over the tree's entries, with the subtree and window described in
 // absolute indices. known reports whether the subtree hash is already known to
 // the verifier and so may be omitted from the proof.
-func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi int, known bool) ([]byte, error) {
+func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi uint64, known bool) ([]byte, error) {
 	if start == lo && end == hi {
 		// The subtree is the whole window.
 		if known {
@@ -175,10 +175,10 @@ func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi int, known bool) ([]byt
 	}
 	// The window has more than one element, so split it at the largest power
 	// of two smaller than its size.
-	k := 1 << (bits.Len(uint(hi-lo-1)) - 1)
+	k := uint64(1) << (bits.Len64(hi-lo-1) - 1)
 	split := lo + k
 	var proof []byte
-	var siblingStart, siblingEnd int
+	var siblingStart, siblingEnd uint64
 	var err error
 	switch {
 	case end <= split:
@@ -208,7 +208,7 @@ func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi int, known bool) ([]byt
 	return append(proof, h[:]...), nil
 }
 
-func SubtreesForInterval(start, end int) (start1, end1, start2, end2 int, err error) {
+func SubtreesForInterval(start, end uint64) (start1, end1, start2, end2 uint64, err error) {
 	if 0 > start || start > end {
 		err = fmt.Errorf("invalid interval [%d, %d)", start, end)
 		return
@@ -223,12 +223,12 @@ func SubtreesForInterval(start, end int) (start1, end1, start2, end2 int, err er
 	last := end - 1
 	// Find where start and last's tree paths diverge. The two
 	// subtrees will be on either side of the split.
-	split := bits.Len(uint(start^last)) - 1
-	mask := (1 << split) - 1
+	split := bits.Len64(start^last) - 1
+	mask := (uint64(1) << split) - 1
 	mid := last & ^mask
 	// Maximize the left endpoint. This is just before start's
 	// path leaves the right edge of its new subtree.
-	leftSplit := bits.Len(uint(^start & mask))
+	leftSplit := bits.Len64(^start & mask)
 	start1 = start & ^((1 << leftSplit) - 1)
 	end1 = mid
 	start2 = mid

@@ -159,7 +159,7 @@ func NewCosignerFromConfig(version DraftVersion, config *CosignerConfig) (*Cosig
 	}, nil
 }
 
-func (c *Cosigner) Sign(logID TrustAnchorID, start, end int, hash *HashValue) ([]byte, error) {
+func (c *Cosigner) Sign(logID TrustAnchorID, start, end uint64, hash *HashValue) ([]byte, error) {
 	b := cryptobyte.NewBuilder(nil)
 	if c.Version >= VersionPlants04 {
 		b.AddBytes([]byte("subtree/v1\n\x00"))
@@ -178,8 +178,8 @@ func (c *Cosigner) Sign(logID TrustAnchorID, start, end int, hash *HashValue) ([
 	if !IsValidSubtree(start, end) {
 		return nil, fmt.Errorf("invalid subtree")
 	}
-	b.AddUint64(uint64(start))
-	b.AddUint64(uint64(end))
+	b.AddUint64(start)
+	b.AddUint64(end)
 	b.AddBytes((*hash)[:])
 	inp, err := b.Bytes()
 	if err != nil {

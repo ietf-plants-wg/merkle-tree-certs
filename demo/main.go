@@ -24,7 +24,7 @@ var (
 type certificateInfo struct {
 	entryConfig       *EntryConfig
 	certConfig        *CertificateConfig
-	index, start, end int
+	index, start, end uint64
 	cosigners         []*Cosigner
 	// The number of certificate for the given index.
 	num int
@@ -113,14 +113,14 @@ func do() error {
 	// awaiting an end value once the next checkpoint in the sequence is
 	// allocated.
 	type checkpointWait struct {
-		idx  int
-		prev int
+		idx  uint64
+		prev uint64
 	}
 	awaitingCheckpoint := map[string][]checkpointWait{}
 	// Maps checkpoint sequence name to the latest checkpoint size.
 	// Initially, all sequences are at zero, which matches the default map
 	// lookup behavior.
-	checkpointSeqs := map[string]int{}
+	checkpointSeqs := map[string]uint64{}
 	for entryConfigIdx := range config.Entries {
 		entryConfig := &config.Entries[entryConfigIdx]
 		repeat := 1
@@ -133,7 +133,7 @@ func do() error {
 				return err
 			}
 			entries = append(entries, entry)
-			entryIdx := len(entries) - 1
+			entryIdx := uint64(len(entries) - 1)
 
 			// Schedule certificates.
 			for certNum := range entryConfig.Certificates {
@@ -147,7 +147,7 @@ func do() error {
 					info.end = certConfig.SubtreeEnd
 				} else if c := certConfig.Checkpoint; len(c) != 0 {
 					// Make a note to fill in the subtree when available.
-					awaitingCheckpoint[c] = append(awaitingCheckpoint[c], checkpointWait{idx: len(certInfos), prev: checkpointSeqs[c]})
+					awaitingCheckpoint[c] = append(awaitingCheckpoint[c], checkpointWait{idx: uint64(len(certInfos)), prev: checkpointSeqs[c]})
 				} else {
 					return fmt.Errorf("neither Checkpoint nor SubtreeEnd specified in a certificate")
 				}
@@ -169,13 +169,13 @@ func do() error {
 
 			// Update checkpoint sequences.
 			for _, seq := range entryConfig.Checkpoints {
-				checkpointSeqs[seq] = len(entries)
+				checkpointSeqs[seq] = uint64(len(entries))
 				// Fill in any certificate infos that are still awaiting
 				// a checkpoint.
 				for _, wait := range awaitingCheckpoint[seq] {
 					// We have the checkpoint interval. Find the two subtrees
 					// and use the one that includes the certificate.
-					start1, end1, start2, end2, err := SubtreesForInterval(wait.prev, len(entries))
+					start1, end1, start2, end2, err := SubtreesForInterval(wait.prev, uint64(len(entries)))
 					if err != nil {
 						return err
 					}
@@ -274,7 +274,7 @@ func do() error {
 		}
 	}
 
-	checkpointHash, err := issuanceLog.SubtreeHash(0, len(entries))
+	checkpointHash, err := issuanceLog.SubtreeHash(0, uint64(len(entries)))
 	if err != nil {
 		panic(err)
 	}
@@ -283,7 +283,7 @@ func do() error {
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
 	for _, cosigner := range cosigners {
-		cosig, err := cosigner.Sign(LogID(&config), 0, len(entries), &checkpointHash)
+		cosig, err := cosigner.Sign(LogID(&config), 0, uint64(len(entries)), &checkpointHash)
 		if err != nil {
 			return err
 		}

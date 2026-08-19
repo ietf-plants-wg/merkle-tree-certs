@@ -339,7 +339,7 @@ func LogID(config *CAConfig) TrustAnchorID {
 	return logID
 }
 
-func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
+func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end uint64) ([]byte, error) {
 	if entry.Null {
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
@@ -347,7 +347,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 	logID := LogID(config)
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
-		serial := uint64(index)
+		serial := index
 		if config.Version >= VersionPlants04 {
 			if serial > 1<<48-1 {
 				cert.SetError(fmt.Errorf("invalid serial: %d", index))
@@ -383,11 +383,11 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 			}
 			addEmptyMTCEntryExtensions(certSig, config.Version)
 			if config.Version >= VersionPlants04 {
-				certSig.AddUint48(uint64(start))
-				certSig.AddUint48(uint64(end))
+				certSig.AddUint48(start)
+				certSig.AddUint48(end)
 			} else {
-				certSig.AddUint64(uint64(start))
-				certSig.AddUint64(uint64(end))
+				certSig.AddUint64(start)
+				certSig.AddUint64(end)
 			}
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
 			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
