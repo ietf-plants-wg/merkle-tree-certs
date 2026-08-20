@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-18T01:42:28.842104+00:00",
+  "timestamp": "2026-08-20T01:42:52.934847+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -18380,7 +18380,7 @@
       "labels": [],
       "body": "Describe that any party with access to the issuance log and landmark sequence can construct a landmark-relative certificate for a standalone cert they hold.\r\n\r\n(closes #246, relates to https://github.com/C2SP/C2SP/pull/269)",
       "createdAt": "2026-06-16T16:46:27Z",
-      "updatedAt": "2026-07-31T19:30:57Z",
+      "updatedAt": "2026-08-18T19:22:35Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c",
@@ -18490,6 +18490,32 @@
               "body": "> Next step is updating this PR to add more detail on constructing landmark-relative certs based on https://github.com/C2SP/C2SP/pull/269/changes#r3506669159.\n\nDone!",
               "createdAt": "2026-07-08T21:11:31Z",
               "updatedAt": "2026-07-08T21:11:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABJ-twPQ",
+          "commit": {
+            "abbreviatedOid": "02d3f83"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-18T18:57:35Z",
+          "updatedAt": "2026-08-18T19:22:35Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "Probably can omit this paragraph. Dunno if it's all that useful to say that the CA does not need to perform additional per-entry work.",
+              "createdAt": "2026-08-18T18:57:35Z",
+              "updatedAt": "2026-08-18T19:22:35Z"
+            },
+            {
+              "originalPosition": 8,
+              "body": "Hmm. So I guess we moved this here from this comment? https://github.com/C2SP/C2SP/pull/269#discussion_r3506669159\n\nI wasn't so much thinking that we have a generic \"here's how to do this weird self-service thing\" but more that, anything interesting should go in the text that _also applies to the CA_. Anything that's just \"oh yeah, you can get these inputs from here and then run this algorithm\" would ideally then just be a couple sentences, and probably up in mtc-tlog because mtc-tlog actually defines where to fetch stuff. I don't know if we need to, for example, restate how the serial number is computed or anything.\n\nMostly my goal is I want to spend as little verbiage as possible on this. I think we *really* don't want to encourage people to use this. It puts a lot of complexity in an unupdatable portion of the system. Having the decisions happen in ACME is very useful for future evolvability of the system. (What if someone introduces a new hash, for example?) I know that for you all specifically, there's a benefit to doing it, but I think that's the exception.",
+              "createdAt": "2026-08-18T19:22:31Z",
+              "updatedAt": "2026-08-18T19:22:35Z"
             }
           ]
         }
@@ -20254,78 +20280,168 @@
       "id": "PR_kwDOJIBkVc7_NImT",
       "title": "Note where the 1.3.6.1.4.1.44363.47 OID arc came from",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/294",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Folks seem to be mistakenly assuming 44363 is somehow the OID arc for CA or cosigner IDs. (For those, our examples always use 32473 from RFC 5612, though of course real deployments should use your own PENs.)",
       "createdAt": "2026-08-14T16:44:08Z",
-      "updatedAt": "2026-08-14T16:44:54Z",
+      "updatedAt": "2026-08-18T14:22:50Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "clarify-oid",
       "headRefOid": "6e218afbcba7780ed6a89a1e89dbd3ffa3398a9b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-08-18T14:22:47Z",
+      "mergedAt": "2026-08-18T14:22:47Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b365c40dcd0d39623dd7011f0dbdff070c2239ca"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABJ7Ko7w",
+          "commit": {
+            "abbreviatedOid": "6e218af"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-18T12:30:05Z",
+          "updatedAt": "2026-08-18T12:30:05Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 295,
       "id": "PR_kwDOJIBkVc7_QELG",
       "title": "Inline the TrustAnchorID / RELATIVE-OID type alias",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/295",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "After https://github.com/tlswg/tls-trust-anchor-ids/pull/116, the TAI draft won't have an ASN.1 module to import. This type alias isn't doing much, and the prose already said it was a RELATIVE-OID, so just put RELATIVE-OID in there.",
       "createdAt": "2026-08-14T18:50:01Z",
-      "updatedAt": "2026-08-14T18:50:01Z",
+      "updatedAt": "2026-08-18T13:34:39Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "inline-rdna-dfn",
       "headRefOid": "21033dc1368d6f4c4232e3c5ae1a61e6a4bb6fc8",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-08-18T13:34:34Z",
+      "mergedAt": "2026-08-18T13:34:34Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b3d9dc84c120f44d8d9c24967e4a45d5fee83a5d"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABJ7KKrg",
+          "commit": {
+            "abbreviatedOid": "21033dc"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-18T12:29:12Z",
+          "updatedAt": "2026-08-18T12:29:12Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 296,
       "id": "PR_kwDOJIBkVc8AAAABACkx3w",
       "title": "Cover a pair of overflow conditions better",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/296",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "*   Fix the maximum log size to account for also `end` being 48-bit\r\n    \r\n    `end` is maximum index + 1.\r\n\r\n*  Discuss a potential overflow in computing BIT_CEIL\r\n    \r\n    This overflow condition is actually impossible because our logs are 48-bit, not 64-bit. Also no one is ever actually going to build a log with 2^64 entries.\r\n    \r\n    Nonetheless, if a generic implementation wants to handle larger trees, this is technically an overflow condition and it's prudent to call it out. Give an example on how to implement it without overflows in C++. (C++ because it has fixed-width integers, makes this overflow UB and it has std::bit_ceil in the standard library.)\r\n",
       "createdAt": "2026-08-17T16:53:37Z",
-      "updatedAt": "2026-08-17T16:53:38Z",
+      "updatedAt": "2026-08-18T13:33:23Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "subtree-overflow",
       "headRefOid": "5961930c6f3e1a7d68754e19750d431820a34ca9",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-08-18T13:33:20Z",
+      "mergedAt": "2026-08-18T13:33:20Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "d99206c8056fcd2bbe4668bca55dd68aafd7a9af"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABJ7HmLg",
+          "commit": {
+            "abbreviatedOid": "5961930"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-18T12:24:15Z",
+          "updatedAt": "2026-08-18T12:24:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 297,
+      "id": "PR_kwDOJIBkVc8AAAABASfbkQ",
+      "title": "demo: Use uint64 for tree indices",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/297",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "int is a fine type when we're building a tree (the tree fits in memory), but when we're verifying certificates, we should represent the full range of possible values.\r\n\r\nPreparation for #283.",
+      "createdAt": "2026-08-19T13:48:35Z",
+      "updatedAt": "2026-08-19T15:39:20Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b365c40dcd0d39623dd7011f0dbdff070c2239ca",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "demo-u64",
+      "headRefOid": "a9da9e91a7f68bb2308ba19ad07351419d44948f",
+      "closedAt": "2026-08-19T15:39:17Z",
+      "mergedAt": "2026-08-19T15:39:17Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "fb99abcb54aa07b30906f74c633826a5666525ac"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABKHdeeQ",
+          "commit": {
+            "abbreviatedOid": "a9da9e9"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-19T15:30:28Z",
+          "updatedAt": "2026-08-19T15:30:28Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
