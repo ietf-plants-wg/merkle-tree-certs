@@ -216,6 +216,12 @@ type CertificateConfig struct {
 	// DontSortCosigners, if true, skips sorting the cosigners and includes
 	// signatures in the specified order.
 	DontSortCosigners bool
+	// OverrideSignatureAlgorithm, if not empty, overrides the outer signature
+	// algorithm with the specified byte string.
+	OverrideSignatureAlgorithm []byte
+	// OverrideSignatureAlgorithm, if not empty, overrides the TBSCertificate
+	// signature algorithm with the specified byte string.
+	OverrideTBSSignatureAlgorithm []byte
 }
 
 func parseBase128(in []byte) (ret uint32, rest []byte, ok bool) {

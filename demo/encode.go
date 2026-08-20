@@ -254,11 +254,15 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 	})
 }
 
-func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial uint64, entry *EntryConfig) {
+func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial uint64, entry *EntryConfig, certConfig *CertificateConfig) {
 	b.AddASN1(cbasn1.SEQUENCE, func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
 		tbs.AddASN1Uint64(serial)
-		addMTCProofSigAlg(tbs)
+		if len(certConfig.OverrideTBSSignatureAlgorithm) != 0 {
+			tbs.AddBytes(certConfig.OverrideTBSSignatureAlgorithm)
+		} else {
+			addMTCProofSigAlg(tbs)
+		}
 		addX509Name(tbs, issuer)
 		addValidity(tbs, &entry.CertConfigBase)
 		addSubject(tbs, entry)
@@ -355,8 +359,12 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 			}
 			serial |= uint64(config.LogNumber) << 48
 		}
-		AddTBSCertificate(cert, config.ID, serial, entry)
-		addMTCProofSigAlg(cert)
+		AddTBSCertificate(cert, config.ID, serial, entry, certConfig)
+		if len(certConfig.OverrideSignatureAlgorithm) != 0 {
+			cert.AddBytes(certConfig.OverrideSignatureAlgorithm)
+		} else {
+			addMTCProofSigAlg(cert)
+		}
 		cert.AddASN1(cbasn1.BIT_STRING, func(certSig *cryptobyte.Builder) {
 			proof, err := issuanceLog.SubtreeInclusionProof(index, start, end)
 			if err != nil {
