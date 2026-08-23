@@ -149,7 +149,7 @@ func TestMarshalTBSCertificate(t *testing.T) {
 	for i, tt := range tests {
 		if !tt.entry.Null {
 			b := cryptobyte.NewBuilder(nil)
-			AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry)
+			AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry, &CertificateConfig{})
 			tbs, err := b.Bytes()
 			if err != nil {
 				t.Errorf("%d. AddTBSCertificate() failed: %s", i, err)
