@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cmp"
 	"crypto/sha256"
+	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"errors"
@@ -431,7 +432,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 
 func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 	pub := cosigner.Signer.Public()
-	spki, err := marshalPKIXPublicKey(pub)
+	spki, err := x509.MarshalPKIXPublicKey(pub)
 	if err != nil {
 		return nil, err
 	}
