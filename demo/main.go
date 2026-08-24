@@ -121,6 +121,7 @@ func do() error {
 	// Initially, all sequences are at zero, which matches the default map
 	// lookup behavior.
 	checkpointSeqs := map[string]uint64{}
+	landmarks := []uint64{0}
 	for entryConfigIdx := range config.Entries {
 		entryConfig := &config.Entries[entryConfigIdx]
 		repeat := 1
@@ -170,6 +171,9 @@ func do() error {
 			// Update checkpoint sequences.
 			for _, seq := range entryConfig.Checkpoints {
 				checkpointSeqs[seq] = uint64(len(entries))
+				if seq == "landmark" {
+					landmarks = append(landmarks, uint64(len(entries)))
+				}
 				// Fill in any certificate infos that are still awaiting
 				// a checkpoint.
 				for _, wait := range awaitingCheckpoint[seq] {
@@ -291,6 +295,27 @@ func do() error {
 	}
 	if err := os.WriteFile(filepath.Join(*flagOutDir, "checkpoint"), signedNote.Bytes(), 0644); err != nil {
 		return err
+	}
+
+	if len(landmarks) > 1 {
+		for i, landmark := range landmarks[1:] {
+			prev := landmarks[i]
+			start1, end1, start2, end2, err := SubtreesForInterval(prev, landmark)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Landmark %d at tree size %d:\n", i+1, landmark)
+			subtree1, err := issuanceLog.SubtreeHash(start1, end1)
+			if err != nil {
+				return err
+			}
+			subtree2, err := issuanceLog.SubtreeHash(start2, end2)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("  Landmark subtree [%d, %d) with hash %s\n", start1, end1, base64.StdEncoding.EncodeToString(subtree1[:]))
+			fmt.Printf("  Landmark subtree [%d, %d) with hash %s\n", start2, end2, base64.StdEncoding.EncodeToString(subtree2[:]))
+		}
 	}
 
 	return nil
