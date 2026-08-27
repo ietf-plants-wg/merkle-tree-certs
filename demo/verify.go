@@ -249,7 +249,7 @@ func verify(args []string) error {
 		return fmt.Errorf("unknown draft version %q", *flagVersion)
 	}
 	// Prior to plants-04, we didn't have a CA format in the first place.
-	if version <= VersionPlants02 {
+	if version <= VersionPlants04 {
 		return fmt.Errorf("unsupported draft version %q", version)
 	}
 
