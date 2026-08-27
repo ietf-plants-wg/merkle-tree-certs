@@ -72,6 +72,10 @@ func generate(args []string) error {
 		return err
 	}
 
+	if err := os.MkdirAll(*flagOutDir, 0755); err != nil {
+		return err
+	}
+
 	var cosigners []*Cosigner
 	var caCosigner *Cosigner
 	for _, cosignerConfig := range config.Cosigners {
