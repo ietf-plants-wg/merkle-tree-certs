@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-20T01:42:52.934847+00:00",
+  "timestamp": "2026-08-27T09:21:00.935488+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3914,9 +3914,17 @@
       "labels": [],
       "body": "The accumulated tests cover all small values, but we also have to worry about overflow conditions at maximally large trees. A CA does not, but other parties may see consistency and inclusion proofs referencing large entries. The use of BIT_CEIL means that we might overflow slightly.\n\nThe good news is that overflow mostly does not exist anymore. The log/index split meant our logs are at most 2^48, not 2^64, and any integer type that people actually use can represent 2^48-1 can also represent 2^48. Nonetheless, we should:\n\n* Have some test cases that go up to end = 2^48-1.\n* Have some test cases for end = 2^64-1 anyway. While not possible in MTC, it is more generally possible and people might reuse the subtree machinery.\n\nFootnote: we currently say log indices go up to 2^48-1. Practically they go up to 2^48-2 because otherwise you cannot express the end value in an MTCProof.",
       "createdAt": "2026-08-10T14:34:32Z",
-      "updatedAt": "2026-08-10T14:34:32Z",
+      "updatedAt": "2026-08-26T03:19:59Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We should also do 2^63 for folks using signed int64 (Java `long`).",
+          "createdAt": "2026-08-26T03:19:59Z",
+          "updatedAt": "2026-08-26T03:19:59Z"
+        }
+      ]
     },
     {
       "number": 293,
@@ -20440,6 +20448,53 @@
           "createdAt": "2026-08-19T15:30:28Z",
           "updatedAt": "2026-08-19T15:30:28Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 298,
+      "id": "PR_kwDOJIBkVc8AAAABA_HTwA",
+      "title": "demo: Drop in a demo certificate verifier",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/298",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes https://github.com/ietf-plants-wg/merkle-tree-certs/issues/282.\r\n\r\nThis is probably easier reviewed as as individual commits, though one of the commits is quite a big bigger than the others.",
+      "createdAt": "2026-08-25T19:47:48Z",
+      "updatedAt": "2026-08-25T19:55:14Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "9383619b7d89135e9d19dc94249328f90891468a",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "demo-verify",
+      "headRefOid": "47f21c119089f011bda967a2c094ff8f0d0d0121",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABK2p2Kw",
+          "commit": {
+            "abbreviatedOid": "0e7ca7d"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-25T19:51:12Z",
+          "updatedAt": "2026-08-25T19:51:12Z",
+          "comments": [
+            {
+              "originalPosition": 47,
+              "body": "Self-review: oops, I think I updated these docs and then never updated the code to match. Will go rework that...",
+              "createdAt": "2026-08-25T19:51:12Z",
+              "updatedAt": "2026-08-25T19:51:12Z"
+            }
+          ]
         }
       ]
     }
