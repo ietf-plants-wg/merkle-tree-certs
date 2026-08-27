@@ -62,14 +62,28 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 	proofStr := cryptobyte.String(cert.Signature)
 	var start, end uint64
 	var signatures []parsedSignature
-	var proofExtensions, inclusionProof, sigs cryptobyte.String
-	if !proofStr.ReadUint16LengthPrefixed(&proofExtensions) ||
+	var entryExtensions, inclusionProof, sigs cryptobyte.String
+	if !proofStr.ReadUint16LengthPrefixed(&entryExtensions) ||
 		!proofStr.ReadUint48(&start) ||
 		!proofStr.ReadUint48(&end) ||
 		!proofStr.ReadUint16LengthPrefixed(&inclusionProof) ||
 		!proofStr.ReadUint16LengthPrefixed(&sigs) ||
 		!proofStr.Empty() {
 		return nil, fmt.Errorf("malformed MTCProof")
+	}
+
+	// No proof extensions are defined, but validate their syntax.
+	lastExtType := -1
+	extsCopy := entryExtensions
+	for !extsCopy.Empty() {
+		var typ uint16
+		var data cryptobyte.String
+		if !extsCopy.ReadUint16(&typ) ||
+			!extsCopy.ReadUint16LengthPrefixed(&data) ||
+			int(typ) <= lastExtType {
+			return nil, fmt.Errorf("malformed MTCProof")
+		}
+		lastExtType = int(typ)
 	}
 
 	var prevID TrustAnchorID
@@ -91,7 +105,7 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 
 	entryHash := sha256.New()
 	entryHash.Write([]byte{0x00}) // MTC leaf domain separator
-	hashU16LengthPrefixed(entryHash, proofExtensions)
+	hashU16LengthPrefixed(entryHash, entryExtensions)
 	hashU16(entryHash, entryTypeTBSCert)
 
 	var tbs cryptobyte.String
