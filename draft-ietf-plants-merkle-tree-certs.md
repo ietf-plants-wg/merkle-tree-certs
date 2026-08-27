@@ -1034,7 +1034,7 @@ struct {
 } MTCLogEntry;
 ~~~
 
-Field `extensions` is the list of tag-length-value extensions associated with the log entry. The extensions list MUST be appear in ascending order by `extension_type` and MUST NOT contain two extensions with the same `extension_type`.
+The `extensions` field is a list of tag-length-value extensions associated with the log entry. Extensions MUST appear in the list in ascending order by `extension_type`, and the list MUST NOT contain two extensions with the same `extension_type`.
 
 When `type` is `null_entry`, the entry does not represent any information. Entries at any index in the log MAY have type `null_entry`.
 
