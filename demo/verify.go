@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"errors"
 	"flag"
 	"fmt"
 	"math"
@@ -268,6 +269,7 @@ func verify(args []string) error {
 		return fmt.Errorf("no certificate files specified to verify")
 	}
 
+	var failed bool
 	for _, certPath := range certPaths {
 		pemBytes, err := os.ReadFile(certPath)
 		if err != nil {
@@ -290,6 +292,7 @@ func verify(args []string) error {
 			numCerts++
 			result, err := VerifyMTCProof(cert, &policy, version)
 			if err != nil {
+				failed = true
 				fmt.Printf("%s: %s\n", certPath, err)
 			} else {
 				fmt.Printf("%s: OK\n", certPath)
@@ -329,6 +332,10 @@ func verify(args []string) error {
 		if numCerts == 0 {
 			return fmt.Errorf("%s: no certificates found in file", certPath)
 		}
+	}
+
+	if failed {
+		return errors.New("some certificates failed verification")
 	}
 
 	return nil
