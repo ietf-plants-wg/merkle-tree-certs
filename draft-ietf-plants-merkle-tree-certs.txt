@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 24 February 2027                                     Apple Inc.
+Expires: 28 February 2027                                     Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          23 August 2026
+                                                          27 August 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 February 2027.
+   This Internet-Draft will expire on 28 February 2027.
 
 Copyright Notice
 
@@ -1324,10 +1324,10 @@ Table of Contents
        }
    } MTCLogEntry;
 
-   Field extensions is the list of tag-length-value extensions
-   associated with the log entry.  The extensions list MUST be appear in
-   ascending order by extension_type and MUST NOT contain two extensions
-   with the same extension_type.
+   The extensions field is a list of tag-length-value extensions
+   associated with the log entry.  Extensions MUST appear in the list in
+   ascending order by extension_type, and the list MUST NOT contain two
+   extensions with the same extension_type.
 
    When type is null_entry, the entry does not represent any
    information.  Entries at any index in the log MAY have type
