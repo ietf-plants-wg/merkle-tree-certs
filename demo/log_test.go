@@ -45,6 +45,42 @@ func TestMerkleTree(t *testing.T) {
 	}
 }
 
+func TestIsValidSubtree(t *testing.T) {
+	// Small inputs for IsValidSubtree are exercised by TestSubtreeHashVectors.
+	// This covers boundary conditions.
+	var validSubtrees = []struct {
+		start, end uint64
+	}{
+		{start: 0, end: (1 << 47) + 1},
+		{start: 0, end: (1 << 48) - 1},
+		{start: 0, end: (1 << 62) + 1},
+		{start: 0, end: (1 << 63) - 1},
+		{start: 0, end: (1 << 63) + 1},
+		{start: 0, end: (1 << 64) - 1},
+	}
+	for _, tt := range validSubtrees {
+		if !IsValidSubtree(tt.start, tt.end) {
+			t.Errorf("IsValidSubtree(%d, %d) = false, want true", tt.start, tt.end)
+		}
+	}
+
+	var invalidSubtrees = []struct {
+		start, end uint64
+	}{
+		{start: 1 << 46, end: (1 << 47) + 1},
+		{start: 1 << 46, end: (1 << 48) - 1},
+		{start: 1 << 61, end: (1 << 62) + 1},
+		{start: 1 << 61, end: (1 << 63) - 1},
+		{start: 1 << 62, end: (1 << 63) + 1},
+		{start: 1 << 62, end: (1 << 64) - 1},
+	}
+	for _, tt := range invalidSubtrees {
+		if IsValidSubtree(tt.start, tt.end) {
+			t.Errorf("IsValidSubtree(%d, %d) = true, want false", tt.start, tt.end)
+		}
+	}
+}
+
 func TestSubtreesForInterval(t *testing.T) {
 	var tests = []struct {
 		start, end   uint64
