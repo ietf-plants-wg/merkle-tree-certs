@@ -198,6 +198,13 @@ informative:
     author:
     - name: Filippo Valsorda
 
+  LargeInclusionProofs:
+    title: Large Inclusion Proof Test Vectors
+    target: https://github.com/ietf-plants-wg/merkle-tree-certs/tree/main/demo/large_inclusion_proofs.txt
+    date: August 2026
+    author:
+      org: IETF
+
 ...
 
 --- abstract
@@ -2443,6 +2450,10 @@ The following are not valid subtrees:
 * start is 2<sup>61</sup> and end is 2<sup>63</sup> - 1
 * start is 2<sup>62</sup> and end is 2<sup>63</sup> + 1
 * start is 2<sup>62</sup> and end is 2<sup>64</sup> - 1
+
+### Subtree Inclusion Proofs {#subtree-inclusion-proof-large-vectors}
+
+{{LargeInclusionProofs}} contains additional test vectors for subtree inclusion proofs.
 
 # Acknowledgements
 {:numbered="false"}

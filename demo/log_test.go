@@ -2,9 +2,20 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
+	"flag"
 	"fmt"
+	"maps"
+	"os"
+	"slices"
+	"strings"
 	"testing"
 )
+
+var update = flag.Bool("update", false, "updates saved test vector files")
 
 func TestMerkleTree(t *testing.T) {
 	const depth = 9
@@ -22,14 +33,14 @@ func TestMerkleTree(t *testing.T) {
 			start := ((end - 1) >> level) << level
 			subtreeHash, err := SubtreeHash(tree, start, end)
 			if err != nil {
-				t.Errorf("tree.SubtreeHash(%d, %d) unexpectedly failed: %s", start, end, err)
+				t.Errorf("SubtreeHash(tree, %d, %d) unexpectedly failed: %s", start, end, err)
 				continue
 			}
 			for index := start; index < end; index++ {
 				entryHash := HashLeaf(entries[index])
 				proof, err := SubtreeInclusionProof(tree, index, start, end)
 				if err != nil {
-					t.Errorf("tree.SubtreeInclusionProof(%d, %d, %d) unexpectedly failed: %s", index, start, end, err)
+					t.Errorf("SubtreeInclusionProof(tree, %d, %d, %d) unexpectedly failed: %s", index, start, end, err)
 					continue
 				}
 				r, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, proof)
@@ -100,4 +111,205 @@ func TestSubtreesForInterval(t *testing.T) {
 			t.Errorf("SubtreesForInterval(%d, %d) gave [%d, %d) and [%d, %d), wanted [%d, %d) and [%d, %d)", tt.start, tt.end, start1, end1, start2, end2, tt.start1, tt.end1, tt.start2, tt.end2)
 		}
 	}
+}
+
+// A LargeMerkleTree simulates a larger Merkle Tree than fits in memory. It is
+// given a set of leaf nodes to construct, each with value "Leaf N", and
+// computes all nodes needed along the path to each node. Some subtree hashes
+// will be filled with a fake deterministic value. Hashes not along the path to
+// a target leaf may be unavailable due to a missing preimage.
+type LargeMerkleTree struct {
+	size   uint64
+	levels []map[uint64]HashValue
+}
+
+func NewLargeMerkleTree(size uint64, indices []uint64) *LargeMerkleTree {
+	mt := &LargeMerkleTree{size: size}
+	leaves := map[uint64]HashValue{}
+	makeLeaf := func(idx uint64) {
+		leaves[idx] = HashLeaf([]byte(fmt.Sprintf("Leaf %d", idx)))
+		// Also fill in the neighbor.
+		if idx^1 < size {
+			leaves[idx^1] = HashLeaf([]byte(fmt.Sprintf("Leaf %d", idx^1)))
+		}
+	}
+	// Always construct the left and right edge.
+	makeLeaf(0)
+	makeLeaf(size - 1)
+	for _, idx := range indices {
+		makeLeaf(idx)
+	}
+	mt.levels = append(mt.levels, leaves)
+
+	// Fill in subsequent levels.
+	for levelSize := size; levelSize != 0; levelSize >>= 1 {
+		prev := mt.levels[len(mt.levels)-1]
+		level := map[uint64]HashValue{}
+		// Fill in all hashes with known value.
+		var needsNeighbor []uint64
+		for idx := range prev {
+			parent := idx >> 1
+			if parent >= levelSize {
+				continue
+			}
+			other := idx ^ 1
+			left, right := prev[min(idx, other)], prev[max(idx, other)]
+			level[parent] = HashNode(&left, &right)
+			needsNeighbor = append(needsNeighbor, parent)
+		}
+		// Synthesize neighbors of every node we filled in. These do not have
+		// known preimages, so we assume their descendants are never accessed.
+		for _, idx := range needsNeighbor {
+			other := idx ^ 1
+			if other >= levelSize {
+				continue
+			}
+			if _, ok := level[other]; ok {
+				continue
+			}
+			h := sha256.New()
+			h.Write([]byte{0x03})
+			fmt.Fprintf(h, "Synthetic Node %d %d", len(mt.levels), other)
+			level[other] = *((*[32]byte)(h.Sum(nil)))
+		}
+		mt.levels = append(mt.levels, level)
+	}
+	return mt
+}
+
+func (mt *LargeMerkleTree) Size() uint64 { return mt.size }
+
+func (mt *LargeMerkleTree) FullSubtreeHashByLevel(level int, idx uint64) HashValue {
+	hash, ok := mt.levels[level][idx]
+	if !ok {
+		// This panic will trip if some Merkle Tree algorithm uses a node we didn't
+		// compute the tree with.
+		var b strings.Builder
+		fmt.Fprintf(&b, "could not find node at level %d and index 0x%x, (available: ", level, idx)
+		for i, key := range slices.Sorted(maps.Keys(mt.levels[level])) {
+			if i != 0 {
+				b.WriteString(", ")
+			}
+			fmt.Fprintf(&b, "0x%x", key)
+		}
+		b.WriteString(")")
+		panic(b.String())
+	}
+	return hash
+}
+
+func alternatingBits(n int) uint64 {
+	return uint64(0xaaaa_aaaa_aaaa_aaaa) >> (64 - n)
+}
+
+func mustDecodeHex(s string) []byte {
+	ret, err := hex.DecodeString(s)
+	if err != nil {
+		panic(err)
+	}
+	return ret
+}
+
+func checkOrUpdateTestVectors(t *testing.T, path string, contents []byte) {
+	if *update {
+		if err := os.WriteFile(path, contents, 0644); err != nil {
+			t.Fatalf("could not write %q: %s", path, err)
+		}
+	} else {
+		expected, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("could not read %q: %s", path, err)
+		}
+		if !bytes.Equal(contents, expected) {
+			t.Errorf("test vector file did not match, pass -update to update")
+		}
+	}
+}
+
+type inclusionProofVector struct {
+	Index, Start, End             uint64
+	EntryHash, SubtreeHash, Proof []byte
+}
+
+func TestLargeInclusionProofs(t *testing.T) {
+	pow2 := func(n int) uint64 { return uint64(1) << n }
+
+	var text bytes.Buffer
+	var vectors []inclusionProofVector
+	subtest := func(tree MerkleTree, index, start, end uint64) {
+		t.Run(fmt.Sprintf("index_%x_start_%x_end_%x", index, start, end), func(t *testing.T) {
+			subtreeHash, err := SubtreeHash(tree, start, end)
+			if err != nil {
+				t.Fatalf("SubtreeHash(tree, %d, %d) unexpectedly failed: %s", start, end, err)
+			}
+			entryHash := tree.FullSubtreeHashByLevel(0, index)
+			proof, err := SubtreeInclusionProof(tree, index, start, end)
+			if err != nil {
+				t.Fatalf("SubtreeInclusionProof(tree, %d, %d, %d) unexpectedly failed: %s", index, start, end, err)
+			}
+			r, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, proof)
+			if err != nil {
+				t.Fatalf("EvaluateSubtreeInclusionProof(%d, %d, %d, %x, %x) unexpectedly failed: %s", index, start, end, entryHash[:], proof, err)
+			}
+			if !bytes.Equal(subtreeHash[:], r[:]) {
+				t.Errorf("inclusion proof of entry %d in subtree [%d, %d) gave subtree hash of %x from entry hash %x, wanted %x", index, start, end, r[:], entryHash[:], subtreeHash[:])
+			}
+
+			vectors = append(vectors, inclusionProofVector{
+				Index:       index,
+				Start:       start,
+				End:         end,
+				EntryHash:   entryHash[:],
+				SubtreeHash: subtreeHash[:],
+				Proof:       proof,
+			})
+			fmt.Fprintf(&text, "Entry index 0x%x with hash %x\n", index, entryHash)
+			fmt.Fprintf(&text, "Subtree [0x%x, 0x%x) with hash %x\n", start, end, subtreeHash)
+			fmt.Fprintf(&text, "Inclusion Proof:\n")
+			for start := 0; start < len(proof); start += 32 {
+				fmt.Fprintf(&text, "  %x\n", proof[start:start+32])
+			}
+			fmt.Fprintf(&text, "\n")
+		})
+	}
+
+	text.WriteString("Also available in machine-readable form in large_inclusion_proofs.json\n\n")
+
+	for _, n := range []int{48, 63, 64} {
+		t.Run(fmt.Sprintf("%d_bits", n), func(t *testing.T) {
+			fmt.Fprintf(&text, "Test vectors for a tree of size 2^%d-1:\n\n", n)
+
+			// Exercise a subtree of maximum height.
+			start1 := uint64(0)
+			// Exercise a non-trivial starting point.
+			start2 := pow2(n - 1)
+			// This value looks like 0b11...1100..00100...00. It is significantly on the
+			// right edge, has significant left turns, and ends at a significant
+			// complete subtree.
+			end := pow2(n) - pow2(n/2) + pow2(n/4)
+			// An interesting value (0b1010101010...) between start2 and end.
+			index1 := alternatingBits(n)
+			// An interesting value inside end's complete subtree.
+			index2 := pow2(n) - pow2(n/2) + alternatingBits(n/4)
+
+			tree := NewLargeMerkleTree(pow2(n)-1, []uint64{start1, start2, end - 1, index1, index2})
+
+			subtest(tree, start1, start1, end)
+			subtest(tree, index1, start1, end)
+			subtest(tree, index2, start1, end)
+			subtest(tree, end-1, start1, end)
+
+			subtest(tree, start2, start2, end)
+			subtest(tree, index1, start2, end)
+			subtest(tree, index2, start2, end)
+			subtest(tree, end-1, start2, end)
+		})
+	}
+
+	checkOrUpdateTestVectors(t, "large_inclusion_proofs.txt", text.Bytes())
+	vectorsJSON, err := json.Marshal(vectors, json.StringifyNumbers(true), jsontext.WithIndent("  "))
+	if err != nil {
+		t.Fatalf("could not write JSON: %s", err)
+	}
+	checkOrUpdateTestVectors(t, "large_inclusion_proofs.json", vectorsJSON)
 }

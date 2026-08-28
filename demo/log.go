@@ -53,7 +53,7 @@ type MerkleTree interface {
 	Size() uint64
 	// FullSubtreeHashByLevel returns MTH(D[2^i*j:2^i*(j+1)]). It panics if this
 	// is out of range of the tree.
-	FullSubtreeHashByLevel(level int, idx uint64) *HashValue
+	FullSubtreeHashByLevel(level int, idx uint64) HashValue
 }
 
 type StaticMerkleTree struct {
@@ -86,11 +86,11 @@ func NewStaticMerkleTree(entries [][]byte) *StaticMerkleTree {
 
 func (mt *StaticMerkleTree) Size() uint64 { return uint64(len(mt.levels[0])) }
 
-func (mt *StaticMerkleTree) FullSubtreeHashByLevel(level int, idx uint64) *HashValue {
+func (mt *StaticMerkleTree) FullSubtreeHashByLevel(level int, idx uint64) HashValue {
 	if idx > math.MaxInt {
 		panic("out of range")
 	}
-	return &mt.levels[level][int(idx)]
+	return mt.levels[level][int(idx)]
 }
 
 func SubtreeHash(mt MerkleTree, start, end uint64) (HashValue, error) {
@@ -108,12 +108,13 @@ func SubtreeHash(mt MerkleTree, start, end uint64) (HashValue, error) {
 	level := bits.TrailingZeros64(^last - start)
 	start >>= level
 	last >>= level
-	ret := *mt.FullSubtreeHashByLevel(level, last)
+	ret := mt.FullSubtreeHashByLevel(level, last)
 	// Invariant: ret is SubtreeHash(last<<level, end).
 	// Iterate up until we get the desired subtree.
 	for start < last {
 		if last&1 == 1 {
-			ret = HashNode(mt.FullSubtreeHashByLevel(level, last-1), &ret)
+			h := mt.FullSubtreeHashByLevel(level, last-1)
+			ret = HashNode(&h, &ret)
 		}
 		level++
 		start >>= 1
@@ -140,7 +141,8 @@ func SubtreeInclusionProof(mt MerkleTree, index, start, end uint64) ([]byte, err
 		neighbor := index ^ 1
 		if neighbor < last {
 			// The neighbor is complete, so we can look it up directly.
-			proof = append(proof, mt.FullSubtreeHashByLevel(level, neighbor)[:]...)
+			h := mt.FullSubtreeHashByLevel(level, neighbor)
+			proof = append(proof, h[:]...)
 		} else if neighbor == last {
 			// The neighbor is on the right edge and may not be complete.
 			h, err := SubtreeHash(mt, last<<level, end)
