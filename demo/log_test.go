@@ -14,20 +14,20 @@ func TestMerkleTree(t *testing.T) {
 	for i := range numEntries {
 		entries[i] = []byte(fmt.Sprintf("entry %d", i))
 	}
-	tree := NewMerkleTree(entries)
+	tree := NewStaticMerkleTree(entries)
 
 	for end := uint64(1); end <= numEntries; end++ {
 		// Try all subtrees ending at `end`.
 		for level := range depth {
 			start := ((end - 1) >> level) << level
-			subtreeHash, err := tree.SubtreeHash(start, end)
+			subtreeHash, err := SubtreeHash(tree, start, end)
 			if err != nil {
 				t.Errorf("tree.SubtreeHash(%d, %d) unexpectedly failed: %s", start, end, err)
 				continue
 			}
 			for index := start; index < end; index++ {
 				entryHash := HashLeaf(entries[index])
-				proof, err := tree.SubtreeInclusionProof(index, start, end)
+				proof, err := SubtreeInclusionProof(tree, index, start, end)
 				if err != nil {
 					t.Errorf("tree.SubtreeInclusionProof(%d, %d, %d) unexpectedly failed: %s", index, start, end, err)
 					continue

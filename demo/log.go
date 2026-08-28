@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+	"math"
 	"math/bits"
 )
 
@@ -47,13 +48,21 @@ func IsValidSubtree(start, end uint64) bool {
 	return start&(ceil-1) == 0
 }
 
-type MerkleTree struct {
-	// levels[i][j] has MTH(
+type MerkleTree interface {
+	// Size returns the number of elements in the Merkle Tree.
+	Size() uint64
+	// FullSubtreeHashByLevel returns MTH(D[2^i*j:2^i*(j+1)]). It panics if this
+	// is out of range of the tree.
+	FullSubtreeHashByLevel(level int, idx uint64) *HashValue
+}
+
+type StaticMerkleTree struct {
+	// levels[i][j] has MTH(D[2^i*j:2^i*(j+1)])
 	levels [][]HashValue
 }
 
-func NewMerkleTree(entries [][]byte) *MerkleTree {
-	log := &MerkleTree{}
+func NewStaticMerkleTree(entries [][]byte) *StaticMerkleTree {
+	log := &StaticMerkleTree{}
 	// Hash level 0.
 	level := make([]HashValue, len(entries))
 	for i, entry := range entries {
@@ -75,9 +84,16 @@ func NewMerkleTree(entries [][]byte) *MerkleTree {
 	return log
 }
 
-func (mt *MerkleTree) Size() uint64 { return uint64(len(mt.levels[0])) }
+func (mt *StaticMerkleTree) Size() uint64 { return uint64(len(mt.levels[0])) }
 
-func (mt *MerkleTree) SubtreeHash(start, end uint64) (HashValue, error) {
+func (mt *StaticMerkleTree) FullSubtreeHashByLevel(level int, idx uint64) *HashValue {
+	if idx > math.MaxInt {
+		panic("out of range")
+	}
+	return &mt.levels[level][int(idx)]
+}
+
+func SubtreeHash(mt MerkleTree, start, end uint64) (HashValue, error) {
 	if !IsValidSubtree(start, end) {
 		return HashValue{}, fmt.Errorf("invalid subtree: [%d, %d)", start, end)
 	}
@@ -92,12 +108,12 @@ func (mt *MerkleTree) SubtreeHash(start, end uint64) (HashValue, error) {
 	level := bits.TrailingZeros64(^last - start)
 	start >>= level
 	last >>= level
-	ret := mt.levels[level][last]
+	ret := *mt.FullSubtreeHashByLevel(level, last)
 	// Invariant: ret is SubtreeHash(last<<level, end).
 	// Iterate up until we get the desired subtree.
 	for start < last {
 		if last&1 == 1 {
-			ret = HashNode(&mt.levels[level][last-1], &ret)
+			ret = HashNode(mt.FullSubtreeHashByLevel(level, last-1), &ret)
 		}
 		level++
 		start >>= 1
@@ -106,7 +122,7 @@ func (mt *MerkleTree) SubtreeHash(start, end uint64) (HashValue, error) {
 	return ret, nil
 }
 
-func (mt *MerkleTree) SubtreeInclusionProof(index, start, end uint64) ([]byte, error) {
+func SubtreeInclusionProof(mt MerkleTree, index, start, end uint64) ([]byte, error) {
 	if !IsValidSubtree(start, end) {
 		return nil, fmt.Errorf("invalid subtree: [%d, %d)", start, end)
 	}
@@ -124,10 +140,10 @@ func (mt *MerkleTree) SubtreeInclusionProof(index, start, end uint64) ([]byte, e
 		neighbor := index ^ 1
 		if neighbor < last {
 			// The neighbor is complete, so we can look it up directly.
-			proof = append(proof, mt.levels[level][neighbor][:]...)
+			proof = append(proof, mt.FullSubtreeHashByLevel(level, neighbor)[:]...)
 		} else if neighbor == last {
 			// The neighbor is on the right edge and may not be complete.
-			h, err := mt.SubtreeHash(last<<level, end)
+			h, err := SubtreeHash(mt, last<<level, end)
 			if err != nil {
 				panic(err) // This should not happen.
 			}
@@ -141,7 +157,7 @@ func (mt *MerkleTree) SubtreeInclusionProof(index, start, end uint64) ([]byte, e
 	return proof, nil
 }
 
-func (mt *MerkleTree) SubtreeConsistencyProof(start, end, n uint64) ([]byte, error) {
+func SubtreeConsistencyProof(mt MerkleTree, start, end, n uint64) ([]byte, error) {
 	if !IsValidSubtree(start, end) {
 		return nil, fmt.Errorf("invalid subtree: [%d, %d)", start, end)
 	}
@@ -154,20 +170,20 @@ func (mt *MerkleTree) SubtreeConsistencyProof(start, end, n uint64) ([]byte, err
 	if start == end {
 		return nil, nil
 	}
-	return mt.subtreeSubproof(start, end, 0, n, true)
+	return subtreeSubproof(mt, start, end, 0, n, true)
 }
 
 // subtreeSubproof implements SUBTREE_SUBPROOF(start - lo, end - lo, D[lo:hi],
 // known) over the tree's entries, with the subtree and window described in
 // absolute indices. known reports whether the subtree hash is already known to
 // the verifier and so may be omitted from the proof.
-func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi uint64, known bool) ([]byte, error) {
+func subtreeSubproof(mt MerkleTree, start, end, lo, hi uint64, known bool) ([]byte, error) {
 	if start == lo && end == hi {
 		// The subtree is the whole window.
 		if known {
 			return nil, nil
 		}
-		h, err := mt.SubtreeHash(lo, hi)
+		h, err := SubtreeHash(mt, lo, hi)
 		if err != nil {
 			return nil, err
 		}
@@ -184,24 +200,24 @@ func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi uint64, known bool) ([]
 	case end <= split:
 		// The subtree is entirely in the left child, so recurse into it and
 		// include the right child.
-		proof, err = mt.subtreeSubproof(start, end, lo, split, known)
+		proof, err = subtreeSubproof(mt, start, end, lo, split, known)
 		siblingStart, siblingEnd = split, hi
 	case split <= start:
 		// The subtree is entirely in the right child, so recurse into it and
 		// include the left child.
-		proof, err = mt.subtreeSubproof(start, end, split, hi, known)
+		proof, err = subtreeSubproof(mt, start, end, split, hi, known)
 		siblingStart, siblingEnd = lo, split
 	default:
 		// The subtree spans the split, which implies start == lo. Recurse into
 		// the right child, no longer knowing its subtree hash, and include the
 		// left child.
-		proof, err = mt.subtreeSubproof(split, end, split, hi, false)
+		proof, err = subtreeSubproof(mt, split, end, split, hi, false)
 		siblingStart, siblingEnd = lo, split
 	}
 	if err != nil {
 		return nil, err
 	}
-	h, err := mt.SubtreeHash(siblingStart, siblingEnd)
+	h, err := SubtreeHash(mt, siblingStart, siblingEnd)
 	if err != nil {
 		return nil, err
 	}

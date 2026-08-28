@@ -17,12 +17,12 @@ const subtreeVectorMax = 130
 
 // subtreeVectorTree builds the tree D used by the test vectors, with leaf values
 // d[0] = 0x00, d[1] = 0x01, and so on.
-func subtreeVectorTree() *MerkleTree {
+func subtreeVectorTree() *StaticMerkleTree {
 	entries := make([][]byte, subtreeVectorMax)
 	for i := range entries {
 		entries[i] = []byte{byte(i)}
 	}
-	return NewMerkleTree(entries)
+	return NewStaticMerkleTree(entries)
 }
 
 // writeProofLine writes prefix followed by, for each hash in the concatenated
@@ -44,7 +44,7 @@ func TestSubtreeHashVectors(t *testing.T) {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
-			subtreeHash, err := tree.SubtreeHash(start, end)
+			subtreeHash, err := SubtreeHash(tree, start, end)
 			if err != nil {
 				t.Fatalf("SubtreeHash(%d, %d): %v", start, end, err)
 			}
@@ -65,12 +65,12 @@ func TestSubtreeInclusionProofVectors(t *testing.T) {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
-			subtreeHash, err := tree.SubtreeHash(start, end)
+			subtreeHash, err := SubtreeHash(tree, start, end)
 			if err != nil {
 				t.Fatalf("SubtreeHash(%d, %d): %v", start, end, err)
 			}
 			for index := start; index < end; index++ {
-				proof, err := tree.SubtreeInclusionProof(index, start, end)
+				proof, err := SubtreeInclusionProof(tree, index, start, end)
 				if err != nil {
 					t.Fatalf("SubtreeInclusionProof(%d, %d, %d): %v", index, start, end, err)
 				}
@@ -122,7 +122,7 @@ func TestSubtreeConsistencyProofVectors(t *testing.T) {
 				if !IsValidSubtree(start, end) {
 					continue
 				}
-				proof, err := tree.SubtreeConsistencyProof(start, end, n)
+				proof, err := SubtreeConsistencyProof(tree, start, end, n)
 				if err != nil {
 					t.Fatalf("SubtreeConsistencyProof(%d, %d, %d): %v", start, end, n, err)
 				}

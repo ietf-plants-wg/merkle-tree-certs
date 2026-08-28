@@ -352,7 +352,7 @@ func compareCosignerIDs(a, b TrustAnchorID) int {
 	return cmp.Or(cmp.Compare(len(a), len(b)), bytes.Compare(a, b))
 }
 
-func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end uint64) ([]byte, error) {
+func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Cosigner, entry *EntryConfig, certConfig *CertificateConfig, index, start, end uint64) ([]byte, error) {
 	if entry.Null {
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
@@ -375,7 +375,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 			addMTCProofSigAlg(cert)
 		}
 		cert.AddASN1(cbasn1.BIT_STRING, func(certSig *cryptobyte.Builder) {
-			proof, err := issuanceLog.SubtreeInclusionProof(index, start, end)
+			proof, err := SubtreeInclusionProof(issuanceLog, index, start, end)
 			if err != nil {
 				certSig.SetError(err)
 				return
@@ -387,7 +387,7 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 				}
 				proof[0] ^= 1
 			}
-			subtree, err := issuanceLog.SubtreeHash(start, end)
+			subtree, err := SubtreeHash(issuanceLog, start, end)
 			if err != nil {
 				certSig.SetError(err)
 				return
