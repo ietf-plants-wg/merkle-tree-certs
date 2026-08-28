@@ -205,6 +205,13 @@ informative:
     author:
       org: IETF
 
+  LargeConsistencyProofs:
+    title: Large Consistency Proof Test Vectors
+    target: https://github.com/ietf-plants-wg/merkle-tree-certs/tree/main/demo/large_consistency_proofs.txt
+    date: August 2026
+    author:
+      org: IETF
+
 ...
 
 --- abstract
@@ -2455,6 +2462,11 @@ The following are not valid subtrees:
 
 {{LargeInclusionProofs}} contains additional test vectors for subtree inclusion proofs.
 
+### Subtree Consistency Proofs {#subtree-consistency-proof-large-vectors}
+
+{{LargeConsistencyProofs}} contains additional test vectors for subtree consistency proofs.
+
+
 # Acknowledgements
 {:numbered="false"}
 
@@ -2681,4 +2693,4 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.
 
-- Added test vectors for inclusion proofs in larger trees
+- Added test vectors for subtree proofs in larger trees

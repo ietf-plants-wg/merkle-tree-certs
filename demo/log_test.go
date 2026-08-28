@@ -313,3 +313,90 @@ func TestLargeInclusionProofs(t *testing.T) {
 	}
 	checkOrUpdateTestVectors(t, "large_inclusion_proofs.json", vectorsJSON)
 }
+
+type consistencyProofVector struct {
+	Start, End, TreeSize         uint64
+	SubtreeHash, TreeHash, Proof []byte
+}
+
+func TestLargeConsistencyProofs(t *testing.T) {
+	pow2 := func(n int) uint64 { return uint64(1) << n }
+
+	var text bytes.Buffer
+	var vectors []consistencyProofVector
+	subtest := func(tree MerkleTree, start, end, treeSize uint64) {
+		t.Run(fmt.Sprintf("start_%x_end_%x_size_%x", start, end, treeSize), func(t *testing.T) {
+			subtreeHash, err := SubtreeHash(tree, start, end)
+			if err != nil {
+				t.Fatalf("SubtreeHash(tree, %d, %d) unexpectedly failed: %s", start, end, err)
+			}
+			treeHash, err := SubtreeHash(tree, 0, treeSize)
+			if err != nil {
+				t.Fatalf("SubtreeHash(tree, 0, %d) unexpectedly failed: %s", treeSize, err)
+			}
+			proof, err := SubtreeConsistencyProof(tree, start, end, treeSize)
+			if err != nil {
+				t.Fatalf("SubtreeConsistencyProof(tree, %d, %d, %d) unexpectedly failed: %s", start, end, treeSize, err)
+			}
+
+			vectors = append(vectors, consistencyProofVector{
+				Start:       start,
+				End:         end,
+				TreeSize:    treeSize,
+				SubtreeHash: subtreeHash[:],
+				TreeHash:    treeHash[:],
+				Proof:       proof,
+			})
+			fmt.Fprintf(&text, "Subtree [0x%x, 0x%x) with hash %x\n", start, end, subtreeHash)
+			fmt.Fprintf(&text, "Tree size 0x%x with hash %x\n", treeSize, treeHash)
+			fmt.Fprintf(&text, "Consistency Proof:\n")
+			for start := 0; start < len(proof); start += 32 {
+				fmt.Fprintf(&text, "  %x\n", proof[start:start+32])
+			}
+			fmt.Fprintf(&text, "\n")
+		})
+	}
+
+	text.WriteString("Also available in machine-readable form in large_consistency_proofs.json\n\n")
+
+	for _, n := range []int{48, 63, 64} {
+		t.Run(fmt.Sprintf("%d_bits", n), func(t *testing.T) {
+			fmt.Fprintf(&text, "Test vectors for a tree of size 2^%d-2^%d+2^%d:\n\n", n, n/2, n/4)
+
+			// Use an incomplete tree of size 0b11...1100..00100...00 with skipped
+			// levels on the right edge and multiple split points.
+			treeSize := pow2(n) - pow2(n/2) + pow2(n/4)
+			start1 := uint64(0)
+			start2 := pow2(n - 1)
+			// A complete power-of-2 prefix deep in the left child.
+			startPow2 := pow2(n / 2)
+			// The split point before the final complete subtree.
+			mid := pow2(n) - pow2(n/2)
+
+			tree := NewLargeMerkleTree(treeSize, []uint64{start2, startPow2 - 1, mid - 1, mid})
+
+			// Empty subtree.
+			subtest(tree, start1, start1, treeSize)
+			// Whole tree.
+			subtest(tree, start1, treeSize, treeSize)
+			// Complete power-of-2 prefix.
+			subtest(tree, start1, startPow2, treeSize)
+			// Incomplete prefix, decomposing the subtree's right edge.
+			subtest(tree, start1, mid, treeSize)
+			// Complete subtree touching the right edge.
+			subtest(tree, mid, treeSize, treeSize)
+			// Interior incomplete subtree, decomposing within the right child.
+			subtest(tree, start2, mid, treeSize)
+			// Single leaf at the right edge, matching an inclusion proof.
+			subtest(tree, treeSize-1, treeSize, treeSize)
+
+		})
+	}
+
+	checkOrUpdateTestVectors(t, "large_consistency_proofs.txt", text.Bytes())
+	vectorsJSON, err := json.Marshal(vectors, json.StringifyNumbers(true), jsontext.WithIndent("  "))
+	if err != nil {
+		t.Fatalf("could not write JSON: %s", err)
+	}
+	checkOrUpdateTestVectors(t, "large_consistency_proofs.json", vectorsJSON)
+}
