@@ -179,6 +179,7 @@ Table of Contents
      C.2.  Large Subtree Test Vectors
        C.2.1.  Subtree Validity
        C.2.2.  Subtree Inclusion Proofs
+       C.2.3.  Subtree Consistency Proofs
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -3508,6 +3509,11 @@ Table of Contents
               Key Reuse: Context-Separable Interfaces and their
               Applications", 2019, <https://eprint.iacr.org/2019/519>.
 
+   [LargeConsistencyProofs]
+              IETF, "Large Consistency Proof Test Vectors", August 2026,
+              <https://github.com/ietf-plants-wg/merkle-tree-
+              certs/tree/main/demo/large_consistency_proofs.txt>.
+
    [LargeInclusionProofs]
               IETF, "Large Inclusion Proof Test Vectors", August 2026,
               <https://github.com/ietf-plants-wg/merkle-tree-
@@ -4293,6 +4299,11 @@ C.2.2.  Subtree Inclusion Proofs
    [LargeInclusionProofs] contains additional test vectors for subtree
    inclusion proofs.
 
+C.2.3.  Subtree Consistency Proofs
+
+   [LargeConsistencyProofs] contains additional test vectors for subtree
+   consistency proofs.
+
 Acknowledgements
 
    This document stands on the shoulders of giants and builds upon
@@ -4559,7 +4570,7 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Discuss a potential overflow in the valid subtree definition
 
-   *  Added test vectors for inclusion proofs in larger trees
+   *  Added test vectors for subtree proofs in larger trees
 
 Authors' Addresses
 
