@@ -22,6 +22,26 @@
       "CosignerID": "32473.2.3",
       "SignatureAlgorithm": "mldsa87",
       "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMTBCKAIAABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4f"
+    },
+    {
+      "CosignerID": "32473.3.1",
+      "SignatureAlgorithm": "mldsa44",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMRBCKAIFjaimQAg5B4OTbZNTnt/YcmjPmbijnynHnvsyPLk8Sg"
+    },
+    {
+      "CosignerID": "32473.3.2",
+      "SignatureAlgorithm": "mldsa44",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMRBCKAIIGtnTZ2R5Pgp/LvgBo1ZTPJwaKcFmxe8r0wPhNvs8Sa"
+    },
+    {
+      "CosignerID": "32473.3.3",
+      "SignatureAlgorithm": "mldsa44",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMRBCKAICTZRYfEBWrOAIYqcvvXMwD4WUiGtodBvmL6yurbazOH"
+    },
+    {
+      "CosignerID": "32473.3.4",
+      "SignatureAlgorithm": "mldsa44",
+      "PrivateKey": "MDQCAQAwCwYJYIZIAWUDBAMRBCKAIHdUCNv4IVovnAvS64yzdYpQhMMiT8OcHpFU2zF6ByZr"
     }
   ],
   "CACert": {
@@ -49,9 +69,18 @@
       "DNSNames": ["b.example", "*.blah.b.example"],
       "KeyUsage": ["DigitalSignature"],
       "ExtKeyUsage": ["ServerAuth"],
-      "Checkpoints": ["fast"],
+      "Checkpoints": ["standalone"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"], "BitFlipProof": true},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.3.1"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.3.2"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.3.3"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.3.4"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.2.1", "32473.2.2", "32473.2.3", "32473.3.1", "32473.3.2", "32473.3.3", "32473.3.4"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2", "32473.2.3", "32473.3.1", "32473.3.2", "32473.3.3", "32473.3.4"]},
+        {"Checkpoint": "standalone"},
         {"SubtreeStart": 8, "SubtreeEnd": 16, "Cosigners": ["32473.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
@@ -78,7 +107,7 @@
       "NotBefore": "2020-01-01T00:00:00Z",
       "NotAfter": "2030-12-31T23:59:59Z",
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -89,9 +118,9 @@
       "DNSNames": ["d.example"],
       "KeyUsage": ["DigitalSignature"],
       "ExtKeyUsage": ["ServerAuth"],
-      "Checkpoints": ["fast", "landmark"],
+      "Checkpoints": ["standalone", "landmark"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -100,7 +129,8 @@
       "Subject": {"CommonName": "Some more filler certificates"},
       "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
       "NotBefore": "2020-01-01T00:00:00Z",
-      "NotAfter": "2030-12-31T23:59:59Z"
+      "NotAfter": "2030-12-31T23:59:59Z",
+      "Checkpoints": ["standalone"]
     },
     {
       "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
@@ -113,8 +143,9 @@
       "KeyUsage": ["CertSign"],
       "IsCA": true,
       "MaxPathLen": 5,
+      "Checkpoints": ["standalone"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },
@@ -125,11 +156,45 @@
       "DNSNames": ["e.example"],
       "KeyUsage": ["DigitalSignature"],
       "ExtKeyUsage": ["ServerAuth"],
-      "Checkpoints": ["fast", "landmark"],
+      "Checkpoints": ["standalone", "landmark"],
       "Certificates": [
-        {"Checkpoint": "fast", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
         {"Checkpoint": "landmark"},
         {"Checkpoint": "landmark", "BitFlipProof": true}
+      ]
+    },
+    {
+      "Repeat": 42,
+      "Null": true
+    },
+    {
+      "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
+      "NotBefore": "2020-01-01T00:00:00Z",
+      "NotAfter": "2030-12-31T23:59:59Z",
+      "DNSNames": ["e.example"],
+      "KeyUsage": ["DigitalSignature"],
+      "ExtKeyUsage": ["ServerAuth"],
+      "Checkpoints": ["standalone"],
+      "Certificates": [
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "landmark"}
+      ]
+    },
+    {
+      "Repeat": 42,
+      "Null": true
+    },
+    {
+      "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
+      "NotBefore": "2020-01-01T00:00:00Z",
+      "NotAfter": "2030-12-31T23:59:59Z",
+      "DNSNames": ["e.example"],
+      "KeyUsage": ["DigitalSignature"],
+      "ExtKeyUsage": ["ServerAuth"],
+      "Checkpoints": ["standalone", "landmark"],
+      "Certificates": [
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "landmark"}
       ]
     }
   ]

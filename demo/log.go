@@ -37,7 +37,7 @@ func HashNode(left, right *HashValue) HashValue {
 }
 
 func IsValidSubtree(start, end uint64) bool {
-	if 0 > start || start > end {
+	if start > end {
 		return false
 	}
 	if start == end {
@@ -209,7 +209,7 @@ func (mt *MerkleTree) subtreeSubproof(start, end, lo, hi uint64, known bool) ([]
 }
 
 func SubtreesForInterval(start, end uint64) (start1, end1, start2, end2 uint64, err error) {
-	if 0 > start || start > end {
+	if start > end {
 		err = fmt.Errorf("invalid interval [%d, %d)", start, end)
 		return
 	}
@@ -234,4 +234,41 @@ func SubtreesForInterval(start, end uint64) (start1, end1, start2, end2 uint64, 
 	start2 = mid
 	end2 = end
 	return
+}
+
+func EvaluateSubtreeInclusionProof(index, start, end uint64, entryHash *HashValue, proof []byte) (HashValue, error) {
+	if !IsValidSubtree(start, end) {
+		return HashValue{}, fmt.Errorf("invalid subtree")
+	}
+	if start > index || index >= end {
+		return HashValue{}, fmt.Errorf("index not in subtree")
+	}
+	fn := index - start
+	sn := end - start - 1
+	r := *entryHash
+	for len(proof) != 0 {
+		if len(proof) < HashSize {
+			return HashValue{}, fmt.Errorf("truncated hash in proof")
+		}
+		p := (*HashValue)(proof)
+		proof = proof[HashSize:]
+		if sn == 0 {
+			return HashValue{}, fmt.Errorf("proof too long")
+		}
+		if fn&1 == 1 || fn == sn {
+			r = HashNode(p, &r)
+			for fn&1 == 0 {
+				fn >>= 1
+				sn >>= 1
+			}
+		} else {
+			r = HashNode(&r, p)
+		}
+		fn >>= 1
+		sn >>= 1
+	}
+	if sn != 0 {
+		return HashValue{}, fmt.Errorf("proof too short")
+	}
+	return r, nil
 }

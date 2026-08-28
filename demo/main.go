@@ -1,305 +1,40 @@
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
-	"encoding/pem"
 	"flag"
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
-	"slices"
-	"strconv"
-
-	"golang.org/x/crypto/cryptobyte"
 )
-
-var (
-	flagConfig = flag.String("config", "mtc.json", "the path to the config file to generate certificates from")
-	flagOutDir = flag.String("out", "out", "the path to the output directory")
-)
-
-type certificateInfo struct {
-	entryConfig       *EntryConfig
-	certConfig        *CertificateConfig
-	index, start, end uint64
-	cosigners         []*Cosigner
-	// The number of certificate for the given index.
-	num int
-}
-
-func makeDirsAndWriteFile(name string, data []byte) error {
-	if err := os.MkdirAll(filepath.Dir(name), 0755); err != nil {
-		return err
-	}
-	return os.WriteFile(name, data, 0644)
-}
-
-func tlogIndex(n int, partial bool) string {
-	if n < 0 {
-		panic("negative tlog index")
-	}
-	var s string
-	if partial {
-		s = fmt.Sprintf("%03d.p", n%1000)
-	} else {
-		s = fmt.Sprintf("%03d", n%1000)
-	}
-	n /= 1000
-	for n != 0 {
-		s = filepath.Join(fmt.Sprintf("x%03d", n%1000), s)
-		n /= 1000
-	}
-	return s
-}
-
-func do() error {
-	// Load the config.
-	configBytes, err := os.ReadFile(*flagConfig)
-	if err != nil {
-		return err
-	}
-	var config CAConfig
-	if err := json.Unmarshal(configBytes, &config); err != nil {
-		return err
-	}
-
-	var cosigners []*Cosigner
-	var caCosigner *Cosigner
-	for _, cosignerConfig := range config.Cosigners {
-		cosigner, err := NewCosignerFromConfig(config.Version, &cosignerConfig)
-		if err != nil {
-			return fmt.Errorf("error in cosigner %s: %s", cosignerConfig.CosignerID, err)
-		}
-		cosigners = append(cosigners, cosigner)
-		if bytes.Equal(cosigner.ID, config.ID) {
-			caCosigner = cosigner
-		}
-	}
-
-	if config.Version >= VersionPlants04 {
-		// Generate an a CA certificate.
-		if caCosigner == nil {
-			return fmt.Errorf("CA cosigner %s not found", config.ID)
-		}
-		caCert, err := CreateCACertificate(&config, caCosigner)
-		if err != nil {
-			return err
-		}
-		certPath := filepath.Join(*flagOutDir, "ca_cert.pem")
-		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert})
-		if err := os.WriteFile(certPath, certPEM, 0644); err != nil {
-			return err
-		}
-
-		fmt.Printf("Wrote CA certificate %q.\n", certPath)
-		fmt.Printf("\n")
-	}
-
-	// Entries in the issuance log.
-	var entries [][]byte
-	if config.Version < VersionPlants04 {
-		// Prior to plants-04, the log began with a null entry.
-		entries = append(entries, MarshalNullEntry(config.Version))
-	} else if config.LogNumber == 0 {
-		// Starting plants-04, non-zero serials come from the log number.
-		return fmt.Errorf("invalid log number: %d", config.LogNumber)
-	}
-	// Certificates to be constructed.
-	var certInfos []certificateInfo
-	// Maps checkpoint sequence name to a list of certInfos indices that are
-	// awaiting an end value once the next checkpoint in the sequence is
-	// allocated.
-	type checkpointWait struct {
-		idx  uint64
-		prev uint64
-	}
-	awaitingCheckpoint := map[string][]checkpointWait{}
-	// Maps checkpoint sequence name to the latest checkpoint size.
-	// Initially, all sequences are at zero, which matches the default map
-	// lookup behavior.
-	checkpointSeqs := map[string]uint64{}
-	for entryConfigIdx := range config.Entries {
-		entryConfig := &config.Entries[entryConfigIdx]
-		repeat := 1
-		if entryConfig.Repeat != 0 {
-			repeat = entryConfig.Repeat
-		}
-		for range repeat {
-			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.ID, entryConfig)
-			if err != nil {
-				return err
-			}
-			entries = append(entries, entry)
-			entryIdx := uint64(len(entries) - 1)
-
-			// Schedule certificates.
-			for certNum := range entryConfig.Certificates {
-				certConfig := &entryConfig.Certificates[certNum]
-				info := certificateInfo{index: entryIdx, entryConfig: entryConfig, certConfig: certConfig, num: certNum}
-				if certConfig.SubtreeEnd != 0 {
-					if len(certConfig.Checkpoint) != 0 {
-						return fmt.Errorf("both Checkpoint and SubtreeEnd specified in a certificate")
-					}
-					info.start = certConfig.SubtreeStart
-					info.end = certConfig.SubtreeEnd
-				} else if c := certConfig.Checkpoint; len(c) != 0 {
-					// Make a note to fill in the subtree when available.
-					awaitingCheckpoint[c] = append(awaitingCheckpoint[c], checkpointWait{idx: uint64(len(certInfos)), prev: checkpointSeqs[c]})
-				} else {
-					return fmt.Errorf("neither Checkpoint nor SubtreeEnd specified in a certificate")
-				}
-				for _, cosignerID := range certConfig.Cosigners {
-					var cosigner *Cosigner
-					for _, c := range cosigners {
-						if bytes.Equal(c.ID, cosignerID) {
-							cosigner = c
-							break
-						}
-					}
-					if cosigner == nil {
-						return fmt.Errorf("cosigner %s not found", cosignerID)
-					}
-					info.cosigners = append(info.cosigners, cosigner)
-				}
-				certInfos = append(certInfos, info)
-			}
-
-			// Update checkpoint sequences.
-			for _, seq := range entryConfig.Checkpoints {
-				checkpointSeqs[seq] = uint64(len(entries))
-				// Fill in any certificate infos that are still awaiting
-				// a checkpoint.
-				for _, wait := range awaitingCheckpoint[seq] {
-					// We have the checkpoint interval. Find the two subtrees
-					// and use the one that includes the certificate.
-					start1, end1, start2, end2, err := SubtreesForInterval(wait.prev, uint64(len(entries)))
-					if err != nil {
-						return err
-					}
-					if certInfos[wait.idx].index < end1 {
-						certInfos[wait.idx].start = start1
-						certInfos[wait.idx].end = end1
-					} else {
-						certInfos[wait.idx].start = start2
-						certInfos[wait.idx].end = end2
-					}
-				}
-				delete(awaitingCheckpoint, seq)
-			}
-		}
-	}
-
-	for seq := range awaitingCheckpoint {
-		return fmt.Errorf("certificate required checkpoint sequence %q, but no checkpoint in sequence defined", seq)
-	}
-
-	issuanceLog := NewMerkleTree(entries)
-
-	// Construct certificates.
-	if err := os.MkdirAll(*flagOutDir, 0755); err != nil {
-		log.Fatal(err)
-	}
-	for _, info := range certInfos {
-		// TODO: A real CA would not generate fresh cosignatures for every
-		// certificate. Rather it cosign subtrees as it checkpoints. This tool
-		// is less opinionated about subtrees, so we would need to make a
-		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(&config, issuanceLog, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
-		if err != nil {
-			return err
-		}
-
-		subtree, err := issuanceLog.SubtreeHash(info.start, info.end)
-		if err != nil {
-			return err
-		}
-
-		certPath := filepath.Join(*flagOutDir, fmt.Sprintf("cert_%d_%d.pem", info.index, info.num))
-		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
-		if err := os.WriteFile(certPath, certPEM, 0644); err != nil {
-			return err
-		}
-
-		fmt.Printf("Wrote certificate for entry %d at %q.\n", info.index, certPath)
-		fmt.Printf("  Subtree [%d, %d) with hash %s\n", info.start, info.end, base64.StdEncoding.EncodeToString(subtree[:]))
-		for _, cosigner := range info.cosigners {
-			fmt.Printf("  Cosigned by %s\n", cosigner.ID)
-		}
-		fmt.Printf("\n")
-	}
-
-	// Write out the tree in tlog-tiles format.
-	tileDir := filepath.Join(*flagOutDir, "tile")
-
-	entryDir := filepath.Join(tileDir, "entries")
-	for i := 0; 256*i < len(entries); i++ {
-		bundle := cryptobyte.NewBuilder(nil)
-		for j := 256 * i; j < 256*(i+1) && j < len(entries); j++ {
-			bundle.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(entries[j]) })
-		}
-		var path string
-		if 256*(i+1) <= len(entries) {
-			path = filepath.Join(entryDir, tlogIndex(i, false))
-		} else {
-			path = filepath.Join(entryDir, tlogIndex(i, true), strconv.Itoa(len(entries)-256*i))
-		}
-		data, err := bundle.Bytes()
-		if err != nil {
-			return err
-		}
-		if err := makeDirsAndWriteFile(path, data); err != nil {
-			return err
-		}
-	}
-
-	for l := 0; l < len(issuanceLog.levels); l += 8 {
-		level := issuanceLog.levels[l]
-		for i := 0; 256*i < len(level); i++ {
-			var tile []byte
-			for j := 256 * i; j < 256*(i+1) && j < len(level); j++ {
-				tile = append(tile, level[j][:]...)
-			}
-			var path string
-			if 256*(i+1) <= len(level) {
-				path = filepath.Join(tileDir, strconv.Itoa(l/8), tlogIndex(i, false))
-			} else {
-				path = filepath.Join(tileDir, strconv.Itoa(l/8), tlogIndex(i, true), strconv.Itoa(len(level)-256*i))
-			}
-			if err := makeDirsAndWriteFile(path, tile); err != nil {
-				return err
-			}
-		}
-	}
-
-	checkpointHash, err := issuanceLog.SubtreeHash(0, uint64(len(entries)))
-	if err != nil {
-		panic(err)
-	}
-	var signedNote bytes.Buffer
-	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogID(&config)))
-	fmt.Fprintf(&signedNote, "%d\n", len(entries))
-	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
-	for _, cosigner := range cosigners {
-		cosig, err := cosigner.Sign(LogID(&config), 0, uint64(len(entries)), &checkpointHash)
-		if err != nil {
-			return err
-		}
-		fmt.Fprintf(&signedNote, "\u2014 %s %s\n", tlogOrigin(cosigner.ID), base64.StdEncoding.EncodeToString(slices.Concat(cosigner.KeyID[:], cosig)))
-	}
-	if err := os.WriteFile(filepath.Join(*flagOutDir, "checkpoint"), signedNote.Bytes(), 0644); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s COMMAND [ARGS...]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\n")
+		fmt.Fprintf(os.Stderr, "Available commands:\n")
+		fmt.Fprintf(os.Stderr, "  generate - Generate test MTC certificates\n")
+		fmt.Fprintf(os.Stderr, "  verify   - Verify MTC certificates\n")
+	}
+
 	flag.Parse()
-	if err := do(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error generating certificates: %s\n", err)
-		os.Exit(1)
+	if flag.NArg() < 1 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	switch cmd := flag.Arg(0); cmd {
+	case "generate":
+		if err := generate(flag.Args()[1:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error generating certificates: %s\n", err)
+			os.Exit(1)
+		}
+	case "verify":
+		if err := verify(flag.Args()[1:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error verifying certificates: %s\n", err)
+			os.Exit(1)
+		}
+	default:
+		fmt.Fprintf(os.Stderr, "Unrecognized command %q\n", cmd)
+		flag.Usage()
+		os.Exit(2)
 	}
 }
