@@ -38,6 +38,26 @@ func hashASN1Element(dst hash.Hash, src *cryptobyte.String, tag cbasn1.Tag) bool
 	return true
 }
 
+func certSignatureBytes(cert *x509.Certificate) ([]byte, error) {
+	// Go does not check for a whole number of bytes and also does not directly
+	// expose any way to tell, so we must reparse the certificate. See
+	// https://github.com/golang/go/issues/81178
+	//
+	// The certificate was previously valid, so this can only fail if the
+	// signature had padding bits. When the above issue is fixed, we can remove
+	// this.
+	str := cryptobyte.String(cert.Raw)
+	var seq, skip cryptobyte.String
+	var sig []byte
+	if !str.ReadASN1(&seq, cbasn1.SEQUENCE) ||
+		!seq.ReadASN1(&skip, cbasn1.SEQUENCE) || // tbsCertificate
+		!seq.ReadASN1(&skip, cbasn1.SEQUENCE) || // signatureAlgorithm
+		!seq.ReadASN1BitStringAsBytes(&sig) {
+		return nil, errors.New("signature was not a whole number of bytes")
+	}
+	return sig, nil
+}
+
 type VerifyResult struct {
 	TrustedSubtree          bool
 	VerifyErrors            []error
@@ -59,7 +79,11 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 		return nil, errors.New("signature algorithm was not an mtcProof")
 	}
 
-	proofStr := cryptobyte.String(cert.Signature)
+	sig, err := certSignatureBytes(cert)
+	if err != nil {
+		return nil, err
+	}
+	proofStr := cryptobyte.String(sig)
 	var start, end uint64
 	var signatures []parsedSignature
 	var entryExtensions, inclusionProof, sigs cryptobyte.String
