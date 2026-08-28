@@ -163,42 +163,56 @@ type CosignerPublic struct {
 	PublicKey          crypto.PublicKey
 }
 
+func NewCosignerPublic(vers DraftVersion, id TrustAnchorID, sigAlg SignatureAlgorithm, pubkey crypto.PublicKey) (*CosignerPublic, error) {
+	// See x509.ParsePKIXPublicKey's documentation for the key types.
+	switch sigAlg {
+	case SignatureAlgorithmEd25519:
+		if _, ok := pubkey.(ed25519.PublicKey); !ok {
+			return nil, errors.New("not an Ed25519 key")
+		}
+	case SignatureAlgorithmMLDSA44, SignatureAlgorithmMLDSA65, SignatureAlgorithmMLDSA87:
+		params := mldsaParamsFromAlg(sigAlg)
+		ml, ok := pubkey.(*mldsa.PublicKey)
+		if !ok || ml.Parameters() != params {
+			return nil, fmt.Errorf("not a %s key", params)
+		}
+	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384:
+		curve, _ := ecdsaParamsFromAlg(sigAlg)
+		ec, ok := pubkey.(*ecdsa.PublicKey)
+		if !ok {
+			return nil, fmt.Errorf("not an EC key")
+		}
+		if ec.Curve != curve {
+			return nil, fmt.Errorf("not a %s key", curve.Params().Name)
+		}
+	default:
+		return nil, fmt.Errorf("unsupported signature algorithm: %s", sigAlg)
+	}
+
+	return &CosignerPublic{Version: vers, ID: id, SignatureAlgorithm: sigAlg, PublicKey: pubkey}, nil
+}
+
 func (c *CosignerPublic) Verify(logID TrustAnchorID, start, end uint64, hash *HashValue, sig []byte) error {
 	inp, err := cosignedMessage(c.Version, c.ID, logID, start, end, hash)
 	if err != nil {
 		return err
 	}
 
-	// See x509.ParsePKIXPublicKey's documentation for the key types.
+	// See x509.ParsePKIXPublicKey's documentation for the key types. We assume
+	// the checks in NewCosignerPublic have already passed.
 	switch c.SignatureAlgorithm {
 	case SignatureAlgorithmEd25519:
-		ed, ok := c.PublicKey.(ed25519.PublicKey)
-		if !ok {
-			return errors.New("not an Ed25519 key")
-		}
-		if !ed25519.Verify(ed, inp, sig) {
+		if !ed25519.Verify(c.PublicKey.(ed25519.PublicKey), inp, sig) {
 			return errors.New("invalid Ed25519 signature")
 		}
 		return nil
 	case SignatureAlgorithmMLDSA44, SignatureAlgorithmMLDSA65, SignatureAlgorithmMLDSA87:
-		params := mldsaParamsFromAlg(c.SignatureAlgorithm)
-		ml, ok := c.PublicKey.(*mldsa.PublicKey)
-		if !ok || ml.Parameters() != params {
-			return fmt.Errorf("not a %s key", params)
-		}
-		return mldsa.Verify(ml, inp, sig, nil)
+		return mldsa.Verify(c.PublicKey.(*mldsa.PublicKey), inp, sig, nil)
 	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384:
-		curve, hash := ecdsaParamsFromAlg(c.SignatureAlgorithm)
-		ec, ok := c.PublicKey.(*ecdsa.PublicKey)
-		if !ok {
-			return fmt.Errorf("not an EC key")
-		}
-		if ec.Curve != curve {
-			return fmt.Errorf("not a %s key", curve.Params().Name)
-		}
+		_, hash := ecdsaParamsFromAlg(c.SignatureAlgorithm)
 		h := hash.New()
 		h.Write(inp)
-		if !ecdsa.VerifyASN1(ec, h.Sum(nil), sig) {
+		if !ecdsa.VerifyASN1(c.PublicKey.(*ecdsa.PublicKey), h.Sum(nil), sig) {
 			return errors.New("invalid ECDSA signature")
 		}
 		return nil

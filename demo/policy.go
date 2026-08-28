@@ -183,17 +183,15 @@ func (p *Policy) AddCosigner(id TrustAnchorID, sigAlg SignatureAlgorithm, spki [
 		p.Names = map[string]PolicyIndex{}
 	}
 	if _, ok := p.Names[id.String()]; ok {
-		return fmt.Errorf("cosigner %q already defined", id.String())
+		return fmt.Errorf("cosigner %s already defined", id)
 	}
 	pubKey, err := x509.ParsePKIXPublicKey(spki)
 	if err != nil {
-		return fmt.Errorf("failed to parse SPKI: %w", err)
+		return fmt.Errorf("error in cosigner %s: failed to parse SPKI: %w", id, err)
 	}
-	cosigner := &CosignerPublic{
-		Version:            p.Version,
-		ID:                 id,
-		SignatureAlgorithm: sigAlg,
-		PublicKey:          pubKey,
+	cosigner, err := NewCosignerPublic(p.Version, id, sigAlg, pubKey)
+	if err != nil {
+		return fmt.Errorf("error in cosigner %s: %w", id, err)
 	}
 	p.Cosigners = append(p.Cosigners, cosigner)
 	p.Names[id.String()] = PolicyIndex{IsGroup: false, Index: len(p.Cosigners) - 1}
