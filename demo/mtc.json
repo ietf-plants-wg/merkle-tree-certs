@@ -72,6 +72,7 @@
       "Checkpoints": ["standalone"],
       "Certificates": [
         {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"]},
+        {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"], "UnusedBit": true},
         {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"], "BitFlipProof": true},
         {"Checkpoint": "standalone", "Cosigners": ["32473.1"]},
         {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.3.1"]},

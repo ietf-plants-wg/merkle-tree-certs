@@ -414,11 +414,22 @@ func CreateCertificate(config *CAConfig, issuanceLog *MerkleTree, cosigners []*C
 						return compareCosignerIDs(a.ID, b.ID)
 					})
 				}
-				for _, cosigner := range cosigners {
+				for i, cosigner := range cosigners {
+					var attempts int
+				RetryCosig:
 					cosig, err := cosigner.Sign(logID, start, end, &subtree)
 					if err != nil {
 						cosigs.SetError(err)
 						return
+					}
+					// If UnusedBit is set, we require the last cosignature to end in a zero bit.
+					// ECDSA and ML-DSA signing are non-deterministic, so try a few times before
+					// giving up.
+					if certConfig.UnusedBit && i == len(cosigners)-1 && cosig[len(cosig)-1]&1 != 0 {
+						attempts++
+						if attempts < 32 {
+							goto RetryCosig
+						}
 					}
 					addTrustAnchorID(cosigs, cosigner.ID)
 					cosigs.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(cosig) })
