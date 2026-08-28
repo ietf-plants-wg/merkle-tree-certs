@@ -4262,31 +4262,31 @@ C.2.1.  Subtree Validity
 
    The following are valid subtrees:
 
-   *  0 to 2^47 + 1
+   *  start is 0 and end is 2^47 + 1
 
-   *  0 to 2^48 - 1
+   *  start is 0 and end is 2^48 - 1
 
-   *  0 to 2^62 + 1
+   *  start is 0 and end is 2^62 + 1
 
-   *  0 to 2^63 - 1
+   *  start is 0 and end is 2^63 - 1
 
-   *  0 to 2^63 + 1
+   *  start is 0 and end is 2^63 + 1
 
-   *  0 to 2^64 - 1
+   *  start is 0 and end is 2^64 - 1
 
    The following are not valid subtrees:
 
-   *  42 to 2^47 + 1
+   *  start is 2^46 and end is 2^47 + 1
 
-   *  42 to 2^48 - 1
+   *  start is 2^46 and end is 2^48 - 1
 
-   *  42 to 2^62 + 1
+   *  start is 2^61 and end is 2^62 + 1
 
-   *  42 to 2^63 - 1
+   *  start is 2^61 and end is 2^63 - 1
 
-   *  42 to 2^63 + 1
+   *  start is 2^62 and end is 2^63 + 1
 
-   *  42 to 2^64 - 1
+   *  start is 2^62 and end is 2^64 - 1
 
 C.2.2.  Subtree Inclusion Proofs
 
