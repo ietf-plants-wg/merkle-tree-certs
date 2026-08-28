@@ -2297,7 +2297,7 @@ They are hash values of the outputs of all possible inputs for each algorithm, f
 
 For all the test vectors, a tree `D_n` of size `n` is constructed with leaf values `d[0] = 0x00, d[1] = 0x01, ...`. The hash function used is SHA-256. The hash values are encoded in hexadecimal.
 
-## Subtree Hashes
+## Subtree Hashes {#subtree-hash-vectors}
 
 For each value of `end` from 0 to 130, and each value of `start` from 0 to `end`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) HASH` followed by a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `HASH` is the hexadecimal encoding of `MTH(D[start:end])`, according to {{subtrees}}.
 
@@ -2319,6 +2319,8 @@ for end in range(0, 131):
             h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
 assert h.hexdigest() == 'b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81'
 ~~~
+
+This test exercises both an implementation's subtree hash calculation as well as the subtree validity check. In a CA, both of these operations apply. In a relying party, only the subtree validity check applies. A relying party implementation SHOULD implement a Merkle Tree in testing logic so the above will exercise the subtree validity check.
 
 ## Subtree Inclusion Proofs {#subtree-inclusion-proof-vectors}
 
@@ -2347,6 +2349,13 @@ for end in range(0, 131):
 assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
 ~~~
 
+This test exercises constructing subtree inclusion proofs, as computed by a CA. A relying party instead evaluates untrusted subtree inclusion proofs. This test can be used to exercise this logic as follows:
+
+1. If not available, implement a Merkle Tree in testing logic to compute subtree hashes and subtree inclusion proofs. This logic can be validated by the above test and {{subtree-hash-vectors}}.
+2. For each subtree inclusion proof in the above test, evaluate the inclusion proof and assert the resulting hash matches the corresponding subtree hash.
+3. For each non-empty subtree inclusion proof in the above test, truncate the proof by both one byte and a full hash. Assert that evaluating each proof fails.
+4. For each subtree inclusion proof in the above test, extend the proof by both one byte and an arbitrary full hash. Assert that evaluating each proof fails.
+
 ## Subtree Consistency Proofs {#subtree-consistency-proof-vectors}
 
 For each value of `n` from 0 to 130, and each value of `end` from 0 to `n`, and each value of `start` from 0 to `end`, if `[start, end)` is a valid subtree, add to the rolling hash the ASCII string `[START, END) N`, then, for each hash in the consistency proof ({{subtree-consistency-proofs}}) for the subtree `[start, end)` and tree of size `n`, a space (U+0020) followed by the hexadecimal encoding of that hash, and finally a newline (U+000A), where `START` and `END` are the decimal representations of `start` and `end`, respectively, and `N` is the decimal representation of `n`.
@@ -2373,6 +2382,15 @@ for n in range(131):
                 h.update(f'{line}\n'.encode())
 assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74'
 ~~~
+
+This test exercises constructing subtree consistency proofs. Other parties will check these proofs (e.g. {{trusted-subtrees}} and {{TLOG-WITNESS}}). This test can be used to exercise this logic as follows:
+
+1. If not available, implement a Merkle Tree in testing logic to compute subtree hashes and subtree consistency proofs. This logic can be validated by the above test and {{subtree-hash-vectors}}.
+2. For each subtree consistency proof in the above test, check the proof and assert it succeeds.
+3. For each non-empty subtree consistency proof in the above test, truncate the proof by both one byte and a full hash. Assert that the checking each proof fails.
+4. For each subtree consistency proof in the above test, extend the proof by both one byte and an arbitrary full hash. Assert that checking each proof fails.
+5. For each subtree consistency proof in the above test, flip a bit in the input subtree hash. Assert that checking each proof fails.
+5. For each subtree consistency proof in the above test with a non-empty subtree, flip a bit in the input tree hash. Assert that checking each proof fails.
 
 ## Efficient Covering Subtrees
 
