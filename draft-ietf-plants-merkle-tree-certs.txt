@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 1 March 2027                                         Apple Inc.
+Expires: 2 March 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          28 August 2026
+                                                          29 August 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 March 2027.
+   This Internet-Draft will expire on 2 March 2027.
 
 Copyright Notice
 
@@ -2031,6 +2031,12 @@ Table of Contents
    anchor ID of the landmark may be used as an efficient identifier in
    the application protocol.  Section 8 discusses how to do this in TLS
    [RFC9846].
+
+   The procedure above is not specific to the CA.  In particular, a
+   party holding a standalone certificate (Section 6.3) can construct
+   the corresponding landmark-relative certificate by recovering the
+   certificate inputs from it and obtaining the landmark sequence and
+   inclusion proof hashes from the issuance log.
 
 6.5.  Size Estimates
 
@@ -4439,6 +4445,9 @@ Since draft-ietf-plants-merkle-tree-certs-05
    *  Fix the maximum log index to account for also end being 48-bit.
 
    *  Discuss a potential overflow in the valid subtree definition
+
+   *  Describe how a party holding a standalone certificate can
+      construct the corresponding landmark-relative certificate itself.
 
 Authors' Addresses
 
