@@ -1378,6 +1378,8 @@ Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-r
 
 Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
 
+The procedure above is not specific to the CA. In particular, a party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
+
 ## Size Estimates
 
 The inclusion proofs in standalone and landmark-relative certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.
@@ -2617,3 +2619,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Fix the maximum log index to account for also `end` being 48-bit.
 
 - Discuss a potential overflow in the valid subtree definition
+
+- Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.
