@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 1 March 2027                                         Apple Inc.
+Expires: 3 March 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          28 August 2026
+                                                          30 August 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 March 2027.
+   This Internet-Draft will expire on 3 March 2027.
 
 Copyright Notice
 
@@ -180,6 +180,7 @@ Table of Contents
        C.2.1.  Subtree Validity
        C.2.2.  Subtree Inclusion Proofs
        C.2.3.  Subtree Consistency Proofs
+       C.2.4.  Efficient Covering Subtrees
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -4266,7 +4267,7 @@ C.2.  Large Subtree Test Vectors
 
 C.2.1.  Subtree Validity
 
-   The following are valid subtrees:
+   The following are valid subtrees (Section 4.1):
 
    *  start is 0 and end is 2^47 + 1
 
@@ -4297,12 +4298,115 @@ C.2.1.  Subtree Validity
 C.2.2.  Subtree Inclusion Proofs
 
    [LargeInclusionProofs] contains additional test vectors for subtree
-   inclusion proofs.
+   inclusion proofs (Section 4.3).
 
 C.2.3.  Subtree Consistency Proofs
 
    [LargeConsistencyProofs] contains additional test vectors for subtree
-   consistency proofs.
+   consistency proofs (Section 4.4).
+
+C.2.4.  Efficient Covering Subtrees
+
+   This section contains sample inputs and outputs for the procedure in
+   Section 4.5.1.
+
+   Given range [0x0, 0x800000000000), the subtrees are:
+
+   *  [0x0, 0x400000000000)
+
+   *  [0x400000000000, 0x800000000000)
+
+   Given range [0x500000000000, 0xd00000000000), the subtrees are:
+
+   *  [0x400000000000, 0x800000000000)
+
+   *  [0x800000000000, 0xd00000000000)
+
+   Given range [0x7fffffffffff, 0x800000000001), the subtrees are:
+
+   *  [0x7fffffffffff, 0x800000000000)
+
+   *  [0x800000000000, 0x800000000001)
+
+   Given range [0xfffffffffffe, 0xffffffffffff), the subtrees are:
+
+   *  [0xfffffffffffe, 0xffffffffffff)
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   Given range [0xffffffffffff, 0xffffffffffff), the subtrees are:
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   Given range [0x0, 0x4000000000000000), the subtrees are:
+
+   *  [0x0, 0x2000000000000000)
+
+   *  [0x2000000000000000, 0x4000000000000000)
+
+   Given range [0x2800000000000000, 0x6800000000000000), the subtrees
+   are:
+
+   *  [0x2000000000000000, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x6800000000000000)
+
+   Given range [0x3fffffffffffffff, 0x4000000000000001), the subtrees
+   are:
+
+   *  [0x3fffffffffffffff, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x4000000000000001)
+
+   Given range [0x7ffffffffffffffe, 0x7fffffffffffffff), the subtrees
+   are:
+
+   *  [0x7ffffffffffffffe, 0x7fffffffffffffff)
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   Given range [0x7fffffffffffffff, 0x7fffffffffffffff), the subtrees
+   are:
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   Given range [0x0, 0x8000000000000000), the subtrees are:
+
+   *  [0x0, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x8000000000000000)
+
+   Given range [0x5000000000000000, 0xd000000000000000), the subtrees
+   are:
+
+   *  [0x4000000000000000, 0x8000000000000000)
+
+   *  [0x8000000000000000, 0xd000000000000000)
+
+   Given range [0x7fffffffffffffff, 0x8000000000000001), the subtrees
+   are:
+
+   *  [0x7fffffffffffffff, 0x8000000000000000)
+
+   *  [0x8000000000000000, 0x8000000000000001)
+
+   Given range [0xfffffffffffffffe, 0xffffffffffffffff), the subtrees
+   are:
+
+   *  [0xfffffffffffffffe, 0xffffffffffffffff)
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
+   Given range [0xffffffffffffffff, 0xffffffffffffffff), the subtrees
+   are:
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
 
 Acknowledgements
 
