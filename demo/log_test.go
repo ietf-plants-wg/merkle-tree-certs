@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"flag"
@@ -273,14 +272,6 @@ func (mt *LargeMerkleTree) FullSubtreeHashByLevel(level int, idx uint64) HashVal
 
 func alternatingBits(n int) uint64 {
 	return uint64(0xaaaa_aaaa_aaaa_aaaa) >> (64 - n)
-}
-
-func mustDecodeHex(s string) []byte {
-	ret, err := hex.DecodeString(s)
-	if err != nil {
-		panic(err)
-	}
-	return ret
 }
 
 func checkOrUpdateTestVectors(t *testing.T, path string, contents []byte) {
