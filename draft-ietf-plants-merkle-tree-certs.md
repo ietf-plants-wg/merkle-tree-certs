@@ -2772,4 +2772,4 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.
 
-- Added test vectors for subtree proofs in larger trees
+- Added test vectors for subtree algorithms in larger trees
