@@ -211,7 +211,7 @@ This document describes Merkle Tree certificates, a new form of X.509 certificat
 
 In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) {{?RFC6962}} for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate {{APPLE-CT}} {{CHROME-CT}}, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.
 
-Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-44 {{?FIPS204=DOI.10.6028/NIST.FIPS.204}} uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate ({{Section 7.5 of ?I-D.ietf-tls-trust-anchor-ids}}), two SCTs and a leaf certificate signature adds 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.
+Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-44 {{?FIPS204=DOI.10.6028/NIST.FIPS.204}} uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate ({{Section 7.5 of ?I-D.ietf-tls-trust-anchor-ids}}), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.
 
 This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.
 
@@ -594,7 +594,7 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 
 <!-- If changing this procedure, remember to update {{inclusion-proof-evaluation-explain}} -->
 
-1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `start <= index < end`. If either do not hold, fail proof evaluation.
+1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `start <= index < end`. If either does not hold, fail proof evaluation.
 
 1. Set `fn` to `index - start` and `sn` to `end - start - 1`.
 
@@ -789,7 +789,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 <!-- If changing this procedure, remember to update {{consistency-proof-verification-explain}} -->
 
-1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start <= end <= n`.
+1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either does not hold, fail proof verification. These checks imply `0 <= start <= end <= n`.
 1. If `start` equals `end`, check the following conditions:
    * `proof` is an empty array.
    * `node_hash` is equal to `HASH()`, the hash of the empty string.
@@ -1324,7 +1324,7 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 
 Steps 4 and 5 are analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
 
-This document does not place any requirements on how frequently this job runs. More frequent runs results in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
+This document does not place any requirements on how frequently this job runs. More frequent runs result in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
 
 This document does not prescribe the specific cosigner roles, or a particular protocol for requesting cosignatures. Protocols for cosigners can vary depending on the needs of that cosigner. Some example protocols are described in {{TLOG-WITNESS}} and {{TLOG-MIRROR}}. It is RECOMMENDED that the CA collect cosignatures for the authenticating party, but the authenticating party MAY collect additional cosignatures and add them to the certificate.
 
@@ -1456,7 +1456,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
 
-1. If `log_number`, `start`, and `end` matches a trusted subtree ({{trusted-subtrees}}) for the CA, check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
+1. If `log_number`, `start`, and `end` match a trusted subtree ({{trusted-subtrees}}) for the CA, check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
 1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored.
 
@@ -1526,7 +1526,7 @@ Each trusted subtree contains:
 
 Trusted subtrees for a given log are determined by its active landmark subtrees, as described in {{landmark-tree-sizes}}. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
 
-This criteria can be checked given:
+This criterion can be checked given:
 
 * Some *reference checkpoint* that contains the latest landmark
 * For each cosigner, either:
@@ -1814,7 +1814,7 @@ The transparency ecosystem does not retain unhashed public keys, so it also may 
 
 ## Extensibility
 
-MTCLogEntry ({{log-entries}}) contain several extension points:
+MTCLogEntry ({{log-entries}}) contains several extension points:
 
 * New X.509 extensions can be added to TBSCertificateLogEntry.
 * New MTCLogEntryType values define new formats for the entry contents.
@@ -2284,7 +2284,7 @@ Step 7 incorporates the remainder of the consistency proof into `fr` and `sr`:
 
 * All hashes are incorporated into `sr`, with hashing on the left or right determined the same as in inclusion proof evaluation.
 
-* A subset of the hashes are incorporated into `fr`. It skips any hash on the right because those contain elements greater than `end - 1`. It also stops incorporating when `fn` and `sn` have converged.
+* A subset of the hashes is incorporated into `fr`. It skips any hash on the right because those contain elements greater than `end - 1`. It also stops incorporating when `fn` and `sn` have converged.
 
 This reconstructs the hashes of the subtree and original tree, which are then compared to expected values in step 8.
 
