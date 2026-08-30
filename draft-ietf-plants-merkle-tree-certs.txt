@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 2 March 2027                                         Apple Inc.
+Expires: 3 March 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          29 August 2026
+                                                          30 August 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 March 2027.
+   This Internet-Draft will expire on 3 March 2027.
 
 Copyright Notice
 
@@ -3452,10 +3452,11 @@ Table of Contents
               and Technology (U.S.), DOI 10.6028/nist.fips.180-4, 2015,
               <https://doi.org/10.6028/nist.fips.180-4>.
 
-   [X.690]    ITU-T, "Information technology - ASN.1 encoding Rules:
+   [X.690]    ITU-T, "Information technology - ASN.1 encoding rules:
               Specification of Basic Encoding Rules (BER), Canonical
               Encoding Rules (CER) and Distinguished Encoding Rules
-              (DER)", ISO/IEC 8824-1:2021 , February 2021.
+              (DER)", ISO/IEC 8825-1:2021, February 2021,
+              <https://www.itu.int/rec/T-REC-X.690>.
 
 14.2.  Informative References
 
