@@ -221,7 +221,6 @@ func NewLargeMerkleTree(size uint64, indices []uint64) *LargeMerkleTree {
 		prev := mt.levels[len(mt.levels)-1]
 		level := map[uint64]HashValue{}
 		// Fill in all hashes with known value.
-		var needsNeighbor []uint64
 		for idx := range prev {
 			parent := idx >> 1
 			if parent >= levelSize {
@@ -230,12 +229,11 @@ func NewLargeMerkleTree(size uint64, indices []uint64) *LargeMerkleTree {
 			other := idx ^ 1
 			left, right := prev[min(idx, other)], prev[max(idx, other)]
 			level[parent] = HashNode(&left, &right)
-			needsNeighbor = append(needsNeighbor, parent)
 		}
 		// Synthesize neighbors of every node we filled in. These do not have
 		// known preimages, so we assume their descendants are never accessed.
-		for _, idx := range needsNeighbor {
-			other := idx ^ 1
+		for idx := range prev {
+			other := (idx >> 1) ^ 1
 			if other >= levelSize {
 				continue
 			}
