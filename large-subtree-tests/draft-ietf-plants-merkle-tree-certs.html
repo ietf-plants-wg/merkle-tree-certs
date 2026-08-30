@@ -4394,6 +4394,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 </li>
           </ol>
 <p id="section-6.4.4-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-4">The procedure above is not specific to the CA. In particular, a party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.<a href="#section-6.4.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -7359,7 +7360,10 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
             <p id="appendix-E.17-1.9.1">Discuss a potential overflow in the valid subtree definition<a href="#appendix-E.17-1.9.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-E.17-1.10">
-            <p id="appendix-E.17-1.10.1">Added test vectors for subtree algorithms in larger trees<a href="#appendix-E.17-1.10.1" class="pilcrow">¶</a></p>
+            <p id="appendix-E.17-1.10.1">Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.<a href="#appendix-E.17-1.10.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.11">
+            <p id="appendix-E.17-1.11.1">Added test vectors for subtree algorithms in larger trees<a href="#appendix-E.17-1.11.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>

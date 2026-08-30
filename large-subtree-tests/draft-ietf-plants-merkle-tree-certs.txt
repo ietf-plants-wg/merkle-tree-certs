@@ -2038,6 +2038,12 @@ Table of Contents
    the application protocol.  Section 8 discusses how to do this in TLS
    [RFC9846].
 
+   The procedure above is not specific to the CA.  In particular, a
+   party holding a standalone certificate (Section 6.3) can construct
+   the corresponding landmark-relative certificate by recovering the
+   certificate inputs from it and obtaining the landmark sequence and
+   inclusion proof hashes from the issuance log.
+
 6.5.  Size Estimates
 
    The inclusion proofs in standalone and landmark-relative certificates
@@ -4673,6 +4679,9 @@ Since draft-ietf-plants-merkle-tree-certs-05
    *  Fix the maximum log index to account for also end being 48-bit.
 
    *  Discuss a potential overflow in the valid subtree definition
+
+   *  Describe how a party holding a standalone certificate can
+      construct the corresponding landmark-relative certificate itself.
 
    *  Added test vectors for subtree algorithms in larger trees
 
