@@ -223,7 +223,8 @@ Table of Contents
    entry will grow.
 
    Additionally, as PKIs transition to shorter-lived certificates
-   [CABF-153] [CABF-SC081], the number of entries in the log will grow.
+   [CABF-153] [CABF-SC081], the rate at which entries are added to the
+   log will increase.
 
    This document introduces Merkle Tree Certificates (MTCs), a new form
    of X.509 certificate that integrates logging with certificate
