@@ -55,7 +55,7 @@ normative:
     author:
       org: ITU-T
     seriesinfo:
-      ISO/IEC 8824-1:2021
+      ISO/IEC 8825-1:2021
 
   # For the ASN.1 module
   RFC5912:
