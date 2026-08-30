@@ -50,12 +50,13 @@ author:
 
 normative:
   X.690:
-    title: "Information technology - ASN.1 encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)"
+    title: "Information technology - ASN.1 encoding rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)"
+    target: https://www.itu.int/rec/T-REC-X.690
     date: February 2021
     author:
       org: ITU-T
     seriesinfo:
-      ISO/IEC 8824-1:2021
+      ISO/IEC: 8825-1:2021
 
   # For the ASN.1 module
   RFC5912:
