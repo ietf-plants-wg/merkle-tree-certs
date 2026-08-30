@@ -2440,7 +2440,7 @@ Implementations MAY skip tests above 2<sup>48</sup>-1 if they do not support suc
 
 ### Subtree Validity {#subtree-validity-large-vectors}
 
-The following are valid subtrees:
+The following are valid subtrees ({{definition-of-a-subtree}}):
 
 * start is 0 and end is 2<sup>47</sup> + 1
 * start is 0 and end is 2<sup>48</sup> - 1
@@ -2460,11 +2460,90 @@ The following are not valid subtrees:
 
 ### Subtree Inclusion Proofs {#subtree-inclusion-proof-large-vectors}
 
-{{LargeInclusionProofs}} contains additional test vectors for subtree inclusion proofs.
+{{LargeInclusionProofs}} contains additional test vectors for subtree inclusion proofs ({{subtree-inclusion-proofs}}).
 
 ### Subtree Consistency Proofs {#subtree-consistency-proof-large-vectors}
 
-{{LargeConsistencyProofs}} contains additional test vectors for subtree consistency proofs.
+{{LargeConsistencyProofs}} contains additional test vectors for subtree consistency proofs ({{subtree-consistency-proofs}}).
+
+### Efficient Covering Subtrees {#efficient-covering-subtrees-large-vectors}
+
+This section contains sample inputs and outputs for the procedure in {{selecting-two-subtrees}}.
+
+Given range `[0x0, 0x800000000000)`, the subtrees are:
+
+* `[0x0, 0x400000000000)`
+* `[0x400000000000, 0x800000000000)`
+
+Given range `[0x500000000000, 0xd00000000000)`, the subtrees are:
+
+* `[0x400000000000, 0x800000000000)`
+* `[0x800000000000, 0xd00000000000)`
+
+Given range `[0x7fffffffffff, 0x800000000001)`, the subtrees are:
+
+* `[0x7fffffffffff, 0x800000000000)`
+* `[0x800000000000, 0x800000000001)`
+
+Given range `[0xfffffffffffe, 0xffffffffffff)`, the subtrees are:
+
+* `[0xfffffffffffe, 0xffffffffffff)`
+* `[0xffffffffffff, 0xffffffffffff)`
+
+Given range `[0xffffffffffff, 0xffffffffffff)`, the subtrees are:
+
+* `[0xffffffffffff, 0xffffffffffff)`
+* `[0xffffffffffff, 0xffffffffffff)`
+
+Given range `[0x0, 0x4000000000000000)`, the subtrees are:
+
+* `[0x0, 0x2000000000000000)`
+* `[0x2000000000000000, 0x4000000000000000)`
+
+Given range `[0x2800000000000000, 0x6800000000000000)`, the subtrees are:
+
+* `[0x2000000000000000, 0x4000000000000000)`
+* `[0x4000000000000000, 0x6800000000000000)`
+
+Given range `[0x3fffffffffffffff, 0x4000000000000001)`, the subtrees are:
+
+* `[0x3fffffffffffffff, 0x4000000000000000)`
+* `[0x4000000000000000, 0x4000000000000001)`
+
+Given range `[0x7ffffffffffffffe, 0x7fffffffffffffff)`, the subtrees are:
+
+* `[0x7ffffffffffffffe, 0x7fffffffffffffff)`
+* `[0x7fffffffffffffff, 0x7fffffffffffffff)`
+
+Given range `[0x7fffffffffffffff, 0x7fffffffffffffff)`, the subtrees are:
+
+* `[0x7fffffffffffffff, 0x7fffffffffffffff)`
+* `[0x7fffffffffffffff, 0x7fffffffffffffff)`
+
+Given range `[0x0, 0x8000000000000000)`, the subtrees are:
+
+* `[0x0, 0x4000000000000000)`
+* `[0x4000000000000000, 0x8000000000000000)`
+
+Given range `[0x5000000000000000, 0xd000000000000000)`, the subtrees are:
+
+* `[0x4000000000000000, 0x8000000000000000)`
+* `[0x8000000000000000, 0xd000000000000000)`
+
+Given range `[0x7fffffffffffffff, 0x8000000000000001)`, the subtrees are:
+
+* `[0x7fffffffffffffff, 0x8000000000000000)`
+* `[0x8000000000000000, 0x8000000000000001)`
+
+Given range `[0xfffffffffffffffe, 0xffffffffffffffff)`, the subtrees are:
+
+* `[0xfffffffffffffffe, 0xffffffffffffffff)`
+* `[0xffffffffffffffff, 0xffffffffffffffff)`
+
+Given range `[0xffffffffffffffff, 0xffffffffffffffff)`, the subtrees are:
+
+* `[0xffffffffffffffff, 0xffffffffffffffff)`
+* `[0xffffffffffffffff, 0xffffffffffffffff)`
 
 
 # Acknowledgements

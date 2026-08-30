@@ -102,6 +102,81 @@ func TestSubtreesForInterval(t *testing.T) {
 		{start: 8, end: 9, start1: 8, end1: 9, start2: 9, end2: 9},
 		{start: 5, end: 13, start1: 4, end1: 8, start2: 8, end2: 13},
 		{start: 7, end: 9, start1: 7, end1: 8, start2: 8, end2: 9},
+		{
+			start: 0x0, end: 0x800000000000,
+			start1: 0x0, end1: 0x400000000000,
+			start2: 0x400000000000, end2: 0x800000000000,
+		},
+		{
+			start: 0x500000000000, end: 0xd00000000000,
+			start1: 0x400000000000, end1: 0x800000000000,
+			start2: 0x800000000000, end2: 0xd00000000000,
+		},
+		{
+			start: 0x7fffffffffff, end: 0x800000000001,
+			start1: 0x7fffffffffff, end1: 0x800000000000,
+			start2: 0x800000000000, end2: 0x800000000001,
+		},
+		{
+			start: 0xfffffffffffe, end: 0xffffffffffff,
+			start1: 0xfffffffffffe, end1: 0xffffffffffff,
+			start2: 0xffffffffffff, end2: 0xffffffffffff,
+		},
+		{
+			start: 0xffffffffffff, end: 0xffffffffffff,
+			start1: 0xffffffffffff, end1: 0xffffffffffff,
+			start2: 0xffffffffffff, end2: 0xffffffffffff,
+		},
+		{
+			start: 0x0, end: 0x4000000000000000,
+			start1: 0x0, end1: 0x2000000000000000,
+			start2: 0x2000000000000000, end2: 0x4000000000000000,
+		},
+		{
+			start: 0x2800000000000000, end: 0x6800000000000000,
+			start1: 0x2000000000000000, end1: 0x4000000000000000,
+			start2: 0x4000000000000000, end2: 0x6800000000000000,
+		},
+		{
+			start: 0x3fffffffffffffff, end: 0x4000000000000001,
+			start1: 0x3fffffffffffffff, end1: 0x4000000000000000,
+			start2: 0x4000000000000000, end2: 0x4000000000000001,
+		},
+		{
+			start: 0x7ffffffffffffffe, end: 0x7fffffffffffffff,
+			start1: 0x7ffffffffffffffe, end1: 0x7fffffffffffffff,
+			start2: 0x7fffffffffffffff, end2: 0x7fffffffffffffff,
+		},
+		{
+			start: 0x7fffffffffffffff, end: 0x7fffffffffffffff,
+			start1: 0x7fffffffffffffff, end1: 0x7fffffffffffffff,
+			start2: 0x7fffffffffffffff, end2: 0x7fffffffffffffff,
+		},
+		{
+			start: 0x0, end: 0x8000000000000000,
+			start1: 0x0, end1: 0x4000000000000000,
+			start2: 0x4000000000000000, end2: 0x8000000000000000,
+		},
+		{
+			start: 0x5000000000000000, end: 0xd000000000000000,
+			start1: 0x4000000000000000, end1: 0x8000000000000000,
+			start2: 0x8000000000000000, end2: 0xd000000000000000,
+		},
+		{
+			start: 0x7fffffffffffffff, end: 0x8000000000000001,
+			start1: 0x7fffffffffffffff, end1: 0x8000000000000000,
+			start2: 0x8000000000000000, end2: 0x8000000000000001,
+		},
+		{
+			start: 0xfffffffffffffffe, end: 0xffffffffffffffff,
+			start1: 0xfffffffffffffffe, end1: 0xffffffffffffffff,
+			start2: 0xffffffffffffffff, end2: 0xffffffffffffffff,
+		},
+		{
+			start: 0xffffffffffffffff, end: 0xffffffffffffffff,
+			start1: 0xffffffffffffffff, end1: 0xffffffffffffffff,
+			start2: 0xffffffffffffffff, end2: 0xffffffffffffffff,
+		},
 	}
 	for _, tt := range tests {
 		start1, end1, start2, end2, err := SubtreesForInterval(tt.start, tt.end)
