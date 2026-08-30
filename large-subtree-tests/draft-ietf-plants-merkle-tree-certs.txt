@@ -4674,7 +4674,7 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Discuss a potential overflow in the valid subtree definition
 
-   *  Added test vectors for subtree proofs in larger trees
+   *  Added test vectors for subtree algorithms in larger trees
 
 Authors' Addresses
 
