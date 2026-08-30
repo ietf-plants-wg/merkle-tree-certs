@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-27T09:21:00.935488+00:00",
+  "timestamp": "2026-08-30T05:09:38.538366+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3635,7 +3635,7 @@
       "id": "I_kwDOJIBkVc8AAAABEAxCTw",
       "title": "Landmark-relative certs can be built directly from the CA issuance log",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/246",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "lukevalenta",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -3644,8 +3644,8 @@
       "labels": [],
       "body": "We'll probably want to have support for clients to fetch landmark-relative certificates directly from the ACME server (#203, #207), but it's also worth documenting that clients can construct landmark-relative certs for themselves (while also doing \"[re-anchoring](https://mailarchive.ietf.org/arch/msg/plants/zY4l-TzRAsCXSwBueiMVOvRqAoE/)\") by directly fetching tiles from the CA issuance log.\n\n(This is a followup to https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207#discussion_r3290634320 and some other conversations.)",
       "createdAt": "2026-06-01T15:12:29Z",
-      "updatedAt": "2026-06-16T04:09:17Z",
-      "closedAt": null,
+      "updatedAt": "2026-08-29T16:02:54Z",
+      "closedAt": "2026-08-29T16:02:54Z",
       "comments": [
         {
           "author": "ilaril",
@@ -3822,16 +3822,24 @@
       ],
       "body": "",
       "createdAt": "2026-07-21T14:04:24Z",
-      "updatedAt": "2026-07-21T14:05:20Z",
+      "updatedAt": "2026-08-28T03:40:03Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oops, attached the PR to the wrong one. This is still open. https://github.com/ietf-plants-wg/merkle-tree-certs/issues/283 is the one that's now closed.",
+          "createdAt": "2026-08-28T03:40:03Z",
+          "updatedAt": "2026-08-28T03:40:03Z"
+        }
+      ]
     },
     {
       "number": 283,
       "id": "I_kwDOJIBkVc8AAAABJm5Stg",
       "title": "Include a certificate verifier in the demo tool",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/283",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -3842,9 +3850,17 @@
       ],
       "body": "",
       "createdAt": "2026-07-21T14:04:40Z",
-      "updatedAt": "2026-07-21T14:05:20Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-08-28T03:40:17Z",
+      "closedAt": "2026-08-28T03:40:17Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Attached the PR to the wrong issue. https://github.com/ietf-plants-wg/merkle-tree-certs/pull/298 closes this issue.",
+          "createdAt": "2026-08-28T03:40:17Z",
+          "updatedAt": "2026-08-28T03:40:17Z"
+        }
+      ]
     },
     {
       "number": 285,
@@ -18377,9 +18393,9 @@
     {
       "number": 254,
       "id": "PR_kwDOJIBkVc7nG3da",
-      "title": "Clarify landmark-relative cert construction",
+      "title": "Mention client-constructed landmark-relative certs",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/254",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "lukevalenta",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -18388,17 +18404,19 @@
       "labels": [],
       "body": "Describe that any party with access to the issuance log and landmark sequence can construct a landmark-relative certificate for a standalone cert they hold.\r\n\r\n(closes #246, relates to https://github.com/C2SP/C2SP/pull/269)",
       "createdAt": "2026-06-16T16:46:27Z",
-      "updatedAt": "2026-08-18T19:22:35Z",
+      "updatedAt": "2026-08-29T16:03:00Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "dde56cb97fdd7ad074929c1629734eb6d2b38d5c",
+      "baseRefOid": "a421d934e52c54eafa610738b00dea55e381af58",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "lvalenta/client-constructed-landmark-relative",
-      "headRefOid": "02d3f83e99bda9fd087f0da1d270099affb713af",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "9cc2fe660867d8c7be58d471f78dbb2f780f6274",
+      "closedAt": "2026-08-29T16:02:53Z",
+      "mergedAt": "2026-08-29T16:02:53Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "d3bf5f9617f037b60401a4448c79ddaa2f26e4f8"
+      },
       "comments": [
         {
           "author": "lukevalenta",
@@ -18526,6 +18544,39 @@
               "updatedAt": "2026-08-18T19:22:35Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLJ-JKw",
+          "commit": {
+            "abbreviatedOid": "02d3f83"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T17:19:43Z",
+          "updatedAt": "2026-08-27T17:19:43Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Fair enough! I've pared the text way down in the latest version. I'm also OK to just abandon the PR since we've settled on a blessed ACME approach! No strong feelings either way.",
+              "createdAt": "2026-08-27T17:19:43Z",
+              "updatedAt": "2026-08-27T17:19:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLYNVsg",
+          "commit": {
+            "abbreviatedOid": "9cc2fe6"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-29T16:02:32Z",
+          "updatedAt": "2026-08-29T16:02:32Z",
+          "comments": []
         }
       ]
     },
@@ -20456,25 +20507,35 @@
       "id": "PR_kwDOJIBkVc8AAAABA_HTwA",
       "title": "demo: Drop in a demo certificate verifier",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/298",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes https://github.com/ietf-plants-wg/merkle-tree-certs/issues/282.\r\n\r\nThis is probably easier reviewed as as individual commits, though one of the commits is quite a big bigger than the others.",
       "createdAt": "2026-08-25T19:47:48Z",
-      "updatedAt": "2026-08-25T19:55:14Z",
+      "updatedAt": "2026-08-28T03:39:27Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "9383619b7d89135e9d19dc94249328f90891468a",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "demo-verify",
-      "headRefOid": "47f21c119089f011bda967a2c094ff8f0d0d0121",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "345cfef2f508b694d0bc8cb4f88d1d93d1df7736",
+      "closedAt": "2026-08-28T03:39:24Z",
+      "mergedAt": "2026-08-28T03:39:24Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "9d37b5d18e143b76a0a70bc4b784e10828f1f13b"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks! Got through some of the comments but not all of them yet. Will go through the rest later today or tomorrow.",
+          "createdAt": "2026-08-27T22:34:23Z",
+          "updatedAt": "2026-08-27T22:34:23Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABK2p2Kw",
@@ -20495,8 +20556,329 @@
               "updatedAt": "2026-08-25T19:51:12Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLK29qg",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "An AI review flagged a few small issues, but overall looks good!",
+          "createdAt": "2026-08-27T18:52:27Z",
+          "updatedAt": "2026-08-27T20:12:45Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "`flagOutDir` might not exist yet, as it doesn't get created until https://github.com/ietf-plants-wg/merkle-tree-certs/pull/298/changes/338370c99dce7241eacc51fbb2014477edf4d0d3#diff-bb18b434abdca60275311710431b2e3fb34a6aee5bdbeaa1b6011accd91508b3R212",
+              "createdAt": "2026-08-27T18:52:27Z",
+              "updatedAt": "2026-08-27T20:12:45Z"
+            },
+            {
+              "originalPosition": 252,
+              "body": "```suggestion\n\tif version <= VersionPlants04 {\n```",
+              "createdAt": "2026-08-27T19:06:12Z",
+              "updatedAt": "2026-08-27T20:12:45Z"
+            },
+            {
+              "originalPosition": 292,
+              "body": "Maybe track the failures and return a non-zero exit code at the end if any certificates fail verification?\n```suggestion\n\t\t\tif err != nil {\n\t\t\t    failed = true\n```",
+              "createdAt": "2026-08-27T19:14:49Z",
+              "updatedAt": "2026-08-27T20:12:45Z"
+            },
+            {
+              "originalPosition": 65,
+              "body": "Should we validate the proofExtensions here? Encoding, descending order, no duplicates: https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-log-entries",
+              "createdAt": "2026-08-27T19:29:41Z",
+              "updatedAt": "2026-08-27T20:12:45Z"
+            },
+            {
+              "originalPosition": 188,
+              "body": "Maybe check the signature algorithm and public key are compatible here at parse time? Otherwise, it'll just result in a failed cosignature in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/298/changes#diff-0eaf634550af94de178838e0e6832905062985e03c1e730e130bca236a70dc59R166.",
+              "createdAt": "2026-08-27T19:30:47Z",
+              "updatedAt": "2026-08-27T20:12:45Z"
+            },
+            {
+              "originalPosition": 61,
+              "body": "This is a tricky one flagged by an AI review. Go's x509.ParseCertificate discards BIT STRING alignment metadata when it stores cert.Signature, so we have to check that the signature's ASN.1 BIT STRING encoding is a multiple of 8 (step 2 of https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#section-7.2).\n```suggestion\n     var rawCert struct {\n       TBSCertificate     asn1.RawValue\n       SignatureAlgorithm asn1.RawValue\n       SignatureValue     asn1.BitString\n     }\n     rest, err := asn1.Unmarshal(cert.Raw, &rawCert)\n     if err != nil || len(rest) != 0 {\n       return nil, errors.New(\"malformed certificate\")\n     }\n     if rawCert.SignatureValue.BitLength%8 != 0 {\n       return nil, errors.New(\"MTCProof signatureValue is not byte-aligned\")\n     }\n```\n\nHere's a test showing the malleability. If you put it in `verify_proof_test.go` you can run with\n```\ngo test -run TestVerifyMTCProofAcceptsNonByteAlignedSignatureValue\n```\n```go\npackage main\n\nimport (\n\t\"bytes\"\n\t\"crypto/x509\"\n\t\"encoding/asn1\"\n\t\"encoding/pem\"\n\t\"errors\"\n\t\"os\"\n\t\"path/filepath\"\n\t\"testing\"\n)\n\nfunc TestVerifyMTCProofAcceptsNonByteAlignedSignatureValue(t *testing.T) {\n\toutDir := t.TempDir()\n\tif err := generate([]string{\"-config\", \"mtc.json\", \"-out\", outDir}); err != nil {\n\t\tt.Fatalf(\"generate: %v\", err)\n\t}\n\n\toriginalDER := readCertificateDER(t, filepath.Join(outDir, \"cert_10_0.pem\"))\n\tmalleatedDER, err := malleateSignatureValue(originalDER)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\n\toriginal, err := x509.ParseCertificate(originalDER)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\tmalleated, err := x509.ParseCertificate(malleatedDER)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\n\tif bytes.Equal(original.Raw, malleated.Raw) {\n\t\tt.Fatal(\"DER encodings unexpectedly match\")\n\t}\n\tif !bytes.Equal(original.Signature, malleated.Signature) {\n\t\tt.Fatal(\"parsed signatures unexpectedly differ\")\n\t}\n\n\tpolicy := Policy{Version: VersionPlants05}\n\tif err := loadCACerts([]string{filepath.Join(outDir, \"ca_cert.pem\")}, &policy); err != nil {\n\t\tt.Fatal(err)\n\t}\n\n\tif _, err := VerifyMTCProof(original, &policy, VersionPlants05); err != nil {\n\t\tt.Fatalf(\"original certificate rejected: %v\", err)\n\t}\n\tif _, err := VerifyMTCProof(malleated, &policy, VersionPlants05); err != nil {\n\t\tt.Fatalf(\"malleated certificate rejected: %v\", err)\n\t}\n}\n\nfunc readCertificateDER(t *testing.T, path string) []byte {\n\tt.Helper()\n\n\tcertPEM, err := os.ReadFile(path)\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}\n\n\tblock, rest := pem.Decode(certPEM)\n\tif block == nil || block.Type != \"CERTIFICATE\" || len(rest) != 0 {\n\t\tt.Fatal(\"invalid certificate PEM\")\n\t}\n\treturn block.Bytes\n}\n\nfunc malleateSignatureValue(certDER []byte) ([]byte, error) {\n\tvar cert struct {\n\t\tTBSCertificate     asn1.RawValue\n\t\tSignatureAlgorithm asn1.RawValue\n\t\tSignatureValue     asn1.BitString\n\t}\n\trest, err := asn1.Unmarshal(certDER, &cert)\n\tif err != nil || len(rest) != 0 {\n\t\treturn nil, errors.New(\"invalid certificate\")\n\t}\n\n\tsig := cert.SignatureValue\n\tif sig.BitLength != len(sig.Bytes)*8 || len(sig.Bytes) == 0 || sig.Bytes[0]&0x80 != 0 {\n\t\treturn nil, errors.New(\"unsuitable signatureValue\")\n\t}\n\n\tshifted := make([]byte, len(sig.Bytes))\n\tfor i := range shifted {\n\t\tshifted[i] = sig.Bytes[i] << 1\n\t\tif i+1 < len(sig.Bytes) {\n\t\t\tshifted[i] |= sig.Bytes[i+1] >> 7\n\t\t}\n\t}\n\n\tcert.SignatureValue = asn1.BitString{\n\t\tBytes:     shifted,\n\t\tBitLength: sig.BitLength - 1,\n\t}\n\treturn asn1.Marshal(cert)\n}\n```",
+              "createdAt": "2026-08-27T20:11:44Z",
+              "updatedAt": "2026-08-27T20:12:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLMdtSA",
+          "commit": {
+            "abbreviatedOid": "338370c"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T22:32:55Z",
+          "updatedAt": "2026-08-27T22:32:55Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Done",
+              "createdAt": "2026-08-27T22:32:55Z",
+              "updatedAt": "2026-08-27T22:32:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLMdvRQ",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T22:33:01Z",
+          "updatedAt": "2026-08-27T22:33:01Z",
+          "comments": [
+            {
+              "originalPosition": 292,
+              "body": "Done",
+              "createdAt": "2026-08-27T22:33:01Z",
+              "updatedAt": "2026-08-27T22:33:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLMdyiw",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T22:33:09Z",
+          "updatedAt": "2026-08-27T22:33:09Z",
+          "comments": [
+            {
+              "originalPosition": 65,
+              "body": "Done",
+              "createdAt": "2026-08-27T22:33:09Z",
+              "updatedAt": "2026-08-27T22:33:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLMeILQ",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T22:34:03Z",
+          "updatedAt": "2026-08-27T22:34:03Z",
+          "comments": [
+            {
+              "originalPosition": 61,
+              "body": "Oof. Thank you, X.509. LLMs love to complain about malleability, but it's not an issue here. You can always insert a new cosignature. But I agree we should check this. Will poke at this.",
+              "createdAt": "2026-08-27T22:34:03Z",
+              "updatedAt": "2026-08-27T22:34:03Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLMeTpw",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-27T22:34:32Z",
+          "updatedAt": "2026-08-27T22:34:32Z",
+          "comments": [
+            {
+              "originalPosition": 252,
+              "body": "Done",
+              "createdAt": "2026-08-27T22:34:32Z",
+              "updatedAt": "2026-08-27T22:34:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLN2gbQ",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-28T03:30:24Z",
+          "updatedAt": "2026-08-28T03:30:24Z",
+          "comments": [
+            {
+              "originalPosition": 61,
+              "body": "Turns out this is an issue in Go too. I've filed https://github.com/golang/go/issues/81178 for Go and added some code here to catch it in the meantime.",
+              "createdAt": "2026-08-28T03:30:24Z",
+              "updatedAt": "2026-08-28T03:30:24Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLN4PSA",
+          "commit": {
+            "abbreviatedOid": "47f21c1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-08-28T03:38:12Z",
+          "updatedAt": "2026-08-28T03:38:12Z",
+          "comments": [
+            {
+              "originalPosition": 188,
+              "body": "Done",
+              "createdAt": "2026-08-28T03:38:12Z",
+              "updatedAt": "2026-08-28T03:38:12Z"
+            }
+          ]
         }
       ]
+    },
+    {
+      "number": 299,
+      "id": "PR_kwDOJIBkVc8AAAABBNfrrw",
+      "title": "Fix wording of rules related to MerkleTreeCertEntry extensions",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/299",
+      "state": "MERGED",
+      "author": "zacikpa",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Noticed some typos/grammar issues while reading through the draft.",
+      "createdAt": "2026-08-27T13:28:07Z",
+      "updatedAt": "2026-08-27T14:04:00Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "9383619b7d89135e9d19dc94249328f90891468a",
+      "headRepository": "zacikpa/merkle-tree-certs",
+      "headRefName": "extensions-wording",
+      "headRefOid": "efd978d362a03a2967d4e6f0a42cab095f5a34bf",
+      "closedAt": "2026-08-27T14:04:00Z",
+      "mergedAt": "2026-08-27T14:04:00Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a421d934e52c54eafa610738b00dea55e381af58"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLIH6hg",
+          "commit": {
+            "abbreviatedOid": "efd978d"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Ah that's *much* better. Thanks!",
+          "createdAt": "2026-08-27T14:02:42Z",
+          "updatedAt": "2026-08-27T14:02:42Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 300,
+      "id": "PR_kwDOJIBkVc8AAAABBWJs4Q",
+      "title": "demo: Retry a few times when running UnusedBit",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/300",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Otherwise this setting causes generation to fail with 50% probability, which isn't all that helpful.",
+      "createdAt": "2026-08-28T13:59:28Z",
+      "updatedAt": "2026-08-28T15:13:52Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "9d37b5d18e143b76a0a70bc4b784e10828f1f13b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "unused-bit-retry",
+      "headRefOid": "33ac71bbe21d7cf49e2ba4fd6b2b0148e93d3b42",
+      "closedAt": "2026-08-28T15:13:49Z",
+      "mergedAt": "2026-08-28T15:13:48Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "d9401c595748141e1a0e3cce3ed7774f27b18273"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLR2CCQ",
+          "commit": {
+            "abbreviatedOid": "33ac71b"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-28T14:11:24Z",
+          "updatedAt": "2026-08-28T14:11:24Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLR35EA",
+          "commit": {
+            "abbreviatedOid": "33ac71b"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-28T14:14:45Z",
+          "updatedAt": "2026-08-28T14:14:45Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 301,
+      "id": "PR_kwDOJIBkVc8AAAABBYLE6A",
+      "title": "Test vectors for large subtree inclusion proofs",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/301",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Issue #292\r\n\r\nThis handles subtree validity and subtree inclusion proofs. Ideally we would also pick up subtree consistency proofs and the find matching subtrees function, but I'll wrestle with that separately.",
+      "createdAt": "2026-08-28T19:14:32Z",
+      "updatedAt": "2026-08-28T20:26:20Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "d9401c595748141e1a0e3cce3ed7774f27b18273",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "large-subtree-tests",
+      "headRefOid": "c8b0c698fc99e56bfe0894f9763ef040a08f6d4e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Updated with consistency proofs too",
+          "createdAt": "2026-08-28T20:26:20Z",
+          "updatedAt": "2026-08-28T20:26:20Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
