@@ -1332,11 +1332,10 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 1. The CA signs the checkpoint with its key(s) ({{certification-authority-cosigners}}).
 2. Using the procedure in {{arbitrary-intervals}}, the CA determines the two subtrees that cover the entries added between this checkpoint and the most recent checkpoint.
 3. The CA signs each subtree with its key(s) ({{cosigners}}).
-4. The CA requests sufficient checkpoint cosignatures ({{cosigners}}) from external cosigners to meet relying party requirements ({{trusted-cosigners}}).
-5. The CA requests subtree cosignatures from the cosigners above.
-6. For each log entry in the interval, the CA constructs a certificate ({{certificate-format}}) from the inputs in {{certificate-inputs}}, using the covering subtree and the subtree cosignatures collected in steps 3 and 5.
+4. The CA requests sufficient subtree cosignatures from external cosigners to meet relying party requirements ({{trusted-cosigners}}). Depending on the protocol for requesting subtree cosignatures (e.g. {{TLOG-WITNESS}} and {{TLOG-MIRROR}}), this step may require first requesting a checkpoint cosignature ({{cosigners}}) from each cosigner.
+5. For each log entry in the interval, the CA constructs a certificate ({{certificate-format}}) from the inputs in {{certificate-inputs}}, using the covering subtree and the subtree cosignatures collected in steps 3 and 5.
 
-Steps 4 and 5 are analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
+Step 4 is analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
 
 This document does not place any requirements on how frequently this job runs. More frequent runs result in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
 
