@@ -1922,7 +1922,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Certi
 
 ## Relative Distinguished Name Attribute
 
-IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{?I-D.ietf-lamps-x509-alg-none}}:
+IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{!RFC9925}}:
 
 | Decimal | Description           | References |
 |---------|-----------------------|------------|
