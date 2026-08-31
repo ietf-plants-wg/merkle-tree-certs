@@ -245,10 +245,7 @@ This achieves the following:
 
 # Conventions and Definitions
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
-when, and only when, they appear in all capitals, as shown here.
+{::boilerplate bcp14-tagged}
 
 This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC9846}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}. It extends the numeric types defined in {{Section 3.3 of !RFC9846}} with a big-endian, 48-bit integer:
 
@@ -1849,7 +1846,7 @@ This situation is analogous to the addition of a new X.509 extension. When relyi
 
 ## Certificate Malleability
 
-An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER {{X.690}}, such as {{Section 4.5.1 of ?RFC9846}}. This aligns with {{Section 4.1.1.3 of ?RFC5280}}, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.
+An ASN.1 structure like X.509's Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER {{X.690}}, such as {{Section 4.5.1 of ?RFC9846}}. This aligns with {{Section 4.1.1.3 of ?RFC5280}}, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.
 
 When the signature verification process in {{verifying-certificate-signatures}} first transforms the TBSCertificate into a TBSCertificateLogEntry, it preserves this non-malleability. There is a unique valid DER encoding for every abstract TBSCertificate structure, so malleability of the DER-encoded TBSCertificate reduces to malleability of the TBSCertificate value:
 
@@ -2610,7 +2607,7 @@ The idea to mint tree heads infrequently was originally described by Richard Bar
 
 Substantially reworked the design. The old design was essentially the landmark checkpoint and CA-built logs ideas, but targeting only the optimized and slow issuance path, and with a more bespoke tree structure:
 
-In both draft-04 and draft-05, a CA looks like today’s CAs except that they run some software to publish what they issue and sign tree heads to certify certificates in bulk.
+In both draft-04 and draft-05, a CA looks like today's CAs except that they run some software to publish what they issue and sign tree heads to certify certificates in bulk.
 
 In draft-04, the CA software publishes certificates in a bunch of independent Merkle Trees. This is very easy to do as a collection of highly cacheable, immutable static files because each tree is constructed independently, and never appended to after being built. In draft-05, the certificates are published in a single Merkle Tree. The {{TLOG-TILES}} interface allows such trees to also use highly cacheable, immutable static files.
 
