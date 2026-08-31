@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"slices"
 	"testing"
 )
 
@@ -16,12 +17,12 @@ const subtreeVectorMax = 130
 
 // subtreeVectorTree builds the tree D used by the test vectors, with leaf values
 // d[0] = 0x00, d[1] = 0x01, and so on.
-func subtreeVectorTree() *MerkleTree {
+func subtreeVectorTree() *StaticMerkleTree {
 	entries := make([][]byte, subtreeVectorMax)
 	for i := range entries {
 		entries[i] = []byte{byte(i)}
 	}
-	return NewMerkleTree(entries)
+	return NewStaticMerkleTree(entries)
 }
 
 // writeProofLine writes prefix followed by, for each hash in the concatenated
@@ -43,7 +44,7 @@ func TestSubtreeHashVectors(t *testing.T) {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
-			subtreeHash, err := tree.SubtreeHash(start, end)
+			subtreeHash, err := SubtreeHash(tree, start, end)
 			if err != nil {
 				t.Fatalf("SubtreeHash(%d, %d): %v", start, end, err)
 			}
@@ -64,12 +65,45 @@ func TestSubtreeInclusionProofVectors(t *testing.T) {
 			if !IsValidSubtree(start, end) {
 				continue
 			}
+			subtreeHash, err := SubtreeHash(tree, start, end)
+			if err != nil {
+				t.Fatalf("SubtreeHash(%d, %d): %v", start, end, err)
+			}
 			for index := start; index < end; index++ {
-				proof, err := tree.SubtreeInclusionProof(index, start, end)
+				proof, err := SubtreeInclusionProof(tree, index, start, end)
 				if err != nil {
 					t.Fatalf("SubtreeInclusionProof(%d, %d, %d): %v", index, start, end, err)
 				}
 				writeProofLine(h, fmt.Sprintf("%d [%d, %d)", index, start, end), proof)
+
+				entryHash := HashLeaf([]byte{byte(index)})
+				got, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, proof)
+				if err != nil {
+					t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d): %v", index, start, end, err)
+				} else if got != subtreeHash {
+					t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d) = %x, want %x", index, start, end, got, subtreeHash)
+				}
+
+				if len(proof) > 0 {
+					if _, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, proof[:len(proof)-1]); err == nil {
+						t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d) unexpectedly succeeded with proof truncated by one byte", index, start, end)
+					}
+				}
+				if len(proof) >= HashSize {
+					if _, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, proof[:len(proof)-HashSize]); err == nil {
+						t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d) unexpectedly succeeded with proof truncated by a full hash", index, start, end)
+					}
+				}
+
+				extendedByte := slices.Concat(proof, []byte{0})
+				if _, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, extendedByte); err == nil {
+					t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d) unexpectedly succeeded with proof extended by one byte", index, start, end)
+				}
+
+				extendedHash := slices.Concat(proof, make([]byte, HashSize))
+				if _, err := EvaluateSubtreeInclusionProof(index, start, end, &entryHash, extendedHash); err == nil {
+					t.Errorf("EvaluateSubtreeInclusionProof(%d, %d, %d) unexpectedly succeeded with proof extended by a full hash", index, start, end)
+				}
 			}
 		}
 	}
@@ -88,7 +122,7 @@ func TestSubtreeConsistencyProofVectors(t *testing.T) {
 				if !IsValidSubtree(start, end) {
 					continue
 				}
-				proof, err := tree.SubtreeConsistencyProof(start, end, n)
+				proof, err := SubtreeConsistencyProof(tree, start, end, n)
 				if err != nil {
 					t.Fatalf("SubtreeConsistencyProof(%d, %d, %d): %v", start, end, n, err)
 				}

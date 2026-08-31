@@ -210,7 +210,7 @@ func generate(args []string) error {
 		return fmt.Errorf("certificate required checkpoint sequence %q, but no checkpoint in sequence defined", seq)
 	}
 
-	issuanceLog := NewMerkleTree(entries)
+	issuanceLog := NewStaticMerkleTree(entries)
 
 	// Construct certificates.
 	if err := os.MkdirAll(*flagOutDir, 0755); err != nil {
@@ -226,7 +226,7 @@ func generate(args []string) error {
 			return err
 		}
 
-		subtree, err := issuanceLog.SubtreeHash(info.start, info.end)
+		subtree, err := SubtreeHash(issuanceLog, info.start, info.end)
 		if err != nil {
 			return err
 		}
@@ -288,7 +288,7 @@ func generate(args []string) error {
 		}
 	}
 
-	checkpointHash, err := issuanceLog.SubtreeHash(0, uint64(len(entries)))
+	checkpointHash, err := SubtreeHash(issuanceLog, 0, uint64(len(entries)))
 	if err != nil {
 		panic(err)
 	}
@@ -315,11 +315,11 @@ func generate(args []string) error {
 				return err
 			}
 			fmt.Printf("Landmark %d at tree size %d:\n", i+1, landmark)
-			subtree1, err := issuanceLog.SubtreeHash(start1, end1)
+			subtree1, err := SubtreeHash(issuanceLog, start1, end1)
 			if err != nil {
 				return err
 			}
-			subtree2, err := issuanceLog.SubtreeHash(start2, end2)
+			subtree2, err := SubtreeHash(issuanceLog, start2, end2)
 			if err != nil {
 				return err
 			}
