@@ -219,7 +219,7 @@ Table of Contents
    public key and 3,309 bytes per signature.  Even with a directly-
    trusted intermediate (Section 7.5 of
    [I-D.ietf-tls-trust-anchor-ids]), two SCTs and a leaf certificate
-   signature adds 7,260 bytes of authentication overhead with ML-DSA-44
+   signature add 7,260 bytes of authentication overhead with ML-DSA-44
    and 9,927 bytes with ML-DSA-65.
 
    This increased overhead additionally impacts CT logs themselves.
@@ -755,7 +755,7 @@ Table of Contents
    hash:
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
-       that start <= index < end.  If either do not hold, fail proof
+       that start <= index < end.  If either does not hold, fail proof
        evaluation.
 
    2.  Set fn to index - start and sn to end - start - 1.
@@ -976,7 +976,7 @@ Table of Contents
    hash root_hash:
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
-       that end <= n.  If either do not hold, fail proof verification.
+       that end <= n.  If either does not hold, fail proof verification.
        These checks imply 0 <= start <= end <= n.
 
    2.  If start equals end, check the following conditions:
@@ -1881,7 +1881,7 @@ Table of Contents
    ones that complete first.
 
    This document does not place any requirements on how frequently this
-   job runs.  More frequent runs results in lower issuance delay, but
+   job runs.  More frequent runs result in lower issuance delay, but
    higher signing overhead.  It is RECOMMENDED that CAs run at most one
    instance of this job at a time, starting the next instance after the
    previous one completes.  A single run collects signatures for all
@@ -2198,7 +2198,7 @@ Table of Contents
         end, following the procedure in Section 4.3.2.  If evaluation
         fails, abort this process and fail verification.
 
-   11.  If log_number, start, and end matches a trusted subtree
+   11.  If log_number, start, and end match a trusted subtree
         (Section 7.4) for the CA, check that expected_subtree_hash is
         equal to the trusted subtree's hash.  Return success if it
         matches and failure if it does not.
@@ -2352,7 +2352,7 @@ Table of Contents
    It is not necessary that the cosigners have generated signatures over
    the specific subtrees, only that they are consistent.
 
-   This criteria can be checked given:
+   This criterion can be checked given:
 
    *  Some _reference checkpoint_ that contains the latest landmark
 
@@ -3104,7 +3104,7 @@ Table of Contents
 
 12.5.  Extensibility
 
-   MTCLogEntry (Section 5.2.1) contain several extension points:
+   MTCLogEntry (Section 5.2.1) contains several extension points:
 
    *  New X.509 extensions can be added to TBSCertificateLogEntry.
 
@@ -4053,9 +4053,9 @@ B.5.  Consistency Proof Verification
    *  All hashes are incorporated into sr, with hashing on the left or
       right determined the same as in inclusion proof evaluation.
 
-   *  A subset of the hashes are incorporated into fr.  It skips any
-      hash on the right because those contain elements greater than end
-      - 1.  It also stops incorporating when fn and sn have converged.
+   *  A subset of the hashes is incorporated into fr.  It skips any hash
+      on the right because those contain elements greater than end - 1.
+      It also stops incorporating when fn and sn have converged.
 
    This reconstructs the hashes of the subtree and original tree, which
    are then compared to expected values in step 8.
