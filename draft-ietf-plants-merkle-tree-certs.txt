@@ -170,11 +170,17 @@ Table of Contents
      B.3.  Inclusion Proof Evaluation
      B.4.  Consistency Proof Structure
      B.5.  Consistency Proof Verification
-   Appendix C.  Subtree Test Vectors
-     C.1.  Subtree Hashes
-     C.2.  Subtree Inclusion Proofs
-     C.3.  Subtree Consistency Proofs
-     C.4.  Efficient Covering Subtrees
+   Appendix C.  Test Vectors
+     C.1.  Accumulated Subtree Test Vectors
+       C.1.1.  Subtree Hashes
+       C.1.2.  Subtree Inclusion Proofs
+       C.1.3.  Subtree Consistency Proofs
+       C.1.4.  Efficient Covering Subtrees
+     C.2.  Large Subtree Test Vectors
+       C.2.1.  Subtree Validity
+       C.2.2.  Subtree Inclusion Proofs
+       C.2.3.  Subtree Consistency Proofs
+       C.2.4.  Efficient Covering Subtrees
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -561,8 +567,8 @@ Table of Contents
    by two subtrees.  Section 4.5 describes how to determine these
    subtrees.
 
-   Appendix C provides test vectors for the algorithms defined in this
-   section.
+   Appendix C.1 and Appendix C.2 provide test vectors for the algorithms
+   defined in this section.
 
 4.1.  Definition of a Subtree
 
@@ -3504,6 +3510,16 @@ Table of Contents
               Key Reuse: Context-Separable Interfaces and their
               Applications", 2019, <https://eprint.iacr.org/2019/519>.
 
+   [LargeConsistencyProofs]
+              IETF, "Large Consistency Proof Test Vectors", August 2026,
+              <https://github.com/ietf-plants-wg/merkle-tree-
+              certs/tree/main/demo/large_consistency_proofs.txt>.
+
+   [LargeInclusionProofs]
+              IETF, "Large Inclusion Proof Test Vectors", August 2026,
+              <https://github.com/ietf-plants-wg/merkle-tree-
+              certs/tree/main/demo/large_inclusion_proofs.txt>.
+
    [LetsEncrypt]
               Let's Encrypt, "Let's Encrypt Stats", 7 March 2023,
               <https://letsencrypt.org/stats/>.
@@ -4050,7 +4066,9 @@ B.5.  Consistency Proof Verification
    proof for the truncated subtree [fn, sn + 1) and truncated tree tn +
    1.
 
-Appendix C.  Subtree Test Vectors
+Appendix C.  Test Vectors
+
+C.1.  Accumulated Subtree Test Vectors
 
    The following are "accumulated" [Accumulated] test vectors for the
    various subtree algorithms defined in Section 4.
@@ -4064,7 +4082,7 @@ Appendix C.  Subtree Test Vectors
    leaf values d[0] = 0x00, d[1] = 0x01, .... The hash function used is
    SHA-256.  The hash values are encoded in hexadecimal.
 
-C.1.  Subtree Hashes
+C.1.1.  Subtree Hashes
 
    For each value of end from 0 to 130, and each value of start from 0
    to end, if [start, end) is a valid subtree, add to the rolling hash
@@ -4088,7 +4106,14 @@ C.1.  Subtree Hashes
                h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
    assert h.hexdigest() == 'b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81'
 
-C.2.  Subtree Inclusion Proofs
+   This test exercises both an implementation's subtree hash calculation
+   as well as the subtree validity check.  In a CA, both of these
+   operations apply.  In a relying party, only the subtree validity
+   check applies.  A relying party implementation SHOULD implement a
+   Merkle Tree in testing logic so the above will exercise the subtree
+   validity check.
+
+C.1.2.  Subtree Inclusion Proofs
 
    For each value of end from 0 to 130, and each value of start from 0
    to end, if [start, end) is a valid subtree, for each value of index
@@ -4119,7 +4144,28 @@ C.2.  Subtree Inclusion Proofs
                    h.update(f'{line}\n'.encode())
    assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
 
-C.3.  Subtree Consistency Proofs
+   This test exercises constructing subtree inclusion proofs, as
+   computed by a CA.  A relying party instead evaluates untrusted
+   subtree inclusion proofs.  This test can be used to exercise this
+   logic as follows:
+
+   1.  If not available, implement a Merkle Tree in testing logic to
+       compute subtree hashes and subtree inclusion proofs.  This logic
+       can be validated by the above test and Appendix C.1.1.
+
+   2.  For each subtree inclusion proof in the above test, evaluate the
+       inclusion proof and assert the resulting hash matches the
+       corresponding subtree hash.
+
+   3.  For each non-empty subtree inclusion proof in the above test,
+       truncate the proof by both one byte and a full hash.  Assert that
+       evaluating each proof fails.
+
+   4.  For each subtree inclusion proof in the above test, extend the
+       proof by both one byte and an arbitrary full hash.  Assert that
+       evaluating each proof fails.
+
+C.1.3.  Subtree Consistency Proofs
 
    For each value of n from 0 to 130, and each value of end from 0 to n,
    and each value of start from 0 to end, if [start, end) is a valid
@@ -4150,7 +4196,35 @@ C.3.  Subtree Consistency Proofs
                    h.update(f'{line}\n'.encode())
    assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74'
 
-C.4.  Efficient Covering Subtrees
+   This test exercises constructing subtree consistency proofs.  Other
+   parties will check these proofs (e.g. Section 7.4 and
+   [TLOG-WITNESS]).  This test can be used to exercise this logic as
+   follows:
+
+   1.  If not available, implement a Merkle Tree in testing logic to
+       compute subtree hashes and subtree consistency proofs.  This
+       logic can be validated by the above test and Appendix C.1.1.
+
+   2.  For each subtree consistency proof in the above test, check the
+       proof and assert it succeeds.
+
+   3.  For each non-empty subtree consistency proof in the above test,
+       truncate the proof by both one byte and a full hash.  Assert that
+       the checking each proof fails.
+
+   4.  For each subtree consistency proof in the above test, extend the
+       proof by both one byte and an arbitrary full hash.  Assert that
+       checking each proof fails.
+
+   5.  For each subtree consistency proof in the above test, flip a bit
+       in the input subtree hash.  Assert that checking each proof
+       fails.
+
+   6.  For each subtree consistency proof in the above test with a non-
+       empty subtree, flip a bit in the input tree hash.  Assert that
+       checking each proof fails.
+
+C.1.4.  Efficient Covering Subtrees
 
    For each value of end from 0 to 130, and each value of start from 0
    to end, add to the rolling hash the ASCII string [LEFT_START,
@@ -4173,6 +4247,166 @@ C.4.  Efficient Covering Subtrees
            left_start, left_end, right_start, right_end = get_covering_subtrees(start, end)
            h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
    assert h.hexdigest() == '7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0'
+
+C.2.  Large Subtree Test Vectors
+
+   Appendix C.1 exhaustively tests subtree algorithms for trees of size
+   up to 130.  An implementation may also encounter overflow conditions
+   with very large trees.  This is primarily a concern for a relying
+   party, which must act on untrusted tree sizes.
+
+   The largest possible Merkle Tree in this protocol is 2^48-1.  In
+   particular, the MTCProof structure in Section 6.2 cannot express
+   larger values.  These sizes will fit comfortably in 64-bit integers,
+   whether signed or unsigned.  To exercise more general
+   implementations, this section includes test vectors for trees bounded
+   by 2^48-1, 2^63-1, and 2^64-1.
+
+   Implementations MAY skip tests above 2^48-1 if they do not support
+   such trees.
+
+C.2.1.  Subtree Validity
+
+   The following are valid subtrees (Section 4.1):
+
+   *  start is 0 and end is 2^47 + 1
+
+   *  start is 0 and end is 2^48 - 1
+
+   *  start is 0 and end is 2^62 + 1
+
+   *  start is 0 and end is 2^63 - 1
+
+   *  start is 0 and end is 2^63 + 1
+
+   *  start is 0 and end is 2^64 - 1
+
+   The following are not valid subtrees:
+
+   *  start is 2^46 and end is 2^47 + 1
+
+   *  start is 2^46 and end is 2^48 - 1
+
+   *  start is 2^61 and end is 2^62 + 1
+
+   *  start is 2^61 and end is 2^63 - 1
+
+   *  start is 2^62 and end is 2^63 + 1
+
+   *  start is 2^62 and end is 2^64 - 1
+
+C.2.2.  Subtree Inclusion Proofs
+
+   [LargeInclusionProofs] contains additional test vectors for subtree
+   inclusion proofs (Section 4.3).
+
+C.2.3.  Subtree Consistency Proofs
+
+   [LargeConsistencyProofs] contains additional test vectors for subtree
+   consistency proofs (Section 4.4).
+
+C.2.4.  Efficient Covering Subtrees
+
+   This section contains sample inputs and outputs for the procedure in
+   Section 4.5.1.
+
+   Given range [0x0, 0x800000000000), the subtrees are:
+
+   *  [0x0, 0x400000000000)
+
+   *  [0x400000000000, 0x800000000000)
+
+   Given range [0x500000000000, 0xd00000000000), the subtrees are:
+
+   *  [0x400000000000, 0x800000000000)
+
+   *  [0x800000000000, 0xd00000000000)
+
+   Given range [0x7fffffffffff, 0x800000000001), the subtrees are:
+
+   *  [0x7fffffffffff, 0x800000000000)
+
+   *  [0x800000000000, 0x800000000001)
+
+   Given range [0xfffffffffffe, 0xffffffffffff), the subtrees are:
+
+   *  [0xfffffffffffe, 0xffffffffffff)
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   Given range [0xffffffffffff, 0xffffffffffff), the subtrees are:
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   Given range [0x0, 0x4000000000000000), the subtrees are:
+
+   *  [0x0, 0x2000000000000000)
+
+   *  [0x2000000000000000, 0x4000000000000000)
+
+   Given range [0x2800000000000000, 0x6800000000000000), the subtrees
+   are:
+
+   *  [0x2000000000000000, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x6800000000000000)
+
+   Given range [0x3fffffffffffffff, 0x4000000000000001), the subtrees
+   are:
+
+   *  [0x3fffffffffffffff, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x4000000000000001)
+
+   Given range [0x7ffffffffffffffe, 0x7fffffffffffffff), the subtrees
+   are:
+
+   *  [0x7ffffffffffffffe, 0x7fffffffffffffff)
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   Given range [0x7fffffffffffffff, 0x7fffffffffffffff), the subtrees
+   are:
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   Given range [0x0, 0x8000000000000000), the subtrees are:
+
+   *  [0x0, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x8000000000000000)
+
+   Given range [0x5000000000000000, 0xd000000000000000), the subtrees
+   are:
+
+   *  [0x4000000000000000, 0x8000000000000000)
+
+   *  [0x8000000000000000, 0xd000000000000000)
+
+   Given range [0x7fffffffffffffff, 0x8000000000000001), the subtrees
+   are:
+
+   *  [0x7fffffffffffffff, 0x8000000000000000)
+
+   *  [0x8000000000000000, 0x8000000000000001)
+
+   Given range [0xfffffffffffffffe, 0xffffffffffffffff), the subtrees
+   are:
+
+   *  [0xfffffffffffffffe, 0xffffffffffffffff)
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
+   Given range [0xffffffffffffffff, 0xffffffffffffffff), the subtrees
+   are:
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
 
 Acknowledgements
 
@@ -4442,6 +4676,8 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Describe how a party holding a standalone certificate can
       construct the corresponding landmark-relative certificate itself.
+
+   *  Added test vectors for subtree algorithms in larger trees
 
 Authors' Addresses
 
