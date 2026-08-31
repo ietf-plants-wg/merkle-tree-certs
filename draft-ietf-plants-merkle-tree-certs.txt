@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 3 March 2027                                         Apple Inc.
+Expires: 4 March 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          30 August 2026
+                                                          31 August 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 March 2027.
+   This Internet-Draft will expire on 4 March 2027.
 
 Copyright Notice
 
@@ -3349,8 +3349,7 @@ Table of Contents
 13.4.  Relative Distinguished Name Attribute
 
    IANA is requested to add the following entry to the "SMI Security for
-   PKIX Relative Distinguished Name Attribute" registry
-   [I-D.ietf-lamps-x509-alg-none]:
+   PKIX Relative Distinguished Name Attribute" registry [RFC9925]:
 
              +=========+=======================+============+
              | Decimal | Description           | References |
@@ -3500,13 +3499,6 @@ Table of Contents
 
    [FIREFOX]  Mozilla, "Firefox Remote Settings", 20 August 2022,
               <https://wiki.mozilla.org/Firefox/RemoteSettings>.
-
-   [I-D.ietf-lamps-x509-alg-none]
-              Benjamin, D., "Unsigned X.509 Certificates", Work in
-              Progress, Internet-Draft, draft-ietf-lamps-x509-alg-none-
-              10, 5 September 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
-              x509-alg-none-10>.
 
    [KeyReuse] Patton, C. and T. Shrimpton, "Security in the Presence of
               Key Reuse: Context-Separable Interfaces and their
