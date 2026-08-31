@@ -213,6 +213,13 @@ informative:
     author:
       org: IETF
 
+  EndToEndCertificate:
+    title: End-to-End Certificate Test Vectors
+    target: https://github.com/ietf-plants-wg/merkle-tree-certs/tree/main/demo/e2e_certificate.txt
+    date: September 2026
+    author:
+      org: IETF
+
 ...
 
 --- abstract
@@ -2542,6 +2549,58 @@ Given range `[0xffffffffffffffff, 0xffffffffffffffff)`, the subtrees are:
 * `[0xffffffffffffffff, 0xffffffffffffffff)`
 * `[0xffffffffffffffff, 0xffffffffffffffff)`
 
+## End-to-End Certificate Test Vector
+
+{{accumulated-subtree-test-vectors}} and {{large-subtree-test-vectors}} exercise the Merkle Tree algorithms with synthetic leaf values. This section provides a worked example of encoding a standalone Merkle Tree Certificate, including intermediate values from the TBSCertificate fields through the log entry, leaf hash, inclusion proof, cosignature, and resulting Certificate. Implementations can use it to debug the certificate construction and verification procedures in {{certificate-format}} and {{verifying-certificate-signatures}}.
+
+The example uses draft version plants-05 with:
+
+* CA ID `32473.1` and log number `1`
+* A two-entry issuance log whose leaf 0 is a `tbs_cert_entry` and leaf 1 is a `null_entry`
+* Subtree `[0, 2)` covering both entries
+* A single Ed25519 cosignature from the CA cosigner (`32473.1`)
+
+The leaf certificate uses ECDSA P-256, with `notBefore` 2020-01-01T00:00:00Z and `notAfter` 2020-12-31T23:59:59Z, subject common name `example.com`, and DNS names `example.com`, `a.example`, and `*.b.example`. The certificate serial is `0x1000000000000` (log number 1 in the high 16 bits and entry index 0 in the low 48 bits).
+
+SHA-256 of the SubjectPublicKeyInfo is:
+
+~~~
+b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5
+~~~
+
+The corresponding `MTCLogEntry` is:
+
+~~~
+00000001a003020102301931173015060a2b0601040182da4b2f010c0733323437
+332e31301e170d3230303130313030303030305a170d3230313233313233353935
+395a3016311430120603550403130b6578616d706c652e636f6d301306072a8648
+ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25
+ccc3dae700e20dcad42d3d5c074ca5a35d305b300e0603551d0f0101ff04040302
+078030160603551d250101ff040c300a06082b0601050507030130310603551d11
+0101ff04273025820b6578616d706c652e636f6d8209612e6578616d706c65820b
+2a2e622e6578616d706c65
+~~~
+
+The entry hash `SHA-256(0x00 || MTCLogEntry)` is:
+
+~~~
+e951cd29e3f9850142cea6c275779a02446e48fa36012ad48c24381ffed78581
+~~~
+
+The null entry at index 1 is `00000000`, with entry hash:
+
+~~~
+8855508aade16ec573d21e6a485dfd0a7624085c1a14b5ecdd6485de0c6839a4
+~~~
+
+The subtree hash of `[0, 2)` is:
+
+~~~
+be8bea95d82561c1b21ead7c0d53c30bf2fe334c567f836e516305a7ccc43681
+~~~
+
+The inclusion proof for index 0 in `[0, 2)` is a single hash equal to the null entry's leaf hash above. {{EndToEndCertificate}} contains the full CosignedMessage, Ed25519 cosignature, `MTCProof`, Certificate, and CA Certificate encodings, including a machine-readable JSON form.
+
 
 # Acknowledgements
 {:numbered="false"}
@@ -2770,3 +2829,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Describe how a party holding a standalone certificate can construct the corresponding landmark-relative certificate itself.
 
 - Added test vectors for subtree algorithms in larger trees
+
+- Added an end-to-end certificate encoding test vector
