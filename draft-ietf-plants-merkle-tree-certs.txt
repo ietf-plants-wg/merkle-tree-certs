@@ -1863,22 +1863,23 @@ Table of Contents
 
    3.  The CA signs each subtree with its key(s) (Section 5.3).
 
-   4.  The CA requests sufficient checkpoint cosignatures (Section 5.3)
-       from external cosigners to meet relying party requirements
-       (Section 7.3).
+   4.  The CA requests sufficient subtree cosignatures from external
+       cosigners to meet relying party requirements (Section 7.3).
+       Depending on the protocol for requesting subtree cosignatures
+       (e.g. [TLOG-WITNESS] and [TLOG-MIRROR]), this step may require
+       first requesting a checkpoint cosignature (Section 5.3) from each
+       cosigner.
 
-   5.  The CA requests subtree cosignatures from the cosigners above.
-
-   6.  For each log entry in the interval, the CA constructs a
+   5.  For each log entry in the interval, the CA constructs a
        certificate (Section 6.2) from the inputs in Section 6.1, using
        the covering subtree and the subtree cosignatures collected in
        steps 3 and 5.
 
-   Steps 4 and 5 are analogous to requesting SCTs from CT logs in
-   Certificate Transparency, except that a single run of this job
-   collects signatures for many certificates at once.  The CA MAY
-   request signatures from a redundant set of cosigners and select the
-   ones that complete first.
+   Step 4 is analogous to requesting SCTs from CT logs in Certificate
+   Transparency, except that a single run of this job collects
+   signatures for many certificates at once.  The CA MAY request
+   signatures from a redundant set of cosigners and select the ones that
+   complete first.
 
    This document does not place any requirements on how frequently this
    job runs.  More frequent runs result in lower issuance delay, but
