@@ -1044,11 +1044,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">August 2026</td>
+<td class="right">September 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 4 March 2027</td>
+<td class="center">Expires 5 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-31" class="published">31 August 2026</time>
+<time datetime="2026-09-01" class="published">1 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-04">4 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-05">5 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3853,7 +3853,7 @@ def find_subtrees(start, end):
             <p id="section-5.1-3.1.1">For each positive integer <code>N</code>, the OID <code>{caID logs(0) N}</code> represents the issuance log <code>N</code> (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>).<a href="#section-5.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-3.2">
-            <p id="section-5.1-3.2.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarks(1) N L}</code> represents landmark <code>L</code> (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) of issuance log <code>N</code>. These OIDs may be used as trust anchor IDs, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-3.2.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarks(1) N L}</code> represents landmark <code>L</code> (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) of issuance log <code>N</code>. These OIDs may be used as trust anchor IDs, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-3.3">
             <p id="section-5.1-3.3.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarkGroups(2) N L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark <code>L</code> of log <code>N</code> and earlier landmarks of that log, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.1-3.3.1" class="pilcrow">¶</a></p>
@@ -3877,7 +3877,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 <p id="section-5.1-9">For initial experimentation, early implementations of this design will:<a href="#section-5.1-9" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-5.1-10">
 <li id="section-5.1-10.1">
-            <p id="section-5.1-10.1.1">Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. <code>32473.1</code>.<a href="#section-5.1-10.1.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-10.1.1">Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains the trust anchor ID's ASCII representation, e.g. <code>32473.1</code>.<a href="#section-5.1-10.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-5.1-10.2">
             <p id="section-5.1-10.2.1">Use the OID 1.3.6.1.4.1.44363.47.1 instead of <code>id-rdna-trustAnchorID</code>. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.<a href="#section-5.1-10.2.1" class="pilcrow">¶</a></p>
@@ -3984,7 +3984,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
               <p id="section-5.2.1-9.3.1"><code>subjectPublicKeyAlgorithm</code> describes the algorithm of the subject's public key. It is constructed identically to the <code>algorithm</code> field of a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>).<a href="#section-5.2.1-9.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-5.2.1-9.4">
-              <p id="section-5.2.1-9.4.1"><code>subjectPublicKeyInfoHash</code> contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the CA's hash function (<a href="#certification-authorities" class="auto internal xref">Section 5</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding.<a href="#section-5.2.1-9.4.1" class="pilcrow">¶</a></p>
+              <p id="section-5.2.1-9.4.1"><code>subjectPublicKeyInfoHash</code> contains the hash of the subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the CA's hash function (<a href="#certification-authorities" class="auto internal xref">Section 5</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding.<a href="#section-5.2.1-9.4.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-5.2.1-10">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.2.1-10" class="pilcrow">¶</a></p>
@@ -4691,7 +4691,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-7.5-5">A relying party with transparency requirements additionally <span class="bcp14">SHOULD</span> revoke all log numbers above some threshold to bound monitoring overhead. If using the format defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>, this can be configured with the <code>maxSerial</code> value. See <a href="#limiting-issuance-logs" class="auto internal xref">Section 12.2.2</a>.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
 <p id="section-7.5-6">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-6" class="pilcrow">¶</a></p>
 <p id="section-7.5-7">When a CA is found to be untrustworthy, relying parties <span class="bcp14">SHOULD</span> remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-7" class="pilcrow">¶</a></p>
-<p id="section-7.5-8">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-8" class="pilcrow">¶</a></p>
+<p id="section-7.5-8">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4747,14 +4747,14 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </li>
         </ul>
 <p id="section-8.2-4">For example, the trust anchor ID for landmark 42 of CA <code>32473.1</code> and log number <code>8</code> is <code>32473.1.1.8.42</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
-<p id="section-8.2-5">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying paries to express their landmark state with a single ID.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+<p id="section-8.2-5">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying parties to express their landmark state with a single ID.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
 <p id="section-8.2-6">If both a landmark-relative and a standalone certificate are usable, an authenticating party <span class="bcp14">SHOULD</span> preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 <div id="single-log-landmark-groups">
 <section id="section-8.2.1">
           <h4 id="name-single-log-landmark-groups">
 <a href="#section-8.2.1" class="section-number selfRef">8.2.1. </a><a href="#name-single-log-landmark-groups" class="section-name selfRef">Single-Log Landmark Groups</a>
           </h4>
-<p id="section-8.2.1-1">Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines series of trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) called <em>landmark groups</em>.<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-1">Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines a series of trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) called <em>landmark groups</em>.<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
 <p id="section-8.2.1-2">For each Merkle Tree Certificates CA, each log number <code>N</code>, and each landmark number <code>L</code>, a landmark group is defined. The group's ID is the concatenation of the following OID components:<a href="#section-8.2.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.1-3.1">
@@ -4788,10 +4788,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           <h4 id="name-timestamped-landmark-groups">
 <a href="#section-8.2.2" class="section-number selfRef">8.2.2. </a><a href="#name-timestamped-landmark-groups" class="section-name selfRef">Timestamped Landmark Groups</a>
           </h4>
-<p id="section-8.2.2-1">Landmark groups for an single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state.<a href="#section-8.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2.2-1">Landmark groups for a single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state.<a href="#section-8.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2.2-2">When needed, <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> describes how PKIs requiring further size savings can use trust anchor groups that span multiple CA instances. For example, a single ID may signal support for a group of CAs across one or more CA operators. This section describes how such groups can be applied to landmarks, using a variation of the versioning construction described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-5.1" class="relref">Section 5.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2.2-3">Trust anchor groups containing landmarks <span class="bcp14">SHOULD</span> define versions predictably based on the time. For example, if the contained CAs allocate landmarks roughly hourly, the trust anchor group might increment the version component every hour. Each given version of the group <span class="bcp14">SHOULD</span> contain the active landmarks as of the corresponding timestamp.<a href="#section-8.2.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2.2-4">This predictable cadence allows the CA to construct trust anchor group inclusions (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7.2" class="relref">Section 7.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) for issued certificates without additional coordination. Conversely, a relying party <span class="bcp14">MAY</span> send a version if its trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) are up-to-date for all contained CAs, as of the versions timestamp.<a href="#section-8.2.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2.2-4">This predictable cadence allows the CA to construct trust anchor group inclusions (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-7.2" class="relref">Section 7.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) for issued certificates without additional coordination. Conversely, a relying party <span class="bcp14">MAY</span> send a version if its trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) are up-to-date for all contained CAs, as of the version's timestamp.<a href="#section-8.2.2-4" class="pilcrow">¶</a></p>
 <p id="section-8.2.2-5">In some cases, the relying party's trusted subtrees may only be partially up-to-date. The relying party, or its update service, may be unable to reach one CA in the group, e.g. due to a transient outage. This complicates timestamp-based strategies:<a href="#section-8.2.2-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.2-6.1">
@@ -5110,7 +5110,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             <p id="section-12.6-6.3.1">Reparse the <code>serialNumber</code> field with a conforming DER parser and fail verification if invalid.<a href="#section-12.6-6.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-12.6-6.4">
-            <p id="section-12.6-6.4.1">Reparse the <code>signature</code> field with a conforming DER parser and fail verification if invalid. Equivalently, check for an exact equality with for the expected, DER-encoded value.<a href="#section-12.6-6.4.1" class="pilcrow">¶</a></p>
+            <p id="section-12.6-6.4.1">Reparse the <code>signature</code> field with a conforming DER parser and fail verification if invalid. Equivalently, check for an exact equality with the expected, DER-encoded value.<a href="#section-12.6-6.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-12.6-6.5">
             <p id="section-12.6-6.5.1">When hashing <code>subjectPublicKeyInfo</code>, either hash the observed BER encoding, or reparse the structure with a conforming DER parser and fail verification if invalid.<a href="#section-12.6-6.5.1" class="pilcrow">¶</a></p>
@@ -5135,7 +5135,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-12.8" class="section-number selfRef">12.8. </a><a href="#name-signature-domain-separation" class="section-name selfRef">Signature Domain Separation</a>
         </h3>
 <p id="section-12.8-1">The signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a> includes a fixed label prefix to ensure domain separation. Provided other uses of the same key use a non-overlapping prefix, signatures in one context cannot be substituted for those in another.<a href="#section-12.8-1" class="pilcrow">¶</a></p>
-<p id="section-12.8-2"><a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> permits a CA cosigner key to be used to sign CRLs and OCSP resposes. These signatures do not include a domain separation prefix. Instead, X.509 relies on an undocumented assumption that the TBSCertificate, TBSCertList, and OCSP ResponseData structures do not overlap at the level of individual ASN.1 fields.<a href="#section-12.8-2" class="pilcrow">¶</a></p>
+<p id="section-12.8-2"><a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> permits a CA cosigner key to be used to sign CRLs and OCSP responses. These signatures do not include a domain separation prefix. Instead, X.509 relies on an undocumented assumption that the TBSCertificate, TBSCertList, and OCSP ResponseData structures do not overlap at the level of individual ASN.1 fields.<a href="#section-12.8-2" class="pilcrow">¶</a></p>
 <p id="section-12.8-3">These ASN.1 structures all begin with a SEQUENCE tag, which is encoded in DER as 0x30 or the ASCII digit "0". The domain separation label used in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>, <code>subtree/v1\n\0</code>, does not begin with "0", so their inputs do not overlap. More generally, this label is not a prefix of any DER or BER encoding.<a href="#section-12.8-3" class="pilcrow">¶</a></p>
 <p id="section-12.8-4">Domain separation analysis based on the structures themselves is fragile, particularly when individual ASN.1 fields must be analyzed. This document depends on a structure-level analysis for CRLs and OCSP responses due to how these legacy protocols were defined. Future uses of the key <span class="bcp14">SHOULD</span> use a more robust mechanism, namely a fixed label prefix or a context string parameter if the signature scheme supports it.<a href="#section-12.8-4" class="pilcrow">¶</a></p>
 </section>
@@ -5582,7 +5582,7 @@ END
       <h2 id="name-merkle-tree-structure">
 <a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-merkle-tree-structure" class="section-name selfRef">Merkle Tree Structure</a>
       </h2>
-<p id="appendix-B-1">This non-normative section describes how the Merkle Tree structure relates to the binary representations of indices. It is included to help implementors understand the procedures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">This non-normative section describes how the Merkle Tree structure relates to the binary representations of indices. It is included to help implementers understand the procedures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <div id="binary-representations">
 <section id="appendix-B.1">
         <h3 id="name-binary-representations">
@@ -6110,7 +6110,7 @@ END
         </h3>
 <p id="appendix-B.3-1">The procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a> builds up a subtree hash in <code>r</code> by starting from <code>entry_hash</code> and iteratively hashing elements of <code>inclusion_proof</code> on the left or right. That means this procedure, when successful, must return <em>some</em> hash that contains <code>entry_hash</code>.<a href="#appendix-B.3-1" class="pilcrow">¶</a></p>
 <p id="appendix-B.3-2">Treating <code>[start, end)</code> as a Merkle Tree of size <code>end - start</code>, the procedure hashes based on the path to <code>index</code>. Within this smaller Merkle Tree, it has index <code>fn = index - start</code> (first number), and the last element has index <code>sn = end - start - 1</code> (second number).<a href="#appendix-B.3-2" class="pilcrow">¶</a></p>
-<p id="appendix-B.3-3">Step 4 iterates through <code>inclusion_proof</code> and the paths to <code>fn</code> and <code>sn</code> in parallel. As the procedure right-shifts <code>fn</code> and <code>sn</code> and looks at the least-significant bit, it moves up the two paths, towards the root. When <code>sn</code> is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.<a href="#appendix-B.3-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-3">Step 4 iterates through <code>inclusion_proof</code> and the paths to <code>fn</code> and <code>sn</code> in parallel. As the procedure right-shifts <code>fn</code> and <code>sn</code> and looks at the least-significant bit, it moves up the two paths, toward the root. When <code>sn</code> is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.<a href="#appendix-B.3-3" class="pilcrow">¶</a></p>
 <p id="appendix-B.3-4">Iterating from level 0 up, <code>fn</code> and <code>sn</code> will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in <a href="#binary-representations" class="auto internal xref">Appendix B.1</a>.<a href="#appendix-B.3-4" class="pilcrow">¶</a></p>
 <p id="appendix-B.3-5">Once <code>fn = sn</code>, the remainder of the path is on the right edge. At that point, the condition in step 4.2 is always true. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.<a href="#appendix-B.3-5" class="pilcrow">¶</a></p>
 <p id="appendix-B.3-6">Inclusion proofs can also be evaluated by considering these two stages separately. The first stage consumes <code>l1 = BIT_WIDTH(fn XOR sn)</code> proof entries. The second stage consumes <code>l2 = POPCOUNT(fn &gt;&gt; l1)</code> proof entries. A valid inclusion proof must then have <code>l1 + l2</code> entries. The first <code>l1</code> entries are hashed based on <code>fn</code>'s least significant bits, and the remaining <code>l2</code> entries are hashed on the left.<a href="#appendix-B.3-6" class="pilcrow">¶</a></p>
@@ -6124,7 +6124,7 @@ END
 <p id="appendix-B.4-1">A subtree consistency proof for <code>[start, end)</code> and the tree of <code>n</code> elements is similar to an inclusion proof for element <code>end - 1</code>. If one starts from <code>end - 1</code>'s hash, incorporating the whole inclusion proof should reconstruct <code>root_hash</code> and incorporating a subset of the inclusion proof should reconstruct <code>node_hash</code>. Thus <code>end - 1</code>'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:<a href="#appendix-B.4-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="appendix-B.4-2">
 <li id="appendix-B.4-2.1">
-            <p id="appendix-B.4-2.1.1">Instead of starting at level 0 with <code>end - 1</code>, the proof can start at a higher level. Any ancestor of <code>end - 1</code> shared by both the subtree and the overall tree is a valid starting node to reconstruct <code>node_hash</code> and <code>root_hash</code>. Use the highest level with a commmon ancestor. This truncates the inclusion proof.<a href="#appendix-B.4-2.1.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.4-2.1.1">Instead of starting at level 0 with <code>end - 1</code>, the proof can start at a higher level. Any ancestor of <code>end - 1</code> shared by both the subtree and the overall tree is a valid starting node to reconstruct <code>node_hash</code> and <code>root_hash</code>. Use the highest level with a common ancestor. This truncates the inclusion proof.<a href="#appendix-B.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="appendix-B.4-2.2">
             <p id="appendix-B.4-2.2.1">If this starting node is the entire subtree, omit its hash from the consistency proof. The verifier is assumed to already know <code>node_hash</code>.<a href="#appendix-B.4-2.2.1" class="pilcrow">¶</a></p>
@@ -6698,7 +6698,7 @@ assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9
               <p id="appendix-C.1.3-7.2.1">For each subtree consistency proof in the above test, check the proof and assert it succeeds.<a href="#appendix-C.1.3-7.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="appendix-C.1.3-7.3">
-              <p id="appendix-C.1.3-7.3.1">For each non-empty subtree consistency proof in the above test, truncate the proof by both one byte and a full hash. Assert that the checking each proof fails.<a href="#appendix-C.1.3-7.3.1" class="pilcrow">¶</a></p>
+              <p id="appendix-C.1.3-7.3.1">For each non-empty subtree consistency proof in the above test, truncate the proof by both one byte and a full hash. Assert that checking each proof fails.<a href="#appendix-C.1.3-7.3.1" class="pilcrow">¶</a></p>
 </li>
             <li id="appendix-C.1.3-7.4">
               <p id="appendix-C.1.3-7.4.1">For each subtree consistency proof in the above test, extend the proof by both one byte and an arbitrary full hash. Assert that checking each proof fails.<a href="#appendix-C.1.3-7.4.1" class="pilcrow">¶</a></p>

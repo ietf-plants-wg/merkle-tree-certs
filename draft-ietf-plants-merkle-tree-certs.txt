@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 4 March 2027                                         Apple Inc.
+Expires: 5 March 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          31 August 2026
+                                                        1 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 March 2027.
+   This Internet-Draft will expire on 5 March 2027.
 
 Copyright Notice
 
@@ -1216,8 +1216,8 @@ Table of Contents
       represents landmark L (Section 6.4.1) of issuance log N.  These
       OIDs may be used as trust anchor IDs, as described in Section 8.2.
       These OIDs are used when it is necessary to identify an individual
-      landmark, e.g. as in the retry mechanism described Section 4.3 of
-      [I-D.ietf-tls-trust-anchor-ids].
+      landmark, e.g. as in the retry mechanism described in Section 4.3
+      of [I-D.ietf-tls-trust-anchor-ids].
 
    *  For each positive integer N and L, the OID {caID landmarkGroups(2)
       N L} represents a trust anchor group (Section 5 of
@@ -1247,8 +1247,8 @@ Table of Contents
    will:
 
    1.  Use UTF8String to represent the attribute's value rather than
-       RELATIVE-OID.  The UTF8String contains trust anchor ID's ASCII
-       representation, e.g. 32473.1.
+       RELATIVE-OID.  The UTF8String contains the trust anchor ID's
+       ASCII representation, e.g. 32473.1.
 
    2.  Use the OID 1.3.6.1.4.1.44363.47.1 instead of id-rdna-
        trustAnchorID.  Cloudflare has kindly donated the
@@ -1391,7 +1391,7 @@ Table of Contents
       public key.  It is constructed identically to the algorithm field
       of a SubjectPublicKeyInfo (Section 4.1.2.7 of [RFC5280]).
 
-   *  subjectPublicKeyInfoHash contains the hash of subject's public
+   *  subjectPublicKeyInfoHash contains the hash of the subject's public
       key, encoded as a SubjectPublicKeyInfo.  The hash uses the CA's
       hash function (Section 5) and is computed over the
       SubjectPublicKeyInfo's DER [X.690] encoding.
@@ -2433,9 +2433,10 @@ Table of Contents
    This is analogous to the [SCTNotAfter] mechanism used in some PKIs.
 
    The revocation mechanism in this section is complementary to
-   certificate-level revocation mechanisms. log entries are uniquely
-   identified by their serial number and issuer, existing revocation
-   mechanisms like CRLs [RFC5280] and OCSP [RFC6960] apply unchanged.
+   certificate-level revocation mechanisms.  Because log entries are
+   uniquely identified by their serial number and issuer, existing
+   revocation mechanisms like CRLs [RFC5280] and OCSP [RFC6960] apply
+   unchanged.
 
 8.  Use in TLS
 
@@ -2514,11 +2515,11 @@ Table of Contents
    log number 8 is 32473.1.1.8.42.
 
    These trust anchor IDs are used when it is necessary to identify an
-   individual landmark, e.g. as in the retry mechanism described
+   individual landmark, e.g. as in the retry mechanism described in
    Section 4.3 of [I-D.ietf-tls-trust-anchor-ids].  To more efficiently
    express a relying party's complete landmark state, these IDs are
    contained in trust anchor groups defined in Section 8.2.1, which
-   allow relying paries to express their landmark state with a single
+   allow relying parties to express their landmark state with a single
    ID.
 
    If both a landmark-relative and a standalone certificate are usable,
@@ -2530,7 +2531,7 @@ Table of Contents
 8.2.1.  Single-Log Landmark Groups
 
    Relying parties support many landmarks per log at a time.  To
-   compactly represent this, each log ID implicitly defines series of
+   compactly represent this, each log ID implicitly defines a series of
    trust anchor groups (Section 5 of [I-D.ietf-tls-trust-anchor-ids])
    called _landmark groups_.
 
@@ -2565,7 +2566,7 @@ Table of Contents
 
 8.2.2.  Timestamped Landmark Groups
 
-   Landmark groups for an single CA, described above, allow relying
+   Landmark groups for a single CA, described above, allow relying
    parties to advertise one ID per supported CA.  Depending on the
    number of trust anchors, this can be sufficient to efficiently
    represent relying party state.
@@ -2590,7 +2591,7 @@ Table of Contents
    issued certificates without additional coordination.  Conversely, a
    relying party MAY send a version if its trusted subtrees
    (Section 7.4) are up-to-date for all contained CAs, as of the
-   versions timestamp.
+   version's timestamp.
 
    In some cases, the relying party's trusted subtrees may only be
    partially up-to-date.  The relying party, or its update service, may
@@ -3215,7 +3216,7 @@ Table of Contents
 
    *  Reparse the signature field with a conforming DER parser and fail
       verification if invalid.  Equivalently, check for an exact
-      equality with for the expected, DER-encoded value.
+      equality with the expected, DER-encoded value.
 
    *  When hashing subjectPublicKeyInfo, either hash the observed BER
       encoding, or reparse the structure with a conforming DER parser
@@ -3258,7 +3259,7 @@ Table of Contents
    substituted for those in another.
 
    Section 5.4 permits a CA cosigner key to be used to sign CRLs and
-   OCSP resposes.  These signatures do not include a domain separation
+   OCSP responses.  These signatures do not include a domain separation
    prefix.  Instead, X.509 relies on an undocumented assumption that the
    TBSCertificate, TBSCertList, and OCSP ResponseData structures do not
    overlap at the level of individual ASN.1 fields.
@@ -3679,7 +3680,7 @@ Appendix B.  Merkle Tree Structure
 
    This non-normative section describes how the Merkle Tree structure
    relates to the binary representations of indices.  It is included to
-   help implementors understand the procedures described in Section 4.
+   help implementers understand the procedures described in Section 4.
 
 B.1.  Binary Representations
 
@@ -3881,7 +3882,7 @@ B.3.  Inclusion Proof Evaluation
 
    Step 4 iterates through inclusion_proof and the paths to fn and sn in
    parallel.  As the procedure right-shifts fn and sn and looks at the
-   least-significant bit, it moves up the two paths, towards the root.
+   least-significant bit, it moves up the two paths, toward the root.
    When sn is zero, the procedure has reached the top of the tree.  The
    procedure checks that the two iterations complete together.
 
@@ -3917,7 +3918,7 @@ B.4.  Consistency Proof Structure
        at a higher level.  Any ancestor of end - 1 shared by both the
        subtree and the overall tree is a valid starting node to
        reconstruct node_hash and root_hash.  Use the highest level with
-       a commmon ancestor.  This truncates the inclusion proof.
+       a common ancestor.  This truncates the inclusion proof.
 
    2.  If this starting node is the entire subtree, omit its hash from
        the consistency proof.  The verifier is assumed to already know
@@ -4211,7 +4212,7 @@ C.1.3.  Subtree Consistency Proofs
 
    3.  For each non-empty subtree consistency proof in the above test,
        truncate the proof by both one byte and a full hash.  Assert that
-       the checking each proof fails.
+       checking each proof fails.
 
    4.  For each subtree consistency proof in the above test, extend the
        proof by both one byte and an arbitrary full hash.  Assert that
