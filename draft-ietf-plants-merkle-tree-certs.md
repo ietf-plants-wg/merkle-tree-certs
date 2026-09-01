@@ -1371,11 +1371,13 @@ To ensure that only active landmarks contain unexpired certificates, set `max_ac
 
 CAs SHOULD publish their active landmarks, so that relying parties can configure trusted subtrees ({{trusted-subtrees}}). The following format can be used to describe this information. The format is the following sequence of lines. Each line MUST be terminated by a newline character (U+000A):
 
-* Two space-separated non-negative decimal integers: `<last_landmark> <num_active_landmarks>`.
+* Two non-negative decimal integers, separated by a single space character (U+0020) and represented without leading zeros: `<last_landmark> <num_active_landmarks>`.
   This line MUST satisfy the following, otherwise it is invalid:
   * `num_active_landmarks <= max_active_landmarks`
   * `num_active_landmarks <= last_landmark`
-* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, representing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The tree sizes MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.
+* `num_active_landmarks + 1` lines, each containing a tree size as a non-negative decimal integer without leading zeros. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The tree sizes MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.
+
+Landmark numbers and tree sizes are both at most 2<sup>48</sup>-1 ({{issuance-logs}}). Any deviation from this format, including additional whitespace or any content following the final line, makes the document invalid. Relying parties MUST reject an invalid document in its entirety, rather than acting on the portion that precedes the error.
 
 It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}} with content type `text/plain; charset=utf-8`.
 
