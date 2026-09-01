@@ -373,7 +373,7 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 1. The authenticating party requests a certificate, e.g. over ACME {{?RFC8555}}
 
-2. The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.
+2. The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process diverges from CT-based PKIs.
 
 3. The CA operates a series of append-only *issuance logs* ({{issuance-logs}}). Unlike a CT log, these logs only contain entries added by the CA:
 
