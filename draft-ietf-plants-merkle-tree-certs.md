@@ -965,7 +965,7 @@ Once allocated, the ID's entire object identifier (OID) arc is reserved by this 
 
 * For each positive integer `N`, the OID `{caID logs(0) N}` represents the issuance log `N` ({{issuance-logs}}).
 
-* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
+* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 * For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
@@ -987,7 +987,7 @@ The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 r
 
 For initial experimentation, early implementations of this design will:
 
-1. Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. `32473.1`.
+1. Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains the trust anchor ID's ASCII representation, e.g. `32473.1`.
 
 1. Use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
@@ -1080,7 +1080,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `subjectPublicKeyAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
 
-* `subjectPublicKeyInfoHash` contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the CA's hash function ({{certification-authorities}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding.
+* `subjectPublicKeyInfoHash` contains the hash of the subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the CA's hash function ({{certification-authorities}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding.
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
@@ -1568,7 +1568,7 @@ A misbehaving CA might correctly construct a globally consistent log, but refuse
 
 When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the {{SCTNotAfter}} mechanism used in some PKIs.
 
-The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.
+The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.
 
 # Use in TLS
 
@@ -1603,13 +1603,13 @@ TLS implementations SHOULD use the `trust_anchors` extension to determine this. 
 
 For example, the trust anchor ID for landmark 42 of CA `32473.1` and log number `8` is `32473.1.1.8.42`.
 
-These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in {{single-log-landmark-groups}}, which allow relying paries to express their landmark state with a single ID.
+These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in {{single-log-landmark-groups}}, which allow relying parties to express their landmark state with a single ID.
 
 If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.
 
 ### Single-Log Landmark Groups
 
-Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines series of trust anchor groups ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) called *landmark groups*.
+Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines a series of trust anchor groups ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) called *landmark groups*.
 
 For each Merkle Tree Certificates CA, each log number `N`, and each landmark number `L`, a landmark group is defined. The group's ID is the concatenation of the following OID components:
 
@@ -1630,13 +1630,13 @@ For example, a relying party which is up-to-date as of landmark 42 of log 8 of C
 
 ### Timestamped Landmark Groups
 
-Landmark groups for an single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state.
+Landmark groups for a single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state.
 
 When needed, {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}} describes how PKIs requiring further size savings can use trust anchor groups that span multiple CA instances. For example, a single ID may signal support for a group of CAs across one or more CA operators. This section describes how such groups can be applied to landmarks, using a variation of the versioning construction described in {{Section 5.1 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 Trust anchor groups containing landmarks SHOULD define versions predictably based on the time. For example, if the contained CAs allocate landmarks roughly hourly, the trust anchor group might increment the version component every hour. Each given version of the group SHOULD contain the active landmarks as of the corresponding timestamp.
 
-This predictable cadence allows the CA to construct trust anchor group inclusions ({{Section 7.2 of !I-D.ietf-tls-trust-anchor-ids}}) for issued certificates without additional coordination. Conversely, a relying party MAY send a version if its trusted subtrees ({{trusted-subtrees}}) are up-to-date for all contained CAs, as of the versions timestamp.
+This predictable cadence allows the CA to construct trust anchor group inclusions ({{Section 7.2 of !I-D.ietf-tls-trust-anchor-ids}}) for issued certificates without additional coordination. Conversely, a relying party MAY send a version if its trusted subtrees ({{trusted-subtrees}}) are up-to-date for all contained CAs, as of the version's timestamp.
 
 In some cases, the relying party's trusted subtrees may only be partially up-to-date. The relying party, or its update service, may be unable to reach one CA in the group, e.g. due to a transient outage. This complicates timestamp-based strategies:
 
@@ -1868,7 +1868,7 @@ Some non-conforming X.509 implementations use a BER {{X.690}} parser instead of 
 
 * Reparse the `serialNumber` field with a conforming DER parser and fail verification if invalid.
 
-* Reparse the `signature` field with a conforming DER parser and fail verification if invalid. Equivalently, check for an exact equality with for the expected, DER-encoded value.
+* Reparse the `signature` field with a conforming DER parser and fail verification if invalid. Equivalently, check for an exact equality with the expected, DER-encoded value.
 
 * When hashing `subjectPublicKeyInfo`, either hash the observed BER encoding, or reparse the structure with a conforming DER parser and fail verification if invalid.
 
@@ -1886,7 +1886,7 @@ This document does not define a new certificate-level revocation mechanism. Exis
 
 The signature format defined in {{signature-format}} includes a fixed label prefix to ensure domain separation. Provided other uses of the same key use a non-overlapping prefix, signatures in one context cannot be substituted for those in another.
 
-{{certification-authority-cosigners}} permits a CA cosigner key to be used to sign CRLs and OCSP resposes. These signatures do not include a domain separation prefix. Instead, X.509 relies on an undocumented assumption that the TBSCertificate, TBSCertList, and OCSP ResponseData structures do not overlap at the level of individual ASN.1 fields.
+{{certification-authority-cosigners}} permits a CA cosigner key to be used to sign CRLs and OCSP responses. These signatures do not include a domain separation prefix. Instead, X.509 relies on an undocumented assumption that the TBSCertificate, TBSCertList, and OCSP ResponseData structures do not overlap at the level of individual ASN.1 fields.
 
 These ASN.1 structures all begin with a SEQUENCE tag, which is encoded in DER as 0x30 or the ASCII digit "0". The domain separation label used in {{signature-format}}, `subtree/v1\n\0`, does not begin with "0", so their inputs do not overlap. More generally, this label is not a prefix of any DER or BER encoding.
 
@@ -2043,7 +2043,7 @@ END
 
 # Merkle Tree Structure
 
-This non-normative section describes how the Merkle Tree structure relates to the binary representations of indices. It is included to help implementors understand the procedures described in {{subtrees}}.
+This non-normative section describes how the Merkle Tree structure relates to the binary representations of indices. It is included to help implementers understand the procedures described in {{subtrees}}.
 
 ## Binary Representations
 
@@ -2178,7 +2178,7 @@ The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree ha
 
 Treating `[start, end)` as a Merkle Tree of size `end - start`, the procedure hashes based on the path to `index`. Within this smaller Merkle Tree, it has index `fn = index - start` (first number), and the last element has index `sn = end - start - 1` (second number).
 
-Step 4 iterates through `inclusion_proof` and the paths to `fn` and `sn` in parallel. As the procedure right-shifts `fn` and `sn` and looks at the least-significant bit, it moves up the two paths, towards the root. When `sn` is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.
+Step 4 iterates through `inclusion_proof` and the paths to `fn` and `sn` in parallel. As the procedure right-shifts `fn` and `sn` and looks at the least-significant bit, it moves up the two paths, toward the root. When `sn` is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.
 
 Iterating from level 0 up, `fn` and `sn` will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in {{binary-representations}}.
 
@@ -2190,7 +2190,7 @@ Inclusion proofs can also be evaluated by considering these two stages separatel
 
 A subtree consistency proof for `[start, end)` and the tree of `n` elements is similar to an inclusion proof for element `end - 1`. If one starts from `end - 1`'s hash, incorporating the whole inclusion proof should reconstruct `root_hash` and incorporating a subset of the inclusion proof should reconstruct `node_hash`. Thus `end - 1`'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:
 
-1. Instead of starting at level 0 with `end - 1`, the proof can start at a higher level. Any ancestor of `end - 1` shared by both the subtree and the overall tree is a valid starting node to reconstruct `node_hash` and `root_hash`. Use the highest level with a commmon ancestor. This truncates the inclusion proof.
+1. Instead of starting at level 0 with `end - 1`, the proof can start at a higher level. Any ancestor of `end - 1` shared by both the subtree and the overall tree is a valid starting node to reconstruct `node_hash` and `root_hash`. Use the highest level with a common ancestor. This truncates the inclusion proof.
 
 2. If this starting node is the entire subtree, omit its hash from the consistency proof. The verifier is assumed to already know `node_hash`.
 
@@ -2400,10 +2400,10 @@ This test exercises constructing subtree consistency proofs. Other parties will 
 
 1. If not available, implement a Merkle Tree in testing logic to compute subtree hashes and subtree consistency proofs. This logic can be validated by the above test and {{subtree-hash-vectors}}.
 2. For each subtree consistency proof in the above test, check the proof and assert it succeeds.
-3. For each non-empty subtree consistency proof in the above test, truncate the proof by both one byte and a full hash. Assert that the checking each proof fails.
+3. For each non-empty subtree consistency proof in the above test, truncate the proof by both one byte and a full hash. Assert that checking each proof fails.
 4. For each subtree consistency proof in the above test, extend the proof by both one byte and an arbitrary full hash. Assert that checking each proof fails.
 5. For each subtree consistency proof in the above test, flip a bit in the input subtree hash. Assert that checking each proof fails.
-5. For each subtree consistency proof in the above test with a non-empty subtree, flip a bit in the input tree hash. Assert that checking each proof fails.
+6. For each subtree consistency proof in the above test with a non-empty subtree, flip a bit in the input tree hash. Assert that checking each proof fails.
 
 ### Efficient Covering Subtrees
 
