@@ -1616,25 +1616,26 @@ uint8 uint48[6];
 </pre><a href="#section-2-3" class="pilcrow">¶</a>
 </div>
 <p id="section-2-4"><code>U+</code> followed by four hexadecimal characters denotes a Unicode codepoint, to be encoded in UTF-8 <span>[<a href="#RFC3629" class="cite xref">RFC3629</a>]</span>. <code>0x</code> followed by two hexadecimal characters denotes a byte value in the 0-255 range.<a href="#section-2-4" class="pilcrow">¶</a></p>
-<p id="section-2-5"><code>[start, end)</code>, where <code>start &lt;= end</code>, denotes the half-open interval containing integers <code>x</code> such that <code>start &lt;= x &lt; end</code>.<a href="#section-2-5" class="pilcrow">¶</a></p>
-<p id="section-2-6">Given a non-negative integer <code>n</code>,<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2-5">The <em>decimal representation</em> of a non-negative integer is its base-ten representation, written with the ASCII digits <code>0</code> through <code>9</code> (U+0030 through U+0039). Zero is written as the single digit <code>0</code>, and no other value is written with a leading <code>0</code>.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6"><code>[start, end)</code>, where <code>start &lt;= end</code>, denotes the half-open interval containing integers <code>x</code> such that <code>start &lt;= x &lt; end</code>.<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2-7">Given a non-negative integer <code>n</code>,<a href="#section-2-7" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-2-7.1">
-          <p id="section-2-7.1.1"><code>LSB(n)</code> refers to the least-significant bit of <code>n</code>'s binary representation. Equivalently, it is the remainder when <code>n</code> is divided by 2.<a href="#section-2-7.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-2-8.1">
+          <p id="section-2-8.1.1"><code>LSB(n)</code> refers to the least-significant bit of <code>n</code>'s binary representation. Equivalently, it is the remainder when <code>n</code> is divided by 2.<a href="#section-2-8.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-7.2">
-          <p id="section-2-7.2.1"><code>BIT_WIDTH(n)</code> refers to the smallest number of bits needed to represent <code>n</code>. <code>BIT_WIDTH(0)</code> is zero.<a href="#section-2-7.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-8.2">
+          <p id="section-2-8.2.1"><code>BIT_WIDTH(n)</code> refers to the smallest number of bits needed to represent <code>n</code>. <code>BIT_WIDTH(0)</code> is zero.<a href="#section-2-8.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-7.3">
-          <p id="section-2-7.3.1"><code>POPCOUNT(n)</code> refers to the number of set bits in <code>n</code>'s binary representation.<a href="#section-2-7.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-8.3">
+          <p id="section-2-8.3.1"><code>POPCOUNT(n)</code> refers to the number of set bits in <code>n</code>'s binary representation.<a href="#section-2-8.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-2-7.4">
-          <p id="section-2-7.4.1"><code>BIT_CEIL(n)</code> refers to the smallest power of 2 that is greater or equal to <code>n</code>.<a href="#section-2-7.4.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-2-8.4">
+          <p id="section-2-8.4.1"><code>BIT_CEIL(n)</code> refers to the smallest power of 2 that is greater or equal to <code>n</code>.<a href="#section-2-8.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-2-8">To <em>left-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one upper position. Equivalently, it is <code>n</code> times 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &lt;&lt; b</code> refers to <code>a</code> left-shifted <code>b</code> times.<a href="#section-2-8" class="pilcrow">¶</a></p>
-<p id="section-2-9">To <em>right-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of <code>n</code> divided by 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &gt;&gt; b</code> refers to <code>a</code> right-shifted <code>b</code> times.<a href="#section-2-9" class="pilcrow">¶</a></p>
-<p id="section-2-10">Given two non-negative integers <code>a</code> and <code>b</code>, <code>a &amp; b</code> refers to the non-negative integer such that each bit position is set if the corresponding bit is set in both <code>a</code> and <code>b</code>, and unset otherwise. This is commonly referred to as the bitwise AND operator.<a href="#section-2-10" class="pilcrow">¶</a></p>
+<p id="section-2-9">To <em>left-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one upper position. Equivalently, it is <code>n</code> times 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &lt;&lt; b</code> refers to <code>a</code> left-shifted <code>b</code> times.<a href="#section-2-9" class="pilcrow">¶</a></p>
+<p id="section-2-10">To <em>right-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of <code>n</code> divided by 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &gt;&gt; b</code> refers to <code>a</code> right-shifted <code>b</code> times.<a href="#section-2-10" class="pilcrow">¶</a></p>
+<p id="section-2-11">Given two non-negative integers <code>a</code> and <code>b</code>, <code>a &amp; b</code> refers to the non-negative integer such that each bit position is set if the corresponding bit is set in both <code>a</code> and <code>b</code>, and unset otherwise. This is commonly referred to as the bitwise AND operator.<a href="#section-2-11" class="pilcrow">¶</a></p>
 <div id="terminology-and-roles">
 <section id="section-2.1">
         <h3 id="name-terminology-and-roles">
@@ -4355,7 +4356,7 @@ struct {
 <p id="section-6.4.3-1">CAs <span class="bcp14">SHOULD</span> publish their active landmarks, so that relying parties can configure trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>). The following format can be used to describe this information. The format is the following sequence of lines. Each line <span class="bcp14">MUST</span> be terminated by a newline character (U+000A):<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4.3-2.1">
-              <p id="section-6.4.3-2.1.1">Two space-separated non-negative decimal integers: <code>&lt;last_landmark&gt; &lt;num_active_landmarks&gt;</code>.
+              <p id="section-6.4.3-2.1.1">The decimal representations of two non-negative integers, separated by a single space character (U+0020): <code>&lt;last_landmark&gt; &lt;num_active_landmarks&gt;</code>.
 This line <span class="bcp14">MUST</span> satisfy the following, otherwise it is invalid:<a href="#section-6.4.3-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4.3-2.1.2.1">
@@ -4367,10 +4368,11 @@ This line <span class="bcp14">MUST</span> satisfy the following, otherwise it is
               </ul>
 </li>
             <li class="normal" id="section-6.4.3-2.2">
-              <p id="section-6.4.3-2.2.1"><code>num_active_landmarks + 1</code> lines each containing a single non-negative decimal integer, representing a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The tree sizes <span class="bcp14">MUST</span> be strictly monotonically decreasing and less than or equal to the log's latest tree size.<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.3-2.2.1"><code>num_active_landmarks + 1</code> lines, each containing the decimal representation of a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The tree sizes <span class="bcp14">MUST</span> be strictly monotonically decreasing and less than or equal to the log's latest tree size.<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.4.3-3">It is <span class="bcp14">RECOMMENDED</span> that this format be published as an HTTP resource <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> with content type <code>text/plain; charset=utf-8</code>.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-3">Landmark numbers and tree sizes are both at most 2<sup>48</sup>-1 (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). Any deviation from this format, including additional whitespace or any content following the final line, makes the document invalid. Relying parties <span class="bcp14">MUST</span> reject an invalid document in its entirety, rather than acting on the portion that precedes the error.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-4">It is <span class="bcp14">RECOMMENDED</span> that this format be published as an HTTP resource <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> with content type <code>text/plain; charset=utf-8</code>.<a href="#section-6.4.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="constructing-landmark-relative-certificates">
