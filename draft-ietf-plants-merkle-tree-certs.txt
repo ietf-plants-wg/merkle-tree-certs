@@ -1873,7 +1873,7 @@ Table of Contents
    5.  For each log entry in the interval, the CA constructs a
        certificate (Section 6.2) from the inputs in Section 6.1, using
        the covering subtree and the subtree cosignatures collected in
-       steps 3 and 5.
+       steps 3 and 4.
 
    Step 4 is analogous to requesting SCTs from CT logs in Certificate
    Transparency, except that a single run of this job collects
