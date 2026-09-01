@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-30T05:09:38.538366+00:00",
+  "timestamp": "2026-09-01T04:52:14.088913+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3914,24 +3914,39 @@
       "labels": [],
       "body": "We should have an end to end test vector, with worked intermediate values (tbs cert to entry), maybe generated from the demo tool, so people can more easily test and debug.",
       "createdAt": "2026-08-07T15:53:23Z",
-      "updatedAt": "2026-08-07T15:53:23Z",
+      "updatedAt": "2026-08-31T21:50:05Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "nad33mahm3d",
+          "authorAssociation": "NONE",
+          "body": "Working on this; PR coming with regenerable demo vector + draft appendix",
+          "createdAt": "2026-08-31T21:48:05Z",
+          "updatedAt": "2026-08-31T21:48:05Z"
+        },
+        {
+          "author": "nad33mahm3d",
+          "authorAssociation": "NONE",
+          "body": "Working on this \u2014 planning a regenerable end-to-end certificate test vector from the demo tool (worked intermediates from TBSCertificateLogEntry through MTCProof/Certificate) plus a short draft appendix, following the large_* vector pattern.",
+          "createdAt": "2026-08-31T21:50:05Z",
+          "updatedAt": "2026-08-31T21:50:05Z"
+        }
+      ]
     },
     {
       "number": 292,
       "id": "I_kwDOJIBkVc8AAAABMKbBLw",
       "title": "Add test vectors for maximally large trees",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/292",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The accumulated tests cover all small values, but we also have to worry about overflow conditions at maximally large trees. A CA does not, but other parties may see consistency and inclusion proofs referencing large entries. The use of BIT_CEIL means that we might overflow slightly.\n\nThe good news is that overflow mostly does not exist anymore. The log/index split meant our logs are at most 2^48, not 2^64, and any integer type that people actually use can represent 2^48-1 can also represent 2^48. Nonetheless, we should:\n\n* Have some test cases that go up to end = 2^48-1.\n* Have some test cases for end = 2^64-1 anyway. While not possible in MTC, it is more generally possible and people might reuse the subtree machinery.\n\nFootnote: we currently say log indices go up to 2^48-1. Practically they go up to 2^48-2 because otherwise you cannot express the end value in an MTCProof.",
       "createdAt": "2026-08-10T14:34:32Z",
-      "updatedAt": "2026-08-26T03:19:59Z",
-      "closedAt": null,
+      "updatedAt": "2026-08-31T14:49:32Z",
+      "closedAt": "2026-08-31T14:49:32Z",
       "comments": [
         {
           "author": "davidben",
@@ -20851,24 +20866,26 @@
       "id": "PR_kwDOJIBkVc8AAAABBYLE6A",
       "title": "Test vectors for large subtree inclusion proofs",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/301",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "Issue #292\r\n\r\nThis handles subtree validity and subtree inclusion proofs. Ideally we would also pick up subtree consistency proofs and the find matching subtrees function, but I'll wrestle with that separately.",
+      "body": "Closes #292\r\n\r\n~This handles subtree validity and subtree inclusion proofs. Ideally we would also pick up subtree consistency proofs and the find matching subtrees function, but I'll wrestle with that separately.~ Eh, this now has all of them.",
       "createdAt": "2026-08-28T19:14:32Z",
-      "updatedAt": "2026-08-28T20:26:20Z",
+      "updatedAt": "2026-08-31T14:49:35Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "d9401c595748141e1a0e3cce3ed7774f27b18273",
+      "baseRefOid": "d3bf5f9617f037b60401a4448c79ddaa2f26e4f8",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "large-subtree-tests",
-      "headRefOid": "c8b0c698fc99e56bfe0894f9763ef040a08f6d4e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "6542aaed9e8ddaaf265ce2f0b459818d8cd4534e",
+      "closedAt": "2026-08-31T14:49:31Z",
+      "mergedAt": "2026-08-31T14:49:31Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "6ec3a4a1f026dd6c26a2683d0d251e4c1b9c17ab"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -20878,6 +20895,311 @@
           "updatedAt": "2026-08-28T20:26:20Z"
         }
       ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLhDJFA",
+          "commit": {
+            "abbreviatedOid": "6542aae"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T14:45:57Z",
+          "updatedAt": "2026-08-31T14:45:57Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 302,
+      "id": "PR_kwDOJIBkVc8AAAABBhEuxQ",
+      "title": "Fix X.690 reference",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/302",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Four small fixes to the X.690 normative reference, one commit each:\r\n\r\n1. **`ISO/IEC 8824-1:2021` \u2192 `8825-1:2021`.** 8824-1 is X.680, the ASN.1 *notation*. X.690, the *encoding rules*, is 8825-1.\r\n2. **`encoding Rules` \u2192 `encoding rules`,** matching ITU-T's own capitalization.\r\n3. **Add a `target` URL.** X.690 was the only non-RFC reference without one.\r\n4. **Split the seriesinfo into name and value.** The bare scalar form emitted `name=\"ISO/IEC 8824-1:2021\" value=\"\"`; the empty value renders as a stray space before the comma.\r\n\r\nResult:\r\n\r\n    -          (DER)\", ISO/IEC 8824-1:2021 , February 2021.\r\n    +          (DER)\", ISO/IEC 8825-1:2021, February 2021,\r\n    +          <https://www.itu.int/rec/T-REC-X.690>.",
+      "createdAt": "2026-08-30T17:07:43Z",
+      "updatedAt": "2026-08-30T22:30:45Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "d3bf5f9617f037b60401a4448c79ddaa2f26e4f8",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "fix-x690-reference",
+      "headRefOid": "73d51efbc0717f85e37d5e266d45e52b040c156e",
+      "closedAt": "2026-08-30T17:22:35Z",
+      "mergedAt": "2026-08-30T17:22:35Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "5a45d611e14b3694582af093dbd6c59c84628484"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLa91GA",
+          "commit": {
+            "abbreviatedOid": "73d51ef"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Thanks!",
+          "createdAt": "2026-08-30T17:22:12Z",
+          "updatedAt": "2026-08-30T17:22:12Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 303,
+      "id": "PR_kwDOJIBkVc8AAAABBiEoFg",
+      "title": "Clarify impact of shorter-lived certificates",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/303",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The issuance log is append-only, so its entry count grows regardless of certificate lifetimes. What shorter lifetimes actually change is how quickly entries accumulate, since certificates are renewed more often. Reword the Introduction accordingly to refer to the rate at which entries are added rather than to the number of entries.",
+      "createdAt": "2026-08-30T22:20:56Z",
+      "updatedAt": "2026-08-30T22:58:09Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "5a45d611e14b3694582af093dbd6c59c84628484",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "clarify_impact_of_short_lived_certs",
+      "headRefOid": "886bb6ddf184f35c4ba9455b277107c3bdf09098",
+      "closedAt": "2026-08-30T22:55:59Z",
+      "mergedAt": "2026-08-30T22:55:59Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "117c87bf199c0c16711bbc953fd7d0473c7d38b1"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLbm3JQ",
+          "commit": {
+            "abbreviatedOid": "886bb6d"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-30T22:55:43Z",
+          "updatedAt": "2026-08-30T22:55:43Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 304,
+      "id": "PR_kwDOJIBkVc8AAAABBlLkNA",
+      "title": "Editorial: fix subject-verb agreement and \"criteria\"->\"criterion\"",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/304",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-31T09:36:36Z",
+      "updatedAt": "2026-08-31T17:23:52Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7c094d777d1f30916ec3b397c86842d4c9dc5c55",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "fix_subjectverb_agreement",
+      "headRefOid": "98d1d84806cde2edcd4e235aa78a40b652f6dec3",
+      "closedAt": "2026-08-31T17:23:52Z",
+      "mergedAt": "2026-08-31T17:23:52Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "c361852baaefe6e6648edd08112b34d75f82c0ec"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLfAIGQ",
+          "commit": {
+            "abbreviatedOid": "98d1d84"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T10:54:53Z",
+          "updatedAt": "2026-08-31T10:54:53Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLicy4Q",
+          "commit": {
+            "abbreviatedOid": "98d1d84"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T17:23:45Z",
+          "updatedAt": "2026-08-31T17:23:45Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 305,
+      "id": "PR_kwDOJIBkVc8AAAABBlVgpQ",
+      "title": "Cite RFC 9925 instead of draft-ietf-lamps-x509-alg-none",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/305",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The LAMPS draft that defined the \"SMI Security for PKIX Relative Distinguished Name Attribute\" registry has since been published as RFC 9925, and idnits flags the draft reference as stale. Point the IANA section at the RFC. The document already cites RFC 9925 normatively when describing unsigned certificates, so use the same normative form here.",
+      "createdAt": "2026-08-31T09:59:29Z",
+      "updatedAt": "2026-08-31T15:11:58Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7c094d777d1f30916ec3b397c86842d4c9dc5c55",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "update_x509_alg_none_reference",
+      "headRefOid": "1acef1803be9764cbaa26f1829bd25592980859e",
+      "closedAt": "2026-08-31T10:54:16Z",
+      "mergedAt": "2026-08-31T10:54:16Z",
+      "mergedBy": "bwesterb",
+      "mergeCommit": {
+        "oid": "d458bb2eb78403b939fd07b2c030c6daadb99c34"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLe_reg",
+          "commit": {
+            "abbreviatedOid": "1acef18"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T10:54:02Z",
+          "updatedAt": "2026-08-31T10:54:02Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 306,
+      "id": "PR_kwDOJIBkVc8AAAABBpE8pA",
+      "title": "Clarify checkpoint vs subtree cosignatures for standalone certificates",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/306",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The algorithm described here gets checkpoint cosignatures from external cosigners but then does nothing with them. It's up to the reader to infer that they are used to acquire subtree cosignatures. Streamline the algorithm description to make the ultimate goal (getting subtree cosigs) clearer.",
+      "createdAt": "2026-08-31T18:29:57Z",
+      "updatedAt": "2026-08-31T19:00:16Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "c361852baaefe6e6648edd08112b34d75f82c0ec",
+      "headRepository": "aarongable/merkle-tree-certs",
+      "headRefName": "patch-2",
+      "headRefOid": "1f95c076cf4b6a8ed39dfc4191d0a36f57b6003b",
+      "closedAt": "2026-08-31T19:00:16Z",
+      "mergedAt": "2026-08-31T19:00:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "59ea3f6b0ae6d393ad00a4e94826a89cf546bb6b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLjPymA",
+          "commit": {
+            "abbreviatedOid": "1f95c07"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T19:00:07Z",
+          "updatedAt": "2026-08-31T19:00:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 307,
+      "id": "PR_kwDOJIBkVc8AAAABBqFXtA",
+      "title": "Fix some idnits: Use the tagged BCP 14 boilerplate, and use only ASCII apostrophes in prose",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/307",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-31T20:56:13Z",
+      "updatedAt": "2026-08-31T21:12:14Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "59ea3f6b0ae6d393ad00a4e94826a89cf546bb6b",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "idnits_bcp14_and_apostrophes",
+      "headRefOid": "b2f3fee7941595c57962b31729ec2aedf1a1936b",
+      "closedAt": "2026-08-31T21:12:13Z",
+      "mergedAt": "2026-08-31T21:12:13Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "1bf9277eacbc45ab0e6d0b943f0550304cbe4c4c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLkWWhA",
+          "commit": {
+            "abbreviatedOid": "b2f3fee"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T21:12:03Z",
+          "updatedAt": "2026-08-31T21:12:03Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 308,
+      "id": "PR_kwDOJIBkVc8AAAABBqe76Q",
+      "title": "Add end-to-end certificate encoding test vector",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/308",
+      "state": "OPEN",
+      "author": "nad33mahm3d",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "## Summary\n- Adds a regenerable end-to-end certificate encoding test vector in the demo tool (`demo/e2e_test.go`, `demo/e2e_certificate.{txt,json}`), covering intermediates from `TBSCertificateLogEntry` through leaf hash, inclusion proof, CosignedMessage, `MTCProof`, and Certificate.\n- Uses a small plants-05 example (two-entry log, Ed25519 CA cosigner for deterministic signatures) and round-trips through `VerifyMTCProof`.\n- Adds a short draft appendix under Test Vectors with the worked intermediate values and an informative reference to the demo files.\n\nFixes #291\n\n## Test plan\n- [ ] `cd demo && go test ./...`\n- [ ] `cd demo && go test -run TestE2ECertificateVector -update` regenerates goldens that match the committed files\n- [ ] Spot-check draft appendix hex against `demo/e2e_certificate.txt`\n\n\nMade with [Cursor](https://cursor.com)",
+      "createdAt": "2026-08-31T21:53:57Z",
+      "updatedAt": "2026-08-31T21:53:57Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "1bf9277eacbc45ab0e6d0b943f0550304cbe4c4c",
+      "headRepository": "nad33mahm3d/merkle-tree-certs",
+      "headRefName": "e2e-certificate-test-vector",
+      "headRefOid": "0273d16148096d016abb4df1b28956ce81989a2e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
