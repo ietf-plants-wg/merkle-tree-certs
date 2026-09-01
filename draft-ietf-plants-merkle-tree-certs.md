@@ -1330,7 +1330,7 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 2. Using the procedure in {{arbitrary-intervals}}, the CA determines the two subtrees that cover the entries added between this checkpoint and the most recent checkpoint.
 3. The CA signs each subtree with its key(s) ({{cosigners}}).
 4. The CA requests sufficient subtree cosignatures from external cosigners to meet relying party requirements ({{trusted-cosigners}}). Depending on the protocol for requesting subtree cosignatures (e.g. {{TLOG-WITNESS}} and {{TLOG-MIRROR}}), this step may require first requesting a checkpoint cosignature ({{cosigners}}) from each cosigner.
-5. For each log entry in the interval, the CA constructs a certificate ({{certificate-format}}) from the inputs in {{certificate-inputs}}, using the covering subtree and the subtree cosignatures collected in steps 3 and 5.
+5. For each log entry in the interval, the CA constructs a certificate ({{certificate-format}}) from the inputs in {{certificate-inputs}}, using the covering subtree and the subtree cosignatures collected in steps 3 and 4.
 
 Step 4 is analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
 
