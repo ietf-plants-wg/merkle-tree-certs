@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-01T04:52:14.088913+00:00",
+  "timestamp": "2026-09-03T04:08:37.231553+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3914,7 +3914,7 @@
       "labels": [],
       "body": "We should have an end to end test vector, with worked intermediate values (tbs cert to entry), maybe generated from the demo tool, so people can more easily test and debug.",
       "createdAt": "2026-08-07T15:53:23Z",
-      "updatedAt": "2026-08-31T21:50:05Z",
+      "updatedAt": "2026-09-02T22:17:25Z",
       "closedAt": null,
       "comments": [
         {
@@ -3930,6 +3930,13 @@
           "body": "Working on this \u2014 planning a regenerable end-to-end certificate test vector from the demo tool (worked intermediates from TBSCertificateLogEntry through MTCProof/Certificate) plus a short draft appendix, following the large_* vector pattern.",
           "createdAt": "2026-08-31T21:50:05Z",
           "updatedAt": "2026-08-31T21:50:05Z"
+        },
+        {
+          "author": "nad33mahm3d",
+          "authorAssociation": "NONE",
+          "body": "@davidben did you get a chance to check PR?",
+          "createdAt": "2026-09-02T22:17:24Z",
+          "updatedAt": "2026-09-02T22:17:24Z"
         }
       ]
     },
@@ -21007,7 +21014,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-08-31T09:36:36Z",
-      "updatedAt": "2026-08-31T17:23:52Z",
+      "updatedAt": "2026-09-01T09:31:39Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "7c094d777d1f30916ec3b397c86842d4c9dc5c55",
@@ -21146,7 +21153,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-08-31T20:56:13Z",
-      "updatedAt": "2026-08-31T21:12:14Z",
+      "updatedAt": "2026-09-01T09:31:39Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "59ea3f6b0ae6d393ad00a4e94826a89cf546bb6b",
@@ -21201,6 +21208,248 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 309,
+      "id": "PR_kwDOJIBkVc8AAAABBua0-w",
+      "title": "Fix a stale step reference in the issuance procedure",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/309",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Step 5 referred to \"the subtree cosignatures collected in steps 3 and 5\", which points at itself.\r\n\r\nBefore #306 the list ran to six steps, with external subtree cosignatures collected in step 5, so the reference was correct. That PR merged the checkpoint and subtree cosignature requests into a single step 4 and renumbered the rest, but the cross-reference still names the old number.\r\n\r\nThe subtree cosignatures are now collected in step 3, where the CA signs each subtree with its own key, and step 4, where it requests cosignatures from external cosigners.",
+      "createdAt": "2026-09-01T09:34:19Z",
+      "updatedAt": "2026-09-01T15:26:56Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "1bf9277eacbc45ab0e6d0b943f0550304cbe4c4c",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "fix-issuance-step-reference",
+      "headRefOid": "45e055a6b689f4d0d7470d37773150555d298319",
+      "closedAt": "2026-09-01T14:32:17Z",
+      "mergedAt": "2026-09-01T14:32:17Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "31770f3def632040221662d2bedf8bfe722ba761"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Wow, you're really on a roll here. Thanks for all these fixes!",
+          "createdAt": "2026-09-01T14:32:35Z",
+          "updatedAt": "2026-09-01T14:32:35Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLsBztA",
+          "commit": {
+            "abbreviatedOid": "45e055a"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-01T14:32:11Z",
+          "updatedAt": "2026-09-01T14:32:11Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 310,
+      "id": "PR_kwDOJIBkVc8AAAABBvCsvA",
+      "title": "Fix spelling and grammar",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/310",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Editorial only; no normative changes. Found with `codespell`, `aspell` and a manual read-through.\n\n**Spelling**\n\n- \"resposes\" -> \"responses\" (Signature Domain Separation)\n- \"commmon\" -> \"common\" (Consistency Proof Structure)\n- relying \"paries\" -> \"parties\" (Landmark-Relative Certificates)\n\n**Grammar**\n\n- Add missing articles: \"contains **the** trust anchor ID's ASCII representation\", \"the hash of **the** subject's public key\", \"defines **a** series of trust anchor groups\"\n- \"for **an** single CA\" -> \"for **a** single CA\"\n- \"the retry mechanism described {{Section 4.3 ...}}\" -> \"described **in** ...\" (two places)\n- \"as of the versions timestamp\" -> \"as of the version's timestamp\"\n- Drop a stray \"for\": \"check for an exact equality **with for** the expected ... value\"\n- Drop a stray \"the\": \"Assert that **the** checking each proof fails\"\n- Revoked Ranges: the last sentence was a comma splice beginning with a lowercase \"log entries\". Turned into a subordinate clause: \"**Because** log entries are uniquely identified by their serial number and issuer, existing revocation mechanisms ... apply unchanged.\"\n\n**US English**\n\nSection 3.1 of RFC 7322 allows either American or British spelling but requires internal consistency, and normalizes mixed usage to American.\n\n- \"implementors\" -> \"implementers\" (also the RFC Editor's own usage, e.g. Section 4.8.2 of RFC 7322)\n- \"towards\" -> \"toward\"\n\nThe Acknowledgements section keeps its current spelling: that is the form the RFC Series uses for the section itself, in Section 4.10 of RFC 7322.\n\n**Other**\n\n- The subtree consistency proof test vectors had two list items numbered 5. The second is now 6. Rendering was unaffected, since Markdown renumbers ordered lists, but the source was misleading.\n\n`make spellcheck` now reports only one finding, a false positive on the `SHS` reference anchor for FIPS 180-4. Adding a `.ignore-words` file containing `shs` would make the target pass; happy to do that here or separately if wanted.\n",
+      "createdAt": "2026-09-01T11:00:53Z",
+      "updatedAt": "2026-09-01T15:26:56Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "1bf9277eacbc45ab0e6d0b943f0550304cbe4c4c",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "editorial_spelling_and_grammar",
+      "headRefOid": "14efbb797619ec08b22f377d863176fb3819b694",
+      "closedAt": "2026-09-01T14:31:46Z",
+      "mergedAt": "2026-09-01T14:31:46Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "bbdd25d07e1fb13c93e0a011e3dbd89b2e94a505"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLsBcgg",
+          "commit": {
+            "abbreviatedOid": "14efbb7"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-01T14:31:40Z",
+          "updatedAt": "2026-09-01T14:31:40Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 311,
+      "id": "PR_kwDOJIBkVc8AAAABBxS5oA",
+      "title": "Say what the issuance process diverges from",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/311",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Editorial only; no normative changes.\n\nStep 2 of the issuance overview ended with \"From there, the process differs\", without saying what it differs from.\n\nThe intended contrast is with Certificate Transparency, drawn in the first paragraph of the section:\n\n> In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates invert this process ...\n\nThat paragraph is separated from the numbered list by the issuance architecture figure, so a reader arriving at the list from the \"Merkle Tree Certificates are issued as follows\" lead-in no longer has the comparison in view. Locally, the list describes a single process, so \"the process differs\" invites being read as differing between deployments or depending on something established in step 2. Step 3 then opens with \"Unlike a CT log ...\", which supplies the comparator retroactively, but step 2 should not need step 3 to be unambiguous.\n\nThis names the comparison and uses \"diverges\" rather than \"differs\". \"Diverge\" presupposes a shared path up to the point of divergence, so it also conveys that the first two steps are unchanged from existing issuance, which is the other half of the point the sentence is making.\n",
+      "createdAt": "2026-09-01T15:37:03Z",
+      "updatedAt": "2026-09-01T18:00:42Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "31770f3def632040221662d2bedf8bfe722ba761",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "clarify_process_divergence",
+      "headRefOid": "74ccf162febf61dc7adfe5f9a40a880df24f2363",
+      "closedAt": "2026-09-01T17:33:17Z",
+      "mergedAt": "2026-09-01T17:33:17Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7a68f4c041be432553107c888e9fa8496551671d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLtu7OA",
+          "commit": {
+            "abbreviatedOid": "74ccf16"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "I guess it diverges from both CT-based PKIs and \"normal\" PKIs, but yeah saying CT-based SGTM.",
+          "createdAt": "2026-09-01T17:33:06Z",
+          "updatedAt": "2026-09-01T17:33:06Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 312,
+      "id": "PR_kwDOJIBkVc8AAAABByTO8w",
+      "title": "Specify the landmark publication format precisely",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/312",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The landmark publication format is fetched by relying parties from CAs, so\ntwo implementations that parse it differently is an interoperability\nproblem rather than a local matter. The description was looser than the\nsurrounding text, which pins the line terminator to \"a newline character\n(U+000A)\" and, in the test vector appendix, the separator to \"a space\n(U+0020)\".\n\nThis makes the first line's separator exactly one U+0020, rules out\nleading zeros on both lines, states the range of the values, and says what\n\"invalid\" obliges a relying party to do.\n\nThe 2^48-1 bound is not a new constraint: landmark zero has tree size zero\nand tree sizes are strictly monotonically increasing, so a landmark number\nnever exceeds its tree size, which Section 5.2 already caps at 2^48-1.\n\nThe second bullet is also reworded slightly to avoid \"integer,\nrepresenting a tree size\" reading awkwardly once \"without leading zeros\"\nis added.\n",
+      "createdAt": "2026-09-01T17:52:54Z",
+      "updatedAt": "2026-09-01T21:08:25Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7a68f4c041be432553107c888e9fa8496551671d",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "clarify_landmark_format",
+      "headRefOid": "31b456f9818d6ae2b59356303f58e4b8b026de35",
+      "closedAt": "2026-09-01T20:40:49Z",
+      "mergedAt": "2026-09-01T20:40:48Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "ac88b3a3ed7961b9e7803c2ae164e77cebcca408"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLuyBaw",
+          "commit": {
+            "abbreviatedOid": "b384356"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks!\n\n> The landmark publication format is fetched by relying parties from CAs\n\nStrictly speaking, it's fetched by the backend update services of relying parties, but yes. :-)",
+          "createdAt": "2026-09-01T19:31:28Z",
+          "updatedAt": "2026-09-01T19:33:44Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "This does make it ambiguous whether zero is \"0\" or \"\". Not sure if there's a compact way to say that. WDYT about:\r\n\r\n```suggestion\r\n* Two non-negative decimal integers, separated by a single space character (U+0020) and represented without extra leading zeros: `<last_landmark> <num_active_landmarks>`.\r\n```\r\n\r\nAnother possibility is that we toss something up in \"Conventions and Definitions\" that says that \"decimal integers\" refers to [insert lots of text here].",
+              "createdAt": "2026-09-01T19:31:29Z",
+              "updatedAt": "2026-09-01T19:33:56Z"
+            },
+            {
+              "originalPosition": 19,
+              "body": "Ditto re the ambiguity around zero.",
+              "createdAt": "2026-09-01T19:31:56Z",
+              "updatedAt": "2026-09-01T19:33:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLvQ1ZA",
+          "commit": {
+            "abbreviatedOid": "b384356"
+          },
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-01T20:24:36Z",
+          "updatedAt": "2026-09-01T20:24:36Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Adding something in \"Conventions and Definitions\" makes sense to me.  There are two mentions of \"decimal integers\" here, as well as several instances of \"decimal representations\" elsewhere in the document.  I'll propose text.",
+              "createdAt": "2026-09-01T20:24:36Z",
+              "updatedAt": "2026-09-01T20:24:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLvZ3XQ",
+          "commit": {
+            "abbreviatedOid": "b384356"
+          },
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-01T20:38:33Z",
+          "updatedAt": "2026-09-01T20:38:33Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "I've pushed a commit that defines the \"decimal representation\" of a non-negative integer, and adapted this section to refer to that.  Note that this also tightens the existing uses of \"decimal representation\".",
+              "createdAt": "2026-09-01T20:38:33Z",
+              "updatedAt": "2026-09-01T20:38:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABLva9Qg",
+          "commit": {
+            "abbreviatedOid": "31b456f"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-01T20:40:42Z",
+          "updatedAt": "2026-09-01T20:40:42Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
