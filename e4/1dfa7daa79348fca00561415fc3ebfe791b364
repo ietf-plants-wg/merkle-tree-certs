@@ -1,0 +1,21 @@
+demo/encode_test.go
+  s_e7076a1af4d106::t_b78c1c0a4f0419 4,185-240
+demo/encode.go
+  s_e7076a1af4d106::t_c45e56b0dd1894 293-300,428
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e41dfa7daa79348fca00561415fc3ebfe791b364",
+  "prompts": {},
+  "sessions": {
+    "s_e7076a1af4d106": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f73c06486ffeRq7SEzmTuro9ZR",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Luke Valenta <lvalenta@cloudflare.com>"
+    }
+  }
+}
