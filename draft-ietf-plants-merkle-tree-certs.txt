@@ -1806,7 +1806,7 @@ Table of Contents
        uint48 start;
        uint48 end;
        HashValue inclusion_proof<0..2^16-1>;
-       SubtreeSignature signatures<0..2^16-1>;
+       SubtreeSignature signatures<0..2^24-1>;
    } MTCProof;
 
    extensions MUST contain the log entry's extensions value
@@ -4653,6 +4653,8 @@ Since draft-ietf-plants-merkle-tree-certs-04
    *  Add a maxSerial field to the CA format
 
 Since draft-ietf-plants-merkle-tree-certs-05
+
+   *  Use 24-bit length prefix for MTCProof subtree signatures.
 
    *  Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be
       consistent with MTCProof, shorter, and help disambiguate the many
