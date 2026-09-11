@@ -2128,6 +2128,9 @@ Table of Contents
 
    *  The CA ID is determined from the certificate's subject.
 
+   *  The log hash algorithm is determined from the type of the Merkle
+      Tree CA extension.
+
    *  The CA cosigner is determined from the certificate's subject
       public key and Merkle Tree CA extension.  The CA's cosigner ID is
       the same as its CA ID.  The relying party incorporates this

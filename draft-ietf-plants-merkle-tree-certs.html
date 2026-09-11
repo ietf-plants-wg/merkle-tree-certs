@@ -4450,13 +4450,16 @@ This line <span class="bcp14">MUST</span> satisfy the following, otherwise it is
             <p id="section-7.1-4.1.1">The CA ID is determined from the certificate's subject.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.2">
-            <p id="section-7.1-4.2.1">The CA cosigner is determined from the certificate's subject public key and Merkle Tree CA extension. The CA's cosigner ID is the same as its CA ID. The relying party incorporates this cosigner into its cosigner policy based on the guidance in <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.2.1">The log hash algorithm is determined from the type of the Merkle Tree CA extension.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.3">
-            <p id="section-7.1-4.3.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party <span class="bcp14">MAY</span> incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.3.1">The CA cosigner is determined from the certificate's subject public key and Merkle Tree CA extension. The CA's cosigner ID is the same as its CA ID. The relying party incorporates this cosigner into its cosigner policy based on the guidance in <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.4">
-            <p id="section-7.1-4.4.1">The revoked serial number ranges include the half-open ranges <code>[0, minSerial)</code> and <code>[maxSerial+1, 2^64)</code>, but the relying party <span class="bcp14">MAY</span> incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.4.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party <span class="bcp14">MAY</span> incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.1-4.5">
+            <p id="section-7.1-4.5.1">The revoked serial number ranges include the half-open ranges <code>[0, minSerial)</code> and <code>[maxSerial+1, 2^64)</code>, but the relying party <span class="bcp14">MAY</span> incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
