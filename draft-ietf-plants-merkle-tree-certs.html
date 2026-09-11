@@ -1048,7 +1048,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 14 March 2027</td>
+<td class="center">Expires 15 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-10" class="published">10 September 2026</time>
+<time datetime="2026-09-11" class="published">11 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-14">14 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-15">15 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 14 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 15 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -4121,7 +4121,7 @@ struct {
         <h3 id="name-representing-certification-">
 <a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-representing-certification-" class="section-name selfRef">Representing Certification Authorities</a>
         </h3>
-<p id="section-5.5-1">This section defines the X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> representation of a Merkle Tree Certificate CA. It identifies the CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>) and associated issuance logs. This information is encoded as follows:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">This section defines the X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> representation of a Merkle Tree CA. It identifies the CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>) and associated issuance logs. This information is encoded as follows:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.5-2.1">
             <p id="section-5.5-2.1.1">The <code>subject</code> field <span class="bcp14">MUST</span> be the CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
@@ -4130,7 +4130,7 @@ struct {
             <p id="section-5.5-2.2.1">The <code>subjectPublicKeyInfo</code> field <span class="bcp14">MUST</span> be the public key of the CA cosigner <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-2.3">
-            <p id="section-5.5-2.3.1">The <code>extensions</code> field <span class="bcp14">MUST</span> contain a critical extension of type id-pe-mtcCertificationAuthority, defined below.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-5.5-2.3.1">The <code>extensions</code> field <span class="bcp14">MUST</span> contain a critical Merkle Tree CA extension. This is defined below.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-2.4">
             <p id="section-5.5-2.4.1">The subject key identifier extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.2" class="relref">Section 4.2.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>), if present, <span class="bcp14">SHOULD</span> be set to the CA ID <a href="#ca-ids" class="auto internal xref">Section 5.1</a>. The CA ID is encoded in its binary representation, as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
@@ -4145,16 +4145,17 @@ struct {
             <p id="section-5.5-4.2.1">The basic constraints extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.9" class="relref">Section 4.2.1.9</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) <span class="bcp14">MUST</span> be present and set the <code>cA</code> field to TRUE.<a href="#section-5.5-4.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-5">The id-pe-mtcCertificationAuthority extension is defined below. This extension indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it <span class="bcp14">MUST</span> be marked as critical.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
-<div class="lang-asn.1 sourcecode" id="section-5.5-6">
+<p id="section-5.5-5">The Merkle Tree CA extension defines the remaining parameters specific to this protocol. It indicates that the subject of the certificate is a CA that issues Merkle Tree Certificates. If present, it <span class="bcp14">MUST</span> be marked as critical. The extension type identifies the Merkle Tree construction, and the contents define additional parameters of the CA cosigner.<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+<p id="section-5.5-6">This document defines one extension type, id-pe-mtcCertificationAuthority-SHA256, which indicates hashing with SHA-256 <span>[<a href="#SHS" class="cite xref">SHS</a>]</span>. Other documents <span class="bcp14">MAY</span> define corresponding extensions for other hash functions or new versions of the tree construction.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
+<div class="lang-asn.1 sourcecode" id="section-5.5-7">
 <pre>
-id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) pe(1) TBD }
 
-ext-mtcCertificationAuthority EXTENSION ::= {
+ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
-    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
     CRITICALITY TRUE
 }
 
@@ -4162,29 +4163,25 @@ ext-mtcCertificationAuthority EXTENSION ::= {
 mtcMaxSerial INTEGER ::= 18446744073709551615
 
 MTCCertificationAuthority ::= SEQUENCE {
-    logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
     minSerial INTEGER (0..mtcMaxSerial),
     maxSerial INTEGER (0..mtcMaxSerial)
 }
-</pre><a href="#section-5.5-6" class="pilcrow">¶</a>
+</pre><a href="#section-5.5-7" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.2 instead of <code>id-pe-mtcCertificationAuthority</code>. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
-<p id="section-5.5-8">The fields of an MTCCertificationAuthority structure are defined as follows:<a href="#section-5.5-8" class="pilcrow">¶</a></p>
+<p id="section-5.5-8">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.4 instead of <code>id-pe-mtcCertificationAuthority-SHA256</code>. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.<a href="#section-5.5-8" class="pilcrow">¶</a></p>
+<p id="section-5.5-9">The fields of an MTCCertificationAuthority structure are defined as follows:<a href="#section-5.5-9" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.5-9.1">
-            <p id="section-5.5-9.1.1"><code>logHash</code> describes the hash algorithm used by all logs operated by this CA. For example, if the hash is SHA-256, it would be <code>mda-sha256</code> as defined in <span><a href="https://rfc-editor.org/rfc/rfc5912#section-8" class="relref">Section 8</a> of [<a href="#RFC5912" class="cite xref">RFC5912</a>]</span>.<a href="#section-5.5-9.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.5-10.1">
+            <p id="section-5.5-10.1.1"><code>sigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.3.3</a>).<a href="#section-5.5-10.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-9.2">
-            <p id="section-5.5-9.2.1"><code>sigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.3.3</a>).<a href="#section-5.5-9.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-5.5-9.3">
-            <p id="section-5.5-9.3.1"><code>minSerial</code> and <code>maxSerial</code> describe the minimum and maximum allowed serial numbers from this CA, respectively. See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> for discussion on setting these values.<a href="#section-5.5-9.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-10.2">
+            <p id="section-5.5-10.2.1"><code>minSerial</code> and <code>maxSerial</code> describe the minimum and maximum allowed serial numbers from this CA, respectively. See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> for discussion on setting these values.<a href="#section-5.5-10.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>. In particular, it <span class="bcp14">MUST NOT</span> be used to directly sign TBSCertificate structures.<a href="#section-5.5-10" class="pilcrow">¶</a></p>
-<p id="section-5.5-11">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. If a later version of the protocol defines a new format, this <span class="bcp14">SHOULD</span> be represented in CA certificates with a new extension type.<a href="#section-5.5-11" class="pilcrow">¶</a></p>
-<p id="section-5.5-12">A CA certificate using this format <span class="bcp14">SHOULD NOT</span> be self-signed by the Merkle Tree Certificate CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate <span class="bcp14">SHOULD</span> be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-5.5-12" class="pilcrow">¶</a></p>
+<p id="section-5.5-11">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>. In particular, it <span class="bcp14">MUST NOT</span> be used to directly sign TBSCertificate structures.<a href="#section-5.5-11" class="pilcrow">¶</a></p>
+<p id="section-5.5-12">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. If a later version of the protocol defines a new format, this <span class="bcp14">SHOULD</span> be represented in CA certificates with a new extension type.<a href="#section-5.5-12" class="pilcrow">¶</a></p>
+<p id="section-5.5-13">A CA certificate using this format <span class="bcp14">SHOULD NOT</span> be self-signed by the CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate <span class="bcp14">SHOULD</span> be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-5.5-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4453,16 +4450,13 @@ This line <span class="bcp14">MUST</span> satisfy the following, otherwise it is
             <p id="section-7.1-4.1.1">The CA ID is determined from the certificate's subject.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.2">
-            <p id="section-7.1-4.2.1">The log hash algorithm is determined from the id-pe-mtcCertificationAuthority extension.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.2.1">The CA cosigner is determined from the certificate's subject public key and Merkle Tree CA extension. The CA's cosigner ID is the same as its CA ID. The relying party incorporates this cosigner into its cosigner policy based on the guidance in <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.3">
-            <p id="section-7.1-4.3.1">The CA cosigner is determined from the certificate's subject public key and id-pe-mtcCertificationAuthority extension. The CA's cosigner ID is the same as its CA ID. The relying party incorporates this cosigner into its cosigner policy based on the guidance in <a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.3.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party <span class="bcp14">MAY</span> incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.4">
-            <p id="section-7.1-4.4.1">No trusted subtrees are directly represented by the CA certificate structure, but the relying party <span class="bcp14">MAY</span> incorporate trusted subtrees from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.1-4.5">
-            <p id="section-7.1-4.5.1">The revoked serial number ranges include the half-open ranges <code>[0, minSerial)</code> and <code>[maxSerial+1, 2^64)</code>, but the relying party <span class="bcp14">MAY</span> incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.4.1">The revoked serial number ranges include the half-open ranges <code>[0, minSerial)</code> and <code>[maxSerial+1, 2^64)</code>, but the relying party <span class="bcp14">MAY</span> incorporate additional ranges from out-of-band information.<a href="#section-7.1-4.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -5220,7 +5214,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">TBD</td>
-              <td class="text-left" rowspan="1" colspan="1">id-pe-mtcCertificationAuthority</td>
+              <td class="text-left" rowspan="1" colspan="1">id-pe-mtcCertificationAuthority-SHA256</td>
               <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
             </tr>
           </tbody>
@@ -5545,13 +5539,13 @@ at-trustAnchorID ATTRIBUTE ::= {
     IDENTIFIED BY id-rdna-trustAnchorID
 }
 
-id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) pe(1) TBD }
 
-ext-mtcCertificationAuthority EXTENSION ::= {
+ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
-    IDENTIFIED BY id-pe-mtcCertificationAuthority
+    IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
     CRITICALITY TRUE
 }
 
@@ -5559,7 +5553,6 @@ ext-mtcCertificationAuthority EXTENSION ::= {
 mtcMaxSerial INTEGER ::= 18446744073709551615
 
 MTCCertificationAuthority ::= SEQUENCE {
-    logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
     minSerial INTEGER (0..mtcMaxSerial),
     maxSerial INTEGER (0..mtcMaxSerial)
@@ -7356,6 +7349,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.17-1.13">
             <p id="appendix-E.17-1.13.1">Align the experimental OID with the final one in the X.509 name construction in using RELATIVE-OID directly.<a href="#appendix-E.17-1.13.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.14">
+            <p id="appendix-E.17-1.14.1">Lifted the tree hash into the MTC CA extension OID, so it can capture new tree constructions more generally.<a href="#appendix-E.17-1.14.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
