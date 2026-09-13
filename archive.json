@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-06T04:20:20.583682+00:00",
+  "timestamp": "2026-09-13T04:34:24.077128+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3969,15 +3969,15 @@
       "id": "I_kwDOJIBkVc8AAAABMqvAHg",
       "title": "Lift the log hash into the CA OID?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/293",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Came up when @bob-beck and I were talking about things. Having the log hash as a separate AlgorithmIdentifier means every possible hash might be reachable from MTCs, including say MD5. It also makes it challenging should someone want to do, I dunno, specific truncation of some hash.\n\nIf we instead did `id-pe-mtcCertificationAuthority-SHA256` and said that other MTC log hashes get their own OIDs, it's the same extensibility, but keeps the parameter space more controlled _and_ makes it easier to encode funny things if that's what people want.\n\nNot sure if we'd also `id-alg-mtcProof-SHA256` to match or if that's just `id-alg-mtcProof`. Strictly speaking, we don't need to bifurcate that one (and currently don't).",
       "createdAt": "2026-08-13T19:27:26Z",
-      "updatedAt": "2026-08-13T19:27:26Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-11T19:25:54Z",
+      "closedAt": "2026-09-11T19:25:54Z",
       "comments": []
     }
   ],
@@ -21447,6 +21447,176 @@
           "body": "",
           "createdAt": "2026-09-01T20:40:42Z",
           "updatedAt": "2026-09-01T20:40:42Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 313,
+      "id": "PR_kwDOJIBkVc8AAAABDB1Ofw",
+      "title": "Switch the experiment X.509 Name construction to RELATIVE-OID",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/313",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "At IETF 126, we decided to stay the course. Now that Go 1.27 is released, remove the divergence between experiment and final versions. (Go 1.27 is also the first release with ML-DSA so, while the Go limitation was annoying during the early experiments, it's very unlikely that any real deployments will care about this.)\r\n\r\nSee issue #259.",
+      "createdAt": "2026-09-10T17:12:04Z",
+      "updatedAt": "2026-09-10T19:48:06Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b68f9aef53d6397d36f4a5bc170f2d2c2e08d172",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "relative-oid",
+      "headRefOid": "d6215ff711176c0cc2ee51bc6e40db10257a5964",
+      "closedAt": "2026-09-10T19:48:02Z",
+      "mergedAt": "2026-09-10T19:48:02Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "5150a7c53e0bc2da21f957b7cb74089aab5548a8"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNDY2Ww",
+          "commit": {
+            "abbreviatedOid": "d6215ff"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-10T18:38:05Z",
+          "updatedAt": "2026-09-10T18:38:05Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 314,
+      "id": "PR_kwDOJIBkVc8AAAABDCweNA",
+      "title": "Use 24-bit length prefix for MTCProof signatures",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/314",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "Context: https://mailarchive.ietf.org/arch/msg/plants/rKNHxduUguaUwQnfttC2gFeh-BM/",
+      "createdAt": "2026-09-10T19:16:10Z",
+      "updatedAt": "2026-09-10T19:50:43Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "5150a7c53e0bc2da21f957b7cb74089aab5548a8",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "lvalenta/large-mtc-signatures",
+      "headRefOid": "31b572a18ae3de52a6093220a3d719b49e7510bf",
+      "closedAt": "2026-09-10T19:50:43Z",
+      "mergedAt": "2026-09-10T19:50:43Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3595ea9c7b75af0462e9c945bff2ac2bf59b1440"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNEBeoQ",
+          "commit": {
+            "abbreviatedOid": "31b572a"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-10T19:50:30Z",
+          "updatedAt": "2026-09-10T19:50:30Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 315,
+      "id": "PR_kwDOJIBkVc8AAAABDL71bg",
+      "title": "Make the MTC CA extension OID specify the tree type",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/315",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #293",
+      "createdAt": "2026-09-11T18:43:53Z",
+      "updatedAt": "2026-09-11T19:25:56Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3595ea9c7b75af0462e9c945bff2ac2bf59b1440",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "log-hash-in-oid",
+      "headRefOid": "a4fbba490ddf6ee91c4bc2e73aa7e4f7d108a2ce",
+      "closedAt": "2026-09-11T19:25:53Z",
+      "mergedAt": "2026-09-11T19:25:53Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "235ac4ecf97d74d6d36b067e33571ae245762c60"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNOZEzA",
+          "commit": {
+            "abbreviatedOid": "a4fbba4"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-11T19:02:34Z",
+          "updatedAt": "2026-09-11T19:02:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 316,
+      "id": "PR_kwDOJIBkVc8AAAABDNA7Pw",
+      "title": "Say how a relying party determines the log hash algorithm",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/316",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Relying Party Configuration requires the CA log hash algorithm, and the list below it says how each required item is obtained from a CA certificate structure.  The bullet for the hash algorithm was removed when the logHash field was replaced by per-hash extension types, but no replacement was added, so the list no longer accounts for one of the items it introduces.\r\n\r\nRepresenting Certification Authorities already says the extension type identifies the construction, so this only restores the pointer in the place a relying party implementer reads.",
+      "createdAt": "2026-09-11T21:41:46Z",
+      "updatedAt": "2026-09-11T23:17:02Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "235ac4ecf97d74d6d36b067e33571ae245762c60",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "restore-log-hash-derivation",
+      "headRefOid": "316eca2dd809c08163fdfbf72e79592f2c930937",
+      "closedAt": "2026-09-11T21:46:56Z",
+      "mergedAt": "2026-09-11T21:46:56Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNPibxg",
+          "commit": {
+            "abbreviatedOid": "316eca2"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-11T21:46:48Z",
+          "updatedAt": "2026-09-11T21:46:48Z",
           "comments": []
         }
       ]
