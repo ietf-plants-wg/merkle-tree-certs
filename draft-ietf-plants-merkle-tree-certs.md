@@ -1679,7 +1679,14 @@ If renewing certificates, the ACME client MAY opt to wait for optional alternate
 
 ## Using ACME with Merkle Tree Certificates
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7.5 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates.
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7.6 of !I-D.ietf-tls-trust-anchor-ids}}.
+
+{{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates. At minimum, the ACME SHOULD include:
+
+* The individual trust anchor IDs described in {{standalone-certificates-tls}} and {{landmark-relative-certificates-tls}}
+* The trust anchor group information described in {{single-log-landmark-groups}}
+
+If the CA participates in other landmark groups, e.g. {{timestamped-landmark-groups}}, the CA SHOULD include the corresponding group information.
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
