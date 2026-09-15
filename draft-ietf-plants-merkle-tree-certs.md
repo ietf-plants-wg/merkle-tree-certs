@@ -225,7 +225,7 @@ This document describes Merkle Tree certificates, a new form of X.509 certificat
 
 In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) {{?RFC6962}} for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate {{APPLE-CT}} {{CHROME-CT}}, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.
 
-Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-44 {{?FIPS204=DOI.10.6028/NIST.FIPS.204}} uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate ({{Section 7.5 of ?I-D.ietf-tls-trust-anchor-ids}}), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.
+Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-44 {{?FIPS204=DOI.10.6028/NIST.FIPS.204}} uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate ({{Section 8.5 of ?I-D.ietf-tls-trust-anchor-ids}}), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.
 
 This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.
 
@@ -967,9 +967,9 @@ Once allocated, the ID's entire object identifier (OID) arc is reserved by this 
 
 * For each positive integer `N`, the OID `{caID logs(0) N}` represents the issuance log `N` ({{issuance-logs}}).
 
-* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}.
+* For each positive integer `N` and `L`, the OID `{caID landmarks(1) N L}` represents landmark `L` ({{landmark-tree-sizes}}) of issuance log `N`. These OIDs may be used as trust anchor IDs, as described in {{landmark-relative-certificates-tls}}. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the recovery mechanism described in {{Section 5.6 of !I-D.ietf-tls-trust-anchor-ids}}.
 
-* For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
+* For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
 Future extensions to this protocol MAY define further allocations.
 
@@ -1131,7 +1131,7 @@ This signature format is designed to be compatible with the ML-DSA-44 signature 
 `cosigner_name` and `log_origin` are computed from the cosigner ID and the issuance log's ID ({{ca-ids}}), respectively. They contain the concatenation of:
 
 * The 16-byte ASCII string `oid/1.3.6.1.4.1.`
-* The trust anchor ID's ASCII representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}})
+* The trust anchor ID's ASCII representation ({{Section 4 of !I-D.ietf-tls-trust-anchor-ids}})
 
 This is equivalent to the concatenation of:
 
@@ -1198,7 +1198,7 @@ This section defines the X.509 Certificate {{!RFC5280}} representation of a Merk
 
 * The `extensions` field MUST contain a critical Merkle Tree CA extension. This is defined below.
 
-* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to the CA ID {{ca-ids}}. The CA ID is encoded in its binary representation, as defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}.
+* The subject key identifier extension ({{Section 4.2.1.2 of !RFC5280}}), if present, SHOULD be set to the CA ID {{ca-ids}}. The CA ID is encoded in its binary representation, as defined in {{Section 4 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 Other fields and extensions in {{!RFC5280}} apply unmodified. In particular:
 
@@ -1283,7 +1283,7 @@ For initial experimentation, early implementations of this design will use the O
 The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
 ~~~tls-presentation
-/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+/* From Section 4 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorID<1..2^8-1>;
 
 opaque HashValue[HASH_SIZE];
@@ -1304,7 +1304,7 @@ struct {
 
 `extensions` MUST contain the log entry's `extensions` value ({{log-entries}}).
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
+`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 4 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
 Each element of the `signatures` field MUST have a unique `cosigner_id`. Elements MUST be ordered by `cosigner_id` (excluding length prefix) as follows:
 
@@ -1581,7 +1581,7 @@ Certificate selection in TLS, described in {{Section 4.5.1.2 of !RFC9846}}, inco
 
 Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding CA ID ({{ca-ids}}). This trust anchor ID is additionally contained in the trust anchor groups defined in {{single-log-landmark-groups}}.
 
-CA IDs MAY be incorporated into other trust anchor groups, following the guidance in {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}.
+CA IDs MAY be incorporated into other trust anchor groups, following the guidance in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 [[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]
 
@@ -1589,57 +1589,71 @@ A standalone certificate MAY also be sent without explicit relying party trust s
 
 ## Landmark-Relative Certificates {#landmark-relative-certificates-tls}
 
-An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
+An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees. This can be represented with the `trust_anchor_negotiation` property in a CertificatePropertyList (see {{Section 7.3 of !I-D.ietf-tls-trust-anchor-ids}}), or other local configuration.
 
-TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate's trust anchor ID is the concatenation of the following OID components:
+TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate issued by a CA with ID `caID`, log number `N`, and constructed from landmark `L` has a trust anchor ID of `{caID landmarks(1) N L}`.
 
-* The CA ID {{ca-ids}} of the CA that issued the certificate
-* The constant 1
-* The log number of the log used to construct the certificate
-* The landmark number of the landmark used to construct the certificate
+For example, the trust anchor ID for landmark 42 of CA `32473.100` and log number `8` is `32473.100.1.8.42`.
 
-For example, the trust anchor ID for landmark 42 of CA `32473.1` and log number `8` is `32473.1.1.8.42`.
-
-These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in {{single-log-landmark-groups}}, which allow relying parties to express their landmark state with a single ID.
+These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the recovery mechanism described in {{Section 5.6 of !I-D.ietf-tls-trust-anchor-ids}}. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in {{single-log-landmark-groups}}, which allow relying parties to express their landmark state with a single ID.
 
 If both a landmark-relative and a standalone certificate are usable, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.
 
 ### Single-Log Landmark Groups
 
-Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines a series of trust anchor groups ({{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}) called *landmark groups*.
+Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines a series of trust anchor groups ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) called *landmark groups*.
 
-For each Merkle Tree Certificates CA, each log number `N`, and each landmark number `L`, a landmark group is defined. The group's ID is the concatenation of the following OID components:
+For each Merkle Tree Certificates CA with ID `caID`, each log number `N`, and each landmark number `L`, the ID `{caID landmarkGroups(2) N L}` defines a landmark group. It contains the following trust anchor IDs:
 
-* The CA ID {{ca-ids}} of the CA
-* The constant 2
-* The log number `N`
-* The landmark number `L`
+* `caID` itself (see {{standalone-certificates-tls}}). This selects all standalone certificates.
+* `{caID landmarks(1) N L2}` for all `L2` from `L - max_active_landmarks + 1` to `L`, inclusive. This selects landmark-relative certificates from landmarks up to `L`.
 
-This group contains the following trust anchors:
+To support these groups in the authenticating party, CAs SHOULD configure certificates to match the following trust anchor groups ({{Sections 5.3 and 7.2 of !I-D.ietf-tls-trust-anchor-ids}}):
 
-* The CA ID itself (see {{standalone-certificates-tls}})
-* Each landmark of log `N` from `L - max_active_landmarks + 1` to `L`, inclusive
+* A standalone certificate SHOULD include a trust anchor ID pattern of `caID.2.{0-}.{0-}`.
+* A landmark-relative log number `N` and landmark `L` SHOULD include a trust anchor ID pattern of `caID.2.N.{L-L_max}`, where `L_max` is `L + max_active_landmarks - 1`.
 
-Landmark-relative certificates SHOULD be configured with this information, as in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party whose latest trusted subtree ({{trusted-subtrees}}) in log `N` is landmark `L` SHOULD configure the `trust_anchors` extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks.
+For example, suppose a CA `32473.100` has a `max_active_landmarks` of 20. It issues a certificate in landmark 42 of log 8. Then:
 
-For example, a relying party which is up-to-date as of landmark 42 of log 8 of CA `32473.1` would send an ID of `32473.1.2.8.42`.
+* The standalone certificate has a trust anchor ID of `32473.100` and is contained in groups `32473.100.2.{0-}.{0-}`.
+* The landmark-relative certificate has a trust anchor ID of `32473.100.1.8.42` and is contained in groups `32473.100.2.8.{42-61}`.
 
+A relying party whose latest trusted subtree ({{trusted-subtrees}}) in log `N` is landmark `L` SHOULD configure the `trust_anchors` extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks. For example, a relying party which is up-to-date as of landmark 42 of log 8 of CA `32473.100` would send an ID of `32473.100.2.8.42`. This would signal the following certificates:
+
+* Any standalone certificate from `32473.100`, no matter the log or landmark number.
+* Any landmark-relative certificate from `32473.100` from landmarks 23 through 42, inclusive, of log 8.
+
+If this landmark information becomes too stale, such a relying party SHOULD switch to advertising just the CA ID. In the above example, this would be `32473.100`.
 
 ### Timestamped Landmark Groups
 
-Landmark groups for a single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state.
+Landmark groups for a single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state. When needed, {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}} describes how PKIs can use trust anchor groups that span multiple CAs. This section defines a variation of the versioning construction described in {{Section 6.1 of !I-D.ietf-tls-trust-anchor-ids}}, as applied to landmarks.
 
-When needed, {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}} describes how PKIs requiring further size savings can use trust anchor groups that span multiple CA instances. For example, a single ID may signal support for a group of CAs across one or more CA operators. This section describes how such groups can be applied to landmarks, using a variation of the versioning construction described in {{Section 5.1 of !I-D.ietf-tls-trust-anchor-ids}}.
+Trust anchor groups containing Merkle Tree CAs can represent landmarks with an OID component based on a predictable clock. Concretely, the family of groups is parameterized by:
 
-Trust anchor groups containing landmarks SHOULD define versions predictably based on the time. For example, if the contained CAs allocate landmarks roughly hourly, the trust anchor group might increment the version component every hour. Each given version of the group SHOULD contain the active landmarks as of the corresponding timestamp.
+* A base OID arc `base`
+* A timestamp `start_time`
+* A time duration `tick_duration`
 
-This predictable cadence allows the CA to construct trust anchor group inclusions ({{Section 7.2 of !I-D.ietf-tls-trust-anchor-ids}}) for issued certificates without additional coordination. Conversely, a relying party MAY send a version if its trusted subtrees ({{trusted-subtrees}}) are up-to-date for all contained CAs, as of the version's timestamp.
+Given non-negative integers `V` and `T`, the group `base.V` contains standalone certificates issued by some CA in version `V` of the group. The group `base.V.T` contains:
 
-In some cases, the relying party's trusted subtrees may only be partially up-to-date. The relying party, or its update service, may be unable to reach one CA in the group, e.g. due to a transient outage. This complicates timestamp-based strategies:
+* Standalone certificates issued by some CA in version `V` of the group.
+* Landmark-relative certificates issued one of the above CAs, provided the landmark was active at time `start_time + T * tick_duration`.
 
-* If the relying party sends the group with an older timestamp, it will not signal its up-to-date state for the reachable CAs. This means a single unreachable CA can disrupt service for certificates issued by unrelated CAs.
+`start_time` SHOULD be set to sometime before the group is in use. `tick_duration` SHOULD be set near the expected time between landmarks in the group, e.g. one hour. This predictable cadence allows the CA to describe the trust anchor groups ({{Section 7.2 of !I-D.ietf-tls-trust-anchor-ids}}) for issued certificates without additional coordination. Concretely, if a CA was added in `V_min`, was removed in `V_max + 1`, and issues a certificate whose landmark was first active at time `T_min` and last active at time `T_max`:
 
-* If the relying party sends the group with a newer timestamp, the relying party may signal support for landmarks it does not have. This risks connection failures. If the unreachable CA issued recent landmark-relative certificates, those certificates will fail validation.
+* The standalone certificate is contained in groups `base.{V_min-V_max}` and `base.{V_min-V_max}.{0-}`.
+* The landmark-relative certificate is contained in groups `base.{V_min-V_max}.{T_min-T_max}`
+
+If the CA has not been removed in the latest version, `V_max` is infinity, similar to the construction described in {{Section 6.1 of !I-D.ietf-tls-trust-anchor-ids}}. `T_min` and `T_max` are measured based on `start_time` and `tick_duration` as described above.
+
+A relying party sets `V` based on its current trust anchors and `T` based on the age of its landmark information. If its landmarks are too stale, it sends `base.V` without any landmark timestamp.
+
+In some cases, the relying party's landmark information may only be partially up-to-date. The relying party, or its update service, may be unable to reach one CA in the group, e.g. due to a transient outage. This complicates timestamp-based strategies:
+
+* If the relying party uses an older timestamp, it will not signal its up-to-date state for the reachable CAs. This means a single unreachable CA can disrupt service for certificates issued by unrelated CAs.
+
+* If the relying party uses a newer timestamp, the relying party may signal support for landmarks it does not have. This risks connection failures. If the unreachable CA issued recent landmark-relative certificates, those certificates will fail validation.
 
 The relying party can mitigate this in a number of ways:
 
@@ -1647,7 +1661,7 @@ The relying party can mitigate this in a number of ways:
 
 * The relying party can opt to send the group with an older timestamp, combined with other, smaller groups at newer timestamps to better describe its state.
 
-* A client relying party can send the newer timestamp and, in the event the unreachable CA did issue recent landmark-relative certificates, rely on the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}} to recover from any signaling failures.
+* A client relying party can send the newer timestamp and, in the event the unreachable CA did issue recent landmark-relative certificates, rely on the recovery mechanism described in {{Section 5.6 of !I-D.ietf-tls-trust-anchor-ids}} to recover from any signaling failures.
 
 # ACME Extensions
 
@@ -1665,11 +1679,20 @@ If renewing certificates, the ACME client MAY opt to wait for optional alternate
 
 ## Using ACME with Merkle Tree Certificates
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates.
+Standalone and landmark-relative certificates represent a single issuance event, so they are returned from the same order. When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
-When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
+The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. The landmark-relative certificate will typically not yet be available, so it initially serves an HTTP 202 response, as described in {{optional-certificates}}. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the "acme-optional-alternate" URL.
 
-The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. It initially serves an HTTP 202 response, as described in {{optional-certificates}}. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the URL.
+When downloading either certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type to include a CertificatePropertyList.
+
+The CertificatePropertyList SHOULD include trust anchor ID information as described in {{Section 7.5 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates. At minimum, the ACME server SHOULD include:
+
+* A `trust_anchor_id` property with the trust anchor IDs described in {{standalone-certificates-tls}} and {{landmark-relative-certificates-tls}}
+* A `trust_anchor_groups` property with the information described in {{single-log-landmark-groups}}
+
+If the CA participates in other landmark groups, e.g. {{timestamped-landmark-groups}}, the ACME server SHOULD include the corresponding information in `trust_anchor_groups`.
+
+The ACME server SHOULD include a `trust_anchor_negotiation` property with the landmark-relative certificate. This indicates the landmark-relative certificate requires a trust anchor ID match to indicate that the relying party recognizes the landmark. The ACME server MAY include or omit `trust_anchor_negotiation` with the standalone certificate, based on the criteria described in {{Sections 7.3 and 7.5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 # Deployment Considerations
 
@@ -1743,7 +1766,7 @@ If the service is rotating keys in response to a key compromise, this option is 
 
 The Privacy Considerations described in {{Section 9 of !I-D.ietf-tls-trust-anchor-ids}} apply to their use with Merkle Tree Certificates.
 
-In particular, relying parties that share an update process for trusted subtrees ({{trusted-subtrees}}) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.
+In particular, relying parties that share an update process for trusted subtrees ({{trusted-subtrees}}) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. gated on the recovery flow, the trust anchor list will require active probing.
 
 # Security Considerations
 
@@ -2772,3 +2795,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Align the experimental OID with the final one in the X.509 name construction in using RELATIVE-OID directly.
 
 - Lifted the tree hash into the MTC CA extension OID, so it can capture new tree constructions more generally.
+
+- Update for draft-ietf-tls-trust-anchor-ids-05, and spell out certificate configuration explicitly.

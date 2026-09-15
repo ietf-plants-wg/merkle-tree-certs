@@ -30,6 +30,9 @@ type certificateInfo struct {
 	cosigners         []*Cosigner
 	// The number of certificate for the given index.
 	num int
+	// The number of the landmark for this certificate, or zero if it wasn't
+	// defined against the landmark sequence.
+	landmarkNum int
 }
 
 func makeDirsAndWriteFile(name string, data []byte) error {
@@ -159,6 +162,9 @@ func generate(args []string) error {
 				} else if c := certConfig.Checkpoint; len(c) != 0 {
 					// Make a note to fill in the subtree when available.
 					awaitingCheckpoint[c] = append(awaitingCheckpoint[c], checkpointWait{idx: uint64(len(certInfos)), prev: checkpointSeqs[c]})
+					if c == "landmark" {
+						info.landmarkNum = len(landmarks)
+					}
 				} else {
 					return fmt.Errorf("neither Checkpoint nor SubtreeEnd specified in a certificate")
 				}
@@ -231,9 +237,38 @@ func generate(args []string) error {
 			return err
 		}
 
+		props := info.certConfig.OverrideCertificatePropertyList
+		if props == nil {
+			props = &CertificatePropertyList{}
+			if info.landmarkNum > 0 {
+				props.TrustAnchorNegotiation = true
+				props.TrustAnchorID = slices.Clip(config.ID)
+				props.TrustAnchorID = appendBase128(props.TrustAnchorID, 1)
+				props.TrustAnchorID = appendBase128(props.TrustAnchorID, uint32(config.LogNumber))
+				props.TrustAnchorID = appendBase128(props.TrustAnchorID, uint32(info.landmarkNum))
+				pattern := TrustAnchorIDToPattern(config.ID)
+				pattern = appendPatternRange(pattern, 2, 2)
+				pattern = appendPatternRange(pattern, uint32(config.LogNumber), uint32(config.LogNumber))
+				pattern = appendPatternRange(pattern, uint32(info.landmarkNum), uint32(info.landmarkNum+config.MaxActiveLandmarks-1))
+				props.TrustAnchorGroups = []TrustAnchorIDPattern{pattern}
+			} else {
+				props.TrustAnchorID = config.ID
+				pattern := TrustAnchorIDToPattern(config.ID)
+				pattern = appendPatternRange(pattern, 2, 2)
+				pattern = appendPatternRangeWithInfinity(pattern, 0)
+				pattern = appendPatternRangeWithInfinity(pattern, 0)
+				props.TrustAnchorGroups = []TrustAnchorIDPattern{pattern}
+			}
+		}
+		propsBytes, err := MarshalCertificatePropertyList(props)
+		if err != nil {
+			return err
+		}
+
 		certPath := filepath.Join(*flagOutDir, fmt.Sprintf("cert_%d_%d.pem", info.index, info.num))
+		propsPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE PROPERTIES", Bytes: propsBytes})
 		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
-		if err := os.WriteFile(certPath, certPEM, 0644); err != nil {
+		if err := os.WriteFile(certPath, slices.Concat(propsPEM, certPEM), 0644); err != nil {
 			return err
 		}
 
