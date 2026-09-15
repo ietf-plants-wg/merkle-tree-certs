@@ -2793,3 +2793,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Align the experimental OID with the final one in the X.509 name construction in using RELATIVE-OID directly.
 
 - Lifted the tree hash into the MTC CA extension OID, so it can capture new tree constructions more generally.
+
+- Update for draft-ietf-tls-trust-anchor-ids-05, and spell out certificate configuration explicitly.
