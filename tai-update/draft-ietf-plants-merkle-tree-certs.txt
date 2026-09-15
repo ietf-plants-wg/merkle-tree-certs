@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 15 February 2027                                     Apple Inc.
+Expires: 19 March 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          14 August 2026
+                                                       15 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 February 2027.
+   This Internet-Draft will expire on 19 March 2027.
 
 Copyright Notice
 
@@ -170,11 +170,17 @@ Table of Contents
      B.3.  Inclusion Proof Evaluation
      B.4.  Consistency Proof Structure
      B.5.  Consistency Proof Verification
-   Appendix C.  Subtree Test Vectors
-     C.1.  Subtree Hashes
-     C.2.  Subtree Inclusion Proofs
-     C.3.  Subtree Consistency Proofs
-     C.4.  Efficient Covering Subtrees
+   Appendix C.  Test Vectors
+     C.1.  Accumulated Subtree Test Vectors
+       C.1.1.  Subtree Hashes
+       C.1.2.  Subtree Inclusion Proofs
+       C.1.3.  Subtree Consistency Proofs
+       C.1.4.  Efficient Covering Subtrees
+     C.2.  Large Subtree Test Vectors
+       C.2.1.  Subtree Validity
+       C.2.2.  Subtree Inclusion Proofs
+       C.2.3.  Subtree Consistency Proofs
+       C.2.4.  Efficient Covering Subtrees
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -211,9 +217,9 @@ Table of Contents
    larger.  For example, ML-DSA-44 [FIPS204] uses 1,312 bytes per public
    key and 2,420 bytes per signature.  ML-DSA-65 uses 1,952 bytes per
    public key and 3,309 bytes per signature.  Even with a directly-
-   trusted intermediate (Section 7.5 of
+   trusted intermediate (Section 8.5 of
    [I-D.ietf-tls-trust-anchor-ids]), two SCTs and a leaf certificate
-   signature adds 7,260 bytes of authentication overhead with ML-DSA-44
+   signature add 7,260 bytes of authentication overhead with ML-DSA-44
    and 9,927 bytes with ML-DSA-65.
 
    This increased overhead additionally impacts CT logs themselves.
@@ -223,7 +229,8 @@ Table of Contents
    entry will grow.
 
    Additionally, as PKIs transition to shorter-lived certificates
-   [CABF-153] [CABF-SC081], the number of entries in the log will grow.
+   [CABF-153] [CABF-SC081], the rate at which entries are added to the
+   log will increase.
 
    This document introduces Merkle Tree Certificates (MTCs), a new form
    of X.509 certificate that integrates logging with certificate
@@ -260,8 +267,8 @@ Table of Contents
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
    This document additionally uses the TLS presentation language defined
@@ -274,6 +281,11 @@ Table of Contents
    U+ followed by four hexadecimal characters denotes a Unicode
    codepoint, to be encoded in UTF-8 [RFC3629]. 0x followed by two
    hexadecimal characters denotes a byte value in the 0-255 range.
+
+   The _decimal representation_ of a non-negative integer is its base-
+   ten representation, written with the ASCII digits 0 through 9 (U+0030
+   through U+0039).  Zero is written as the single digit 0, and no other
+   value is written with a leading 0.
 
    [start, end), where start <= end, denotes the half-open interval
    containing integers x such that start <= x < end.
@@ -429,7 +441,7 @@ Table of Contents
        [RFC8555]
 
    2.  The CA validates each incoming issuance request, e.g. with ACME
-       challenges.  From there, the process differs.
+       challenges.  From there, the process diverges from CT-based PKIs.
 
    3.  The CA operates a series of append-only _issuance logs_
        (Section 5.2).  Unlike a CT log, these logs only contain entries
@@ -560,8 +572,8 @@ Table of Contents
    by two subtrees.  Section 4.5 describes how to determine these
    subtrees.
 
-   Appendix C provides test vectors for the algorithms defined in this
-   section.
+   Appendix C.1 and Appendix C.2 provide test vectors for the algorithms
+   defined in this section.
 
 4.1.  Definition of a Subtree
 
@@ -580,6 +592,23 @@ Table of Contents
    D[start:end] as an independent list, is sufficiently aligned with the
    original Merkle Tree to support subtree consistency proofs.  See
    Appendix B.2 for more details.
+
+   In implementations using fixed-width integers, BIT_CEIL(end - start)
+   above may exceed end and potentially overflow.  For example, if start
+   is zero and end is 2^63+1, BIT_CEIL(end - start) is 2^64.  The
+   following is an example C++ implementation that handles this
+   condition.
+
+   bool is_valid_subtree(uint64_t start, uint64_t end) {
+     if (start > end) {
+       return false;
+     }
+     uint64_t size = end - start;
+     if (size > (uint64_t{1} << 63)) {
+       return start == 0;  // bit_ceil below will overflow.
+     }
+     return (start & (std::bit_ceil(size) - 1)) == 0;
+   }
 
    For all x, [0, x) is a valid subtree (0 is a multiple of everything),
    and [x, x) is a valid subtree (BIT_CEIL(0) is 1).
@@ -731,7 +760,7 @@ Table of Contents
    hash:
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
-       that start <= index < end.  If either do not hold, fail proof
+       that start <= index < end.  If either does not hold, fail proof
        evaluation.
 
    2.  Set fn to index - start and sn to end - start - 1.
@@ -952,7 +981,7 @@ Table of Contents
    hash root_hash:
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
-       that end <= n.  If either do not hold, fail proof verification.
+       that end <= n.  If either does not hold, fail proof verification.
        These checks imply 0 <= start <= end <= n.
 
    2.  If start equals end, check the following conditions:
@@ -1192,11 +1221,11 @@ Table of Contents
       represents landmark L (Section 6.4.1) of issuance log N.  These
       OIDs may be used as trust anchor IDs, as described in Section 8.2.
       These OIDs are used when it is necessary to identify an individual
-      landmark, e.g. as in the retry mechanism described Section 4.3 of
-      [I-D.ietf-tls-trust-anchor-ids].
+      landmark, e.g. as in the recovery mechanism described in
+      Section 5.6 of [I-D.ietf-tls-trust-anchor-ids].
 
    *  For each positive integer N and L, the OID {caID landmarkGroups(2)
-      N L} represents a trust anchor group (Section 5 of
+      N L} represents a trust anchor group (Section 6 of
       [I-D.ietf-tls-trust-anchor-ids]) containing landmark L of log N
       and earlier landmarks of that log, as defined in Section 8.2.1.
       These OIDs may be used to advertise a series of landmarks at once.
@@ -1220,20 +1249,13 @@ Table of Contents
    1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
 
    For initial experimentation, early implementations of this design
-   will:
+   will use the OID 1.3.6.1.4.1.44363.47.3 instead of id-rdna-
+   trustAnchorID.  Cloudflare has kindly donated the
+   1.3.6.1.4.1.44363.47 OID arc for use in this document.  For example,
+   the distinguished name for an experimental CA with ID 32473.1 would
+   be represented in syntax of [RFC4514] as:
 
-   1.  Use UTF8String to represent the attribute's value rather than
-       RELATIVE-OID.  The UTF8String contains trust anchor ID's ASCII
-       representation, e.g. 32473.1.
-
-   2.  Use the OID 1.3.6.1.4.1.44363.47.1 instead of id-rdna-
-       trustAnchorID.  Cloudflare has kindly donated the
-       1.3.6.1.4.1.44363.47 OID arc for use in this document.
-
-   For example, the distinguished name for a CA with ID 32473.1 would be
-   represented in syntax of [RFC4514] as:
-
-   1.3.6.1.4.1.44363.47.1=#0c0733323437332e31
+   1.3.6.1.4.1.44363.47.3=#0d0481fd5901
 
 5.2.  Issuance Logs
 
@@ -1252,12 +1274,12 @@ Table of Contents
 
    A log ID specifies both the CA and the log number in a single ID.
 
-   Each issuance log describes an append-only sequence of _entries_
-   (Section 5.2.1).  Each entry is identified by an integer _index_,
-   assigned consecutively starting from zero.  Indices are at most
-   2^48-1.  Each entry is an assertion that the CA has certified.  The
-   entries in the issuance log are represented as a Merkle Tree,
-   described in Section 2.1 of [RFC9162].
+   Each issuance log describes an append-only sequence of at most 2^48-1
+   _entries_ (Section 5.2.1).  Each entry is identified by an integer
+   _index_, assigned consecutively starting from zero.  Each entry is an
+   assertion that the CA has certified.  The entries in the issuance log
+   are represented as a Merkle Tree, described in Section 2.1 of
+   [RFC9162].
 
    Unlike [RFC6962] and [RFC9162], an issuance log does not have a
    public submission interface.  The log only contains entries which the
@@ -1307,10 +1329,10 @@ Table of Contents
        }
    } MTCLogEntry;
 
-   Field extensions is the list of tag-length-value extensions
-   associated with the log entry.  The extensions list MUST be appear in
-   ascending order by extension_type and MUST NOT contain two extensions
-   with the same extension_type.
+   The extensions field is a list of tag-length-value extensions
+   associated with the log entry.  Extensions MUST appear in the list in
+   ascending order by extension_type, and the list MUST NOT contain two
+   extensions with the same extension_type.
 
    When type is null_entry, the entry does not represent any
    information.  Entries at any index in the log MAY have type
@@ -1367,7 +1389,7 @@ Table of Contents
       public key.  It is constructed identically to the algorithm field
       of a SubjectPublicKeyInfo (Section 4.1.2.7 of [RFC5280]).
 
-   *  subjectPublicKeyInfoHash contains the hash of subject's public
+   *  subjectPublicKeyInfoHash contains the hash of the subject's public
       key, encoded as a SubjectPublicKeyInfo.  The hash uses the CA's
       hash function (Section 5) and is computed over the
       SubjectPublicKeyInfo's DER [X.690] encoding.
@@ -1478,7 +1500,7 @@ Table of Contents
 
    *  The 16-byte ASCII string oid/1.3.6.1.4.1.
 
-   *  The trust anchor ID's ASCII representation (Section 3 of
+   *  The trust anchor ID's ASCII representation (Section 4 of
       [I-D.ietf-tls-trust-anchor-ids])
 
    This is equivalent to the concatenation of:
@@ -1609,9 +1631,8 @@ Table of Contents
 5.5.  Representing Certification Authorities
 
    This section defines the X.509 Certificate [RFC5280] representation
-   of a Merkle Tree Certificate CA.  It identifies the CA cosigner
-   (Section 5.4) and associated issuance logs.  This information is
-   encoded as follows:
+   of a Merkle Tree CA.  It identifies the CA cosigner (Section 5.4) and
+   associated issuance logs.  This information is encoded as follows:
 
    *  The subject field MUST be the CA ID as a PKIX distinguished name,
       as described in Section 5.1.
@@ -1619,13 +1640,13 @@ Table of Contents
    *  The subjectPublicKeyInfo field MUST be the public key of the CA
       cosigner Section 5.4.
 
-   *  The extensions field MUST contain a critical extension of type id-
-      pe-mtcCertificationAuthority, defined below.
+   *  The extensions field MUST contain a critical Merkle Tree CA
+      extension.  This is defined below.
 
    *  The subject key identifier extension (Section 4.2.1.2 of
       [RFC5280]), if present, SHOULD be set to the CA ID Section 5.1.
       The CA ID is encoded in its binary representation, as defined in
-      Section 3 of [I-D.ietf-tls-trust-anchor-ids].
+      Section 4 of [I-D.ietf-tls-trust-anchor-ids].
 
    Other fields and extensions in [RFC5280] apply unmodified.  In
    particular:
@@ -1636,18 +1657,25 @@ Table of Contents
    *  The basic constraints extension (Section 4.2.1.9 of [RFC5280])
       MUST be present and set the cA field to TRUE.
 
-   The id-pe-mtcCertificationAuthority extension is defined below.  This
-   extension indicates that the subject of the certificate is a CA that
-   issues Merkle Tree Certificates.  If present, it MUST be marked as
-   critical.
+   The Merkle Tree CA extension defines the remaining parameters
+   specific to this protocol.  It indicates that the subject of the
+   certificate is a CA that issues Merkle Tree Certificates.  If
+   present, it MUST be marked as critical.  The extension type
+   identifies the Merkle Tree construction, and the contents define
+   additional parameters of the CA cosigner.
 
-   id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+   This document defines one extension type, id-pe-
+   mtcCertificationAuthority-SHA256, which indicates hashing with
+   SHA-256 [SHS].  Other documents MAY define corresponding extensions
+   for other hash functions or new versions of the tree construction.
+
+   id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
        mechanisms(5) pkix(7) pe(1) TBD }
 
-   ext-mtcCertificationAuthority EXTENSION ::= {
+   ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
        SYNTAX MTCCertificationAuthority
-       IDENTIFIED BY id-pe-mtcCertificationAuthority
+       IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
        CRITICALITY TRUE
    }
 
@@ -1655,23 +1683,18 @@ Table of Contents
    mtcMaxSerial INTEGER ::= 18446744073709551615
 
    MTCCertificationAuthority ::= SEQUENCE {
-       logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
        minSerial INTEGER (0..mtcMaxSerial),
        maxSerial INTEGER (0..mtcMaxSerial)
    }
 
    For initial experimentation, early implementations of this design
-   will use the OID 1.3.6.1.4.1.44363.47.2 instead of id-pe-
-   mtcCertificationAuthority.  Cloudflare has kindly donated the
+   will use the OID 1.3.6.1.4.1.44363.47.4 instead of id-pe-
+   mtcCertificationAuthority-SHA256.  Cloudflare has kindly donated the
    1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
    The fields of an MTCCertificationAuthority structure are defined as
    follows:
-
-   *  logHash describes the hash algorithm used by all logs operated by
-      this CA.  For example, if the hash is SHA-256, it would be mda-
-      sha256 as defined in Section 8 of [RFC5912].
 
    *  sigAlg is the CA cosigner's signature algorithm (Section 5.3.3).
 
@@ -1690,10 +1713,9 @@ Table of Contents
    extension type.
 
    A CA certificate using this format SHOULD NOT be self-signed by the
-   Merkle Tree Certificate CA.  Doing so would require writing the
-   information in the issuance log.  Instead, if used to represent a
-   trust anchor, the certificate SHOULD be an unsigned certificate
-   [RFC9925].
+   CA.  Doing so would require writing the information in the issuance
+   log.  Instead, if used to represent a trust anchor, the certificate
+   SHOULD be an unsigned certificate [RFC9925].
 
 6.  Certificates
 
@@ -1769,7 +1791,7 @@ Table of Contents
    The signatureValue contains an MTCProof structure, defined below
    using the TLS presentation language (Section 3 of [RFC9846]):
 
-   /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+   /* From Section 4 of draft-ietf-tls-trust-anchor-ids */
    opaque TrustAnchorID<1..2^8-1>;
 
    opaque HashValue[HASH_SIZE];
@@ -1784,7 +1806,7 @@ Table of Contents
        uint48 start;
        uint48 end;
        HashValue inclusion_proof<0..2^16-1>;
-       SubtreeSignature signatures<0..2^16-1>;
+       SubtreeSignature signatures<0..2^24-1>;
    } MTCProof;
 
    extensions MUST contain the log entry's extensions value
@@ -1795,7 +1817,7 @@ Table of Contents
    (Section 4.3) for the log entry and the subtree. signatures contains
    the chosen subtree signatures.  In each signature, cosigner_id
    contains the cosigner ID (Section 5.3) in its binary representation
-   (Section 3 of [I-D.ietf-tls-trust-anchor-ids]), and signature
+   (Section 4 of [I-D.ietf-tls-trust-anchor-ids]), and signature
    contains the signature value as described in Section 5.3.1.  The
    timestamp field used when computing the signature MUST be zero.
 
@@ -1839,25 +1861,26 @@ Table of Contents
 
    3.  The CA signs each subtree with its key(s) (Section 5.3).
 
-   4.  The CA requests sufficient checkpoint cosignatures (Section 5.3)
-       from external cosigners to meet relying party requirements
-       (Section 7.3).
+   4.  The CA requests sufficient subtree cosignatures from external
+       cosigners to meet relying party requirements (Section 7.3).
+       Depending on the protocol for requesting subtree cosignatures
+       (e.g. [TLOG-WITNESS] and [TLOG-MIRROR]), this step may require
+       first requesting a checkpoint cosignature (Section 5.3) from each
+       cosigner.
 
-   5.  The CA requests subtree cosignatures from the cosigners above.
-
-   6.  For each log entry in the interval, the CA constructs a
+   5.  For each log entry in the interval, the CA constructs a
        certificate (Section 6.2) from the inputs in Section 6.1, using
        the covering subtree and the subtree cosignatures collected in
-       steps 3 and 5.
+       steps 3 and 4.
 
-   Steps 4 and 5 are analogous to requesting SCTs from CT logs in
-   Certificate Transparency, except that a single run of this job
-   collects signatures for many certificates at once.  The CA MAY
-   request signatures from a redundant set of cosigners and select the
-   ones that complete first.
+   Step 4 is analogous to requesting SCTs from CT logs in Certificate
+   Transparency, except that a single run of this job collects
+   signatures for many certificates at once.  The CA MAY request
+   signatures from a redundant set of cosigners and select the ones that
+   complete first.
 
    This document does not place any requirements on how frequently this
-   job runs.  More frequent runs results in lower issuance delay, but
+   job runs.  More frequent runs result in lower issuance delay, but
    higher signing overhead.  It is RECOMMENDED that CAs run at most one
    instance of this job at a time, starting the next instance after the
    previous one completes.  A single run collects signatures for all
@@ -1968,7 +1991,8 @@ Table of Contents
    following sequence of lines.  Each line MUST be terminated by a
    newline character (U+000A):
 
-   *  Two space-separated non-negative decimal integers: <last_landmark>
+   *  The decimal representations of two non-negative integers,
+      separated by a single space character (U+0020): <last_landmark>
       <num_active_landmarks>.  This line MUST satisfy the following,
       otherwise it is invalid:
 
@@ -1976,12 +2000,18 @@ Table of Contents
 
       -  num_active_landmarks <= last_landmark
 
-   *  num_active_landmarks + 1 lines each containing a single non-
-      negative decimal integer, representing a tree size.  Numbered from
-      zero to num_active_landmarks, line i contains the tree size for
-      landmark last_landmark - i.  The tree sizes MUST be strictly
-      monotonically decreasing and less than or equal to the log's
-      latest tree size.
+   *  num_active_landmarks + 1 lines, each containing the decimal
+      representation of a tree size.  Numbered from zero to
+      num_active_landmarks, line i contains the tree size for landmark
+      last_landmark - i.  The tree sizes MUST be strictly monotonically
+      decreasing and less than or equal to the log's latest tree size.
+
+   Landmark numbers and tree sizes are both at most 2^48-1
+   (Section 5.2).  Any deviation from this format, including additional
+   whitespace or any content following the final line, makes the
+   document invalid.  Relying parties MUST reject an invalid document in
+   its entirety, rather than acting on the portion that precedes the
+   error.
 
    It is RECOMMENDED that this format be published as an HTTP resource
    [RFC9110] with content type text/plain; charset=utf-8.
@@ -2014,6 +2044,12 @@ Table of Contents
    anchor ID of the landmark may be used as an efficient identifier in
    the application protocol.  Section 8 discusses how to do this in TLS
    [RFC9846].
+
+   The procedure above is not specific to the CA.  In particular, a
+   party holding a standalone certificate (Section 6.3) can construct
+   the corresponding landmark-relative certificate by recovering the
+   certificate inputs from it and obtaining the landmark sequence and
+   inclusion proof hashes from the issuance log.
 
 6.5.  Size Estimates
 
@@ -2092,14 +2128,14 @@ Table of Contents
 
    *  The CA ID is determined from the certificate's subject.
 
-   *  The log hash algorithm is determined from the id-pe-
-      mtcCertificationAuthority extension.
+   *  The log hash algorithm is determined from the type of the Merkle
+      Tree CA extension.
 
    *  The CA cosigner is determined from the certificate's subject
-      public key and id-pe-mtcCertificationAuthority extension.  The
-      CA's cosigner ID is the same as its CA ID.  The relying party
-      incorporates this cosigner into its cosigner policy based on the
-      guidance in Section 7.3.
+      public key and Merkle Tree CA extension.  The CA's cosigner ID is
+      the same as its CA ID.  The relying party incorporates this
+      cosigner into its cosigner policy based on the guidance in
+      Section 7.3.
 
    *  No trusted subtrees are directly represented by the CA certificate
       structure, but the relying party MAY incorporate trusted subtrees
@@ -2168,7 +2204,7 @@ Table of Contents
         end, following the procedure in Section 4.3.2.  If evaluation
         fails, abort this process and fail verification.
 
-   11.  If log_number, start, and end matches a trusted subtree
+   11.  If log_number, start, and end match a trusted subtree
         (Section 7.4) for the CA, check that expected_subtree_hash is
         equal to the trusted subtree's hash.  Return success if it
         matches and failure if it does not.
@@ -2322,7 +2358,7 @@ Table of Contents
    It is not necessary that the cosigners have generated signatures over
    the specific subtrees, only that they are consistent.
 
-   This criteria can be checked given:
+   This criterion can be checked given:
 
    *  Some _reference checkpoint_ that contains the latest landmark
 
@@ -2402,9 +2438,10 @@ Table of Contents
    This is analogous to the [SCTNotAfter] mechanism used in some PKIs.
 
    The revocation mechanism in this section is complementary to
-   certificate-level revocation mechanisms. log entries are uniquely
-   identified by their serial number and issuer, existing revocation
-   mechanisms like CRLs [RFC5280] and OCSP [RFC6960] apply unchanged.
+   certificate-level revocation mechanisms.  Because log entries are
+   uniquely identified by their serial number and issuer, existing
+   revocation mechanisms like CRLs [RFC5280] and OCSP [RFC6960] apply
+   unchanged.
 
 8.  Use in TLS
 
@@ -2442,7 +2479,7 @@ Table of Contents
    Section 8.2.1.
 
    CA IDs MAY be incorporated into other trust anchor groups, following
-   the guidance in Section 5 of [I-D.ietf-tls-trust-anchor-ids].
+   the guidance in Section 6 of [I-D.ietf-tls-trust-anchor-ids].
 
    [[TODO: Ideally we would negotiate cosigners.
    https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch
@@ -2467,27 +2504,19 @@ Table of Contents
    up-to-date trusted subtrees.
 
    TLS implementations SHOULD use the trust_anchors extension to
-   determine this.  A landmark-relative certificate's trust anchor ID is
-   the concatenation of the following OID components:
+   determine this.  A landmark-relative certificate issued by a CA with
+   ID caID, log number N, and constructed from landmark L has a trust
+   anchor ID of {caID landmarks(1) N L}.
 
-   *  The CA ID Section 5.1 of the CA that issued the certificate
-
-   *  The constant 1
-
-   *  The log number of the log used to construct the certificate
-
-   *  The landmark number of the landmark used to construct the
-      certificate
-
-   For example, the trust anchor ID for landmark 42 of CA 32473.1 and
-   log number 8 is 32473.1.1.8.42.
+   For example, the trust anchor ID for landmark 42 of CA 32473.100 and
+   log number 8 is 32473.100.1.8.42.
 
    These trust anchor IDs are used when it is necessary to identify an
-   individual landmark, e.g. as in the retry mechanism described
-   Section 4.3 of [I-D.ietf-tls-trust-anchor-ids].  To more efficiently
+   individual landmark, e.g. as in the recovery mechanism described in
+   Section 5.6 of [I-D.ietf-tls-trust-anchor-ids].  To more efficiently
    express a relying party's complete landmark state, these IDs are
    contained in trust anchor groups defined in Section 8.2.1, which
-   allow relying paries to express their landmark state with a single
+   allow relying parties to express their landmark state with a single
    ID.
 
    If both a landmark-relative and a standalone certificate are usable,
@@ -2499,83 +2528,131 @@ Table of Contents
 8.2.1.  Single-Log Landmark Groups
 
    Relying parties support many landmarks per log at a time.  To
-   compactly represent this, each log ID implicitly defines series of
-   trust anchor groups (Section 5 of [I-D.ietf-tls-trust-anchor-ids])
+   compactly represent this, each log ID implicitly defines a series of
+   trust anchor groups (Section 6 of [I-D.ietf-tls-trust-anchor-ids])
    called _landmark groups_.
 
-   For each Merkle Tree Certificates CA, each log number N, and each
-   landmark number L, a landmark group is defined.  The group's ID is
-   the concatenation of the following OID components:
+   For each Merkle Tree Certificates CA with ID caID, each log number N,
+   and each landmark number L, the ID {caID landmarkGroups(2) N L}
+   defines a landmark group.  It contains the following trust anchor
+   IDs:
 
-   *  The CA ID Section 5.1 of the CA
+   *  caID itself (see Section 8.1).  This selects all standalone
+      certificates.
 
-   *  The constant 2
+   *  {caID landmarks(1) N L2} for all L2 from L - max_active_landmarks
+      + 1 to L, inclusive.  This selects landmark-relative certificates
+      from landmarks up to L.
 
-   *  The log number N
+   To support these groups in the authenticating party, CAs SHOULD
+   configure certificates to match the following trust anchor groups
+   (Sections 5.3 and 7.2 of [I-D.ietf-tls-trust-anchor-ids]):
 
-   *  The landmark number L
+   *  A standalone certificate SHOULD include a trust anchor ID pattern
+      of caID.2.{0-}.{0-}.
 
-   This group contains the following trust anchors:
+   *  A landmark-relative log number N and landmark L SHOULD include a
+      trust anchor ID pattern of caID.2.N.{L-L_max}, where L_max is L +
+      max_active_landmarks - 1.
 
-   *  The CA ID itself (see Section 8.1)
+   For example, suppose a CA 32473.100 has a max_active_landmarks of 20.
+   It issues a certificate in landmark 42 of log 8.  Then:
 
-   *  Each landmark of log N from L - max_active_landmarks + 1 to L,
-      inclusive
+   *  The standalone certificate has a trust anchor ID of 32473.100 and
+      is contained in groups 32473.100.2.{0-}.{0-}.
 
-   Landmark-relative certificates SHOULD be configured with this
-   information, as in Section 3.2 of [I-D.ietf-tls-trust-anchor-ids].  A
-   relying party whose latest trusted subtree (Section 7.4) in log N is
-   landmark L SHOULD configure the trust_anchors extension to advertise
-   the above landmark group.  This signals support for both standalone
-   certificates and supported landmarks.
+   *  The landmark-relative certificate has a trust anchor ID of
+      32473.100.1.8.42 and is contained in groups 32473.100.2.8.{42-61}.
 
-   For example, a relying party which is up-to-date as of landmark 42 of
-   log 8 of CA 32473.1 would send an ID of 32473.1.2.8.42.
+   A relying party whose latest trusted subtree (Section 7.4) in log N
+   is landmark L SHOULD configure the trust_anchors extension to
+   advertise the above landmark group.  This signals support for both
+   standalone certificates and supported landmarks.  For example, a
+   relying party which is up-to-date as of landmark 42 of log 8 of CA
+   32473.100 would send an ID of 32473.100.2.8.42.  This would signal
+   the following certificates:
+
+   *  Any standalone certificate from 32473.100, no matter the log or
+      landmark number.
+
+   *  Any landmark-relative certificate from 32473.100 from landmarks 23
+      through 42, inclusive, of log 8.
+
+   If this landmark information becomes too stale, such a relying party
+   SHOULD switch to advertising just the CA ID.  In the above example,
+   this would be 32473.100.
 
 8.2.2.  Timestamped Landmark Groups
 
-   Landmark groups for an single CA, described above, allow relying
+   Landmark groups for a single CA, described above, allow relying
    parties to advertise one ID per supported CA.  Depending on the
    number of trust anchors, this can be sufficient to efficiently
-   represent relying party state.
+   represent relying party state.  When needed, Section 6 of
+   [I-D.ietf-tls-trust-anchor-ids] describes how PKIs can use trust
+   anchor groups that span multiple CAs.  This section defines a
+   variation of the versioning construction described in Section 6.1 of
+   [I-D.ietf-tls-trust-anchor-ids], as applied to landmarks.
 
-   When needed, Section 5 of [I-D.ietf-tls-trust-anchor-ids] describes
-   how PKIs requiring further size savings can use trust anchor groups
-   that span multiple CA instances.  For example, a single ID may signal
-   support for a group of CAs across one or more CA operators.  This
-   section describes how such groups can be applied to landmarks, using
-   a variation of the versioning construction described in Section 5.1
-   of [I-D.ietf-tls-trust-anchor-ids].
+   Trust anchor groups containing Merkle Tree CAs can represent
+   landmarks with an OID component based on a predictable clock.
+   Concretely, the family of groups is parameterized by:
 
-   Trust anchor groups containing landmarks SHOULD define versions
-   predictably based on the time.  For example, if the contained CAs
-   allocate landmarks roughly hourly, the trust anchor group might
-   increment the version component every hour.  Each given version of
-   the group SHOULD contain the active landmarks as of the corresponding
-   timestamp.
+   *  A base OID arc base
 
-   This predictable cadence allows the CA to construct trust anchor
-   group inclusions (Section 7.2 of [I-D.ietf-tls-trust-anchor-ids]) for
-   issued certificates without additional coordination.  Conversely, a
-   relying party MAY send a version if its trusted subtrees
-   (Section 7.4) are up-to-date for all contained CAs, as of the
-   versions timestamp.
+   *  A timestamp start_time
 
-   In some cases, the relying party's trusted subtrees may only be
+   *  A time duration tick_duration
+
+   Given non-negative integers V and T, the group base.V contains
+   standalone certificates issued by some CA in version V of the group.
+   The group base.V.T contains:
+
+   *  Standalone certificates issued by some CA in version V of the
+      group.
+
+   *  Landmark-relative certificates issued one of the above CAs,
+      provided the landmark was active at time start_time + T *
+      tick_duration.
+
+   start_time SHOULD be set to sometime before the group is in use.
+   tick_duration SHOULD be set near the expected time between landmarks
+   in the group, e.g. one hour.  This predictable cadence allows the CA
+   to describe the trust anchor groups (Section 7.2 of
+   [I-D.ietf-tls-trust-anchor-ids]) for issued certificates without
+   additional coordination.  Concretely, if a CA was added in V_min, was
+   removed in V_max + 1, and issues a certificate whose landmark was
+   first active at time T_min and last active at time T_max:
+
+   *  The standalone certificate is contained in groups base.{V_min-
+      V_max} and base.{V_min-V_max}.{0-}.
+
+   *  The landmark-relative certificate is contained in groups
+      base.{V_min-V_max}.{T_min-T_max}
+
+   If the CA has not been removed in the latest version, V_max is
+   infinity, similar to the construction described in Section 6.1 of
+   [I-D.ietf-tls-trust-anchor-ids].  T_min and T_max are measured based
+   on start_time and tick_duration as described above.
+
+   A relying party sets V based on its current trust anchors and T based
+   on the age of its landmark information.  If its landmarks are too
+   stale, it sends base.V without any landmark timestamp.
+
+   In some cases, the relying party's landmark information may only be
    partially up-to-date.  The relying party, or its update service, may
    be unable to reach one CA in the group, e.g. due to a transient
    outage.  This complicates timestamp-based strategies:
 
-   *  If the relying party sends the group with an older timestamp, it
-      will not signal its up-to-date state for the reachable CAs.  This
-      means a single unreachable CA can disrupt service for certificates
-      issued by unrelated CAs.
+   *  If the relying party uses an older timestamp, it will not signal
+      its up-to-date state for the reachable CAs.  This means a single
+      unreachable CA can disrupt service for certificates issued by
+      unrelated CAs.
 
-   *  If the relying party sends the group with a newer timestamp, the
-      relying party may signal support for landmarks it does not have.
-      This risks connection failures.  If the unreachable CA issued
-      recent landmark-relative certificates, those certificates will
-      fail validation.
+   *  If the relying party uses a newer timestamp, the relying party may
+      signal support for landmarks it does not have.  This risks
+      connection failures.  If the unreachable CA issued recent
+      landmark-relative certificates, those certificates will fail
+      validation.
 
    The relying party can mitigate this in a number of ways:
 
@@ -2588,9 +2665,9 @@ Table of Contents
 
    *  A client relying party can send the newer timestamp and, in the
       event the unreachable CA did issue recent landmark-relative
-      certificates, rely on the retry mechanism described in Section 4.3
-      of [I-D.ietf-tls-trust-anchor-ids] to recover from any signaling
-      failures.
+      certificates, rely on the recovery mechanism described in
+      Section 5.6 of [I-D.ietf-tls-trust-anchor-ids] to recover from any
+      signaling failures.
 
 9.  ACME Extensions
 
@@ -2640,7 +2717,7 @@ Table of Contents
    pem-certificate-chain-with-properties" in their Accept header
    (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
    certificates SHOULD then respond with that content type and include
-   trust anchor ID information as described in Section 7 of
+   trust anchor ID information as described in Section 7.5 of
    [I-D.ietf-tls-trust-anchor-ids].  Section 8 describes the trust
    anchor ID assignments for standalone and landmark-relative
    certificates.
@@ -2864,7 +2941,7 @@ Table of Contents
    contribute to a fingerprinting attack [RFC6973].  If the Merkle Tree
    CA trust anchors are sent unconditionally in trust_anchors, this
    variation will be passively observable.  If they are sent
-   conditionally, e.g. with the DNS mechanism, the trust anchor list
+   conditionally, e.g. gated on the recovery flow, the trust anchor list
    will require active probing.
 
 12.  Security Considerations
@@ -3074,7 +3151,7 @@ Table of Contents
 
 12.5.  Extensibility
 
-   MTCLogEntry (Section 5.2.1) contain several extension points:
+   MTCLogEntry (Section 5.2.1) contains several extension points:
 
    *  New X.509 extensions can be added to TBSCertificateLogEntry.
 
@@ -3124,7 +3201,7 @@ Table of Contents
 
 12.6.  Certificate Malleability
 
-   An ASN.1 structure like X.509’s Certificate is an abstract data type
+   An ASN.1 structure like X.509's Certificate is an abstract data type
    that is independent of its serialization.  There are multiple
    encoding rules for ASN.1.  Commonly, protocols use DER [X.690], such
    as Section 4.5.1 of [RFC9846].  This aligns with Section 4.1.1.3 of
@@ -3184,7 +3261,7 @@ Table of Contents
 
    *  Reparse the signature field with a conforming DER parser and fail
       verification if invalid.  Equivalently, check for an exact
-      equality with for the expected, DER-encoded value.
+      equality with the expected, DER-encoded value.
 
    *  When hashing subjectPublicKeyInfo, either hash the observed BER
       encoding, or reparse the structure with a conforming DER parser
@@ -3227,7 +3304,7 @@ Table of Contents
    substituted for those in another.
 
    Section 5.4 permits a CA cosigner key to be used to sign CRLs and
-   OCSP resposes.  These signatures do not include a domain separation
+   OCSP responses.  These signatures do not include a domain separation
    prefix.  Instead, X.509 relies on an undocumented assumption that the
    TBSCertificate, TBSCertList, and OCSP ResponseData structures do not
    overlap at the level of individual ASN.1 fields.
@@ -3314,19 +3391,18 @@ Table of Contents
    IANA is requested to add the following entry to the "SMI Security for
    PKIX Certificate Extension" registry [RFC7299]:
 
-        +=========+=================================+============+
-        | Decimal | Description                     | References |
-        +=========+=================================+============+
-        | TBD     | id-pe-mtcCertificationAuthority | [this-RFC] |
-        +---------+---------------------------------+------------+
+     +=========+========================================+============+
+     | Decimal | Description                            | References |
+     +=========+========================================+============+
+     | TBD     | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
+     +---------+----------------------------------------+------------+
 
-                                 Table 3
+                                  Table 3
 
 13.4.  Relative Distinguished Name Attribute
 
    IANA is requested to add the following entry to the "SMI Security for
-   PKIX Relative Distinguished Name Attribute" registry
-   [I-D.ietf-lamps-x509-alg-none]:
+   PKIX Relative Distinguished Name Attribute" registry [RFC9925]:
 
              +=========+=======================+============+
              | Decimal | Description           | References |
@@ -3358,9 +3434,9 @@ Table of Contents
    [I-D.ietf-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-ietf-tls-trust-anchor-ids-04, 30 April 2026,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
-              trust-anchor-ids-04>.
+              Draft, draft-ietf-tls-trust-anchor-ids-05, 14 September
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              tls-trust-anchor-ids-05>.
 
    [POSIX]    "IEEE/Open Group Standard for Information Technology--
               Portable Operating System Interface (POSIX™) Base
@@ -3429,10 +3505,11 @@ Table of Contents
               and Technology (U.S.), DOI 10.6028/nist.fips.180-4, 2015,
               <https://doi.org/10.6028/nist.fips.180-4>.
 
-   [X.690]    ITU-T, "Information technology - ASN.1 encoding Rules:
+   [X.690]    ITU-T, "Information technology - ASN.1 encoding rules:
               Specification of Basic Encoding Rules (BER), Canonical
               Encoding Rules (CER) and Distinguished Encoding Rules
-              (DER)", ISO/IEC 8824-1:2021 , February 2021.
+              (DER)", ISO/IEC 8825-1:2021, February 2021,
+              <https://www.itu.int/rec/T-REC-X.690>.
 
 14.2.  Informative References
 
@@ -3476,16 +3553,19 @@ Table of Contents
    [FIREFOX]  Mozilla, "Firefox Remote Settings", 20 August 2022,
               <https://wiki.mozilla.org/Firefox/RemoteSettings>.
 
-   [I-D.ietf-lamps-x509-alg-none]
-              Benjamin, D., "Unsigned X.509 Certificates", Work in
-              Progress, Internet-Draft, draft-ietf-lamps-x509-alg-none-
-              10, 5 September 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
-              x509-alg-none-10>.
-
    [KeyReuse] Patton, C. and T. Shrimpton, "Security in the Presence of
               Key Reuse: Context-Separable Interfaces and their
               Applications", 2019, <https://eprint.iacr.org/2019/519>.
+
+   [LargeConsistencyProofs]
+              IETF, "Large Consistency Proof Test Vectors", August 2026,
+              <https://github.com/ietf-plants-wg/merkle-tree-
+              certs/tree/main/demo/large_consistency_proofs.txt>.
+
+   [LargeInclusionProofs]
+              IETF, "Large Inclusion Proof Test Vectors", August 2026,
+              <https://github.com/ietf-plants-wg/merkle-tree-
+              certs/tree/main/demo/large_inclusion_proofs.txt>.
 
    [LetsEncrypt]
               Let's Encrypt, "Let's Encrypt Stats", 7 March 2023,
@@ -3585,12 +3665,7 @@ Appendix A.  ASN.1 Module
      FROM PKIX1Explicit-2009 -- in [RFC5912]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
-         id-mod-pkix1-explicit-02(51) }
-     TrustAnchorID
-     FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-anchor-ids]
-       { iso(1) identified-organization(3) dod(6) internet(1)
-         security(5) mechanisms(5) pkix(7) id-mod(0)
-         id-mod-trustAnchorIDs-2025(TBD) } ;
+         id-mod-pkix1-explicit-02(51) } ;
 
    TBSCertificateLogEntry ::= SEQUENCE {
        version               [0] EXPLICIT Version DEFAULT v1,
@@ -3620,17 +3695,17 @@ Appendix A.  ASN.1 Module
        mechanisms(5) pkix(7) rdna(25) TBD }
 
    at-trustAnchorID ATTRIBUTE ::= {
-       TYPE TrustAnchorID
+       TYPE RELATIVE-OID
        IDENTIFIED BY id-rdna-trustAnchorID
    }
 
-   id-pe-mtcCertificationAuthority OBJECT IDENTIFIER ::= {
+   id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
        mechanisms(5) pkix(7) pe(1) TBD }
 
-   ext-mtcCertificationAuthority EXTENSION ::= {
+   ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
        SYNTAX MTCCertificationAuthority
-       IDENTIFIED BY id-pe-mtcCertificationAuthority
+       IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
        CRITICALITY TRUE
    }
 
@@ -3638,7 +3713,6 @@ Appendix A.  ASN.1 Module
    mtcMaxSerial INTEGER ::= 18446744073709551615
 
    MTCCertificationAuthority ::= SEQUENCE {
-       logHash   AlgorithmIdentifier{DIGEST-ALGORITHM, {...}},
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
        minSerial INTEGER (0..mtcMaxSerial),
        maxSerial INTEGER (0..mtcMaxSerial)
@@ -3650,7 +3724,7 @@ Appendix B.  Merkle Tree Structure
 
    This non-normative section describes how the Merkle Tree structure
    relates to the binary representations of indices.  It is included to
-   help implementors understand the procedures described in Section 4.
+   help implementers understand the procedures described in Section 4.
 
 B.1.  Binary Representations
 
@@ -3852,7 +3926,7 @@ B.3.  Inclusion Proof Evaluation
 
    Step 4 iterates through inclusion_proof and the paths to fn and sn in
    parallel.  As the procedure right-shifts fn and sn and looks at the
-   least-significant bit, it moves up the two paths, towards the root.
+   least-significant bit, it moves up the two paths, toward the root.
    When sn is zero, the procedure has reached the top of the tree.  The
    procedure checks that the two iterations complete together.
 
@@ -3888,7 +3962,7 @@ B.4.  Consistency Proof Structure
        at a higher level.  Any ancestor of end - 1 shared by both the
        subtree and the overall tree is a valid starting node to
        reconstruct node_hash and root_hash.  Use the highest level with
-       a commmon ancestor.  This truncates the inclusion proof.
+       a common ancestor.  This truncates the inclusion proof.
 
    2.  If this starting node is the entire subtree, omit its hash from
        the consistency proof.  The verifier is assumed to already know
@@ -4025,9 +4099,9 @@ B.5.  Consistency Proof Verification
    *  All hashes are incorporated into sr, with hashing on the left or
       right determined the same as in inclusion proof evaluation.
 
-   *  A subset of the hashes are incorporated into fr.  It skips any
-      hash on the right because those contain elements greater than end
-      - 1.  It also stops incorporating when fn and sn have converged.
+   *  A subset of the hashes is incorporated into fr.  It skips any hash
+      on the right because those contain elements greater than end - 1.
+      It also stops incorporating when fn and sn have converged.
 
    This reconstructs the hashes of the subtree and original tree, which
    are then compared to expected values in step 8.
@@ -4038,7 +4112,9 @@ B.5.  Consistency Proof Verification
    proof for the truncated subtree [fn, sn + 1) and truncated tree tn +
    1.
 
-Appendix C.  Subtree Test Vectors
+Appendix C.  Test Vectors
+
+C.1.  Accumulated Subtree Test Vectors
 
    The following are "accumulated" [Accumulated] test vectors for the
    various subtree algorithms defined in Section 4.
@@ -4052,7 +4128,7 @@ Appendix C.  Subtree Test Vectors
    leaf values d[0] = 0x00, d[1] = 0x01, .... The hash function used is
    SHA-256.  The hash values are encoded in hexadecimal.
 
-C.1.  Subtree Hashes
+C.1.1.  Subtree Hashes
 
    For each value of end from 0 to 130, and each value of start from 0
    to end, if [start, end) is a valid subtree, add to the rolling hash
@@ -4076,7 +4152,14 @@ C.1.  Subtree Hashes
                h.update(f'[{start}, {end}) {subtree_hash.hex()}\n'.encode())
    assert h.hexdigest() == 'b82806ad4265bb151c1119c0f4db437bb4d1a1f887b3a7fba1cd4ebf552e3e81'
 
-C.2.  Subtree Inclusion Proofs
+   This test exercises both an implementation's subtree hash calculation
+   as well as the subtree validity check.  In a CA, both of these
+   operations apply.  In a relying party, only the subtree validity
+   check applies.  A relying party implementation SHOULD implement a
+   Merkle Tree in testing logic so the above will exercise the subtree
+   validity check.
+
+C.1.2.  Subtree Inclusion Proofs
 
    For each value of end from 0 to 130, and each value of start from 0
    to end, if [start, end) is a valid subtree, for each value of index
@@ -4107,7 +4190,28 @@ C.2.  Subtree Inclusion Proofs
                    h.update(f'{line}\n'.encode())
    assert h.hexdigest() == 'ac2a8f989e44d99e399db448050ff5f19757df53cfb716aa81015d3955d8163f'
 
-C.3.  Subtree Consistency Proofs
+   This test exercises constructing subtree inclusion proofs, as
+   computed by a CA.  A relying party instead evaluates untrusted
+   subtree inclusion proofs.  This test can be used to exercise this
+   logic as follows:
+
+   1.  If not available, implement a Merkle Tree in testing logic to
+       compute subtree hashes and subtree inclusion proofs.  This logic
+       can be validated by the above test and Appendix C.1.1.
+
+   2.  For each subtree inclusion proof in the above test, evaluate the
+       inclusion proof and assert the resulting hash matches the
+       corresponding subtree hash.
+
+   3.  For each non-empty subtree inclusion proof in the above test,
+       truncate the proof by both one byte and a full hash.  Assert that
+       evaluating each proof fails.
+
+   4.  For each subtree inclusion proof in the above test, extend the
+       proof by both one byte and an arbitrary full hash.  Assert that
+       evaluating each proof fails.
+
+C.1.3.  Subtree Consistency Proofs
 
    For each value of n from 0 to 130, and each value of end from 0 to n,
    and each value of start from 0 to end, if [start, end) is a valid
@@ -4138,7 +4242,35 @@ C.3.  Subtree Consistency Proofs
                    h.update(f'{line}\n'.encode())
    assert h.hexdigest() == '10fa99b37bf9bf9ffa26b412fbd98bd75363256d0b75d61bc4538b9c9c5a0a74'
 
-C.4.  Efficient Covering Subtrees
+   This test exercises constructing subtree consistency proofs.  Other
+   parties will check these proofs (e.g. Section 7.4 and
+   [TLOG-WITNESS]).  This test can be used to exercise this logic as
+   follows:
+
+   1.  If not available, implement a Merkle Tree in testing logic to
+       compute subtree hashes and subtree consistency proofs.  This
+       logic can be validated by the above test and Appendix C.1.1.
+
+   2.  For each subtree consistency proof in the above test, check the
+       proof and assert it succeeds.
+
+   3.  For each non-empty subtree consistency proof in the above test,
+       truncate the proof by both one byte and a full hash.  Assert that
+       checking each proof fails.
+
+   4.  For each subtree consistency proof in the above test, extend the
+       proof by both one byte and an arbitrary full hash.  Assert that
+       checking each proof fails.
+
+   5.  For each subtree consistency proof in the above test, flip a bit
+       in the input subtree hash.  Assert that checking each proof
+       fails.
+
+   6.  For each subtree consistency proof in the above test with a non-
+       empty subtree, flip a bit in the input tree hash.  Assert that
+       checking each proof fails.
+
+C.1.4.  Efficient Covering Subtrees
 
    For each value of end from 0 to 130, and each value of start from 0
    to end, add to the rolling hash the ASCII string [LEFT_START,
@@ -4162,6 +4294,166 @@ C.4.  Efficient Covering Subtrees
            h.update(f'[{left_start}, {left_end}) [{right_start}, {right_end})\n'.encode())
    assert h.hexdigest() == '7fd9c8b926e9d2b5cf831560e8ce295a5ef97ad5c5ede4ea0dea28a8c8fc8bb0'
 
+C.2.  Large Subtree Test Vectors
+
+   Appendix C.1 exhaustively tests subtree algorithms for trees of size
+   up to 130.  An implementation may also encounter overflow conditions
+   with very large trees.  This is primarily a concern for a relying
+   party, which must act on untrusted tree sizes.
+
+   The largest possible Merkle Tree in this protocol is 2^48-1.  In
+   particular, the MTCProof structure in Section 6.2 cannot express
+   larger values.  These sizes will fit comfortably in 64-bit integers,
+   whether signed or unsigned.  To exercise more general
+   implementations, this section includes test vectors for trees bounded
+   by 2^48-1, 2^63-1, and 2^64-1.
+
+   Implementations MAY skip tests above 2^48-1 if they do not support
+   such trees.
+
+C.2.1.  Subtree Validity
+
+   The following are valid subtrees (Section 4.1):
+
+   *  start is 0 and end is 2^47 + 1
+
+   *  start is 0 and end is 2^48 - 1
+
+   *  start is 0 and end is 2^62 + 1
+
+   *  start is 0 and end is 2^63 - 1
+
+   *  start is 0 and end is 2^63 + 1
+
+   *  start is 0 and end is 2^64 - 1
+
+   The following are not valid subtrees:
+
+   *  start is 2^46 and end is 2^47 + 1
+
+   *  start is 2^46 and end is 2^48 - 1
+
+   *  start is 2^61 and end is 2^62 + 1
+
+   *  start is 2^61 and end is 2^63 - 1
+
+   *  start is 2^62 and end is 2^63 + 1
+
+   *  start is 2^62 and end is 2^64 - 1
+
+C.2.2.  Subtree Inclusion Proofs
+
+   [LargeInclusionProofs] contains additional test vectors for subtree
+   inclusion proofs (Section 4.3).
+
+C.2.3.  Subtree Consistency Proofs
+
+   [LargeConsistencyProofs] contains additional test vectors for subtree
+   consistency proofs (Section 4.4).
+
+C.2.4.  Efficient Covering Subtrees
+
+   This section contains sample inputs and outputs for the procedure in
+   Section 4.5.1.
+
+   Given range [0x0, 0x800000000000), the subtrees are:
+
+   *  [0x0, 0x400000000000)
+
+   *  [0x400000000000, 0x800000000000)
+
+   Given range [0x500000000000, 0xd00000000000), the subtrees are:
+
+   *  [0x400000000000, 0x800000000000)
+
+   *  [0x800000000000, 0xd00000000000)
+
+   Given range [0x7fffffffffff, 0x800000000001), the subtrees are:
+
+   *  [0x7fffffffffff, 0x800000000000)
+
+   *  [0x800000000000, 0x800000000001)
+
+   Given range [0xfffffffffffe, 0xffffffffffff), the subtrees are:
+
+   *  [0xfffffffffffe, 0xffffffffffff)
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   Given range [0xffffffffffff, 0xffffffffffff), the subtrees are:
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   *  [0xffffffffffff, 0xffffffffffff)
+
+   Given range [0x0, 0x4000000000000000), the subtrees are:
+
+   *  [0x0, 0x2000000000000000)
+
+   *  [0x2000000000000000, 0x4000000000000000)
+
+   Given range [0x2800000000000000, 0x6800000000000000), the subtrees
+   are:
+
+   *  [0x2000000000000000, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x6800000000000000)
+
+   Given range [0x3fffffffffffffff, 0x4000000000000001), the subtrees
+   are:
+
+   *  [0x3fffffffffffffff, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x4000000000000001)
+
+   Given range [0x7ffffffffffffffe, 0x7fffffffffffffff), the subtrees
+   are:
+
+   *  [0x7ffffffffffffffe, 0x7fffffffffffffff)
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   Given range [0x7fffffffffffffff, 0x7fffffffffffffff), the subtrees
+   are:
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   *  [0x7fffffffffffffff, 0x7fffffffffffffff)
+
+   Given range [0x0, 0x8000000000000000), the subtrees are:
+
+   *  [0x0, 0x4000000000000000)
+
+   *  [0x4000000000000000, 0x8000000000000000)
+
+   Given range [0x5000000000000000, 0xd000000000000000), the subtrees
+   are:
+
+   *  [0x4000000000000000, 0x8000000000000000)
+
+   *  [0x8000000000000000, 0xd000000000000000)
+
+   Given range [0x7fffffffffffffff, 0x8000000000000001), the subtrees
+   are:
+
+   *  [0x7fffffffffffffff, 0x8000000000000000)
+
+   *  [0x8000000000000000, 0x8000000000000001)
+
+   Given range [0xfffffffffffffffe, 0xffffffffffffffff), the subtrees
+   are:
+
+   *  [0xfffffffffffffffe, 0xffffffffffffffff)
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
+   Given range [0xffffffffffffffff, 0xffffffffffffffff), the subtrees
+   are:
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
+   *  [0xffffffffffffffff, 0xffffffffffffffff)
+
 Acknowledgements
 
    This document stands on the shoulders of giants and builds upon
@@ -4172,11 +4464,11 @@ Acknowledgements
    The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson,
    Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis
    Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Mike
-   Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, and Emily
-   Stark for many valuable discussions and insights which led to this
-   document, as well as feedback and contributions to the document
-   itself.  We wish to thank Mia Celeste in particular, whose
-   implementation of an earlier draft revealed several pitfalls.
+   Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, Emily
+   Stark, and Rob Stradling for many valuable discussions and insights
+   which led to this document, as well as feedback and contributions to
+   the document itself.  We wish to thank Mia Celeste in particular,
+   whose implementation of an earlier draft revealed several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
    Richard Barnes in [STH-Discipline].  The size optimization in Merkle
@@ -4242,7 +4534,7 @@ Since draft-davidben-tls-merkle-tree-certs-04
    the optimized and slow issuance path, and with a more bespoke tree
    structure:
 
-   In both draft-04 and draft-05, a CA looks like today’s CAs except
+   In both draft-04 and draft-05, a CA looks like today's CAs except
    that they run some software to publish what they issue and sign tree
    heads to certify certificates in bulk.
 
@@ -4401,9 +4693,11 @@ Since draft-ietf-plants-merkle-tree-certs-04
 
 Since draft-ietf-plants-merkle-tree-certs-05
 
+   *  Use 24-bit length prefix for MTCProof subtree signatures.
+
    *  Renamed MerkleTreeCertEntry, etc., structures to MTCLogEntry to be
       consistent with MTCProof, shorter, and help disambiguate the many
-      English meanings of "entry"
+      English meanings of "entry".
 
    *  Fixed one of the accumulated test vectors to better reflect one of
       the edge cases in subtree covering.
@@ -4422,7 +4716,25 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Prune the pruning discussion.  It's really a property of the log
       serving protocol and is better described in [MTC-TLOG] and
-      [TLOG-TILES]
+      [TLOG-TILES].
+
+   *  Fix the maximum log index to account for also end being 48-bit.
+
+   *  Discuss a potential overflow in the valid subtree definition.
+
+   *  Describe how a party holding a standalone certificate can
+      construct the corresponding landmark-relative certificate itself.
+
+   *  Added test vectors for subtree algorithms in larger trees.
+
+   *  Align the experimental OID with the final one in the X.509 name
+      construction in using RELATIVE-OID directly.
+
+   *  Lifted the tree hash into the MTC CA extension OID, so it can
+      capture new tree constructions more generally.
+
+   *  Update for draft-ietf-tls-trust-anchor-ids-05, and spell out
+      certificate configuration explicitly.
 
 Authors' Addresses
 
