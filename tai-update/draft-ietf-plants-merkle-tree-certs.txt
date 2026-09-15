@@ -2717,10 +2717,20 @@ Table of Contents
    pem-certificate-chain-with-properties" in their Accept header
    (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
    certificates SHOULD then respond with that content type and include
-   trust anchor ID information as described in Section 7.5 of
-   [I-D.ietf-tls-trust-anchor-ids].  Section 8 describes the trust
-   anchor ID assignments for standalone and landmark-relative
-   certificates.
+   trust anchor ID information as described in Section 7.6 of
+   [I-D.ietf-tls-trust-anchor-ids].
+
+   Section 8 describes the trust anchor ID assignments for standalone
+   and landmark-relative certificates.  At minimum, the ACME SHOULD
+   include:
+
+   *  The individual trust anchor IDs described in Section 8.1 and
+      Section 8.2
+
+   *  The trust anchor group information described in Section 8.2.1
+
+   If the CA participates in other landmark groups, e.g. Section 8.2.2,
+   the CA SHOULD include the corresponding group information.
 
    When processing an order for a Merkle Tree certificate, the ACME
    server moves the order to the "valid" state after the corresponding
