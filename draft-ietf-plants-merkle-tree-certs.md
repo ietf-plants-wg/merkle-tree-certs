@@ -1589,7 +1589,7 @@ A standalone certificate MAY also be sent without explicit relying party trust s
 
 ## Landmark-Relative Certificates {#landmark-relative-certificates-tls}
 
-An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
+An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees. This can be represented with the `trust_anchor_negotiation` property in a CertificatePropertyList (see {{Section 7.3 of !I-D.ietf-tls-trust-anchor-ids}}), or other local configuration.
 
 TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate issued by a CA with ID `caID`, log number `N`, and constructed from landmark `L` has a trust anchor ID of `{caID landmarks(1) N L}`.
 
@@ -1679,18 +1679,20 @@ If renewing certificates, the ACME client MAY opt to wait for optional alternate
 
 ## Using ACME with Merkle Tree Certificates
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 7.6 of !I-D.ietf-tls-trust-anchor-ids}}.
+Standalone and landmark-relative certificates represent a single issuance event, so they are returned from the same order. When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
-{{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates. At minimum, the ACME SHOULD include:
+The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. The landmark-relative certificate will typically not yet be available, so it initially serves an HTTP 202 response, as described in {{optional-certificates}}. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the "acme-optional-alternate" URL.
 
-* The individual trust anchor IDs described in {{standalone-certificates-tls}} and {{landmark-relative-certificates-tls}}
-* The trust anchor group information described in {{single-log-landmark-groups}}
+When downloading either certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type to include a CertificatePropertyList.
 
-If the CA participates in other landmark groups, e.g. {{timestamped-landmark-groups}}, the CA SHOULD include the corresponding group information.
+The CertificatePropertyList SHOULD include trust anchor ID information as described in {{Section 7.5 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} describes the trust anchor ID assignments for standalone and landmark-relative certificates. At minimum, the ACME server SHOULD include:
 
-When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the corresponding entry is sequenced in the issuance log, cosignatures are collected, and the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
+* A `trust_anchor_id` property with the trust anchor IDs described in {{standalone-certificates-tls}} and {{landmark-relative-certificates-tls}}
+* A `trust_anchor_groups` property with the information described in {{single-log-landmark-groups}}
 
-The standalone certificate response SHOULD additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. It initially serves an HTTP 202 response, as described in {{optional-certificates}}. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}}, and serves it from the URL.
+If the CA participates in other landmark groups, e.g. {{timestamped-landmark-groups}}, the ACME server SHOULD include the corresponding information in `trust_anchor_groups`.
+
+The ACME server SHOULD include a `trust_anchor_negotiation` property with the landmark-relative certificate. This indicates the landmark-relative certificate requires a trust anchor ID match to indicate that the relying party recognizes the landmark. The ACME server MAY include or omit `trust_anchor_negotiation` with the standalone certificate, based on the criteria described in {{Sections 7.3 and 7.5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 # Deployment Considerations
 
