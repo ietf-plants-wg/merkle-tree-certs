@@ -2,6 +2,7 @@
   "Version": "plants-05",
   "ID": "32473.1",
   "LogNumber": 1,
+  "MaxActiveLandmarks": 10,
   "Cosigners": [
     {
       "CosignerID": "32473.1",
@@ -81,7 +82,14 @@
         {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.3.4"]},
         {"Checkpoint": "standalone", "Cosigners": ["32473.2.1", "32473.2.2", "32473.2.3", "32473.3.1", "32473.3.2", "32473.3.3", "32473.3.4"]},
         {"Checkpoint": "standalone", "Cosigners": ["32473.1", "32473.2.1", "32473.2.2", "32473.2.3", "32473.3.1", "32473.3.2", "32473.3.3", "32473.3.4"]},
-        {"Checkpoint": "standalone"},
+        {
+          "Checkpoint": "standalone",
+          "OverrideCertificatePropertyList": {
+            "TrustAnchorNegotiation": true,
+            "TrustAnchorID": "32473.12",
+            "TrustAnchorGroups": ["32473.34", "32473.{56-78}.{90-}"]
+          }
+        },
         {"SubtreeStart": 8, "SubtreeEnd": 16, "Cosigners": ["32473.1", "32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
