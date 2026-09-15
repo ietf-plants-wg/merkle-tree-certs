@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-13T04:34:24.077128+00:00",
+  "timestamp": "2026-09-15T04:41:04.834729+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -11941,21 +11941,21 @@
       "id": "PR_kwDOJIBkVc7AdFAo",
       "title": "Various minor fixes",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/174",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "aww-aww",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-01-30T18:24:49Z",
-      "updatedAt": "2026-05-06T00:12:30Z",
+      "updatedAt": "2026-09-14T19:33:50Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "217ad1697b7bf53ae14ea40f5cd06c4617005625",
       "headRepository": "aww-aww/merkle-tree-certs",
       "headRefName": "aw-cleanup",
       "headRefOid": "83f7caf92a42103eab5a21b71e281936c327188b",
-      "closedAt": null,
+      "closedAt": "2026-09-14T19:33:35Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -11987,6 +11987,13 @@
           "body": "@aww-aww anything else from this PR you think we should merge, or should we close this PR out?",
           "createdAt": "2026-05-06T00:12:30Z",
           "updatedAt": "2026-05-06T00:12:30Z"
+        },
+        {
+          "author": "aww-aww",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "The useful bits have been pulled. Closing",
+          "createdAt": "2026-09-14T19:33:35Z",
+          "updatedAt": "2026-09-14T19:33:50Z"
         }
       ],
       "reviews": [
@@ -21620,6 +21627,160 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 317,
+      "id": "PR_kwDOJIBkVc8AAAABDgTSKg",
+      "title": "Update abstract for Merkle Tree certificates",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/317",
+      "state": "OPEN",
+      "author": "aww-aww",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Revised the abstract to improve clarity and readability.",
+      "createdAt": "2026-09-14T19:45:35Z",
+      "updatedAt": "2026-09-14T20:27:17Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "headRepository": "aww-aww/merkle-tree-certs",
+      "headRefName": "patch-2",
+      "headRefOid": "f0a97e4e0361f7d0cbe7b5e8146368eacecabbb4",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNhSTwQ",
+          "commit": {
+            "abbreviatedOid": "f0a97e4"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-14T20:01:33Z",
+          "updatedAt": "2026-09-14T20:27:17Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "> a new type of X.509 certificate with native public logging similar to Certificate Transparency\n\nI had it cached in my mind to avoid the word \"native\", but I'm not sure how widespread this preference is. I found Google's documentation on this (https://developers.google.com/style/word-list#native), but that's Google's guide.\n\nhttps://authors.ietf.org/en/language-and-style points to a, uh, retracted NIST document so... I've no idea what's preferred. \ud83e\udd37  Probably can find another phrasing.",
+              "createdAt": "2026-09-14T20:01:33Z",
+              "updatedAt": "2026-09-14T20:27:17Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "> an existing certificate to optimize\n\nI don't know how to read this clause. It seems to not say much of anything. If I just got a certificate, that's an existing certificate to optimize. Or you could misread it to mean you get an existing non-MTC certificate and then optimize that, which is extremely wrong.\n\nThe old text was pointing to the fact that your certificate had to be around for a little bit first (need a landmark). That nuance seems to be lost but maybe is not important enough to have in here so we could just remove it perhaps.",
+              "createdAt": "2026-09-14T20:27:06Z",
+              "updatedAt": "2026-09-14T20:27:17Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 318,
+      "id": "PR_kwDOJIBkVc8AAAABDgXftQ",
+      "title": "Revise introduction of Merkle Tree Certificates",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/318",
+      "state": "OPEN",
+      "author": "aww-aww",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Move the portion of the intro text that explains MTCs up to the start of the introduction and add a bit more about the high benefits before getting into all of the details.",
+      "createdAt": "2026-09-14T19:53:08Z",
+      "updatedAt": "2026-09-14T21:24:18Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "headRepository": "aww-aww/merkle-tree-certs",
+      "headRefName": "patch-3",
+      "headRefOid": "eff1c263eeda6a71bf767b019012961e77bf7e52",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hmm. The text you've moved isn't the details per se but the context needed to understand the benefits. I.e. we're introducing the problem first. Now we talk about smaller logs and such but we haven't said what CT is about yet.",
+          "createdAt": "2026-09-14T21:24:18Z",
+          "updatedAt": "2026-09-14T21:24:18Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 319,
+      "id": "PR_kwDOJIBkVc8AAAABDgdoNQ",
+      "title": "Correct a subtree range",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/319",
+      "state": "CLOSED",
+      "author": "aww-aww",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It is not clear if the intent was to have the range be 0x500000000000, 0xd00000000000 or 0x400000000000, 0xd00000000000, but a change was needed either way.",
+      "createdAt": "2026-09-14T20:04:20Z",
+      "updatedAt": "2026-09-14T21:26:38Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "headRepository": "aww-aww/merkle-tree-certs",
+      "headRefName": "patch-4",
+      "headRefOid": "c12761bc160a2e4fd9fd565714f8d395575cb0c9",
+      "closedAt": "2026-09-14T21:25:13Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "No, this is correct. The subtrees contain slightly more than the range. That is how we get two subtrees instead of O(log N) subtrees.",
+          "createdAt": "2026-09-14T21:25:13Z",
+          "updatedAt": "2026-09-14T21:25:13Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(`[0x500000000000, 0x900000000000)` isn't even a valid subtree.)",
+          "createdAt": "2026-09-14T21:26:37Z",
+          "updatedAt": "2026-09-14T21:26:37Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 320,
+      "id": "PR_kwDOJIBkVc8AAAABDiku7Q",
+      "title": "Update for draft-ietf-tls-trust-anchor-ids-05",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/320",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Updates section numbers, reworks the text to spell out the expected group patterns, and updates the demo tool to output certificate properties. https://github.com/tlswg/tls-trust-anchor-ids/pull/125 can be used to print that output while other tools are spun up.\r\n\r\nMight be easiest reviewed as separate commits.\r\n\r\n@bob-beck",
+      "createdAt": "2026-09-15T02:19:30Z",
+      "updatedAt": "2026-09-15T02:19:30Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "tai-update",
+      "headRefOid": "5da64139a0638dd7abaaf77fc07c97083592037d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
