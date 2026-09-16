@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 19 March 2027                                        Apple Inc.
+Expires: 20 March 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       15 September 2026
+                                                       16 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 March 2027.
+   This Internet-Draft will expire on 20 March 2027.
 
 Copyright Notice
 
@@ -2545,7 +2545,7 @@ Table of Contents
 
    *  {caID landmarks(1) N L2} for all L2 from L - max_active_landmarks
       + 1 to L, inclusive.  This selects landmark-relative certificates
-      from landmarks up to L.
+      from active landmarks up to L.
 
    To support these groups in the authenticating party, CAs SHOULD
    configure certificates to match the following trust anchor groups
