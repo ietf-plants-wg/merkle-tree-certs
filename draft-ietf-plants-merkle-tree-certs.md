@@ -1606,7 +1606,7 @@ Relying parties support many landmarks per log at a time. To compactly represent
 For each Merkle Tree Certificates CA with ID `caID`, each log number `N`, and each landmark number `L`, the ID `{caID landmarkGroups(2) N L}` defines a landmark group. It contains the following trust anchor IDs:
 
 * `caID` itself (see {{standalone-certificates-tls}}). This selects all standalone certificates.
-* `{caID landmarks(1) N L2}` for all `L2` from `L - max_active_landmarks + 1` to `L`, inclusive. This selects landmark-relative certificates from landmarks up to `L`.
+* `{caID landmarks(1) N L2}` for all `L2` from `L - max_active_landmarks + 1` to `L`, inclusive. This selects landmark-relative certificates from active landmarks up to `L`.
 
 To support these groups in the authenticating party, CAs SHOULD configure certificates to match the following trust anchor groups ({{Sections 5.3 and 7.2 of !I-D.ietf-tls-trust-anchor-ids}}):
 
