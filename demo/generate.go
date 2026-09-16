@@ -248,8 +248,8 @@ func generate(args []string) error {
 				props.TrustAnchorID = appendBase128(props.TrustAnchorID, uint32(info.landmarkNum))
 				pattern := TrustAnchorIDToPattern(config.ID)
 				pattern = appendPatternRange(pattern, 2, 2)
-				pattern = appendPatternRange(pattern, uint32(config.LogNumber), uint32(config.LogNumber))
-				pattern = appendPatternRange(pattern, uint32(info.landmarkNum), uint32(info.landmarkNum+config.MaxActiveLandmarks-1))
+				pattern = appendPatternRangeWithInfinity(pattern, uint32(config.LogNumber))
+				pattern = appendPatternRangeWithInfinity(pattern, uint32(info.landmarkNum))
 				props.TrustAnchorGroups = []TrustAnchorIDPattern{pattern}
 			} else {
 				props.TrustAnchorID = config.ID

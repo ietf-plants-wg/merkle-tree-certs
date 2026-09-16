@@ -138,13 +138,12 @@ func (s *SignatureAlgorithm) UnmarshalText(text []byte) error {
 }
 
 type CAConfig struct {
-	Version            DraftVersion
-	ID                 TrustAnchorID
-	LogNumber          uint16
-	MaxActiveLandmarks int
-	Cosigners          []CosignerConfig
-	CACert             CACertConfig
-	Entries            []EntryConfig
+	Version   DraftVersion
+	ID        TrustAnchorID
+	LogNumber uint16
+	Cosigners []CosignerConfig
+	CACert    CACertConfig
+	Entries   []EntryConfig
 }
 
 type CosignerConfig struct {
