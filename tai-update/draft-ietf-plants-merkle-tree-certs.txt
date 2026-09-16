@@ -2543,8 +2543,8 @@ Table of Contents
    *  caID itself (see Section 8.1).  This selects all standalone
       certificates.
 
-   *  {caID landmarks(1) N L2} for all L2 from L - max_active_landmarks
-      + 1 to L, inclusive.  This selects landmark-relative certificates
+   *  {caID landmarks(1) N M} for all M from L - max_active_landmarks +
+      1 to L, inclusive.  This selects landmark-relative certificates
       from active landmarks up to L.
 
    To support these groups in the authenticating party, CAs SHOULD
