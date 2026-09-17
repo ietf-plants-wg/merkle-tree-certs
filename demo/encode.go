@@ -511,3 +511,45 @@ func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 	})
 	return b.Bytes()
 }
+
+const (
+	propertyTrustAnchorID          = 0
+	propertyTrustAnchorGroups      = 1
+	propertyTrustAnchorNegotiation = 2
+)
+
+func MarshalCertificatePropertyList(l *CertificatePropertyList) ([]byte, error) {
+	b := cryptobyte.NewBuilder(nil)
+	b.AddUint16LengthPrefixed(func(props *cryptobyte.Builder) {
+		if len(l.TrustAnchorID) != 0 {
+			props.AddUint16(propertyTrustAnchorID)
+			props.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {
+				// No extra length prefix because we said that the `data` field
+				// simply is the trust anchor ID.
+				child.AddBytes(l.TrustAnchorID)
+			})
+		}
+		if len(l.TrustAnchorGroups) != 0 {
+			props.AddUint16(propertyTrustAnchorGroups)
+			// TLS's presentation language leads to many redundant length prefixes.
+			// First we have a length prefix for the property's `data` field.
+			props.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {
+				// Now the TrustAnchorIDPatternList needs a length prefix.
+				child.AddUint16LengthPrefixed(func(list *cryptobyte.Builder) {
+					for _, p := range l.TrustAnchorGroups {
+						// The ID is encoded as a TrustAnchorIDPattern, so it needs a length prefix,
+						// or the parsing will be ambiguous.
+						list.AddUint8LengthPrefixed(func(pattern *cryptobyte.Builder) {
+							pattern.AddBytes(p)
+						})
+					}
+				})
+			})
+		}
+		if l.TrustAnchorNegotiation {
+			props.AddUint16(propertyTrustAnchorNegotiation)
+			props.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {})
+		}
+	})
+	return b.Bytes()
+}
