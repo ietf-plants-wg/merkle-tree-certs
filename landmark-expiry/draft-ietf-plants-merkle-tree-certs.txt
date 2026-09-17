@@ -1958,7 +1958,7 @@ Table of Contents
    party as trusted subtrees, as described in Section 7.4.
 
    The above conditions imply that every unexpired entry in the log is
-   either contained some landmark subtree or was allocated sometime
+   either contained in some landmark subtree or was allocated sometime
    after the latest landmark.
 
    As the issuance log grows, CAs continuously allocate new landmarks.
@@ -1974,7 +1974,7 @@ Table of Contents
    Mistakes in landmark sequence allocation only impact availability,
    not security.  That is, they will not cause the relying party to
    accept certificates for entries the CA did not certify.  However,
-   they might cause a relying party reject some of the CA's otherwise
+   they might cause a relying party to reject some of the CA's otherwise
    valid landmark-relative certificates.
 
 6.4.2.  Allocating Landmarks
@@ -2375,7 +2375,7 @@ Table of Contents
    This criterion can be checked given:
 
    *  Some _reference checkpoint_ whose tree size is greater or equal to
-      that of latest landmark
+      that of the latest landmark
 
    *  For each cosigner, either:
 

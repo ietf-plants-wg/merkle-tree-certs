@@ -4338,9 +4338,9 @@ struct {
           </ol>
 <p id="section-6.4.1-7">A landmark's expiration time <span class="bcp14">MUST</span> be greater or equal to the <code>notAfter</code> time of every TBSCertificateLogEntry whose index is less than the tree size. When allocating a landmark, CAs <span class="bcp14">SHOULD</span> set the expiration time to the current time plus the CA's maximum certificate lifetime.<a href="#section-6.4.1-7" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-8">A landmark that is not yet expired is said to be <em>active</em>. Landmark zero is never active. At any time, a log's <em>active landmark subtrees</em> are the landmark subtrees of each currently active landmark. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.4.1-8" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-9">The above conditions imply that every unexpired entry in the log is either contained some landmark subtree or was allocated sometime after the latest landmark.<a href="#section-6.4.1-9" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-9">The above conditions imply that every unexpired entry in the log is either contained in some landmark subtree or was allocated sometime after the latest landmark.<a href="#section-6.4.1-9" class="pilcrow">¶</a></p>
 <p id="section-6.4.1-10">As the issuance log grows, CAs continuously allocate new landmarks. More frequent allocation reduces landmark-relative certificate delay, while less frequent allocation reduces the size of the relying party's predistributed state. As described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>, relying parties maintain some upper bound on active landmarks per CA. CAs <span class="bcp14">SHOULD</span> allocate landmarks such that the number of active landmarks, across all their logs, is within the bound for supported relying parties. <a href="#allocating-landmarks" class="auto internal xref">Section 6.4.2</a> gives a <span class="bcp14">RECOMMENDED</span> procedure for allocating landmarks.<a href="#section-6.4.1-10" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-11">Mistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party reject some of the CA's otherwise valid landmark-relative certificates.<a href="#section-6.4.1-11" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-11">Mistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party to reject some of the CA's otherwise valid landmark-relative certificates.<a href="#section-6.4.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="allocating-landmarks">
@@ -4682,7 +4682,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-7.4-5">This criterion can be checked given:<a href="#section-7.4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-6.1">
-            <p id="section-7.4-6.1.1">Some <em>reference checkpoint</em> whose tree size is greater or equal to that of latest landmark<a href="#section-7.4-6.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.4-6.1.1">Some <em>reference checkpoint</em> whose tree size is greater or equal to that of the latest landmark<a href="#section-7.4-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.4-6.2">
             <p id="section-7.4-6.2.1">For each cosigner, either:<a href="#section-7.4-6.2.1" class="pilcrow">¶</a></p>
