@@ -4200,7 +4200,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 <p id="section-6.1-1">A Merkle Tree Certificate is constructed from the following inputs:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1-2.1">
-            <p id="section-6.1-2.1.1">A TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>) contained in the issuance log (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>)<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.1.1">A TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>) contained in one of the CA's issuance logs (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>)<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.1-2.2">
             <p id="section-6.1-2.2.1">A subject public key whose hash matches the TBSCertificateLogEntry<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
@@ -4310,13 +4310,37 @@ struct {
           <h4 id="name-landmark-tree-sizes">
 <a href="#section-6.4.1" class="section-number selfRef">6.4.1. </a><a href="#name-landmark-tree-sizes" class="section-name selfRef">Landmark Tree Sizes</a>
           </h4>
-<p id="section-6.4.1-1">A CA that issues landmark-relative certificates <span class="bcp14">MUST</span> additionally maintain a <em>landmark sequence</em>. A landmark sequence is a sequence of <em>landmarks</em>, defined below:<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-2">Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. Landmark zero <span class="bcp14">MUST</span> have a tree size of zero. The sequence of tree sizes <span class="bcp14">MUST</span> be append-only and strictly monotonically increasing.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-3">The landmark sequence determines <em>landmark subtrees</em> for each landmark: for each landmark <code>L</code>, other than number zero, let <code>tree_size</code> be <code>L</code>'s tree size and <code>prev_tree_size</code> be that of <code>L - 1</code>. The landmark subtrees for <code>L</code> are the two subtrees that cover <code>[prev_tree_size, tree_size)</code>, as described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>. Landmark zero has no landmark subtrees.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-4">As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer <code>max_active_landmarks</code> parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.<a href="#section-6.4.1-4" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-5">The most recent <code>max_active_landmarks</code> landmarks are said to be <em>active</em>. Landmarks <span class="bcp14">MUST</span> be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_active_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in at least one landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.4.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-6">It is <span class="bcp14">RECOMMENDED</span> that landmarks be allocated following the procedure described in <a href="#allocating-landmarks" class="auto internal xref">Section 6.4.2</a>. If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_active_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.4.1-6" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-7">Relying parties will locally retain up to <code>2 * max_active_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_active_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure below, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_active_landmarks</code> of 169. The client state is then 338 hashes, or 10,816 bytes with SHA-256.<a href="#section-6.4.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-1">A CA that issues landmark-relative certificates <span class="bcp14">MUST</span> additionally maintain a <em>landmark sequence</em>. A landmark sequence is a sequence of <em>landmarks</em>, defined below. Landmarks are used as a common point of reference across the ecosystem for optimizing certificates.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-2">Each landmark consists of:<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.4.1-3.1">
+              <p id="section-6.4.1-3.1.1">A landmark number, used as an identifier for the landmark<a href="#section-6.4.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.4.1-3.2">
+              <p id="section-6.4.1-3.2.1">A tree size, which is the size of the tree at the time the landmark was allocated<a href="#section-6.4.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.4.1-3.3">
+              <p id="section-6.4.1-3.3.1">An expiration time, represented as seconds since the Epoch (Section 4.19 of Volume 1 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>)<a href="#section-6.4.1-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.4.1-4">The landmark sequence is append-only, with landmarks numbered consecutively from zero. Landmark zero <span class="bcp14">MUST</span> have a tree size of zero and an expiration of zero seconds since the Epoch. For each subsequent landmark, the tree size <span class="bcp14">MUST</span> be greater than that of the previous landmark, and the expiry <span class="bcp14">MUST</span> be greater or equal to that of the previous landmark.<a href="#section-6.4.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-5">Each landmark has two <em>landmark subtrees</em>. The landmark subtrees for landmark number <code>L</code> as determined follows:<a href="#section-6.4.1-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.4.1-6">
+<li id="section-6.4.1-6.1">
+              <p id="section-6.4.1-6.1.1">If <code>L</code> is zero, the landmark subtrees are <code>[0, 0)</code> and <code>[0, 0)</code>.<a href="#section-6.4.1-6.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.1-6.2">
+              <p id="section-6.4.1-6.2.1">Otherwise, let <code>tree_size</code> be landmark <code>L</code>'s tree size and <code>prev_tree_size</code> be that of landmark <code>L - 1</code>.<a href="#section-6.4.1-6.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.1-6.3">
+              <p id="section-6.4.1-6.3.1">The landmark subtrees are the two subtrees that cover <code>[prev_tree_size, tree_size)</code>, as described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>.<a href="#section-6.4.1-6.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.4.1-7">A landmark's expiration time <span class="bcp14">MUST</span> be greater or equal to the <code>notAfter</code> time of every TBSCertificateLogEntry whose index is less than the tree size. When allocating a landmark, CAs <span class="bcp14">SHOULD</span> set the expiration time to the current time plus the CA's maximum certificate lifetime.<a href="#section-6.4.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-8">A landmark that is not yet expired is said to be <em>active</em>. Landmark zero is never active. At any time, a log's <em>active landmark subtrees</em> are the landmark subtrees of each currently active landmark. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.4.1-8" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-9">The above conditions imply that every unexpired entry in the log is either contained in some landmark subtree or was allocated sometime after the latest landmark.<a href="#section-6.4.1-9" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-10">As the issuance log grows, CAs continuously allocate new landmarks. More frequent allocation reduces landmark-relative certificate delay, while less frequent allocation reduces the size of the relying party's predistributed state. As described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>, relying parties maintain some upper bound on active landmarks per CA. CAs <span class="bcp14">SHOULD</span> allocate landmarks such that the number of active landmarks, across all their logs, is within the bound for supported relying parties. <a href="#allocating-landmarks" class="auto internal xref">Section 6.4.2</a> gives a <span class="bcp14">RECOMMENDED</span> procedure for allocating landmarks.<a href="#section-6.4.1-10" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-11">Mistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party to reject some of the CA's otherwise valid landmark-relative certificates.<a href="#section-6.4.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="allocating-landmarks">
@@ -4327,13 +4351,27 @@ struct {
 <p id="section-6.4.2-1">It is <span class="bcp14">RECOMMENDED</span> that landmarks be allocated using the following procedure:<a href="#section-6.4.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.4.2-2">
 <li id="section-6.4.2-2.1">
-              <p id="section-6.4.2-2.1.1">Select some <code>time_between_landmarks</code> duration. Define a series of consecutive, non-overlapping time intervals, each of duration <code>time_between_landmarks</code>.<a href="#section-6.4.2-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.2-2.1.1">Let <code>max_cert_lifetime</code> by some upper bound on the CA's certificate lifetime.<a href="#section-6.4.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.2-2.2">
-              <p id="section-6.4.2-2.2.1">At most once per time interval, append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size.<a href="#section-6.4.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.2-2.2.1">Select some <code>time_between_landmarks</code> duration.<a href="#section-6.4.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.2-2.3">
+              <p id="section-6.4.2-2.3.1">Define a series of consecutive, non-overlapping time intervals, each of duration <code>time_between_landmarks</code>.<a href="#section-6.4.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.2-2.4">
+              <p id="section-6.4.2-2.4.1">At most once per time interval, run the following:<a href="#section-6.4.2-2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.4.2-2.4.2">
+<li id="section-6.4.2-2.4.2.1">
+                  <p id="section-6.4.2-2.4.2.1.1">If the current log's tree size is equal to the its landmark's tree size, do nothing.<a href="#section-6.4.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-6.4.2-2.4.2.2">
+                  <p id="section-6.4.2-2.4.2.2.1">Otherwise, append a landmark to the current log whose tree size is the current tree size and whose expiry is the current time plus <code>max_cert_lifetime</code>.<a href="#section-6.4.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
 </li>
           </ol>
-<p id="section-6.4.2-3">To ensure that only active landmarks contain unexpired certificates, set <code>max_active_landmarks</code> to <code>ceil(max_cert_lifetime / time_between_landmarks) + 1</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime. The <code>+ 1</code> accounts for landmarks not allocated at the exact start of their time interval, which can push certificate expiry one interval further than <code>ceil(max_cert_lifetime / time_between_landmarks)</code> alone would bound.<a href="#section-6.4.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.2-3">This procedure ensures there are at most <code>ceil(max_cert_lifetime / time_between_landmarks) + 1</code> active landmarks across all of the CA's logs. For example, if <code>max_cert_lifetime</code> is 7 days and <code>time_between_landmarks</code> is one hour, there will be at most 169 active landmarks, or 338 active landmark subtrees. The relying party state is then 10,816 bytes with SHA-256.<a href="#section-6.4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="publishing-landmarks">
@@ -4341,26 +4379,28 @@ struct {
           <h4 id="name-publishing-landmarks">
 <a href="#section-6.4.3" class="section-number selfRef">6.4.3. </a><a href="#name-publishing-landmarks" class="section-name selfRef">Publishing Landmarks</a>
           </h4>
-<p id="section-6.4.3-1">CAs <span class="bcp14">SHOULD</span> publish their active landmarks, so that relying parties can configure trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>). The following format can be used to describe this information. The format is the following sequence of lines. Each line <span class="bcp14">MUST</span> be terminated by a newline character (U+000A):<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-1">The following format can be used to represent a CA's active landmarks. The format <span class="bcp14">MUST</span> contain the following sequence of lines. Each line <span class="bcp14">MUST</span> be terminated by a newline character (U+000A):<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4.3-2.1">
-              <p id="section-6.4.3-2.1.1">The decimal representations of two non-negative integers, separated by a single space character (U+0020): <code>&lt;last_landmark&gt; &lt;num_active_landmarks&gt;</code>.
-This line <span class="bcp14">MUST</span> satisfy the following, otherwise it is invalid:<a href="#section-6.4.3-2.1.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.4.3-2.1.2.1">
-                  <p id="section-6.4.3-2.1.2.1.1"><code>num_active_landmarks &lt;= max_active_landmarks</code><a href="#section-6.4.3-2.1.2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.3-2.1.1">A header line consisting of a decimal integer, <code>latest_landmark</code>, with the landmark number of the CA's most recent landmark at the time of publishing. This value <span class="bcp14">MUST</span> be at most 2<sup>48</sup>-1.<a href="#section-6.4.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-6.4.3-2.1.2.2">
-                  <p id="section-6.4.3-2.1.2.2.1"><code>num_active_landmarks &lt;= last_landmark</code><a href="#section-6.4.3-2.1.2.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.4.3-2.2">
+              <p id="section-6.4.3-2.2.1">A sequence of <code>num_active_landmarks + 1</code> lines, where <code>num_active_landmarks</code> is the number of active landmarks at the time of publishing. Decoders <span class="bcp14">MUST</span> reject documents where there are greater than <code>latest_landmark</code> such lines. Numbered consecutively from zero, line <code>i</code> in this sequence consists of:<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.4.3-2.2.2.1">
+                  <p id="section-6.4.3-2.2.2.1.1">The tree size for landmark <code>latest_landmark - i</code> as a decimal integer. This value <span class="bcp14">MUST</span> be at most 2<sup>48</sup>-1.<a href="#section-6.4.3-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-6.4.3-2.2.2.2">
+                  <p id="section-6.4.3-2.2.2.2.1">A single space character (U+0020).<a href="#section-6.4.3-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-6.4.3-2.2.2.3">
+                  <p id="section-6.4.3-2.2.2.3.1">The expiration time for landmark <code>latest_landmark - i</code> as a decimal integer containing seconds since the Epoch (Section 4.19 of Volume 1 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>).<a href="#section-6.4.3-2.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
-            <li class="normal" id="section-6.4.3-2.2">
-              <p id="section-6.4.3-2.2.1"><code>num_active_landmarks + 1</code> lines, each containing the decimal representation of a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The tree sizes <span class="bcp14">MUST</span> be strictly monotonically decreasing and less than or equal to the log's latest tree size.<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
-</li>
           </ul>
-<p id="section-6.4.3-3">Landmark numbers and tree sizes are both at most 2<sup>48</sup>-1 (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). Any deviation from this format, including additional whitespace or any content following the final line, makes the document invalid. Relying parties <span class="bcp14">MUST</span> reject an invalid document in its entirety, rather than acting on the portion that precedes the error.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
-<p id="section-6.4.3-4">It is <span class="bcp14">RECOMMENDED</span> that this format be published as an HTTP resource <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> with content type <code>text/plain; charset=utf-8</code>.<a href="#section-6.4.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-3">Tree sizes <span class="bcp14">MUST</span> be strictly monotonically decreasing, and expiration times <span class="bcp14">MUST</span> be monotonically decreasing. There <span class="bcp14">MUST</span> be at least one expiration time before the current time.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-4">Decoders <span class="bcp14">MUST</span> reject documents that do not strictly conform to the above requirements, including extraneous whitespace and the lack of an expired landmark. A decoder <span class="bcp14">MAY</span> process only a prefix of this document, provided there is at least one expired landmark to denote the end of the active landmarks.<a href="#section-6.4.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="constructing-landmark-relative-certificates">
@@ -4368,20 +4408,22 @@ This line <span class="bcp14">MUST</span> satisfy the following, otherwise it is
           <h4 id="name-constructing-landmark-relat">
 <a href="#section-6.4.4" class="section-number selfRef">6.4.4. </a><a href="#name-constructing-landmark-relat" class="section-name selfRef">Constructing Landmark-Relative Certificates</a>
           </h4>
-<p id="section-6.4.4-1">Given the inputs in <a href="#certificate-inputs" class="auto internal xref">Section 6.1</a> and a landmark sequence, a landmark-relative certificate is constructed as follows:<a href="#section-6.4.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-1">Given the inputs in <a href="#certificate-inputs" class="auto internal xref">Section 6.1</a> and the corresponding log's landmark sequence, a landmark-relative certificate is constructed as follows:<a href="#section-6.4.4-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.4.4-2">
 <li id="section-6.4.4-2.1">
-              <p id="section-6.4.4-2.1.1">Let <code>L</code> be the smallest landmark number in the active window whose tree size is strictly greater than the entry index <code>i</code>. Because the landmark sequence is strictly monotonically increasing, <code>L - 1</code>'s tree size is less than or equal to <code>i</code>. If no such <code>L</code> has been allocated yet (<code>i</code> is greater than or equal to <code>last_landmark</code>'s tree size), wait for one to be allocated. If every landmark that once covered the entry is no longer in the active window (<code>last_landmark - num_active_landmarks</code>'s tree size is greater than <code>i</code>), abort this process.<a href="#section-6.4.4-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-2.1.1">Let <code>idx</code> be the entry index.<a href="#section-6.4.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-2.2">
-              <p id="section-6.4.4-2.2.1">Determine landmark <code>L</code>'s subtrees (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) and select the unique one whose <code>[start, end)</code> interval contains <code>i</code>.<a href="#section-6.4.4-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-2.2.1">Let <code>L</code> be the lowest numbered landmark whose tree size is strictly greater than <code>idx</code>. If no such landmark has been allocated yet, wait for one to be allocated. If the entry has already expired and historical landmark information is unavoidable, abort the procedure.<a href="#section-6.4.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-2.3">
-              <p id="section-6.4.4-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) using the selected subtree and no signatures.<a href="#section-6.4.4-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-2.3.1">Determine the <code>L</code>'s subtrees (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) and select the unique one whose <code>[start, end)</code> interval contains <code>idx</code>.<a href="#section-6.4.4-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.4.4-2.4">
+              <p id="section-6.4.4-2.4.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) using the selected subtree and no signatures.<a href="#section-6.4.4-2.4.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.4.4-3">Before sending this certificate, the authenticating party <span class="bcp14">SHOULD</span> obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
-<p id="section-6.4.4-4">The procedure above is not specific to the CA. In particular, a party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.<a href="#section-6.4.4-4" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-3">The procedure above is not specific to the CA. Any party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4623,7 +4665,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party <span class="bcp14">MAY</span> incorporate a periodically updated, predistributed list of trusted subtrees from the CA's current issuance log. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party <span class="bcp14">MAY</span> incorporate a periodically updated, predistributed list of trusted subtrees from the CA. This allows the relying party to accept landmark-relative certificates (<a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <p id="section-7.4-2">Each trusted subtree contains:<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-3.1">
@@ -4636,11 +4678,11 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             <p id="section-7.4-3.3.1">The hash of the subtree<a href="#section-7.4-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.4-4">Trusted subtrees for a given log are determined by its active landmark subtrees, as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>. Before configuring the subtrees as trusted, the relying party <span class="bcp14">MUST</span> obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.3</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
+<p id="section-7.4-4">Trusted subtrees for a CA are determined by its active landmark subtrees, as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>. Before configuring the subtrees as trusted, the relying party <span class="bcp14">MUST</span> obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.3</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
 <p id="section-7.4-5">This criterion can be checked given:<a href="#section-7.4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-6.1">
-            <p id="section-7.4-6.1.1">Some <em>reference checkpoint</em> that contains the latest landmark<a href="#section-7.4-6.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.4-6.1.1">Some <em>reference checkpoint</em> whose tree size is greater or equal to that of the latest landmark<a href="#section-7.4-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.4-6.2">
             <p id="section-7.4-6.2.1">For each cosigner, either:<a href="#section-7.4-6.2.1" class="pilcrow">¶</a></p>
@@ -4658,8 +4700,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </li>
         </ul>
 <p id="section-7.4-7">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-7" class="pilcrow">¶</a></p>
-<p id="section-7.4-8">This document does not prescribe how relying parties obtain this information. A relying party <span class="bcp14">MAY</span>, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it <span class="bcp14">MAY</span> trust the update service to perform these checks.<a href="#section-7.4-8" class="pilcrow">¶</a></p>
-<p id="section-7.4-9">The relying party <span class="bcp14">SHOULD</span> incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
+<p id="section-7.4-8">If a relying party is unable to validate some active landmark, it <span class="bcp14">MAY</span> discard that landmark, along with all landmarks in the log newer than it, while still using the older active landmarks that it was able to validate. For example, suppose the active landmarks have tree sizes 200, 300, 400, and 500, and the relying party was unable to validate any reference checkpoint of size 500 or higher. If the relying party is able to validate a reference checkpoint of size 350, it <span class="bcp14">MAY</span> incorporate subtrees from the first two landmarks.<a href="#section-7.4-8" class="pilcrow">¶</a></p>
+<p id="section-7.4-9">To bound local state, the relying party <span class="bcp14">SHOULD</span> define some upper bound on the number of active landmarks accepted per CA. If the CA exceeds this bound, the relying party <span class="bcp14">SHOULD</span> similarly discard the newest active landmarks to meet its limit.<a href="#section-7.4-9" class="pilcrow">¶</a></p>
+<p id="section-7.4-10">This document does not prescribe how relying parties obtain trusted subtrees. A relying party <span class="bcp14">MAY</span>, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it <span class="bcp14">MAY</span> trust the update service to perform these checks.<a href="#section-7.4-10" class="pilcrow">¶</a></p>
+<p id="section-7.4-11">The relying party <span class="bcp14">SHOULD</span> incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-7.4-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revoked-ranges">
@@ -4737,7 +4781,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
               <p id="section-8.2.1-3.1.1"><code>caID</code> itself (see <a href="#standalone-certificates-tls" class="auto internal xref">Section 8.1</a>). This selects all standalone certificates.<a href="#section-8.2.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-3.2">
-              <p id="section-8.2.1-3.2.1"><code>{caID landmarks(1) N M}</code> for all <code>M</code> from <code>L - max_active_landmarks + 1</code> to <code>L</code>, inclusive. This selects landmark-relative certificates from active landmarks up to <code>L</code>.<a href="#section-8.2.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-3.2.1"><code>{caID landmarks(1) N M}</code> for all <code>M</code> from 0 to <code>L</code>, inclusive. This selects landmark-relative certificates from active landmarks up to <code>L</code>.<a href="#section-8.2.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-8.2.1-4">To support these groups in the authenticating party, CAs <span class="bcp14">SHOULD</span> configure certificates to match the following trust anchor groups (Sections <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-05#section-5.3" class="relref">5.3</a> and <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-05#section-7.2" class="relref">7.2</a> of <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>):<a href="#section-8.2.1-4" class="pilcrow">¶</a></p>
@@ -4746,16 +4790,16 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
               <p id="section-8.2.1-5.1.1">A standalone certificate <span class="bcp14">SHOULD</span> include a trust anchor ID pattern of <code>caID.2.{0-}.{0-}</code>.<a href="#section-8.2.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-5.2">
-              <p id="section-8.2.1-5.2.1">A landmark-relative log number <code>N</code> and landmark <code>L</code> <span class="bcp14">SHOULD</span> include a trust anchor ID pattern of <code>caID.2.N.{L-L_max}</code>, where <code>L_max</code> is <code>L + max_active_landmarks - 1</code>.<a href="#section-8.2.1-5.2.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-5.2.1">A landmark-relative log number <code>N</code> and landmark <code>L</code> <span class="bcp14">SHOULD</span> include a trust anchor ID pattern of <code>caID.2.N.{L-}</code>.<a href="#section-8.2.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-8.2.1-6">For example, suppose a CA <code>32473.100</code> has a <code>max_active_landmarks</code> of 20. It issues a certificate in landmark 42 of log 8. Then:<a href="#section-8.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-6">For example, suppose a CA with ID <code>32473.100</code> issues a certificate in landmark 42 of log 8:<a href="#section-8.2.1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.1-7.1">
               <p id="section-8.2.1-7.1.1">The standalone certificate has a trust anchor ID of <code>32473.100</code> and is contained in groups <code>32473.100.2.{0-}.{0-}</code>.<a href="#section-8.2.1-7.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.1-7.2">
-              <p id="section-8.2.1-7.2.1">The landmark-relative certificate has a trust anchor ID of <code>32473.100.1.8.42</code> and is contained in groups <code>32473.100.2.8.{42-61}</code>.<a href="#section-8.2.1-7.2.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.1-7.2.1">The landmark-relative certificate has a trust anchor ID of <code>32473.100.1.8.42</code> and is contained in groups <code>32473.100.2.8.{42-}</code>.<a href="#section-8.2.1-7.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-8.2.1-8">A relying party whose latest trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) in log <code>N</code> is landmark <code>L</code> <span class="bcp14">SHOULD</span> configure the <code>trust_anchors</code> extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks. For example, a relying party which is up-to-date as of landmark 42 of log 8 of CA <code>32473.100</code> would send an ID of <code>32473.100.2.8.42</code>. This would signal the following certificates:<a href="#section-8.2.1-8" class="pilcrow">¶</a></p>
@@ -7395,6 +7439,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.17-1.15">
             <p id="appendix-E.17-1.15.1">Update for draft-ietf-tls-trust-anchor-ids-05, and spell out certificate configuration explicitly.<a href="#appendix-E.17-1.15.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.17-1.16">
+            <p id="appendix-E.17-1.16.1">Define active landmarks around landmark expiry and put the expiry time in the landmark format.<a href="#appendix-E.17-1.16.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
