@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-15T04:41:04.834729+00:00",
+  "timestamp": "2026-09-17T04:41:18.438411+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -21768,13 +21768,168 @@
       "labels": [],
       "body": "Updates section numbers, reworks the text to spell out the expected group patterns, and updates the demo tool to output certificate properties. https://github.com/tlswg/tls-trust-anchor-ids/pull/125 can be used to print that output while other tools are spun up.\r\n\r\nMight be easiest reviewed as separate commits.\r\n\r\n@bob-beck",
       "createdAt": "2026-09-15T02:19:30Z",
-      "updatedAt": "2026-09-15T02:19:30Z",
+      "updatedAt": "2026-09-16T17:46:15Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "tai-update",
-      "headRefOid": "5da64139a0638dd7abaaf77fc07c97083592037d",
+      "headRefOid": "d565aa8225974e0222055fe5cf39bbef443f7200",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(Also updated to talk about the `trust_anchor_negotiation` property. Forgot that one.)",
+          "createdAt": "2026-09-15T17:28:58Z",
+          "updatedAt": "2026-09-15T17:28:58Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNpsa3w",
+          "commit": {
+            "abbreviatedOid": "5da6413"
+          },
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-15T14:09:00Z",
+          "updatedAt": "2026-09-15T14:11:09Z",
+          "comments": [
+            {
+              "originalPosition": 178,
+              "body": "\"At minimum, the ACME **server** SHOULD include:\" ?",
+              "createdAt": "2026-09-15T14:09:01Z",
+              "updatedAt": "2026-09-15T14:11:09Z"
+            },
+            {
+              "originalPosition": 176,
+              "body": "s/Section 7.6/Section 7.5/ ?",
+              "createdAt": "2026-09-15T14:10:30Z",
+              "updatedAt": "2026-09-15T14:11:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNsBiow",
+          "commit": {
+            "abbreviatedOid": "5da6413"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-15T17:28:34Z",
+          "updatedAt": "2026-09-15T17:28:34Z",
+          "comments": [
+            {
+              "originalPosition": 178,
+              "body": "Thanks! Fixed.",
+              "createdAt": "2026-09-15T17:28:34Z",
+              "updatedAt": "2026-09-15T17:28:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNsBq7g",
+          "commit": {
+            "abbreviatedOid": "5da6413"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-15T17:28:43Z",
+          "updatedAt": "2026-09-15T17:28:44Z",
+          "comments": [
+            {
+              "originalPosition": 176,
+              "body": "Thanks! Fixed.",
+              "createdAt": "2026-09-15T17:28:43Z",
+              "updatedAt": "2026-09-15T17:28:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABNwcsOg",
+          "commit": {
+            "abbreviatedOid": "a438b00"
+          },
+          "author": "geegeea",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-16T03:24:01Z",
+          "updatedAt": "2026-09-16T03:51:10Z",
+          "comments": [
+            {
+              "originalPosition": 98,
+              "body": "```suggestion\n* `{caID landmarks(1) N L2}` for all `L2` from `L - max_active_landmarks + 1` to `L`, inclusive. This selects landmark-relative certificates from active landmarks up to `L`.\n```",
+              "createdAt": "2026-09-16T03:24:01Z",
+              "updatedAt": "2026-09-16T03:51:10Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 321,
+      "id": "PR_kwDOJIBkVc8AAAABD01Kig",
+      "title": "Add a skeleton architecture document",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/321",
+      "state": "OPEN",
+      "author": "sgmenda",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This adds a skeleton for the informational architecture document. It is purely additive and does not modify the main document.\r\n\r\nA few questions for the reviewers:\r\n\r\n1. What should the filename and docname be?\r\n2. Is `consensus: true` right?\r\n3. Does the outline look right?\r\n\r\nSee #192",
+      "createdAt": "2026-09-16T20:04:09Z",
+      "updatedAt": "2026-09-16T20:30:24Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "headRepository": "sgmenda/merkle-tree-certs",
+      "headRefName": "mtc-architecture-skeleton",
+      "headRefOid": "327c624fde8f031fc0f34fde2d091c7dda9cde73",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I misclicked, this PR is not yet ready for review. Sorry for the noise.",
+          "createdAt": "2026-09-16T20:11:36Z",
+          "updatedAt": "2026-09-16T20:11:36Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 322,
+      "id": "PR_kwDOJIBkVc8AAAABD13EFw",
+      "title": "Rework the landmark file format to include an expiry",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/322",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This sits atop #320. Just look at the topmost commit.\r\n\r\nEverything around landmarks is clocked on when landmarks expire. CAs need to keep track of it anyway, so it seems silly not to just define it explicitly. That also helps relying parties process the file if the CA hasn't been keeping it continuously updated second-by-second as landmarks expire.\r\n\r\nIn doing so, that lets us recenter the definition of active landmarks on landmark expiry. That solves a whole host of problems:\r\n\r\nFirst, we said the CA has a max_active_landmarks parameter, but we never wrote it down. That parameter is also wrong because we set it at a per-log basis, but it needs to be summed across all CAs.\r\n\r\nInstead, we can now define active landmarks more directly. max_active_landmarks is now merely a per-relying-party DoS limit.  RPs and CAs will need to coordinate on this value, but it's no longer a rigid parameter.\r\n\r\nWe can solve the per-log vs per-CA limit by then removing it from the discussion of the landmark file format. Instead, we just say that CAs SHOULD allocate landmarks such that the total number is within the limits of relying parties.\r\n\r\nWhat happens if the limit is exceeded? We explicitly say that if you see more landmarks than your limit, you have to take the oldest active ones, not the newest ones. While I'm here, we never said how to handle the case that you can't validate the latest landmark, but you can validate an earlier one.\r\n\r\nThis lets us remove a dependency on knowing the CA's current log. The relying party just collects all the CA's active landmarks, across all logs. If that's too many, see above. That smooths over an edge case right after operational failure.\r\n\r\nmax_active_landmarks was also used in the TAI configuration, but in reality this was never necessary. All those ranges only needed to be bounded on one side. The width max_active_landmarks was really just a proxy for certificate expiration anyway.\r\n\r\nWhile I'm here, define landmark subtrees for landmark zero, now that zero-length subtrees are allowed. This will never come up (landmark zero is always expired) but makes the type system more uniform.\r\n\r\n(For completeness, I considered following up on this change with collapsing the landmark sequence from per-log to per-CA. This felt very natural but had one problem: if a log failures happens *before* the last landmark on a log, the whole thing gets wedged.)\r\n",
+      "createdAt": "2026-09-16T22:33:12Z",
+      "updatedAt": "2026-09-16T23:45:55Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "landmark-expiry",
+      "headRefOid": "9b34841a3b8511833752142cb1b0025bbbbe8530",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
