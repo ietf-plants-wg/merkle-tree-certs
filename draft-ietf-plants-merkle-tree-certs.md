@@ -1253,7 +1253,7 @@ This section defines how to construct Merkle Tree Certificates, which are X.509 
 
 A Merkle Tree Certificate is constructed from the following inputs:
 
-* A TBSCertificateLogEntry ({{log-entries}}) contained in the issuance log ({{issuance-logs}})
+* A TBSCertificateLogEntry ({{log-entries}}) contained in one of the CA's issuance logs ({{issuance-logs}})
 * A subject public key whose hash matches the TBSCertificateLogEntry
 * The `log_number` and the zero-based entry `index` of that log entry within the issuance log, used to construct the certificate's `serialNumber` ({{certificate-format}}).
 * An `MTCProof` ({{certificate-format}}) proving the entry's inclusion in a subtree, along with zero or more signatures ({{cosigners}}) over that subtree, which together satisfy relying party requirements ({{trusted-cosigners}})
@@ -1339,54 +1339,74 @@ A *landmark-relative certificate* is a Merkle Tree certificate which contains no
 
 ### Landmark Tree Sizes
 
-A CA that issues landmark-relative certificates MUST additionally maintain a *landmark sequence*. A landmark sequence is a sequence of *landmarks*, defined below:
+A CA that issues landmark-relative certificates MUST additionally maintain a *landmark sequence*. A landmark sequence is a sequence of *landmarks*, defined below. Landmarks are used as a common point of reference across the ecosystem for optimizing certificates.
 
-Each landmark consists of a number, used as an identifier for the landmark, and a tree size, used as a common point of reference across the ecosystem for optimizing certificates. Landmarks are numbered consecutively from zero. Landmark zero MUST have a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
+Each landmark consists of:
 
-The landmark sequence determines *landmark subtrees* for each landmark: for each landmark `L`, other than number zero, let `tree_size` be `L`'s tree size and `prev_tree_size` be that of `L - 1`. The landmark subtrees for `L` are the two subtrees that cover `[prev_tree_size, tree_size)`, as described in {{arbitrary-intervals}}. Landmark zero has no landmark subtrees.
+* A landmark number, used as an identifier for the landmark
+* A tree size, which is the size of the tree at the time the landmark was allocated
+* An expiration time, represented as seconds since the Epoch (Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}})
 
-As the issuance log grows, CAs continuously allocate new landmarks. This allocation balances minimizing landmark-relative certificate delay with minimizing the size of the relying party's predistributed state. To bound the latter, each CA sets a positive integer `max_active_landmarks` parameter, which is the maximum number of landmarks that may contain unexpired certificates at any time.
+The landmark sequence is append-only, with landmarks numbered consecutively from zero. Landmark zero MUST have a tree size of zero and an expiration of zero seconds since the Epoch. For each subsequent landmark, the tree size MUST be greater than that of the previous landmark, and the expiry MUST be greater or equal to that of the previous landmark.
 
-The most recent `max_active_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_active_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in at least one landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
+Each landmark has two *landmark subtrees*. The landmark subtrees for landmark number `L` as determined follows:
 
-It is RECOMMENDED that landmarks be allocated following the procedure described in {{allocating-landmarks}}. If landmarks are allocated incorrectly (e.g. past landmarks change, or `max_active_landmarks` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
+1. If `L` is zero, the landmark subtrees are `[0, 0)` and `[0, 0)`.
+2. Otherwise, let `tree_size` be landmark `L`'s tree size and `prev_tree_size` be that of landmark `L - 1`.
+3. The landmark subtrees are the two subtrees that cover `[prev_tree_size, tree_size)`, as described in {{arbitrary-intervals}}.
 
-Relying parties will locally retain up to `2 * max_active_landmarks` hashes ({{trusted-subtrees}}) per CA, so `max_active_landmarks` should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure below, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a `max_active_landmarks` of 169. The client state is then 338 hashes, or 10,816 bytes with SHA-256.
+A landmark's expiration time MUST be greater or equal to the `notAfter` time of every TBSCertificateLogEntry whose index is less than the tree size. When allocating a landmark, CAs SHOULD set the expiration time to the current time plus the CA's maximum certificate lifetime.
+
+A landmark that is not yet expired is said to be *active*. Landmark zero is never active. At any time, a log's *active landmark subtrees* are the landmark subtrees of each currently active landmark. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
+
+The above conditions imply that every unexpired entry in the log is either contained in some landmark subtree or was allocated sometime after the latest landmark.
+
+As the issuance log grows, CAs continuously allocate new landmarks. More frequent allocation reduces landmark-relative certificate delay, while less frequent allocation reduces the size of the relying party's predistributed state. As described in {{trusted-subtrees}}, relying parties maintain some upper bound on active landmarks per CA. CAs SHOULD allocate landmarks such that the number of active landmarks, across all their logs, is within the bound for supported relying parties. {{allocating-landmarks}} gives a RECOMMENDED procedure for allocating landmarks.
+
+Mistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party to reject some of the CA's otherwise valid landmark-relative certificates.
 
 ### Allocating Landmarks
 
 It is RECOMMENDED that landmarks be allocated using the following procedure:
 
-1. Select some `time_between_landmarks` duration. Define a series of consecutive, non-overlapping time intervals, each of duration `time_between_landmarks`.
-2. At most once per time interval, append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size.
+1. Let `max_cert_lifetime` by some upper bound on the CA's certificate lifetime.
+1. Select some `time_between_landmarks` duration.
+2. Define a series of consecutive, non-overlapping time intervals, each of duration `time_between_landmarks`.
+3. At most once per time interval, run the following:
+   1. If the current log's tree size is equal to the its landmark's tree size, do nothing.
+   2. Otherwise, append a landmark to the current log whose tree size is the current tree size and whose expiry is the current time plus `max_cert_lifetime`.
 
-To ensure that only active landmarks contain unexpired certificates, set `max_active_landmarks` to `ceil(max_cert_lifetime / time_between_landmarks) + 1`, where `max_cert_lifetime` is the CA's maximum certificate lifetime. The `+ 1` accounts for landmarks not allocated at the exact start of their time interval, which can push certificate expiry one interval further than `ceil(max_cert_lifetime / time_between_landmarks)` alone would bound.
+This procedure ensures there are at most `ceil(max_cert_lifetime / time_between_landmarks) + 1` active landmarks across all of the CA's logs. For example, if `max_cert_lifetime` is 7 days and `time_between_landmarks` is one hour, there will be at most 169 active landmarks, or 338 active landmark subtrees. The relying party state is then 10,816 bytes with SHA-256.
 
 ### Publishing Landmarks
 
-CAs SHOULD publish their active landmarks, so that relying parties can configure trusted subtrees ({{trusted-subtrees}}). The following format can be used to describe this information. The format is the following sequence of lines. Each line MUST be terminated by a newline character (U+000A):
+The following format can be used to represent a CA's active landmarks. The format MUST contain the following sequence of lines. Each line MUST be terminated by a newline character (U+000A):
 
-* The decimal representations of two non-negative integers, separated by a single space character (U+0020): `<last_landmark> <num_active_landmarks>`.
-  This line MUST satisfy the following, otherwise it is invalid:
-  * `num_active_landmarks <= max_active_landmarks`
-  * `num_active_landmarks <= last_landmark`
-* `num_active_landmarks + 1` lines, each containing the decimal representation of a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The tree sizes MUST be strictly monotonically decreasing and less than or equal to the log's latest tree size.
+* A header line consisting of a decimal integer, `latest_landmark`, with the landmark number of the CA's most recent landmark at the time of publishing. This value MUST be at most 2<sup>48</sup>-1.
 
-Landmark numbers and tree sizes are both at most 2<sup>48</sup>-1 ({{issuance-logs}}). Any deviation from this format, including additional whitespace or any content following the final line, makes the document invalid. Relying parties MUST reject an invalid document in its entirety, rather than acting on the portion that precedes the error.
+* A sequence of `num_active_landmarks + 1` lines, where `num_active_landmarks` is the number of active landmarks at the time of publishing. Decoders MUST reject documents where there are greater than `latest_landmark` such lines. Numbered consecutively from zero, line `i` in this sequence consists of:
 
-It is RECOMMENDED that this format be published as an HTTP resource {{!RFC9110}} with content type `text/plain; charset=utf-8`.
+  * The tree size for landmark `latest_landmark - i` as a decimal integer. This value MUST be at most 2<sup>48</sup>-1.
+  * A single space character (U+0020).
+  * The expiration time for landmark `latest_landmark - i` as a decimal integer containing seconds since the Epoch (Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}).
+
+Tree sizes MUST be strictly monotonically decreasing, and expiration times MUST be monotonically decreasing. There MUST be at least one expiration time before the current time.
+
+Decoders MUST reject documents that do not strictly conform to the above requirements, including extraneous whitespace and the lack of an expired landmark. A decoder MAY process only a prefix of this document, provided there is at least one expired landmark to denote the end of the active landmarks.
 
 ### Constructing Landmark-Relative Certificates
 
-Given the inputs in {{certificate-inputs}} and a landmark sequence, a landmark-relative certificate is constructed as follows:
+Given the inputs in {{certificate-inputs}} and the corresponding log's landmark sequence, a landmark-relative certificate is constructed as follows:
 
-1. Let `L` be the smallest landmark number in the active window whose tree size is strictly greater than the entry index `i`. Because the landmark sequence is strictly monotonically increasing, `L - 1`'s tree size is less than or equal to `i`. If no such `L` has been allocated yet (`i` is greater than or equal to `last_landmark`'s tree size), wait for one to be allocated. If every landmark that once covered the entry is no longer in the active window (`last_landmark - num_active_landmarks`'s tree size is greater than `i`), abort this process.
-2. Determine landmark `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `i`.
-3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
+1. Let `idx` be the entry index.
 
-Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
+2. Let `L` be the lowest numbered landmark whose tree size is strictly greater than `idx`. If no such landmark has been allocated yet, wait for one to be allocated. If the entry has already expired and historical landmark information is unavoidable, abort the procedure.
 
-The procedure above is not specific to the CA. In particular, a party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
+3. Determine the `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `idx`.
+
+4. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
+
+The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
 
 ## Size Estimates
 
@@ -1523,7 +1543,7 @@ Cosigner roles are extensible without changes to certificate verification itself
 
 ## Trusted Subtrees
 
-As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from the CA's current issuance log. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
+As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of trusted subtrees from the CA. This allows the relying party to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
 
 Each trusted subtree contains:
 
@@ -1531,11 +1551,11 @@ Each trusted subtree contains:
 * The `start` and `end` values that define the subtree
 * The hash of the subtree
 
-Trusted subtrees for a given log are determined by its active landmark subtrees, as described in {{landmark-tree-sizes}}. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
+Trusted subtrees for a CA are determined by its active landmark subtrees, as described in {{landmark-tree-sizes}}. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
 
 This criterion can be checked given:
 
-* Some *reference checkpoint* that contains the latest landmark
+* Some *reference checkpoint* whose tree size is greater or equal to that of the latest landmark
 * For each cosigner, either:
   * A cosignature on the reference checkpoint
   * A cosigned checkpoint containing the referenced checkpoint and a valid Merkle consistency proof ({{Section 2.1.4 of !RFC9162}}) between the two
@@ -1543,7 +1563,11 @@ This criterion can be checked given:
 
 [[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]
 
-This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.
+If a relying party is unable to validate some active landmark, it MAY discard that landmark, along with all landmarks in the log newer than it, while still using the older active landmarks that it was able to validate. For example, suppose the active landmarks have tree sizes 200, 300, 400, and 500, and the relying party was unable to validate any reference checkpoint of size 500 or higher. If the relying party is able to validate a reference checkpoint of size 350, it MAY incorporate subtrees from the first two landmarks.
+
+To bound local state, the relying party SHOULD define some upper bound on the number of active landmarks accepted per CA. If the CA exceeds this bound, the relying party SHOULD similarly discard the newest active landmarks to meet its limit.
+
+This document does not prescribe how relying parties obtain trusted subtrees. A relying party MAY, for example, use an application-specific update service, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.
 
 The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC9846}}.
 
@@ -1606,17 +1630,17 @@ Relying parties support many landmarks per log at a time. To compactly represent
 For each Merkle Tree Certificates CA with ID `caID`, each log number `N`, and each landmark number `L`, the ID `{caID landmarkGroups(2) N L}` defines a landmark group. It contains the following trust anchor IDs:
 
 * `caID` itself (see {{standalone-certificates-tls}}). This selects all standalone certificates.
-* `{caID landmarks(1) N M}` for all `M` from `L - max_active_landmarks + 1` to `L`, inclusive. This selects landmark-relative certificates from active landmarks up to `L`.
+* `{caID landmarks(1) N M}` for all `M` from 0 to `L`, inclusive. This selects landmark-relative certificates from active landmarks up to `L`.
 
 To support these groups in the authenticating party, CAs SHOULD configure certificates to match the following trust anchor groups ({{Sections 5.3 and 7.2 of !I-D.ietf-tls-trust-anchor-ids}}):
 
 * A standalone certificate SHOULD include a trust anchor ID pattern of `caID.2.{0-}.{0-}`.
-* A landmark-relative log number `N` and landmark `L` SHOULD include a trust anchor ID pattern of `caID.2.N.{L-L_max}`, where `L_max` is `L + max_active_landmarks - 1`.
+* A landmark-relative log number `N` and landmark `L` SHOULD include a trust anchor ID pattern of `caID.2.N.{L-}`.
 
-For example, suppose a CA `32473.100` has a `max_active_landmarks` of 20. It issues a certificate in landmark 42 of log 8. Then:
+For example, suppose a CA with ID `32473.100` issues a certificate in landmark 42 of log 8:
 
 * The standalone certificate has a trust anchor ID of `32473.100` and is contained in groups `32473.100.2.{0-}.{0-}`.
-* The landmark-relative certificate has a trust anchor ID of `32473.100.1.8.42` and is contained in groups `32473.100.2.8.{42-61}`.
+* The landmark-relative certificate has a trust anchor ID of `32473.100.1.8.42` and is contained in groups `32473.100.2.8.{42-}`.
 
 A relying party whose latest trusted subtree ({{trusted-subtrees}}) in log `N` is landmark `L` SHOULD configure the `trust_anchors` extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks. For example, a relying party which is up-to-date as of landmark 42 of log 8 of CA `32473.100` would send an ID of `32473.100.2.8.42`. This would signal the following certificates:
 
@@ -2797,3 +2821,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Lifted the tree hash into the MTC CA extension OID, so it can capture new tree constructions more generally.
 
 - Update for draft-ietf-tls-trust-anchor-ids-05, and spell out certificate configuration explicitly.
+
+- Define active landmarks around landmark expiry and put the expiry time in the landmark format.
