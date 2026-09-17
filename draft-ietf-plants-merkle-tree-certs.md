@@ -1359,11 +1359,11 @@ A landmark's expiration time MUST be greater or equal to the `notAfter` time of 
 
 A landmark that is not yet expired is said to be *active*. Landmark zero is never active. At any time, a log's *active landmark subtrees* are the landmark subtrees of each currently active landmark. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
 
-The above conditions imply that every unexpired entry in the log is either contained some landmark subtree or was allocated sometime after the latest landmark.
+The above conditions imply that every unexpired entry in the log is either contained in some landmark subtree or was allocated sometime after the latest landmark.
 
 As the issuance log grows, CAs continuously allocate new landmarks. More frequent allocation reduces landmark-relative certificate delay, while less frequent allocation reduces the size of the relying party's predistributed state. As described in {{trusted-subtrees}}, relying parties maintain some upper bound on active landmarks per CA. CAs SHOULD allocate landmarks such that the number of active landmarks, across all their logs, is within the bound for supported relying parties. {{allocating-landmarks}} gives a RECOMMENDED procedure for allocating landmarks.
 
-Mistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party reject some of the CA's otherwise valid landmark-relative certificates.
+Mistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party to reject some of the CA's otherwise valid landmark-relative certificates.
 
 ### Allocating Landmarks
 
@@ -1555,7 +1555,7 @@ Trusted subtrees for a CA are determined by its active landmark subtrees, as des
 
 This criterion can be checked given:
 
-* Some *reference checkpoint* whose tree size is greater or equal to that of latest landmark
+* Some *reference checkpoint* whose tree size is greater or equal to that of the latest landmark
 * For each cosigner, either:
   * A cosignature on the reference checkpoint
   * A cosigned checkpoint containing the referenced checkpoint and a valid Merkle consistency proof ({{Section 2.1.4 of !RFC9162}}) between the two
