@@ -97,9 +97,9 @@ informative:
     author:
     - org: Let's Encrypt
 
-  MerkleTown:
-    title: Merkle Town
-    target: https://ct.cloudflare.com/
+  CloudflareRadar:
+    title: Cloudflare Radar Certificate Transparency
+    target: https://radar.cloudflare.com/certificate-transparency
     date: 2023-03-07
     author:
     - org: Cloudflare, Inc.
@@ -1415,8 +1415,8 @@ The inclusion proofs in standalone and landmark-relative certificates scale loga
 Some organizations have published statistics which can be used to estimate this rate for the Web PKI. As of June 9th, 2025:
 
 * {{LetsEncrypt}} reported around 558,000,000 active certificates for a single CA
-* {{MerkleTown}} reported around 2,100,000,000 unexpired certificates in CT logs, across all CAs
-* {{MerkleTown}} reported an issuance rate of around 444,000 certificates per hour, across all CAs
+* {{CloudflareRadar}} reported around 2,100,000,000 unexpired certificates in CT logs, across all CAs
+* {{CloudflareRadar}} reported an issuance rate of around 444,000 certificates per hour, across all CAs
 
 The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see {{certificate-renewal}}), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 4,400,000 certificates per hour and 17,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.
 
