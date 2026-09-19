@@ -872,7 +872,7 @@ Given any interval, `[start, end)`, this section defines a procedure for selecti
 * While `left` may contain extra elements before `start`, `right` does not contain any extra elements. That is, `end = right.end`.
 * Each subtree's size is at most `BIT_CEIL(end - start)`.
 
-The pair of subtree hashes for `left` and `right` can support inclusion proofs for any element of `[start, end)`. The largest such inclusion proof  is no bigger than the largest inclusion proof in `MTH(D[start:end])`. Unlike `MTH(D[start:end])`, these subtree hashes can be shown consistent with the overall Merkle Tree using subtree consistency proofs.
+The pair of subtree hashes for `left` and `right` can support inclusion proofs for any element of `[start, end)`. The largest such inclusion proof is no bigger than the largest inclusion proof in `MTH(D[start:end])`. Unlike `MTH(D[start:end])`, these subtree hashes can be shown consistent with the overall Merkle Tree using subtree consistency proofs.
 
 The subtrees are selected as follows:
 
