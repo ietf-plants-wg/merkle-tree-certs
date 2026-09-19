@@ -93,7 +93,7 @@ informative:
   LetsEncrypt:
     title: Let's Encrypt Stats
     target: https://letsencrypt.org/stats/
-    date: 2023-03-07
+    date: 2026-09-17
     author:
     - org: Let's Encrypt
 
