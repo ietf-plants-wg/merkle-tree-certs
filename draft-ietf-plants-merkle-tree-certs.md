@@ -93,14 +93,14 @@ informative:
   LetsEncrypt:
     title: Let's Encrypt Stats
     target: https://letsencrypt.org/stats/
-    date: 2023-03-07
+    date: 2026-09-18
     author:
     - org: Let's Encrypt
 
-  MerkleTown:
-    title: Merkle Town
-    target: https://ct.cloudflare.com/
-    date: 2023-03-07
+  CloudflareRadar:
+    title: Cloudflare Radar Certificate Transparency
+    target: https://radar.cloudflare.com/certificate-transparency
+    date: 2026-09-18
     author:
     - org: Cloudflare, Inc.
 
@@ -1412,17 +1412,17 @@ The procedure above is not specific to the CA. Any party holding a standalone ce
 
 The inclusion proofs in standalone and landmark-relative certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.
 
-Some organizations have published statistics which can be used to estimate this rate for the Web PKI. As of June 9th, 2025:
+Some organizations have published statistics which can be used to estimate this rate for the Web PKI. As of September 18th, 2026:
 
-* {{LetsEncrypt}} reported around 558,000,000 active certificates for a single CA
-* {{MerkleTown}} reported around 2,100,000,000 unexpired certificates in CT logs, across all CAs
-* {{MerkleTown}} reported an issuance rate of around 444,000 certificates per hour, across all CAs
+* {{LetsEncrypt}} reported around 682,000,000 active certificates for a single CA
+* {{CloudflareRadar}} reported around 2,900,000,000 unexpired certificates in CT logs, across all CAs
+* {{CloudflareRadar}} reported an issuance rate of around 591,000 certificates per hour, across all CAs
 
-The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see {{certificate-renewal}}), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 4,400,000 certificates per hour and 17,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.
+The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see {{certificate-renewal}}), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 5,400,000 certificates per hour and 23,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.
 
-Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, standalone certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Standalone certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
+Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, standalone certificate subtrees will span around 3,000 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Standalone certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
 
-If a new landmark is allocated every hour, landmark-relative certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
+If a new landmark is allocated every hour, landmark-relative certificate subtrees will span around 5,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
 
 Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
 
