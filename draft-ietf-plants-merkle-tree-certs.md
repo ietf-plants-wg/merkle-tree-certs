@@ -1420,7 +1420,7 @@ Some organizations have published statistics which can be used to estimate this 
 
 The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see {{certificate-renewal}}), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 5,400,000 certificates per hour and 23,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.
 
-Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, standalone certificate subtrees will span around 3,000 certificates, leading to 13 hashes in the inclusion proof, or 416 bytes. Standalone certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
+Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, standalone certificate subtrees will span around 3,000 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Standalone certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
 
 If a new landmark is allocated every hour, landmark-relative certificate subtrees will span around 5,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
 
