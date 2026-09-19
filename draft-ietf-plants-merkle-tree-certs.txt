@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 21 March 2027                                        Apple Inc.
+Expires: 23 March 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       17 September 2026
+                                                       19 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 March 2027.
+   This Internet-Draft will expire on 23 March 2027.
 
 Copyright Notice
 
@@ -2074,15 +2074,15 @@ Table of Contents
    assume the issuance log's hash function is SHA-256.
 
    Some organizations have published statistics which can be used to
-   estimate this rate for the Web PKI.  As of June 9th, 2025:
+   estimate this rate for the Web PKI.  As of September 18th, 2026:
 
-   *  [LetsEncrypt] reported around 558,000,000 active certificates for
+   *  [LetsEncrypt] reported around 682,000,000 active certificates for
       a single CA
 
-   *  [MerkleTown] reported around 2,100,000,000 unexpired certificates
-      in CT logs, across all CAs
+   *  [CloudflareRadar] reported around 2,900,000,000 unexpired
+      certificates in CT logs, across all CAs
 
-   *  [MerkleTown] reported an issuance rate of around 444,000
+   *  [CloudflareRadar] reported an issuance rate of around 591,000
       certificates per hour, across all CAs
 
    The current issuance rate across the Web PKI may not necessarily be
@@ -2091,18 +2091,18 @@ Table of Contents
    subscribers will update their certificates 75% of the way through
    their lifetime (see Section 10.4), every certificate will be reissued
    every 126 hours.  This gives issuance rate estimates of around
-   4,400,000 certificates per hour and 17,000,000 certificates per hour,
+   5,400,000 certificates per hour and 23,000,000 certificates per hour,
    for the first two values above.  Note the larger estimate is across
    all CAs, while subtrees would only span one CA.
 
    Using the per-CA short lifetime estimate, if the CA mints a
    checkpoint every 2 seconds, standalone certificate subtrees will span
-   around 2,500 certificates, leading to 12 hashes in the inclusion
+   around 3,000 certificates, leading to 12 hashes in the inclusion
    proof, or 384 bytes.  Standalone certificates additionally must carry
    a sufficient set of signatures to meet relying party requirements.
 
    If a new landmark is allocated every hour, landmark-relative
-   certificate subtrees will span around 4,400,000 certificates, leading
+   certificate subtrees will span around 5,400,000 certificates, leading
    to 23 hashes in the inclusion proof, giving an inclusion proof size
    of 736 bytes, with no signatures.  This is significantly smaller than
    a single ML-DSA-44 signature, 2,420 bytes, and almost ten times
@@ -3598,6 +3598,11 @@ Table of Contents
               <https://chromium.googlesource.com/chromium/src/+/main/
               components/component_updater/README.md>.
 
+   [CloudflareRadar]
+              Cloudflare, Inc., "Cloudflare Radar Certificate
+              Transparency", 18 September 2026,
+              <https://radar.cloudflare.com/certificate-transparency>.
+
    [FIPS204]  "Module-lattice-based digital signature standard",
               National Institute of Standards and Technology (U.S.),
               DOI 10.6028/nist.fips.204, August 2024,
@@ -3621,12 +3626,8 @@ Table of Contents
               certs/tree/main/demo/large_inclusion_proofs.txt>.
 
    [LetsEncrypt]
-              Let's Encrypt, "Let's Encrypt Stats", 7 March 2023,
+              Let's Encrypt, "Let's Encrypt Stats", 18 September 2026,
               <https://letsencrypt.org/stats/>.
-
-   [MerkleTown]
-              Cloudflare, Inc., "Merkle Town", 7 March 2023,
-              <https://ct.cloudflare.com/>.
 
    [MTC-TLOG] C2SP, "Merkle Tree Certificates With Tiled Transparency
               Logs", July 2026, <https://c2sp.org/mtc-tlog>.
