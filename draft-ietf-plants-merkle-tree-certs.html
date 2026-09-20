@@ -1048,7 +1048,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 23 March 2027</td>
+<td class="center">Expires 24 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-19" class="published">19 September 2026</time>
+<time datetime="2026-09-20" class="published">20 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-23">23 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-24">24 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 23 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 24 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2597,6 +2597,7 @@ bool is_valid_subtree(uint64_t start, uint64_t end) {
         </h3>
 <p id="section-4.3-1">Subtrees are Merkle Trees, so entries can be proven to be contained in the subtree. A subtree inclusion proof for entry <code>index</code> of the subtree <code>[start, end)</code> is a Merkle inclusion proof, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3.1" class="relref">Section 2.1.3.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, where <code>m</code> is <code>index - start</code> and the tree inputs are <code>D[start:end]</code>.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 <p id="section-4.3-2">Subtree inclusion proofs contain a sequence of nodes that are sufficient to reconstruct the subtree hash, <code>MTH(D[start:end])</code>, out of the hash for entry <code>index</code>, <code>MTH({d[index]})</code>, thus demonstrating that the subtree hash contains the entry's hash.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">A subtree inclusion proof for a subtree of size <code>n</code> contains at most ceil(log2(n)) hashes, or <code>BIT_WIDTH(n - 1)</code> hashes.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 <div id="example-subtree-inclusion-proofs">
 <section id="section-4.3.1">
           <h4 id="name-example-subtree-inclusion-p">
@@ -3421,8 +3422,8 @@ If either condition does not hold, stop and fail the proof verification. If both
         <h3 id="name-efficiently-covering-arbitr">
 <a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-efficiently-covering-arbitr" class="section-name selfRef">Efficiently Covering Arbitrary Intervals</a>
         </h3>
-<p id="section-4.5-1">This document uses subtrees to sign over arbitrary intervals, <code>[start, end)</code>, of a Merkle Tree. However, not all intervals are valid subtrees. While subtrees containing the intervals would suffice, the smallest subtree containing <code>[start, end)</code> may be much larger than <code>[start, end)</code>.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
-<p id="section-4.5-2">For example, <a href="#fig-subtree-counterexample" class="auto internal xref">Figure 9</a> shows the smallest subtree that contains <code>[7, 9)</code> in a 9-element tree. The smallest single subtree that contains the interval is <code>[0, 9)</code>, but this is the entire tree.<a href="#section-4.5-2" class="pilcrow">¶</a></p>
+<p id="section-4.5-1">This document uses subtrees to sign over arbitrary intervals, <code>[start, end)</code>, of a Merkle Tree. However, not all intervals are valid subtrees. While a protocol could build a smaller Merkle Tree, <code>MTH(D[start:end])</code>, and compute inclusion proofs of any element, this smaller Merkle Tree cannot, in general, be efficiently proven consistent with the overall Merkle Tree.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.5-2">Enlarging the interval to a valid subtree would mitigate this. However, the smallest subtree containing <code>[start, end)</code> may be much larger than <code>[start, end)</code>. For example, <a href="#fig-subtree-counterexample" class="auto internal xref">Figure 9</a> shows the smallest subtree that contains <code>[7, 9)</code> in a 9-element tree. The smallest single subtree that contains the interval is <code>[0, 9)</code>, but this is the entire tree.<a href="#section-4.5-2" class="pilcrow">¶</a></p>
 <span id="name-an-example-showing-an-ineff"></span><div id="fig-subtree-counterexample">
 <figure id="figure-9">
           <div id="section-4.5-3.1">
@@ -3552,60 +3553,64 @@ If either condition does not hold, stop and fail the proof verification. If both
           <h4 id="name-selecting-two-subtrees">
 <a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-selecting-two-subtrees" class="section-name selfRef">Selecting Two Subtrees</a>
           </h4>
-<p id="section-4.5.1-1">This section defines a procedure for selecting two subtrees given any interval. Combined, the subtrees contain <code>[start, end)</code> with bounded excess elements. The procedure returns two subtrees, <code>left</code> and <code>right</code>, that satisfy the following properties:<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-1">Given any interval, <code>[start, end)</code>, this section defines a procedure for selecting two subtrees, <code>left</code> and <code>right</code>, such that:<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4.5.1-2.1">
-              <p id="section-4.5.1-2.1.1">The two subtrees cover adjacent intervals. That is, <code>left.end = right.start</code>.<a href="#section-4.5.1-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-4.5.1-2.1.1"><code>left</code> and <code>right</code> are valid subtrees, so it is possible to compute subtree consistency proofs.<a href="#section-4.5.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-4.5.1-2.2">
-              <p id="section-4.5.1-2.2.1">The two subtrees together contain the entire interval <code>[start, end)</code>. There are no extra entries after <code>end</code>, but there may be extra entries before <code>start</code>. That is, <code>left.start &lt;= start</code> and <code>end = right.end</code>.<a href="#section-4.5.1-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-4.5.1-2.2.1">The disjoint union of <code>left</code>, followed by <code>right</code>, contains <code>[start, end)</code>. That is, <code>left.start &lt;= start &lt;= left.end = right.start &lt;= end &lt;= right.end</code>.<a href="#section-4.5.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-4.5.1-2.3">
-              <p id="section-4.5.1-2.3.1">If the interval is not empty, the extra entries before <code>start</code> are less than half of <code>left</code>. That is, <code>start - left.start &lt; left.end - start</code>.<a href="#section-4.5.1-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-4.5.1-2.3.1">While <code>left</code> may contain extra elements before <code>start</code>, <code>right</code> does not contain any extra elements. That is, <code>end = right.end</code>.<a href="#section-4.5.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.5.1-2.4">
+              <p id="section-4.5.1-2.4.1">Each subtree's size is at most <code>BIT_CEIL(end - start)</code>.<a href="#section-4.5.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-4.5.1-3">The subtrees are selected as follows:<a href="#section-4.5.1-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5.1-4">
-<li id="section-4.5.1-4.1">
-              <p id="section-4.5.1-4.1.1">If <code>end - start</code> is less than or equal to 1, return the subtrees <code>[start, end)</code> and <code>[end, end)</code>.<a href="#section-4.5.1-4.1.1" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-3">The pair of subtree hashes for <code>left</code> and <code>right</code> can support inclusion proofs for any element of <code>[start, end)</code>. The largest such inclusion proof is no bigger than the largest inclusion proof in <code>MTH(D[start:end])</code>. Unlike <code>MTH(D[start:end])</code>, these subtree hashes can be shown consistent with the overall Merkle Tree using subtree consistency proofs.<a href="#section-4.5.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-4">The subtrees are selected as follows:<a href="#section-4.5.1-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.5.1-5">
+<li id="section-4.5.1-5.1">
+              <p id="section-4.5.1-5.1.1">If <code>end - start</code> is less than or equal to 1, return the subtrees <code>[start, end)</code> and <code>[end, end)</code>.<a href="#section-4.5.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-4.5.1-4.2">
-              <p id="section-4.5.1-4.2.1">Otherwise:<a href="#section-4.5.1-4.2.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5.1-4.2.2">
-<li id="section-4.5.1-4.2.2.1">
-                  <p id="section-4.5.1-4.2.2.1.1">Let <code>last</code> be <code>end - 1</code>, the last index in <code>[start, end)</code>.<a href="#section-4.5.1-4.2.2.1.1" class="pilcrow">¶</a></p>
+            <li id="section-4.5.1-5.2">
+              <p id="section-4.5.1-5.2.1">Otherwise:<a href="#section-4.5.1-5.2.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.5.1-5.2.2">
+<li id="section-4.5.1-5.2.2.1">
+                  <p id="section-4.5.1-5.2.2.1.1">Let <code>last</code> be <code>end - 1</code>, the last index in <code>[start, end)</code>.<a href="#section-4.5.1-5.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li id="section-4.5.1-4.2.2.2">
-                  <p id="section-4.5.1-4.2.2.2.1">Let <code>split</code> be the bit index of the most significant bit where <code>start</code> and <code>last</code> differ. Bits are numbered from the least significant bit, starting at zero. <code>split</code> is the height at which <code>start</code> and <code>last</code>'s paths in the tree diverge.<a href="#section-4.5.1-4.2.2.2.1" class="pilcrow">¶</a></p>
+                <li id="section-4.5.1-5.2.2.2">
+                  <p id="section-4.5.1-5.2.2.2.1">Let <code>split</code> be the bit index of the most significant bit where <code>start</code> and <code>last</code> differ. Bits are numbered from the least significant bit, starting at zero. <code>split</code> is the height at which <code>start</code> and <code>last</code>'s paths in the tree diverge.<a href="#section-4.5.1-5.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
-                <li id="section-4.5.1-4.2.2.3">
-                  <p id="section-4.5.1-4.2.2.3.1">Let <code>mid</code> be <code>last</code> with the least significant <code>split</code> bits set to zero. <code>mid</code> is the leftmost leaf node in the above divergence point's right branch.<a href="#section-4.5.1-4.2.2.3.1" class="pilcrow">¶</a></p>
+                <li id="section-4.5.1-5.2.2.3">
+                  <p id="section-4.5.1-5.2.2.3.1">Let <code>mid</code> be <code>last</code> with the least significant <code>split</code> bits set to zero. <code>mid</code> is the leftmost leaf node in the above divergence point's right branch.<a href="#section-4.5.1-5.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
-                <li id="section-4.5.1-4.2.2.4">
-                  <p id="section-4.5.1-4.2.2.4.1">Within the least significant <code>split</code> bits of <code>start</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.5.1-4.2.2.4.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5.1-4.2.2.4.2">
-<li id="section-4.5.1-4.2.2.4.2.1">
-                      <p id="section-4.5.1-4.2.2.4.2.1.1">If there is such a bit, let <code>left_split</code> be <code>b + 1</code>.<a href="#section-4.5.1-4.2.2.4.2.1.1" class="pilcrow">¶</a></p>
+                <li id="section-4.5.1-5.2.2.4">
+                  <p id="section-4.5.1-5.2.2.4.1">Within the least significant <code>split</code> bits of <code>start</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.5.1-5.2.2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.5.1-5.2.2.4.2">
+<li id="section-4.5.1-5.2.2.4.2.1">
+                      <p id="section-4.5.1-5.2.2.4.2.1.1">If there is such a bit, let <code>left_split</code> be <code>b + 1</code>.<a href="#section-4.5.1-5.2.2.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                    <li id="section-4.5.1-4.2.2.4.2.2">
-                      <p id="section-4.5.1-4.2.2.4.2.2.1">Otherwise, let <code>left_split</code> be zero.<a href="#section-4.5.1-4.2.2.4.2.2.1" class="pilcrow">¶</a></p>
+                    <li id="section-4.5.1-5.2.2.4.2.2">
+                      <p id="section-4.5.1-5.2.2.4.2.2.1">Otherwise, let <code>left_split</code> be zero.<a href="#section-4.5.1-5.2.2.4.2.2.1" class="pilcrow">¶</a></p>
 </li>
                   </ol>
-<p id="section-4.5.1-4.2.2.4.3">
-<code>left_split</code> is the height of the lowest common ancestor of the nodes in <code>[start, mid)</code>.<a href="#section-4.5.1-4.2.2.4.3" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-5.2.2.4.3">
+<code>left_split</code> is the height of the lowest common ancestor of the nodes in <code>[start, mid)</code>.<a href="#section-4.5.1-5.2.2.4.3" class="pilcrow">¶</a></p>
 </li>
-                <li id="section-4.5.1-4.2.2.5">
-                  <p id="section-4.5.1-4.2.2.5.1">Let <code>left_start</code> be <code>start</code> with the least significant <code>left_split</code> bits set to zero. <code>left_start</code> is the above lowest common ancestor's leftmost leaf node.<a href="#section-4.5.1-4.2.2.5.1" class="pilcrow">¶</a></p>
+                <li id="section-4.5.1-5.2.2.5">
+                  <p id="section-4.5.1-5.2.2.5.1">Let <code>left_start</code> be <code>start</code> with the least significant <code>left_split</code> bits set to zero. <code>left_start</code> is the above lowest common ancestor's leftmost leaf node.<a href="#section-4.5.1-5.2.2.5.1" class="pilcrow">¶</a></p>
 </li>
-                <li id="section-4.5.1-4.2.2.6">
-                  <p id="section-4.5.1-4.2.2.6.1">Return the subtrees <code>[left_start, mid)</code> and <code>[mid, end)</code>.<a href="#section-4.5.1-4.2.2.6.1" class="pilcrow">¶</a></p>
+                <li id="section-4.5.1-5.2.2.6">
+                  <p id="section-4.5.1-5.2.2.6.1">Return the subtrees <code>[left_start, mid)</code> and <code>[mid, end)</code>.<a href="#section-4.5.1-5.2.2.6.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
           </ol>
-<p id="section-4.5.1-5">Intuitively, this procedure considers the tree <code>MTH(D[0:end])</code> and finds the lowest common ancestor of the elements in <code>[start, end)</code>. It splits the interval by that ancestor's left and right children and returns the lowest common ancestor of each half.<a href="#section-4.5.1-5" class="pilcrow">¶</a></p>
-<p id="section-4.5.1-6">The following Python code implements this procedure:<a href="#section-4.5.1-6" class="pilcrow">¶</a></p>
-<div class="lang-python sourcecode" id="section-4.5.1-7">
+<p id="section-4.5.1-6">Intuitively, this procedure considers the tree <code>MTH(D[0:end])</code> and finds the lowest common ancestor of the elements in <code>[start, end)</code>. It splits the interval by that ancestor's left and right children and returns the lowest common ancestor of each half.<a href="#section-4.5.1-6" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-7">The following Python code implements this procedure:<a href="#section-4.5.1-7" class="pilcrow">¶</a></p>
+<div class="lang-python sourcecode" id="section-4.5.1-8">
 <pre>
 def find_subtrees(start, end):
     """ Returns a pair of subtrees that efficiently cover
@@ -3624,13 +3629,13 @@ def find_subtrees(start, end):
     left_split = (~start &amp; mask).bit_length()
     left_start = start &amp; ~((1 &lt;&lt; left_split) - 1)
     return (left_start, mid), (mid, end)
-</pre><a href="#section-4.5.1-7" class="pilcrow">¶</a>
+</pre><a href="#section-4.5.1-8" class="pilcrow">¶</a>
 </div>
-<p id="section-4.5.1-8"><a href="#fig-subtree-pair-example" class="auto internal xref">Figure 10</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements in wavy lines. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.5.1-8" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-9"><a href="#fig-subtree-pair-example" class="auto internal xref">Figure 10</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements in wavy lines. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.5.1-9" class="pilcrow">¶</a></p>
 <span id="name-an-example-selection-of-sub"></span><div id="fig-subtree-pair-example">
 <figure id="figure-10">
-            <div id="section-4.5.1-9.1">
-              <div class="alignLeft art-svg artwork" id="section-4.5.1-9.1.1">
+            <div id="section-4.5.1-10.1">
+              <div class="alignLeft art-svg artwork" id="section-4.5.1-10.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="456" viewBox="0 0 456 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                   <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
                   <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
@@ -3805,7 +3810,7 @@ def find_subtrees(start, end):
                     <text x="380" y="308">11</text>
                     <text x="420" y="308">12</text>
                   </g>
-                </svg><a href="#section-4.5.1-9.1.1" class="pilcrow">¶</a>
+                </svg><a href="#section-4.5.1-10.1.1" class="pilcrow">¶</a>
 </div>
 </div>
 <figcaption><a href="#figure-10" class="selfRef">Figure 10</a>:

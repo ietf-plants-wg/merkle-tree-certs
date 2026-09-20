@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 23 March 2027                                        Apple Inc.
+Expires: 24 March 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       19 September 2026
+                                                       20 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 March 2027.
+   This Internet-Draft will expire on 24 March 2027.
 
 Copyright Notice
 
@@ -727,6 +727,9 @@ Table of Contents
    the hash for entry index, MTH({d[index]}), thus demonstrating that
    the subtree hash contains the entry's hash.
 
+   A subtree inclusion proof for a subtree of size n contains at most
+   ceil(log2(n)) hashes, or BIT_WIDTH(n - 1) hashes.
+
 4.3.1.  Example Subtree Inclusion Proofs
 
    The inclusion proof for entry 10 of subtree [8, 13) contains the
@@ -1042,13 +1045,17 @@ Table of Contents
 
    This document uses subtrees to sign over arbitrary intervals, [start,
    end), of a Merkle Tree.  However, not all intervals are valid
-   subtrees.  While subtrees containing the intervals would suffice, the
-   smallest subtree containing [start, end) may be much larger than
-   [start, end).
+   subtrees.  While a protocol could build a smaller Merkle Tree,
+   MTH(D[start:end]), and compute inclusion proofs of any element, this
+   smaller Merkle Tree cannot, in general, be efficiently proven
+   consistent with the overall Merkle Tree.
 
-   For example, Figure 9 shows the smallest subtree that contains [7, 9)
-   in a 9-element tree.  The smallest single subtree that contains the
-   interval is [0, 9), but this is the entire tree.
+   Enlarging the interval to a valid subtree would mitigate this.
+   However, the smallest subtree containing [start, end) may be much
+   larger than [start, end).  For example, Figure 9 shows the smallest
+   subtree that contains [7, 9) in a 9-element tree.  The smallest
+   single subtree that contains the interval is [0, 9), but this is the
+   entire tree.
 
                    +~~~~~~~~~~~~~~~~~~~+
                    |      [0, 9)       |
@@ -1078,22 +1085,27 @@ Table of Contents
 
 4.5.1.  Selecting Two Subtrees
 
-   This section defines a procedure for selecting two subtrees given any
-   interval.  Combined, the subtrees contain [start, end) with bounded
-   excess elements.  The procedure returns two subtrees, left and right,
-   that satisfy the following properties:
+   Given any interval, [start, end), this section defines a procedure
+   for selecting two subtrees, left and right, such that:
 
-   *  The two subtrees cover adjacent intervals.  That is, left.end =
-      right.start.
+   *  left and right are valid subtrees, so it is possible to compute
+      subtree consistency proofs.
 
-   *  The two subtrees together contain the entire interval [start,
-      end).  There are no extra entries after end, but there may be
-      extra entries before start.  That is, left.start <= start and end
-      = right.end.
+   *  The disjoint union of left, followed by right, contains [start,
+      end).  That is, left.start <= start <= left.end = right.start <=
+      end <= right.end.
 
-   *  If the interval is not empty, the extra entries before start are
-      less than half of left.  That is, start - left.start < left.end -
-      start.
+   *  While left may contain extra elements before start, right does not
+      contain any extra elements.  That is, end = right.end.
+
+   *  Each subtree's size is at most BIT_CEIL(end - start).
+
+   The pair of subtree hashes for left and right can support inclusion
+   proofs for any element of [start, end).  The largest such inclusion
+   proof is no bigger than the largest inclusion proof in
+   MTH(D[start:end]).  Unlike MTH(D[start:end]), these subtree hashes
+   can be shown consistent with the overall Merkle Tree using subtree
+   consistency proofs.
 
    The subtrees are selected as follows:
 
