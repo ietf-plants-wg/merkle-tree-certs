@@ -578,6 +578,8 @@ Subtrees are Merkle Trees, so entries can be proven to be contained in the subtr
 
 Subtree inclusion proofs contain a sequence of nodes that are sufficient to reconstruct the subtree hash, `MTH(D[start:end])`, out of the hash for entry `index`, `MTH({d[index]})`, thus demonstrating that the subtree hash contains the entry's hash.
 
+A subtree inclusion proof for a subtree of size `n` contains at most ceil(log2(n)) hashes, or `BIT_WIDTH(n - 1)` hashes.
+
 ### Example Subtree Inclusion Proofs
 
 The inclusion proof for entry 10 of subtree `[8, 13)` contains the hashes `MTH({d[11]})`, `MTH(D[8:10])`, and `MTH({d[12]})`, depicted in  {{fig-subtree-inclusion-proof}}. `MTH({d[10]})` is not part of the proof because the verifier is assumed to already know its value.
@@ -832,9 +834,9 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 ## Efficiently Covering Arbitrary Intervals {#arbitrary-intervals}
 
-This document uses subtrees to sign over arbitrary intervals, `[start, end)`, of a Merkle Tree. However, not all intervals are valid subtrees. While subtrees containing the intervals would suffice, the smallest subtree containing `[start, end)` may be much larger than `[start, end)`.
+This document uses subtrees to sign over arbitrary intervals, `[start, end)`, of a Merkle Tree. However, not all intervals are valid subtrees. While a protocol could build a smaller Merkle Tree, `MTH(D[start:end])`, and compute inclusion proofs of any element, this smaller Merkle Tree cannot, in general, be efficiently proven consistent with the overall Merkle Tree.
 
-For example, {{fig-subtree-counterexample}} shows the smallest subtree that contains `[7, 9)` in a 9-element tree. The smallest single subtree that contains the interval is `[0, 9)`, but this is the entire tree.
+Enlarging the interval to a valid subtree would mitigate this. However, the smallest subtree containing `[start, end)` may be much larger than `[start, end)`. For example, {{fig-subtree-counterexample}} shows the smallest subtree that contains `[7, 9)` in a 9-element tree. The smallest single subtree that contains the interval is `[0, 9)`, but this is the entire tree.
 
 ~~~aasvg
                 +~~~~~~~~~~~~~~~~~~~+
@@ -863,11 +865,14 @@ While one subtree can be inefficient, two subtrees are sufficient to efficiently
 
 ### Selecting Two Subtrees
 
-This section defines a procedure for selecting two subtrees given any interval. Combined, the subtrees contain `[start, end)` with bounded excess elements. The procedure returns two subtrees, `left` and `right`, that satisfy the following properties:
+Given any interval, `[start, end)`, this section defines a procedure for selecting two subtrees, `left` and `right`, such that:
 
-* The two subtrees cover adjacent intervals. That is, `left.end = right.start`.
-* The two subtrees together contain the entire interval `[start, end)`. There are no extra entries after `end`, but there may be extra entries before `start`. That is, `left.start <= start` and `end = right.end`.
-* If the interval is not empty, the extra entries before `start` are less than half of `left`. That is, `start - left.start < left.end - start`.
+* `left` and `right` are valid subtrees, so it is possible to compute subtree consistency proofs.
+* The disjoint union of `left`, followed by `right`, contains `[start, end)`. That is, `left.start <= start <= left.end = right.start <= end <= right.end`.
+* While `left` may contain extra elements before `start`, `right` does not contain any extra elements. That is, `end = right.end`.
+* Each subtree's size is at most `BIT_CEIL(end - start)`.
+
+The pair of subtree hashes for `left` and `right` can support inclusion proofs for any element of `[start, end)`. The largest such inclusion proof is no bigger than the largest inclusion proof in `MTH(D[start:end])`. Unlike `MTH(D[start:end])`, these subtree hashes can be shown consistent with the overall Merkle Tree using subtree consistency proofs.
 
 The subtrees are selected as follows:
 
