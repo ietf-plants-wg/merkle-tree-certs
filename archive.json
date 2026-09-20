@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-17T04:41:18.438411+00:00",
+  "timestamp": "2026-09-20T04:42:11.484791+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -871,15 +871,15 @@
       "id": "I_kwDOJIBkVc5ljPhu",
       "title": "Support multiple logs from a single issuer for incident management",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/26",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We should spend a few words on what to do with bit flips.",
       "createdAt": "2023-05-10T11:44:26Z",
-      "updatedAt": "2026-04-20T18:17:33Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-19T19:59:47Z",
+      "closedAt": "2026-09-19T19:59:47Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -918,10 +918,17 @@
         },
         {
           "author": "nharper",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "(I'm not able to assign it to myself, but I'm going to write up log generations aka \"the Issuer identifies an entity that can run multiple logs and there's a log number in the upper bits of the serial\".)",
           "createdAt": "2026-04-16T04:27:17Z",
           "updatedAt": "2026-04-16T04:27:17Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is done now, forgot to close it.",
+          "createdAt": "2026-09-19T19:59:47Z",
+          "updatedAt": "2026-09-19T19:59:47Z"
         }
       ]
     },
@@ -2704,16 +2711,24 @@
       "id": "I_kwDOJIBkVc7S6XKc",
       "title": "Inclusion and consistency proof test vectors",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/153",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "I think the best strategy to test an implementation is actually to just exhaustively test all subtrees in all trees up to size, say, 128, but we should also have some representative test vectors.\n\nIn addition to finding funny cases along the right edge, we should include a test vector where the tree size is 2^64 - 1. I think we can construct this input by just pretending every leaf in the tree is identical, then we can compute the hash at every layer.",
       "createdAt": "2025-10-21T23:31:08Z",
-      "updatedAt": "2025-10-21T23:31:08Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-09-19T19:58:07Z",
+      "closedAt": "2026-09-19T19:58:07Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think we have these now.",
+          "createdAt": "2026-09-19T19:58:07Z",
+          "updatedAt": "2026-09-19T19:58:07Z"
+        }
+      ]
     },
     {
       "number": 162,
@@ -3763,15 +3778,15 @@
       "id": "I_kwDOJIBkVc8AAAABHaNyAA",
       "title": "Do cosignatures need to sign over a signature algorithm identifier?",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/266",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "martinthomson",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "The cosignatures don't sign over an algorithm identifier for the signature (and hash algorithm), which bothers me a little.\n\nIt's hard to come up with a concrete attack, but let's say that you have a hash algorithm for which it is difficult to generate collisions within its own output domain, but trivial to generate collisions with the output of a different hash function[^1]. Then, an attacker might seek to convince recipients that they are using this new hash function rather than one of these others.  In that case, the cosignature might be accepted as valid.\n\nThe defense you have in the draft is that each cosigner is tightly bound to the algorithms it uses. The hash function is a fixed property of the log.  I think that guarantees that -- provided your trust anchor distribution is solid -- there is no risk that a client with a valid trust configuration will get confused.  Still, redundancy might help.\n\n(I'd have added that you might want an algorithm identifier in case the signature needs to include two paired algorithms, where one or other might end up being weak.  But that seemed a bit silly in this context.)\n\n[^1]: I don't believe that we necessarily depend on hash functions being free from collisions with other hash functions.  Imagine that your function is SHA-256, except that two specific values of your choice are swapped.  That's a function that meets the same security target as SHA-256 on its own, but it has known collisions with SHA-256.",
       "createdAt": "2026-07-02T07:26:36Z",
-      "updatedAt": "2026-07-03T04:50:38Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-19T19:53:56Z",
+      "closedAt": "2026-09-19T19:53:56Z",
       "comments": [
         {
           "author": "davidben",
@@ -3779,6 +3794,13 @@
           "body": "TLS doesn't sign over the signature algorithm either. It doesn't really do anything because you've already decided to use the signature algorithm.\n\nThough actually we do sign over the signature algorithm by way of signing over the cosigner ID, which encompasses the algorithm and more. Likewise, as you note, we sign over the hash by way of signing over the log ID, which encompasses the hash and more.\n\nThis is a standard pattern. We also don't separately list the PSK hash in TLS ClientHellos. The transcript hash is just fine using the ID to stand for it. If your trust store might believe some properties of an ID are wrong, you have worse problems.",
           "createdAt": "2026-07-03T04:50:38Z",
           "updatedAt": "2026-07-03T04:50:38Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closing this since I think this is fine as-is.",
+          "createdAt": "2026-09-19T19:53:56Z",
+          "updatedAt": "2026-09-19T19:53:56Z"
         }
       ]
     },
@@ -3811,7 +3833,7 @@
       "id": "I_kwDOJIBkVc8AAAABJm5IZA",
       "title": "Generate CertificatePropertyList in demo tool",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/282",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -3822,8 +3844,8 @@
       ],
       "body": "",
       "createdAt": "2026-07-21T14:04:24Z",
-      "updatedAt": "2026-08-28T03:40:03Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-17T22:55:20Z",
+      "closedAt": "2026-09-17T22:55:20Z",
       "comments": [
         {
           "author": "davidben",
@@ -3883,15 +3905,15 @@
       "id": "I_kwDOJIBkVc8AAAABKjPurw",
       "title": "How 8.2.1 works via Trust Anchor ID's isn't super clear",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/290",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bob-beck",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "\nBasing this only on what I did, and testing against BoringSSL. \n\n```Landmark-relative certificates SHOULD be configured with this information, as in [Section 3.2](https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-3.2) of [[I-D.ietf-tls-trust-anchor-ids](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-05.html#I-D.ietf-tls-trust-anchor-ids)]. A relying party whose latest trusted subtree ([Section 7.4](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-05.html#trusted-subtrees)) in log N is landmark L SHOULD configure the trust_anchors extension to advertise the above landmark group. This signals support for both standalone certificates and supported landmarks.```\n\nSo this implies that the trust anchors extension advertising the landmark group *implies* support for the standalone certificate for the CA,\nso this is what I have implemented. In my case, let's say we have landmarks and TAI groups defined for logs on a CA 32473.1 - I consider that\nthe CA cert (32473.1) also matches any of those groups. In the end the landmark if it matches ends up served by preference (because it's smaller) but the CA cert is also a match. \n\nConfigring boringssl with a landmark cert preferential to the CA cert, It doesn't seem to do that. and falls back to the RSA ubiquitous cert I configured it with.  If I send boring a landmark corresponding to what it does have it works fine, and sends me the signatureless cert.   looking at the TAI response, it does indicate that it has both a landmark cert and the CA cert.  So what's really supposed to happen here when  the client sends support for a group.? \n\nNew, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384\nProtocol: TLSv1.3\nServer public key is 10496 bit\nThis TLS version forbids renegotiation.\nCompression: NONE\nExpansion: NONE\nNo ALPN negotiated\nEarly data was not sent\nVerify return code: 110 (Merkle Tree Certificate subtree is not trusted)\nAvailable trust anchor IDs:\n    32473.1.1.1.1\n    32473.1\n---\n\nIn the above case I sent a request for a landmark the server did not have The CA cert is 32473.1, but I did not get it back, I got the RSA fallback. \n\n",
       "createdAt": "2026-07-28T21:10:20Z",
-      "updatedAt": "2026-07-29T02:14:34Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-17T22:55:19Z",
+      "closedAt": "2026-09-17T22:55:19Z",
       "comments": [
         {
           "author": "bob-beck",
@@ -3978,6 +4000,22 @@
       "createdAt": "2026-08-13T19:27:26Z",
       "updatedAt": "2026-09-11T19:25:54Z",
       "closedAt": "2026-09-11T19:25:54Z",
+      "comments": []
+    },
+    {
+      "number": 323,
+      "id": "I_kwDOJIBkVc8AAAABRyJ3iQ",
+      "title": "Adjust minSerial and maxSerial range constraints in MTCCertificationAuthority",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/323",
+      "state": "OPEN",
+      "author": "CBonnell",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The MTCCertificationAuthority extension has the following two fields:\n\n```\n minSerial INTEGER (0..mtcMaxSerial),\n maxSerial INTEGER (0..mtcMaxSerial)\n```\n\nAccording to section 6.2, the minimum valid serial number is 1 << 48, so the lower bound of the range constraint on those two fields should be adjusted to reflect this restriction.\n\nHappy to put together a PR for this.",
+      "createdAt": "2026-09-17T14:01:59Z",
+      "updatedAt": "2026-09-17T14:01:59Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -21761,24 +21799,26 @@
       "id": "PR_kwDOJIBkVc8AAAABDiku7Q",
       "title": "Update for draft-ietf-tls-trust-anchor-ids-05",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/320",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Updates section numbers, reworks the text to spell out the expected group patterns, and updates the demo tool to output certificate properties. https://github.com/tlswg/tls-trust-anchor-ids/pull/125 can be used to print that output while other tools are spun up.\r\n\r\nMight be easiest reviewed as separate commits.\r\n\r\n@bob-beck",
       "createdAt": "2026-09-15T02:19:30Z",
-      "updatedAt": "2026-09-16T17:46:15Z",
+      "updatedAt": "2026-09-17T22:55:22Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "tai-update",
       "headRefOid": "d565aa8225974e0222055fe5cf39bbef443f7200",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-17T22:55:18Z",
+      "mergedAt": "2026-09-17T22:55:18Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "361fb6502ba4a1e41dcbdcb5c3307458d3f646c5"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -21861,7 +21901,7 @@
             "abbreviatedOid": "a438b00"
           },
           "author": "geegeea",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-09-16T03:24:01Z",
@@ -21874,6 +21914,19 @@
               "updatedAt": "2026-09-16T03:51:10Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOHIMjw",
+          "commit": {
+            "abbreviatedOid": "d565aa8"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-17T22:11:23Z",
+          "updatedAt": "2026-09-17T22:11:23Z",
+          "comments": []
         }
       ]
     },
@@ -21916,26 +21969,460 @@
       "id": "PR_kwDOJIBkVc8AAAABD13EFw",
       "title": "Rework the landmark file format to include an expiry",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/322",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "This sits atop #320. Just look at the topmost commit.\r\n\r\nEverything around landmarks is clocked on when landmarks expire. CAs need to keep track of it anyway, so it seems silly not to just define it explicitly. That also helps relying parties process the file if the CA hasn't been keeping it continuously updated second-by-second as landmarks expire.\r\n\r\nIn doing so, that lets us recenter the definition of active landmarks on landmark expiry. That solves a whole host of problems:\r\n\r\nFirst, we said the CA has a max_active_landmarks parameter, but we never wrote it down. That parameter is also wrong because we set it at a per-log basis, but it needs to be summed across all CAs.\r\n\r\nInstead, we can now define active landmarks more directly. max_active_landmarks is now merely a per-relying-party DoS limit.  RPs and CAs will need to coordinate on this value, but it's no longer a rigid parameter.\r\n\r\nWe can solve the per-log vs per-CA limit by then removing it from the discussion of the landmark file format. Instead, we just say that CAs SHOULD allocate landmarks such that the total number is within the limits of relying parties.\r\n\r\nWhat happens if the limit is exceeded? We explicitly say that if you see more landmarks than your limit, you have to take the oldest active ones, not the newest ones. While I'm here, we never said how to handle the case that you can't validate the latest landmark, but you can validate an earlier one.\r\n\r\nThis lets us remove a dependency on knowing the CA's current log. The relying party just collects all the CA's active landmarks, across all logs. If that's too many, see above. That smooths over an edge case right after operational failure.\r\n\r\nmax_active_landmarks was also used in the TAI configuration, but in reality this was never necessary. All those ranges only needed to be bounded on one side. The width max_active_landmarks was really just a proxy for certificate expiration anyway.\r\n\r\nWhile I'm here, define landmark subtrees for landmark zero, now that zero-length subtrees are allowed. This will never come up (landmark zero is always expired) but makes the type system more uniform.\r\n\r\n(For completeness, I considered following up on this change with collapsing the landmark sequence from per-log to per-CA. This felt very natural but had one problem: if a log failures happens *before* the last landmark on a log, the whole thing gets wedged.)\r\n",
+      "body": "~This sits atop #320. Just look at the topmost commit.~\r\n\r\nEverything around landmarks is clocked on when landmarks expire. CAs need to keep track of it anyway, so it seems silly not to just define it explicitly. That also helps relying parties process the file if the CA hasn't been keeping it continuously updated second-by-second as landmarks expire.\r\n\r\nIn doing so, that lets us recenter the definition of active landmarks on landmark expiry. That solves a whole host of problems:\r\n\r\nFirst, we said the CA has a max_active_landmarks parameter, but we never wrote it down. That parameter is also wrong because we set it at a per-log basis, but it needs to be summed across all CAs.\r\n\r\nInstead, we can now define active landmarks more directly. max_active_landmarks is now merely a per-relying-party DoS limit.  RPs and CAs will need to coordinate on this value, but it's no longer a rigid parameter.\r\n\r\nWe can solve the per-log vs per-CA limit by then removing it from the discussion of the landmark file format. Instead, we just say that CAs SHOULD allocate landmarks such that the total number is within the limits of relying parties.\r\n\r\nWhat happens if the limit is exceeded? We explicitly say that if you see more landmarks than your limit, you have to take the oldest active ones, not the newest ones. While I'm here, we never said how to handle the case that you can't validate the latest landmark, but you can validate an earlier one.\r\n\r\nThis lets us remove a dependency on knowing the CA's current log. The relying party just collects all the CA's active landmarks, across all logs. If that's too many, see above. That smooths over an edge case right after operational failure.\r\n\r\nmax_active_landmarks was also used in the TAI configuration, but in reality this was never necessary. All those ranges only needed to be bounded on one side. The width max_active_landmarks was really just a proxy for certificate expiration anyway.\r\n\r\nWhile I'm here, define landmark subtrees for landmark zero, now that zero-length subtrees are allowed. This will never come up (landmark zero is always expired) but makes the type system more uniform.\r\n\r\n(For completeness, I considered following up on this change with collapsing the landmark sequence from per-log to per-CA. This felt very natural but had one problem: if a log failures happens *before* the last landmark on a log, the whole thing gets wedged.)\r\n",
       "createdAt": "2026-09-16T22:33:12Z",
-      "updatedAt": "2026-09-16T23:45:55Z",
+      "updatedAt": "2026-09-17T22:59:24Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
+      "baseRefOid": "361fb6502ba4a1e41dcbdcb5c3307458d3f646c5",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "landmark-expiry",
-      "headRefOid": "9b34841a3b8511833752142cb1b0025bbbbe8530",
-      "closedAt": null,
+      "headRefOid": "3d3f38683adab2d654daa8f3ed6e2d5ad3d93956",
+      "closedAt": "2026-09-17T22:59:21Z",
+      "mergedAt": "2026-09-17T22:59:21Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e4908a0646348f62aa73c22d036988df6e21a36d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOHK5Pg",
+          "commit": {
+            "abbreviatedOid": "9b34841"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "This is a nice simplifying change!",
+          "createdAt": "2026-09-17T22:17:08Z",
+          "updatedAt": "2026-09-17T22:46:39Z",
+          "comments": [
+            {
+              "originalPosition": 97,
+              "body": "```suggestion\nThe above conditions imply that every unexpired entry in the log is either contained in some landmark subtree or was allocated sometime after the latest landmark.\n```",
+              "createdAt": "2026-09-17T22:17:08Z",
+              "updatedAt": "2026-09-17T22:46:39Z"
+            },
+            {
+              "originalPosition": 101,
+              "body": "```suggestion\nMistakes in landmark sequence allocation only impact availability, not security. That is, they will not cause the relying party to accept certificates for entries the CA did not certify. However, they might cause a relying party to reject some of the CA's otherwise valid landmark-relative certificates.\n```",
+              "createdAt": "2026-09-17T22:28:55Z",
+              "updatedAt": "2026-09-17T22:46:39Z"
+            },
+            {
+              "originalPosition": 184,
+              "body": "```suggestion\n* Some *reference checkpoint* whose tree size is greater or equal to that of the latest landmark\n```",
+              "createdAt": "2026-09-17T22:36:20Z",
+              "updatedAt": "2026-09-17T22:46:39Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 324,
+      "id": "PR_kwDOJIBkVc8AAAABEBbPQg",
+      "title": "Update MerkleTown ref to Cloudflare Radar",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/324",
+      "state": "CLOSED",
+      "author": "joshuasing",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Cloudflare merged the Merkle Town site into Cloudflare Radar - starting around early October 2025, https://ct.cloudflare.com/ redirects to Cloudflare Radar (https://radar.cloudflare.com/certificate-transparency).",
+      "createdAt": "2026-09-18T02:37:36Z",
+      "updatedAt": "2026-09-19T02:10:43Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e4908a0646348f62aa73c22d036988df6e21a36d",
+      "headRepository": "joshuasing/merkle-tree-certs",
+      "headRefName": "joshua/merkletown",
+      "headRefOid": "7f68c0e91aa26b775b898d019a47bd36388898f3",
+      "closedAt": "2026-09-18T21:20:42Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oh nice catch!\r\n\r\nThis does raise a citation question. The citation is dated 2023-03-07 and the text says \"As of June 9th, 2025\". I guess 2023 must be wrong and we forgot to update it when refreshing the numbers. But I'm guessing it wasn't Cloudflare Radar yet on either date...\r\n\r\nAlternatively, rather than philosophize over questions like these, we can just refresh the numbers and then it'll all be fine again! \ud83d\ude06",
+          "createdAt": "2026-09-18T03:36:01Z",
+          "updatedAt": "2026-09-18T03:36:01Z"
+        },
+        {
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Thanks\r\n\r\nI was going to submit a follow-up pull request to update the statistics as well, but I wasn't sure whether to keep the existing statistics or replace them, as I think the change is quite substantial and interesting - and could be used to the point below with issuance rate increasing with short-lived certificates.\r\n\r\nMaybe this could be done in one pass, and can update the citation date as well?\r\n\r\n```diff\r\n+And as of September 17th, 2026:\r\n+\r\n+* {{LetsEncrypt}} reported 682,000,000 active certificates for a single CA\r\n+* {{CloudflareRadar}} reported around 9,500,000,000 unexpired certificates in CT logs, across all CAs\r\n+* {{CloudflareRadar}} reported an issuance rate of around 591,000 certificates per hour, across all CAs\r\n```\r\n\r\nSources:\r\n- Let's encrypt active certificates: https://letsencrypt.org/stats/\r\n- Cloudflare Radar unexpired certificates in CT logs: https://radar.cloudflare.com/explorer?dataSet=ct&groupBy=log&dt=52w&filters=expirationStatus%253DVALID (download summary response, `cat summary.json | jq '.result.main | [.[] | tonumber] | add'` - I _think_ this is correct, but would be good to double check)\r\n- Cloudflare Radar certificate issuance rate: https://radar.cloudflare.com/explorer?dataSet=ct&filters=uniqueEntries%253Dtrue&timeCompare=1&dt=1d (unique certificates)",
+          "createdAt": "2026-09-18T04:04:55Z",
+          "updatedAt": "2026-09-18T04:48:32Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Just updating them in one pass SGTM!",
+          "createdAt": "2026-09-18T20:33:21Z",
+          "updatedAt": "2026-09-18T20:33:21Z"
+        },
+        {
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I have created https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325 to update the statistics under Size Estimate, and I have rolled this change into it. Thanks!",
+          "createdAt": "2026-09-18T21:20:42Z",
+          "updatedAt": "2026-09-18T21:20:42Z"
+        }
+      ],
       "reviews": []
+    },
+    {
+      "number": 325,
+      "id": "PR_kwDOJIBkVc8AAAABEJbKvw",
+      "title": "Update size estimates section",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325",
+      "state": "MERGED",
+      "author": "joshuasing",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Update statistics referenced in the Size Estimates section to newer statistics collected on September 18, 2026, and recalculate size estimates.\r\n\r\nCloudflare merged their Merkle Town site into Cloudflare Radar around early October 2025, as such updated statistics are from Cloudflare Radar instead - I have updated the reference accordingly (previous discussion: https://github.com/ietf-plants-wg/merkle-tree-certs/pull/324).\r\n\r\nSources:\r\n- Let's encrypt active certificates: https://letsencrypt.org/stats/\r\n- Cloudflare Radar unique unexpired certificates in CT logs: https://radar.cloudflare.com/explorer?dataSet=ct&dt=52w&filters=expirationStatus%253DVALID%252CuniqueEntries%253Dtrue (download summary response, `cat summary.json | jq '.result.main.values | [.[] | tonumber] | add'`\r\n- Cloudflare Radar certificate issuance rate: https://radar.cloudflare.com/explorer?dataSet=ct&filters=uniqueEntries%253Dtrue&timeCompare=1&dt=1d (unique certificates)",
+      "createdAt": "2026-09-18T21:19:14Z",
+      "updatedAt": "2026-09-19T20:03:30Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e4908a0646348f62aa73c22d036988df6e21a36d",
+      "headRepository": "joshuasing/merkle-tree-certs",
+      "headRefName": "joshua/update-stats-sept-17-2026",
+      "headRefOid": "978da7a9870f24837bd17d34dd0a62d7d540a52c",
+      "closedAt": "2026-09-19T18:11:06Z",
+      "mergedAt": "2026-09-19T18:11:06Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b083e4ea5a190e81151c73c97678187663a05130"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOSR63g",
+          "commit": {
+            "abbreviatedOid": "b3054a0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "> Alternatively, it could be interesting to keep the statistics from June 9th, 2025 as a reference to show how substantially certificate issuance has increased, which would also contribute to the paragraph below the statistics. If this is wanted, I am happy to update this diff accordingly.\n\nHmm. That seems not super necessary. These numbers are really only needed to give a rough order of magnitude for some logarithms. I think realistically anyone looking at these numbers should mentally allow for a nontrivial multiplicative increase... which is fine because we've got logarithms here.\n\nIf we wanted to make a statement about growth over time, we'd probably need to do more work to separate out cert lifetime impacts from subscriber count impacts.",
+          "createdAt": "2026-09-19T00:13:00Z",
+          "updatedAt": "2026-09-19T00:25:17Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "This date also needs to be updated.",
+              "createdAt": "2026-09-19T00:13:01Z",
+              "updatedAt": "2026-09-19T00:25:17Z"
+            },
+            {
+              "originalPosition": 29,
+              "body": "These numbers will need to be updated. Also the next two paragraphs.",
+              "createdAt": "2026-09-19T00:13:43Z",
+              "updatedAt": "2026-09-19T00:25:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOSsu7Q",
+          "commit": {
+            "abbreviatedOid": "b3054a0"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T02:02:55Z",
+          "updatedAt": "2026-09-19T02:02:55Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Thanks, updated in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325/commits/09201dfed72ab0f0383f6e1ee0215576fd66ce2b",
+              "createdAt": "2026-09-19T02:02:55Z",
+              "updatedAt": "2026-09-19T02:02:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOSuTVQ",
+          "commit": {
+            "abbreviatedOid": "b3054a0"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T02:08:28Z",
+          "updatedAt": "2026-09-19T02:08:28Z",
+          "comments": [
+            {
+              "originalPosition": 29,
+              "body": "Oh yes, thanks. Updated in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325/commits/584b8858983c0692415a2802eb1c4edf93479b9c",
+              "createdAt": "2026-09-19T02:08:28Z",
+              "updatedAt": "2026-09-19T02:08:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOTM9aA",
+          "commit": {
+            "abbreviatedOid": "584b885"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T04:40:10Z",
+          "updatedAt": "2026-09-19T04:43:35Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "It's a bit fishy that this number increased so dramatically more than the other two. I suspect the issue is that a single certificate actually shows up in multiple logs, and in multiple forms.\n\nDoes this look right to you? I took out the \"breakdown by\" (seems unhelpful) and turned on unique entries.\nhttps://radar.cloudflare.com/explorer?dataSet=ct&dt=52w&filters=expirationStatus%253DVALID%252CuniqueEntries%253Dtrue\n\nFrom there, I think we want is the sum of the entire time series? Passing that summary to `jq '.result.main.values | [.[] | tonumber] | add'` gives 2,906,366,320 which... seems more plausible?\n\nDoes that look right to you?",
+              "createdAt": "2026-09-19T04:40:10Z",
+              "updatedAt": "2026-09-19T04:43:35Z"
+            },
+            {
+              "originalPosition": 38,
+              "body": "Hmm. Why did 12 turn into 13? We haven't crossed a power of 2 yet. (Or am I just too sleepy right now?)",
+              "createdAt": "2026-09-19T04:42:05Z",
+              "updatedAt": "2026-09-19T04:43:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOTWnhg",
+          "commit": {
+            "abbreviatedOid": "584b885"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T05:42:02Z",
+          "updatedAt": "2026-09-19T05:42:02Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "Hmm, I calculated this as:\n```\nlog2 3000 = 11.5507 + 1 = 12.5507\n```\nrounded up to 13. Is this correct?",
+              "createdAt": "2026-09-19T05:42:02Z",
+              "updatedAt": "2026-09-19T06:11:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOTWqJA",
+          "commit": {
+            "abbreviatedOid": "584b885"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T05:42:29Z",
+          "updatedAt": "2026-09-19T05:42:29Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "Yes, that seems far more plausible. It looks like I forgot to enable the unique filter, which per their help tip sounds correct:\n> Whether filter out duplicate certificates and pre-certificates.\n\nI tried finding another source to back up this number, but all similar services seem to have vastly different numbers and no way to filter to unique certificates.\n\nI will update with this number, thank you!\n\n",
+              "createdAt": "2026-09-19T05:42:29Z",
+              "updatedAt": "2026-09-19T05:42:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOTa0Ww",
+          "commit": {
+            "abbreviatedOid": "584b885"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T06:15:45Z",
+          "updatedAt": "2026-09-19T06:15:46Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "Updated in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325/commits/60c57d9df8a1c0e144bc5deea0254f20575101bb (also bumps to Sept 18 since this data is collected as-of today now). Thanks",
+              "createdAt": "2026-09-19T06:15:46Z",
+              "updatedAt": "2026-09-19T06:15:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOUtjLg",
+          "commit": {
+            "abbreviatedOid": "60c57d9"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T15:33:12Z",
+          "updatedAt": "2026-09-19T15:33:13Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "There isn't a +1 in how the other one was computed. log2(5400000) is 22.36ish. But I know I've gotten off-by-ones here in the past, so working from first principles...\r\n\r\nAn inclusion proof in a tree of size 4 has two hashes. An inclusion proof in a tree of size 6 has up to 3 hashes, though potentially less due to right edge. So it's ceil(log2(tree_size))\r\n\r\nThe tree size is not quite the same as the range size because we have to find two subtrees in a funky way. If you're in the right subtree, that subtree is strictly smaller than the range, so those inclusion proofs are bounded by ceil(log2(range_size)). Possibly smaller depending on where the split point ends up.\r\n\r\nOf the remainder, we're essentially rounding that up to a power of 2, although I see what I actually wrote is that the excess is less than half. That's not quite a strong enough statement to get the true upper bound. Anyway, I believe the true upper bound is ceil(log2(range_size)) without a + 1.\r\n\r\nSo... I think that means it's 12, not 13? I'll take yet another pass at the invariants so that actually translates to inclusion proof sizes tidily.",
+              "createdAt": "2026-09-19T15:33:13Z",
+              "updatedAt": "2026-09-19T16:51:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOVA9BA",
+          "commit": {
+            "abbreviatedOid": "60c57d9"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T16:48:57Z",
+          "updatedAt": "2026-09-19T16:48:58Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "> I'll take yet another pass at the invariants so that actually translates to inclusion proof sizes tidily.\n\nDone in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/326",
+              "createdAt": "2026-09-19T16:48:57Z",
+              "updatedAt": "2026-09-19T16:48:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOVBeuQ",
+          "commit": {
+            "abbreviatedOid": "584b885"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T16:50:47Z",
+          "updatedAt": "2026-09-19T16:50:47Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "Hmm, yes, I think you are correct.\r\n\r\nI tried to write a function following [RFC9162 2.1.3.1.](https://www.rfc-editor.org/info/rfc9162/#section-2.1.3.1), which also outputs the maximum as `12` (min on right edge is `9`): https://go.dev/play/p/21SAmNKKuv1\r\n\r\nThis doesn't increase the length to `13` until the subtree size is 4097, which sounds correct?\r\n\r\nI have fixed this in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325/commits/978da7a9870f24837bd17d34dd0a62d7d540a52c. Thank you!",
+              "createdAt": "2026-09-19T16:50:47Z",
+              "updatedAt": "2026-09-19T17:03:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOVH4vQ",
+          "commit": {
+            "abbreviatedOid": "584b885"
+          },
+          "author": "joshuasing",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T17:10:52Z",
+          "updatedAt": "2026-09-19T17:10:53Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "> > I'll take yet another pass at the invariants so that actually translates to inclusion proof sizes tidily.\r\n> \r\n> Done in #326\r\n\r\nThat change makes this a lot clearer. Thanks!",
+              "createdAt": "2026-09-19T17:10:52Z",
+              "updatedAt": "2026-09-19T17:10:53Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOVZ2WA",
+          "commit": {
+            "abbreviatedOid": "978da7a"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Thanks!",
+          "createdAt": "2026-09-19T18:10:44Z",
+          "updatedAt": "2026-09-19T18:10:44Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 326,
+      "id": "PR_kwDOJIBkVc8AAAABEPA_Dg",
+      "title": "Discuss subtree inclusion proof sizes more explicitly",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/326",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We talk about the selected subtrees being \"efficient\", but the specific notion of efficiency we care about is subtree inclusion proof size. The stated bounds actually give a slightly weaker bound on proof size than is true, because it doesn't capture that `left` is sized up to a power of 2.\r\n\r\nReword the discussion a bit to capture this a bit more. I didn't include all the intermediate bounds that let you derive BIT_CEIL(end - start), but hopefully it's not too hard:\r\n\r\nThe intermediate steps are that right = [mid, end) is of course bounded by not just BIT_CEIL(end - start) but end - start and really end - mid.\r\n\r\nleft = [left_start, mid) picks left_start such that left's size is exactly BIT_CEIL(mid - start). Depending on the value of mid, that is potentially tighter than BIT_CEIL(end - start).",
+      "createdAt": "2026-09-19T16:48:17Z",
+      "updatedAt": "2026-09-20T03:12:04Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e4908a0646348f62aa73c22d036988df6e21a36d",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "subtree-bounds",
+      "headRefOid": "b3d566e4daabb68405dfd37291a48de1dd7044aa",
+      "closedAt": "2026-09-20T03:12:01Z",
+      "mergedAt": "2026-09-20T03:12:01Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "1aa6347af7f15f841f259ae913037d53690175bb"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The motivation is because the off-by-one in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/325/changes#r4053623170 confuses me all the time.",
+          "createdAt": "2026-09-19T16:48:39Z",
+          "updatedAt": "2026-09-19T16:48:39Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOVZezA",
+          "commit": {
+            "abbreviatedOid": "f6853f4"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-19T18:09:32Z",
+          "updatedAt": "2026-09-19T18:09:40Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "Two spaces in a row...\n\n```suggestion\nThe pair of subtree hashes for `left` and `right` can support inclusion proofs for any element of `[start, end)`. The largest such inclusion proof is no bigger than the largest inclusion proof in `MTH(D[start:end])`. Unlike `MTH(D[start:end])`, these subtree hashes can be shown consistent with the overall Merkle Tree using subtree consistency proofs.\n```",
+              "createdAt": "2026-09-19T18:09:32Z",
+              "updatedAt": "2026-09-19T18:09:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOXB0XA",
+          "commit": {
+            "abbreviatedOid": "b3d566e"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-20T00:50:16Z",
+          "updatedAt": "2026-09-20T00:50:16Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
