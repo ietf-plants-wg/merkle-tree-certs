@@ -2513,6 +2513,12 @@ Table of Contents
    use application-specific criteria in addition to, or instead of, this
    recommendation.
 
+   Relying parties SHOULD NOT include Merkle Tree CAs in the
+   certificate_authorities extension (Section 4.3.4 of [RFC9846]).
+   Doing so might inadvertently signal an unsupported landmark-relative
+   certificate because they have the same issuer field as standalone
+   certificates.
+
 8.1.  Standalone Certificates
 
    Authenticating and relying parties SHOULD use the trust_anchors
