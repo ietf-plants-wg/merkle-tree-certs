@@ -3712,6 +3712,8 @@ Table of Contents
 
 Appendix A.  ASN.1 Module
 
+   This ASN.1 module uses the conventions established by [RFC5912].
+
    MerkleTreeCertificates
      { iso(1) identified-organization(3) dod(6) internet(1)
        security(5) mechanisms(5) pkix(7) id-mod(0)
