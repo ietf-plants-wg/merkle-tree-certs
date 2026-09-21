@@ -4817,6 +4817,9 @@ Since draft-ietf-plants-merkle-tree-certs-05
    *  Define active landmarks around landmark expiry and put the expiry
       time in the landmark format.
 
+   *  Fix an interaction between landmark-relative certs and TLS
+      certificate_authorities.
+
 Authors' Addresses
 
    David Benjamin
