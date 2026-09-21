@@ -1609,6 +1609,8 @@ Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subj
 
 Certificate selection in TLS, described in {{Section 4.5.1.2 of !RFC9846}}, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.
 
+Relying parties SHOULD NOT include Merkle Tree CAs in the `certificate_authorities` extension ({{Section 4.3.4 of !RFC9846}}). Doing so might inadvertently signal an unsupported landmark-relative certificate because they have the same `issuer` field as standalone certificates.
+
 ## Standalone Certificates {#standalone-certificates-tls}
 
 Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding CA ID ({{ca-ids}}). This trust anchor ID is additionally contained in the trust anchor groups defined in {{single-log-landmark-groups}}.
