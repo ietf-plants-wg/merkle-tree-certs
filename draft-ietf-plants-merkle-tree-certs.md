@@ -1226,13 +1226,16 @@ ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     CRITICALITY TRUE
 }
 
+-- This is 2^48, the minimum possible serial number in this protocol.
+mtcMinSerial INTEGER ::= 281474976710656
+
 -- This is 2^64-1, the maximum possible serial number in this protocol.
 mtcMaxSerial INTEGER ::= 18446744073709551615
 
 MTCCertificationAuthority ::= SEQUENCE {
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER (0..mtcMaxSerial),
-    maxSerial INTEGER (0..mtcMaxSerial)
+    minSerial INTEGER (mtcMinSerial..mtcMaxSerial),
+    maxSerial INTEGER (mtcMinSerial..mtcMaxSerial)
 }
 ~~~
 
@@ -2077,13 +2080,16 @@ ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     CRITICALITY TRUE
 }
 
+-- This is 2^48, the minimum possible serial number in this protocol.
+mtcMinSerial INTEGER ::= 281474976710656
+
 -- This is 2^64-1, the maximum possible serial number in this protocol.
 mtcMaxSerial INTEGER ::= 18446744073709551615
 
 MTCCertificationAuthority ::= SEQUENCE {
     sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-    minSerial INTEGER (0..mtcMaxSerial),
-    maxSerial INTEGER (0..mtcMaxSerial)
+    minSerial INTEGER (mtcMinSerial..mtcMaxSerial),
+    maxSerial INTEGER (mtcMinSerial..mtcMaxSerial)
 }
 
 END
