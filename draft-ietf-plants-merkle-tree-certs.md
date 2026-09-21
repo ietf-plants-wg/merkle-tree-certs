@@ -1145,6 +1145,8 @@ This is equivalent to the concatenation of:
 
 For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
 
+{{Section 4 of !I-D.ietf-tls-trust-anchor-ids}} limits OID components in trust anchor ID, such that the above value fits in 2<sup>8</sup>-1 bytes. However, a general RELATIVE-OID can be arbitrarily long, with arbitrarily large components. Implementations that do not validate these bounds earlier MUST fail signature generation or verification if `cosigner_name` or `log_origin` would be too long. Implementations MAY accept larger OID components than allowed in trust anchor IDs, but MUST support OID components up to at least 2<sup>63</sup>-1 and MUST fail signature generation or verification if conversion to dotted decimal overflows any implementation limit.
+
 `start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. See {{definition-of-a-subtree}}.
 
 If `timestamp` is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally, if `timestamp` is non-zero, the following MUST be true:
