@@ -58,9 +58,6 @@ normative:
     seriesinfo:
       ISO/IEC: 8825-1:2021
 
-  # For the ASN.1 module
-  RFC5912:
-
 informative:
   CHROME-CT:
     title: Chrome Certificate Transparency Policy
@@ -2008,6 +2005,8 @@ Reference:
 --- back
 
 # ASN.1 Module
+
+This ASN.1 module uses the conventions established by {{!RFC5912}}.
 
 ~~~asn.1
 MerkleTreeCertificates
