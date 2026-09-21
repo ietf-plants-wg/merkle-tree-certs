@@ -2836,3 +2836,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Update for draft-ietf-tls-trust-anchor-ids-05, and spell out certificate configuration explicitly.
 
 - Define active landmarks around landmark expiry and put the expiry time in the landmark format.
+
+- Fix an interaction between landmark-relative certs and TLS `certificate_authorities`.
