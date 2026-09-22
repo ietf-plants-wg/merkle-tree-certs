@@ -200,6 +200,7 @@ Table of Contents
      Since draft-ietf-plants-merkle-tree-certs-03
      Since draft-ietf-plants-merkle-tree-certs-04
      Since draft-ietf-plants-merkle-tree-certs-05
+     Since draft-ietf-plants-merkle-tree-certs-06
    Authors' Addresses
 
 1.  Introduction
@@ -1799,7 +1800,7 @@ Table of Contents
        mechanisms(5) pkix(7) algorithms(6) TBD }
 
    For initial experimentation, early implementations of this design
-   will use the OID 1.3.6.1.4.1.44363.47.0 instead of id-alg-mtcProof.
+   will use the OID 1.3.6.1.4.1.44363.47.5 instead of id-alg-mtcProof.
    Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for
    use in this document.
 
@@ -4832,6 +4833,11 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Fix an interaction between landmark-relative certs and TLS
       certificate_authorities.
+
+Since draft-ietf-plants-merkle-tree-certs-06
+
+   *  Bump the experimental OID for id-alg-mtcProof, to reflect the
+      format change.
 
 Authors' Addresses
 
