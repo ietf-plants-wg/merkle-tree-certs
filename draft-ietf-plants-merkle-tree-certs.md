@@ -1318,7 +1318,9 @@ Each element of the `signatures` field MUST have a unique `cosigner_id`. Element
 
 An MTCProof parser MUST reject the input if there are duplicate `cosigner_id` values, or if they are not ordered correctly. This can be done by checking each `cosigner_id` value comes strictly after the previous one in the above order.
 
-The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
+CAs, or other parties, MAY include GREASE {{!RFC8701}} cosignatures in an MTCProof by allocating an unused cosigner ID and inserting it into the `signatures` field. The `cosigner_id` is the unused cosigner ID and the `signature` is an arbitrary byte string. A cosigner ID allocated for GREASE MUST NOT be later repurposed for a real cosigner.
+
+The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string
 
 ## Standalone Certificates
 
