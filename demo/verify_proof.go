@@ -82,7 +82,11 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 		return nil, fmt.Errorf("issuer %s not a known MTC CA", caID)
 	}
 
-	if !bytes.Equal(cert.RawSignatureAlgorithm, mtcProofSigAlg) {
+	// A real implementation would probably save this as static data.
+	mtcProofSigAlg := cryptobyte.NewBuilder(nil)
+	addMTCProofSigAlg(mtcProofSigAlg, policy.Version)
+
+	if !bytes.Equal(cert.RawSignatureAlgorithm, mtcProofSigAlg.BytesOrPanic()) {
 		return nil, errors.New("signature algorithm was not an mtcProof")
 	}
 
@@ -152,7 +156,7 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 	var tbsSigAlg, spki cryptobyte.String
 	if !tbs.ReadASN1Integer(&serial) ||
 		!tbs.ReadASN1Element(&tbsSigAlg, cbasn1.SEQUENCE) ||
-		!bytes.Equal(tbsSigAlg, mtcProofSigAlg) ||
+		!bytes.Equal(tbsSigAlg, mtcProofSigAlg.BytesOrPanic()) ||
 		!hashASN1Element(entryHash, &tbs, cbasn1.SEQUENCE) || // issuer
 		!hashASN1Element(entryHash, &tbs, cbasn1.SEQUENCE) || // validity
 		!hashASN1Element(entryHash, &tbs, cbasn1.SEQUENCE) || // subject

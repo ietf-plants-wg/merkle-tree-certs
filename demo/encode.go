@@ -28,11 +28,12 @@ var (
 	oidBasicConstraints = asn1.ObjectIdentifier{2, 5, 29, 19}
 	oidExtKeyUsage      = asn1.ObjectIdentifier{2, 5, 29, 37}
 
-	oidMTCProofExperiment           = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
+	oidMTCProofExperiment1          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
 	oidRDNATrustAnchorIDExperiment1 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}
 	oidMTCCAExperiment              = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 2}
 	oidRDNATrustAnchorIDExperiment2 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 3}
 	oidMTCCAWithSHA256Experiment    = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 4}
+	oidMTCProofExperiment2          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 5}
 
 	oidAlgUnsigned  = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 6, 36}
 	oidRDNAUnsigned = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 25, 1}
@@ -65,9 +66,13 @@ func addX509V3Version(b *cryptobyte.Builder) {
 	})
 }
 
-func addMTCProofSigAlg(b *cryptobyte.Builder) {
+func addMTCProofSigAlg(b *cryptobyte.Builder, version DraftVersion) {
 	b.AddASN1(cbasn1.SEQUENCE, func(alg *cryptobyte.Builder) {
-		alg.AddASN1ObjectIdentifier(oidMTCProofExperiment)
+		if version >= VersionPlants07 {
+			alg.AddASN1ObjectIdentifier(oidMTCProofExperiment2)
+		} else {
+			alg.AddASN1ObjectIdentifier(oidMTCProofExperiment1)
+		}
 	})
 }
 
@@ -280,7 +285,7 @@ func AddTBSCertificate(b *cryptobyte.Builder, version DraftVersion, issuer Trust
 		if len(certConfig.OverrideTBSSignatureAlgorithm) != 0 {
 			tbs.AddBytes(certConfig.OverrideTBSSignatureAlgorithm)
 		} else {
-			addMTCProofSigAlg(tbs)
+			addMTCProofSigAlg(tbs, version)
 		}
 		addX509Name(tbs, version, issuer)
 		addValidity(tbs, &entry.CertConfigBase)
@@ -398,7 +403,7 @@ func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Co
 		if len(certConfig.OverrideSignatureAlgorithm) != 0 {
 			cert.AddBytes(certConfig.OverrideSignatureAlgorithm)
 		} else {
-			addMTCProofSigAlg(cert)
+			addMTCProofSigAlg(cert, config.Version)
 		}
 		cert.AddASN1(cbasn1.BIT_STRING, func(certSig *cryptobyte.Builder) {
 			proof, err := SubtreeInclusionProof(issuanceLog, index, start, end)

@@ -12,8 +12,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"golang.org/x/crypto/cryptobyte"
 )
 
 type repeatableString []string
@@ -33,16 +31,10 @@ var (
 	flagVersion = verifyFlags.String("version", "plants-06", "the draft version to target")
 	flagPolicy  = verifyFlags.String("policy", "", "path to an optional certificate policy file")
 	flagCACerts repeatableString
-
-	mtcProofSigAlg []byte
 )
 
 func init() {
 	verifyFlags.Var(&flagCACerts, "ca-cert", "path to a PEM file with one or more CA certificates, can be specified multiple times")
-
-	b := cryptobyte.NewBuilder(nil)
-	addMTCProofSigAlg(b)
-	mtcProofSigAlg = b.BytesOrPanic()
 }
 
 func parseSerial(s string) (uint64, error) {

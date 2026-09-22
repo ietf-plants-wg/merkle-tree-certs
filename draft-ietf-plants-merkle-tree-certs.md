@@ -1283,7 +1283,7 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
     mechanisms(5) pkix(7) algorithms(6) TBD }
 ~~~
 
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of `id-alg-mtcProof`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
+For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.5 instead of `id-alg-mtcProof`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
 The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
@@ -2839,3 +2839,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Define active landmarks around landmark expiry and put the expiry time in the landmark format.
 
 - Fix an interaction between landmark-relative certs and TLS `certificate_authorities`.
+
+## Since draft-ietf-plants-merkle-tree-certs-06
+{:numbered="false"}
+
+- Bump the experimental OID for id-alg-mtcProof, to reflect the format change.
