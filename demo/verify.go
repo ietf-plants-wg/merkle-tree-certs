@@ -30,7 +30,7 @@ func (s *repeatableString) Set(value string) error {
 var (
 	verifyFlags = flag.NewFlagSet("verify", flag.ExitOnError)
 
-	flagVersion = verifyFlags.String("version", "plants-05", "the draft version to target")
+	flagVersion = verifyFlags.String("version", "plants-06", "the draft version to target")
 	flagPolicy  = verifyFlags.String("policy", "", "path to an optional certificate policy file")
 	flagCACerts repeatableString
 
