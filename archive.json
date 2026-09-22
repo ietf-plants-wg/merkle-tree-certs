@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-20T04:42:11.484791+00:00",
+  "timestamp": "2026-09-22T04:36:53.855606+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -1234,15 +1234,15 @@
       "id": "I_kwDOJIBkVc5nz1He",
       "title": "Revocation",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/41",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "> [[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document.]] ",
       "createdAt": "2023-06-05T12:08:06Z",
-      "updatedAt": "2025-06-21T14:23:41Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-21T22:22:07Z",
+      "closedAt": "2026-09-21T22:22:07Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -1306,6 +1306,13 @@
           "body": "Post-Photosynthesis triage: I suspect there's not a whole lot to do here, but probably applies equally to both formulations, so leaving open for now",
           "createdAt": "2025-06-21T14:23:32Z",
           "updatedAt": "2025-06-21T14:23:41Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closing this, not because there isn't potentially something cool to do with revocation, but because CRLs and OCSP now work just fine, and someone can always decide to propose something independent of this bug later.",
+          "createdAt": "2026-09-21T22:22:07Z",
+          "updatedAt": "2026-09-21T22:22:07Z"
         }
       ]
     },
@@ -1490,7 +1497,7 @@
       "id": "I_kwDOJIBkVc5pKOmO",
       "title": "Expand upon security requirements of hash in security consideration section",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/55",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -1499,8 +1506,8 @@
       "labels": [],
       "body": "Cover:\r\n\r\n- Hash contextualisation, cf #32 \r\n- Where collision resistance is really used #45 ",
       "createdAt": "2023-06-19T22:08:55Z",
-      "updatedAt": "2025-06-21T14:32:49Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-21T22:15:00Z",
+      "closedAt": "2026-09-21T22:15:00Z",
       "comments": [
         {
           "author": "davidben",
@@ -1508,6 +1515,13 @@
           "body": "Post-Photosynthesis triage: security considerations mentions depending on collision-resistance. Is there more stuff we should do here with a CT-like tree?",
           "createdAt": "2025-06-21T14:32:49Z",
           "updatedAt": "2025-06-21T14:32:49Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Think we can close this? The public key is now clarified as a second-preimage situation. The other stuff cites collision-resistance, but that's true for now. We have the hooks in place to define a randomizer if we want, and then that text will want to be updated with it.",
+          "createdAt": "2026-09-21T22:15:00Z",
+          "updatedAt": "2026-09-21T22:15:00Z"
         }
       ]
     },
@@ -2171,15 +2185,15 @@
       "id": "I_kwDOJIBkVc6cY8K6",
       "title": "Default file structure for RP and AP ",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/97",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "pohlm01",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Operating systems often ship a list of trusted certificates in a well-known location. The [go source code](https://go.dev/src/crypto/x509/root_linux.go) is a nice place for an overview of where Linux stores its trusted roots. It might be nice to recommend a file structure as part of the RFC as well.\r\n\r\n## Relying Party\r\nI propose the following structure for a relying party, mainly inspired by Debian/Ubuntu:\r\n\r\n```text\r\netc\r\n\u2514\u2500 ssl\r\n    \u2514\u2500 mtc\r\n        \u2514\u2500 <issuer_id>\r\n            \u251c\u2500 ca-params\r\n            \u251c\u2500 validity-window\r\n            \u2514\u2500 signature\r\n```\r\n\r\nI think the prefix of the storage location may be different per distribution. For example, `etc/ssl/mtc` for Debian and `/etc/pki/tls/mtc` for Fedora/RHEL. What is more interesting is the structure thereafter.\r\n\r\nEach CA would live in its own subdirectory with the Issuer ID (i.e., TAI/OID) as the directory name. This directory contains the CA parameters, the root hashes of the validity window, and optionally the signature over the validity window. The CA parameters would be the following binary representation:\r\n\r\n```text\r\nstruct {\r\n    TrustAnchorIdentifier   issuer;\r\n    SignatureScheme         signature_scheme;\r\n    opaque                  public_key<1..2^16-1>;\r\n    ProofType               proof_type;\r\n    uint64                  start_time;\r\n    uint64                  batch_duration;\r\n    uint64                  lifetime;\r\n    uint32                  validity_window_size;\r\n    uint64                  storage_window_size;\r\n    opaque                  http_server<1..2^16-1>;\r\n}\r\n```\r\n\r\nThe validity window would contain the batch number and all currently valid root hashes, like defined in the draft already:\r\n```text\r\nstruct {\r\n    uint32      batch_number;\r\n    TreeHead    tree_heads[validity_window_size*hash.length];\r\n} ValidityWindow;\r\n```\r\nThe signature seems optional to me. If the relying party trusts its trust services, there might not be a need to sync them as well.\r\nThis would also save quite some bandwidth, depending on how often an RP gets updated and how many CAs exist.\r\n\r\nThat is also the reason I would like to have the signature and validity window separate, as it simplifies the update service to fetch only the missing tree heads and optionally the signature.\r\n\r\nFor the CA parameters, I am not sure if all information is actually required on the RP side. At the same time, the size is not very important here, as it would get updated only occasionally. Mainly, either the validity window size or lifetime might be left out, and the HTTP server location of the CA might be irrelevant as updates should get fetched from the transparency services. \r\n\r\n## Authenticating Party\r\nFor the authenticating party, a common structure does not seem as relevant; still, it might be nice to recommend one:\r\n\r\nI propose to store the certificates the server can choose from as `<batch_number>.mtc` in separate files and reuse the same format as for the RP for the CA parameters. To my understanding, the CA parameters are only required to know when a certificate becomes invalid, but keeping the other information in the struct allows reusing a parser that was written for the RP.\r\nThe private key is necessary to authenticate the handshake. It may be stored somewhere else as well.\r\n\r\n```text\r\n<some directory>\r\n\u2514\u2500 <issuer_id>\r\n    \u251c\u2500 0.mtc\r\n    \u251c\u2500 240.mtc\r\n    \u251c\u2500 ca-params\r\n    \u2514\u2500 private-key.pem\r\n```\r\n\r\nAny comments on the proposed structure, as well as the need to include this as a recommendation, are welcome.",
       "createdAt": "2024-10-30T11:29:49Z",
-      "updatedAt": "2026-06-03T13:57:56Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-21T22:13:08Z",
+      "closedAt": "2026-09-21T22:13:08Z",
       "comments": [
         {
           "author": "davidben",
@@ -2194,6 +2208,13 @@
           "body": "We've mostly done this. There's a format for CAs and works about the same as X.509 CAs today. It doesn't capture landmarks though.",
           "createdAt": "2026-06-03T13:57:56Z",
           "updatedAt": "2026-06-03T13:57:56Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "tls-trust-anchor-ids now defines file formats for the AP side of things. We don't yet capture landmarks, but probably we can close this for now? I suspect landmark formats are going to be pretty RP-specific. For places where there's more of a split between the RP config (aka the root store) and the verifier, we'll probably have to see how things shake out between OpenSSL, upki, and whatever else.",
+          "createdAt": "2026-09-21T22:13:08Z",
+          "updatedAt": "2026-09-21T22:13:08Z"
         }
       ]
     },
@@ -2275,15 +2296,15 @@
       "id": "I_kwDOJIBkVc6rA_SG",
       "title": "Default batch duration and lifetime",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/104",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "At the moment we have hourly batches with 14 day lifetimes. Those numbers are easy to think about. In practice we might want to tweak them.\n\n**Lifetime.** In the current CA/B baseline requirements, CAs are allowed to forego supporting revocation if their certificates are *short lived*. The latter is defined as less than 7 days. (Strictly speaking it's 10 days now, but that's the transitional value.) I think it makes sense to align here and use 7 days as the default lifetime.\n\n**Batch duration**. Although we don't have good data yet, I think it's safe to say that we can't expect RPs to pull new roots hourly. A batch duration of 6 hours might make more sense.",
       "createdAt": "2025-02-21T14:21:35Z",
-      "updatedAt": "2025-06-21T14:44:35Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-21T22:22:51Z",
+      "closedAt": "2026-09-21T22:22:51Z",
       "comments": [
         {
           "author": "davidben",
@@ -2291,6 +2312,13 @@
           "body": "Post-Photosynthesis triage: still applicable to new formulation",
           "createdAt": "2025-06-21T14:44:35Z",
           "updatedAt": "2025-06-21T14:44:35Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Think we can probably close this? We hint at one hour throughout. Lifetime itself will probably be very deployment-specific.",
+          "createdAt": "2026-09-21T22:22:51Z",
+          "updatedAt": "2026-09-21T22:22:51Z"
         }
       ]
     },
@@ -3108,15 +3136,15 @@
       "id": "I_kwDOJIBkVc7xl7Zf",
       "title": "Account for max cert lifetimes changing over time",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/194",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Over time, a CA's maximum lifetime for new issuance may change. See if we can write our recommended landmark allocation scheme to account for this. (The time between landmarks should get rescaled with the max cert lifetime, I think.)",
       "createdAt": "2026-03-10T17:39:50Z",
-      "updatedAt": "2026-04-13T05:46:25Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-21T22:11:44Z",
+      "closedAt": "2026-09-21T22:11:43Z",
       "comments": [
         {
           "author": "davidben",
@@ -3152,6 +3180,13 @@
           "body": "Yeah, this seems like a good use of something like log generations, or some other kind of reset. Trying to landmark rate right with memory sounds a headache.",
           "createdAt": "2026-04-13T05:46:25Z",
           "updatedAt": "2026-04-13T05:46:25Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Think we can probably close it. Ideally, as noted above, it wouldn't change. The discussion about landmark expiry hopefully both gives a bit more wiggle room for the CA (RPs are told what to do if the landmark count is too big) and also implicitly makes it clear what might need to be rethought if you did try to change it and stay within RP's limits.",
+          "createdAt": "2026-09-21T22:11:43Z",
+          "updatedAt": "2026-09-21T22:11:43Z"
         }
       ]
     },
@@ -3889,16 +3924,38 @@
       "id": "I_kwDOJIBkVc8AAAABJnPzPQ",
       "title": "TLS certificate_authorities should not match a landmark-relative certificate",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/285",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "An MTC CA has both a trust anchor ID and an X.509 name, so it _could_ use either `trust_anchors` or `certificate_authorities`, in principle.\n\nHowever, both the standalone and landmark-relative form of the certificate have the _same_ issuer name. But while a `certificate_authorities` match is broadly sufficient for the standalone certificate, it's not sufficient for the landmark-relative certificate. That needs a finer-grained trust anchor match (the landmark itself).\n\nPossible fixes here:\n1. Say that landmark-relative and standalone certificate have different issuer names in the X.509 representation. Put the landmark number in the landmark-relative certificate's issuer.\n2. Say that _authenticating parties_ somehow know to ignore `certificate_authorities` for the landmark-relative certificate, but the standalone certificate can match.\n3. Say that _authenticating parties_ somehow know to never match `certificate_authorities` to an MTC, landmark-relative or standalone\n4. Say that _relying parties_ never send an MTC CA's X.509 name in `certificate_authorities`, only `trust_anchors`.\n\n(1) seems natural in that it restores an X.509 invariant around certificate matching. But it breaks a _different_ X.509 invariant. Certificates are revoked and referenced via (issuer, serial) tuples, but we want the two certificates to be revoked together.\n\n(2) requires that TLS server software distinguish the two forms. While they could either parse out the certificate, or we introduce a new certificate property, this seems needlessly fiddly.\n\n(3) is less fiddly, but does mean \"this credential requires _some_ kind of issuer match\" and \"this credential requires specifically a `trust_anchors` match\" are now different settings on the credential, and different certificate properties. (Our stack currently uses the same setting, but it should be easy to split them.)\n\nAt that point, if they never apply to MTCs, we may as well do (4), since the relying party necessarily needs to know it's offering MTCs anyway.",
       "createdAt": "2026-07-21T14:45:32Z",
-      "updatedAt": "2026-07-21T14:45:58Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-09-21T16:11:47Z",
+      "closedAt": "2026-09-21T16:11:47Z",
+      "comments": [
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "The issuer is part of certificate data in MTC, and MTC assumes that stand-alone and landmark-relative certificates have the same certificate data. Unless the TLS server knows differently (which goes to (2)), it will pull the issuer from the certificate. Thus, (1) seems non-starter.\n\nAnd treating \"this credential requires some kind of issuer match\" as a property runs into issues, as it is negative of default certificate status, which nullifies all properties (which would include itself if treated as a property) if invoked. \"This credential requires specifically a trust_anchors match\" is better, as it should never get nullified, even if it technically could.\n\nAnd yes, (4) seems by far the easiest.",
+          "createdAt": "2026-09-20T16:16:44Z",
+          "updatedAt": "2026-09-20T16:16:44Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Well, if we were to do (1), we would change the TBSCertificate -> TBSCertificateLogEntry function to work. (TBSCertificateLogEntry [didn't even need an issuer](https://mailarchive.ietf.org/arch/msg/plants/bwW5ljl-rdRqfRvqfZnFNCiL408/) in there anyway.) And then things would \"work\". That said, I think breaking the other X.509 invariants around issuer (revocation, what is a CA, etc.) is undesirable.\n\nBut yeah, I'll go upload a PR for (4) before I forget.",
+          "createdAt": "2026-09-21T15:21:13Z",
+          "updatedAt": "2026-09-21T15:21:13Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/329 for (4)",
+          "createdAt": "2026-09-21T15:28:23Z",
+          "updatedAt": "2026-09-21T15:28:23Z"
+        }
+      ]
     },
     {
       "number": 290,
@@ -4007,14 +4064,97 @@
       "id": "I_kwDOJIBkVc8AAAABRyJ3iQ",
       "title": "Adjust minSerial and maxSerial range constraints in MTCCertificationAuthority",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/323",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "CBonnell",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The MTCCertificationAuthority extension has the following two fields:\n\n```\n minSerial INTEGER (0..mtcMaxSerial),\n maxSerial INTEGER (0..mtcMaxSerial)\n```\n\nAccording to section 6.2, the minimum valid serial number is 1 << 48, so the lower bound of the range constraint on those two fields should be adjusted to reflect this restriction.\n\nHappy to put together a PR for this.",
       "createdAt": "2026-09-17T14:01:59Z",
-      "updatedAt": "2026-09-17T14:01:59Z",
+      "updatedAt": "2026-09-21T14:40:29Z",
+      "closedAt": "2026-09-21T14:40:29Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Happy to put together a PR for this.\n\nSounds good!",
+          "createdAt": "2026-09-20T18:16:03Z",
+          "updatedAt": "2026-09-20T18:16:03Z"
+        }
+      ]
+    },
+    {
+      "number": 327,
+      "id": "I_kwDOJIBkVc8AAAABSPETkg",
+      "title": "cosigner_name/log_origin use different encoding from the rest",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/327",
+      "state": "OPEN",
+      "author": "ilaril",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "When writing some WIP MTC code, I noticed that CosignedMessage `cosigner_name` and `log_origin` fields have a format mismatch. While everything else TLS-part in MTC and TAI seems to use binary ID encoding, those two fields use ASCII encoding.\n\nDoing this format conversion seems very obnoxious to implement:\n* It is base conversion from 128 to 10, which is not an easy special case.\n* There seems to be no explicit limit on how big the numbers can be (other than the first, which fits in 32 bits).\n* This happens in extremely critical place (certificate verification).\n* Performance matters, so easy brute force is out.\n* It is still fallible as the output buffer can overflow\n  * The encoding can be up to 1035 bytes, but there is space for only 255.\n  * `>60` byte ID can overflow, `>120` byte ID will overflow.\n\n(The log ID in issuer was recently switched to use the binary encoding.)",
+      "createdAt": "2026-09-20T15:29:30Z",
+      "updatedAt": "2026-09-21T20:35:50Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah yeah, this part does not spark joy. :-( This comes MTC from having to bridge two disparate universes (TLS/X.509 and tlog). In TLS/X.509, binary encodings are natural and compact, and we have had some fun (ab)using OIDs. In tlog, names are these text \"origins\" that are vaguely URL-like (`example.com/my/fancy/log`).\n\nWe bridged them by mapping them to `oid/1.2.3.4.5.6`. The cost of that was this mess. (Our implementation will just make signature verification fail if either some component doesn't fit in u64, or if the ID is so long that it the text form doesn't fit in a one-byte length prefix. It means a CA that picks such IDs can never usefully sign anything... don't do that. \ud83d\ude04 That deep of an OID hierachy is especially unrealistic.)\n\nWe didn't _have_ to align with tlog here and _could_ have said that MTCs has a totally disjoint signature algorithm. But it's convenient for CA operators if they can reuse the existing signing functions in their log software, so I think this is valuable.\n\nSome thoughts:\n\nWe could add some text to the TAI draft to say that OID components in TAIs can be at most 2<sup>64</sup>-1, which at least makes component conversion easier to implement. (We could also add that limitation to the MTC draft and say you're only allowed to use a subset of TAIs. But that seems silly and we may as well put it in the base.)\n\nFor the overflow, we could see if it's too late to bump that length prefix on the tlog side. We could also cut the maximum TAI length from 256 to, say, 32 bytes. That is plenty and keeps us well underneath the one-byte limit.\n\nNo matter what we do, the MTC spec should include some text flagging these issues. Even if we tweak things so that every valid TAI fits, your generic RELATIVE-OID parser may well admit other values, and it's useful to know this is a concern.\n\nThoughts?",
+          "createdAt": "2026-09-21T15:56:27Z",
+          "updatedAt": "2026-09-21T15:56:53Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "> Ah yeah, this part does not spark joy. :-( This comes MTC from having to bridge two disparate universes (TLS/X.509 and tlog). In TLS/X.509, binary encodings are natural and compact, and we have had some fun (ab)using OIDs. In tlog, names are these text \"origins\" that are vaguely URL-like (`example.com/my/fancy/log`).\n> \n> We bridged them by mapping them to `oid/1.2.3.4.5.6`. The cost of that was this mess. (Our implementation will just make signature verification fail if either some component doesn't fit in u64, or if the ID is so long that it the text form doesn't fit in a one-byte length prefix. It means a CA that picks such IDs can never usefully sign anything... don't do that. \ud83d\ude04 That deep of an OID hierachy is especially unrealistic.)\n\nThe implementation I am writing treats any ID that overflows as hard parse error (and that is far from the only place where it explicitly pukes on various values).\n\nAnother idea would be to use something like `oidb/` followed by raw binary OID representation (the field is 8-bit clean, right?). Without length limit, things could still overflow, but at least there is no format conversion.\n\n> We didn't _have_ to align with tlog here and _could_ have said that MTCs has a totally disjoint signature algorithm. But it's convenient for CA operators if they can reuse the existing signing functions in their log software, so I think this is valuable.\n\nExcept what would happen if they try to use signature algorithm tlog does not define format for, or defines a different format?\n\n(Who designed this?)\n\n> Some thoughts:\n> \n> We could add some text to the TAI draft to say that OID components in TAIs can be at most 264-1, which at least makes component conversion easier to implement. (We could also add that limitation to the MTC draft and say you're only allowed to use a subset of TAIs. But that seems silly and we may as well put it in the base.)\n\nI think `2^63-1` would be better, as it is easier to recognize from the binary representation (count high bits in row), and is more than enough for pretty much everything. Also, AFAICT, this is limit for primitive integers in Java.\n\n> For the overflow, we could see if it's too late to bump that length prefix on the tlog side. We could also cut the maximum TAI length from 256 to, say, 32 bytes. That is plenty and keeps us well underneath the one-byte limit.\n\nOr 60 bytes, which is the largest size guaranteed to fit (`16+4*60-1=255`). The maximum expansion factor is 4 (archived by 100-127, everything else seems to give `2<=x<=3`).\n\n> No matter what we do, the MTC spec should include some text flagging these issues. Even if we tweak things so that every valid TAI fits, your generic RELATIVE-OID parser may well admit other values, and it's useful to know this is a concern.\n \nOh, just found and fixed a security bug in the WIP code where parser accepts ID that overflows in conversion (bad handling of too large component). Yeah, this has risks...\n",
+          "createdAt": "2026-09-21T18:26:42Z",
+          "updatedAt": "2026-09-21T18:26:42Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Another idea would be to use something like oidb/ followed by raw binary OID representation (the field is 8-bit clean, right?). Without length limit, things could still overflow, but at least there is no format conversion.\n\nThe names also show up in places like https://c2sp.org/tlog-checkpoint, so it's not quite an 8-bit-clean field, alas. (I am definitely _not_ text format side of the Great Protocol Schism, but so it goes.) So the signature algorithm itself, from the log's perspective, would need to be defined to include a transform between what is served in the checkpoint file and what is signed.\n\n>> We didn't have to align with tlog here and could have said that MTCs has a totally disjoint signature algorithm. But it's convenient for CA operators if they can reuse the existing signing functions in their log software, so I think this is valuable.\n>\n> Except what would happen if they try to use signature algorithm tlog does not define format for, or defines a different format?\n\nI'm not sure I follow exactly what the question is asking, but I think I can answer anyway?\n\nBoth MTC and tlog do a \"the signature algorithm is part of the key, identified by the ID/name\" story for extensibility. Extensibility-wise, both systems are perfectly happy to define new signature algorithms, you just have to have _some_ way to represent in your configuration that the entity with this name has a key of \"ML-DSA-44 signature scheme v2 and public key blahblahblah\". (In MTC, for the CA certificate, that would mean a different extension OID. For other cosigners... that's all application-local configuration anyway. For tlog, I think that's mostly application-local configuration, but they have [some format of their own](https://c2sp.org/signed-note@main#verifier-keys) with a signature type.)\n\nBut being able to define a new algorithm isn't the same thing as some algorithm being defined and implemented everywhere. Early iterations of the MTC draft defined a custom one because, at the time, the only tlog algorithm was Ed25519 and took a totally plain text signed message. When tlog added an ML-DSA-44 construction, we [tried to align them a bit](https://mailarchive.ietf.org/arch/msg/plants/1gWq4trUrbb60XdLme4wI2IluG4/).\n\n> I think 2^63-1 would be better, as it is easier to recognize from the binary representation (count high bits in row), and is more than enough for pretty much everything. Also, AFAICT, this is limit for primitive integers in Java.\n\nSold. I'll switch my PR to that.\n\n> Or 60 bytes, which is the largest size guaranteed to fit (16+4*60-1=255). The maximum expansion factor is 4 (archived by 100-127, everything else seems to give 2<=x<=3).\n\nTrue. But 32 is a rounder number, should still be plenty large, and gives a comfortable amount of breathing room.\n\n> Oh, just found and fixed a security bug in the WIP code where parser accepts ID that overflows in conversion (bad handling of too large component). Yeah, this has risks...\n\nThis risk would be largely mitigated if the encoding function was fallible, no? Fallibility would be annoying if this were the _only_ source of it, but the whole signature verification process is inherently fallible (bad signature). That seems relatively tame? Worst that can happen is someone sends you an ID such that verification is guaranteed to fail.",
+          "createdAt": "2026-09-21T18:58:45Z",
+          "updatedAt": "2026-09-21T18:58:45Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "> > Except what would happen if they try to use signature algorithm tlog does not define format for, or defines a different format?\n> \n> I'm not sure I follow exactly what the question is asking, but I think I can answer anyway?\n> \n> Both MTC and tlog do a \"the signature algorithm is part of the key, identified by the ID/name\" story for extensibility.\n\nI do not think the key has enough information to validate MTC signature (even without legacy stuff like RSA, there is the log hash, which needs to be known, but is not part of the key).\n\n> But being able to define a new algorithm isn't the same thing as some algorithm being defined and implemented everywhere. Early iterations of the MTC draft defined a custom one because, at the time, the only tlog algorithm was Ed25519 and took a totally plain text signed message. When tlog added an ML-DSA-44 construction, we [tried to align them a bit](https://mailarchive.ietf.org/arch/msg/plants/1gWq4trUrbb60XdLme4wI2IluG4/).\n\nI meant exactly this sort of stuff.\n\n> > Oh, just found and fixed a security bug in the WIP code where parser accepts ID that overflows in conversion (bad handling of too large component). Yeah, this has risks...\n> \n> This risk would be largely mitigated if the encoding function was fallible, no? Fallibility would be annoying if this were the _only_ source of it, but the whole signature verification process is inherently fallible (bad signature). That seems relatively tame? Worst that can happen is someone sends you an ID such that verification is guaranteed to fail.\n\nEncoding functions can not fail, as that would make things like hashes fallible (yuck). And signature verification can not fail this way, as it is impossible to pass invalid data to such. Nor is it possible to throw exceptions from an encoding function.\n\n(The \"signature algorithm\" from MTC can actually fail due to invalid data.)",
+          "createdAt": "2026-09-21T20:10:36Z",
+          "updatedAt": "2026-09-21T20:10:36Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I do not think the key has enough information to validate MTC signature (even without legacy stuff like RSA, there is the log hash, which needs to be known, but is not part of the key).\n\nSorry, terminology. By \"key\" I did not mean the just SPKI, but the complete configuration of a cosigner on the sign or verify side. That includes both the actual RSA/ML-DSA/whatever key, but also the signature algorithm. So *if* we wanted to, there *is* a natural place to put in a separate version of the signed message.\n\nBut, again, the cost is that there's now two of them. So I still think aligning is the more prudent approach.\n\n> Encoding functions can not fail, as that would make things like hashes fallible (yuck). And signature verification can not fail this way, as it is impossible to pass invalid data to such. Nor is it possible to throw exceptions from an encoding function.\n>\n> (The \"signature algorithm\" from MTC can actually fail due to invalid data.)\n\nI mean, you can define your encoding function to have whatever type signature you like.\n\nI think it would be very reasonable for your `make_cosigned_message` function to return a `Result<Vec<u8>, Error>` or whatever. That does not drastically change things from the perspective of the layer above, because your `verify_cosignature` function *already* necessarily had to support returning \"invalid signature\". If `verify_cosignature` maps a failed `make_cosigned_message` to this same \"invalid signature\", this is all neatly hidden away inside `verify_cosignature`.\n\nI *also* agree we should define allowed IDs such that these cases cannot happen. It's just unhelpful to have a unwritten precondition. Hopefully https://github.com/tlswg/tls-trust-anchor-ids/pull/126 will resolve that. But if one is worried about *risks* and does not want the system to be too sensitive to this, I think a fallible `make_cosigned_message` is a very straightforward risk mitigation.",
+          "createdAt": "2026-09-21T20:23:21Z",
+          "updatedAt": "2026-09-21T20:23:21Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/330 to add the MTC side of this text. In principle redundant with https://github.com/tlswg/tls-trust-anchor-ids/pull/126 but, as you say, there is some risk here and I think it is worthwhile to point implementations in reasonable directions.",
+          "createdAt": "2026-09-21T20:35:50Z",
+          "updatedAt": "2026-09-21T20:35:50Z"
+        }
+      ]
+    },
+    {
+      "number": 332,
+      "id": "I_kwDOJIBkVc8AAAABScsBIA",
+      "title": "Set up some registries",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/332",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@robstradling pointed out we have some parameters that could do with registries:\n\n1. MTCLogEntryType, seeded with `null_entry` and `tbs_cert_entry`\n2. MTCLogEntryExtensionType, seeded with nothing.\n3. The CA ID oid arc, seeded with `logs(0)`, `landmarks(1)`, `landmarkGroups(2)`.",
+      "createdAt": "2026-09-21T22:10:22Z",
+      "updatedAt": "2026-09-21T22:10:22Z",
       "closedAt": null,
       "comments": []
     }
@@ -13013,7 +13153,7 @@
       "labels": [],
       "body": "Added documentation for implementations and deployments.",
       "createdAt": "2026-03-15T17:23:08Z",
-      "updatedAt": "2026-03-15T17:23:17Z",
+      "updatedAt": "2026-09-21T11:22:26Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "f87dddc5313452313dedcd6bb47cae0a79ac0495",
@@ -13024,7 +13164,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "abbra",
+          "authorAssociation": "NONE",
+          "body": "It would be nice to merge this PR so that I can add my implementation on top of it.",
+          "createdAt": "2026-09-21T11:22:26Z",
+          "updatedAt": "2026-09-21T11:22:26Z"
+        }
+      ],
       "reviews": []
     },
     {
@@ -14040,12 +14188,12 @@
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207",
       "state": "OPEN",
       "author": "jsha",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "An ACME client polls landmarkURL (which may be shared across many certificates) to determine when a landmark-relative certificate is possible. Once a landmark-relative certificate is possible, the ACME client POSTs to newRelativeCertificate (from the directory).\r\n\r\nAdvantages:\r\n\r\n - No new states in the Order state machine.\r\n - No new polling semantics for certificate download URLs.\r\n - CAs do no extra work for clients that don't want relative certificates (or: clients can defer getting relative certificates until they see that traffic justifies it).\r\n - Order lifetime does not depend on landmarking period.\r\n - All HTTP requests are expected to serve 200 in the happy case.\r\n - The new field in the directory serves as a signal that the ACME server supports Merkle Tree Certificates.\r\n\r\nDisadvantages:\r\n\r\n - ACME clients will tend to rush in and request relative certificates as soon as a landmark is minted. Options:\r\n   - CA returns 503 if load is too high and clients backoff and retry.\r\n   - Some mechanism for clients to decide how long to wait after a landmark is minted before requesting a relative certificate. Perhaps interpolation based on size of landmarks?\r\n\r\nClaude drafted the IANA Considerations section, which I reviewed and reference checked. All other words are mine.",
       "createdAt": "2026-04-13T19:42:08Z",
-      "updatedAt": "2026-05-22T19:23:42Z",
+      "updatedAt": "2026-09-21T21:03:20Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf",
@@ -14056,7 +14204,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Guessing we should close this now?",
+          "createdAt": "2026-09-21T21:03:20Z",
+          "updatedAt": "2026-09-21T21:03:20Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABAyjkEQ",
@@ -22420,6 +22576,311 @@
           "body": "",
           "createdAt": "2026-09-20T00:50:16Z",
           "updatedAt": "2026-09-20T00:50:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 328,
+      "id": "PR_kwDOJIBkVc8AAAABEa5dvA",
+      "title": "Define mtcMinSerial, adjust CA extension serial number field constraints",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/328",
+      "state": "MERGED",
+      "author": "CBonnell",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Resolves #323.",
+      "createdAt": "2026-09-21T12:43:30Z",
+      "updatedAt": "2026-09-21T14:41:13Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "1aa6347af7f15f841f259ae913037d53690175bb",
+      "headRepository": "CBonnell/merkle-tree-certs",
+      "headRefName": "CBonnell-minserial-range",
+      "headRefOid": "06c0fc413f611525c8e3fa72e6280845f6aab25e",
+      "closedAt": "2026-09-21T14:40:28Z",
+      "mergedAt": "2026-09-21T14:40:28Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "da1331d94a4602e0bf82ea2dead3f745296d7502"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOf6-8A",
+          "commit": {
+            "abbreviatedOid": "06c0fc4"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-21T14:40:16Z",
+          "updatedAt": "2026-09-21T14:40:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 329,
+      "id": "PR_kwDOJIBkVc8AAAABEcbWGg",
+      "title": "Avoid certificate_authorities matching a landmark-relative cert",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/329",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #285 by taking option 4.",
+      "createdAt": "2026-09-21T15:28:08Z",
+      "updatedAt": "2026-09-21T16:11:49Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "da1331d94a4602e0bf82ea2dead3f745296d7502",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "tls-ca-ext",
+      "headRefOid": "93e7b42f5c900911316a67874b9f7371d08adb01",
+      "closedAt": "2026-09-21T16:11:46Z",
+      "mergedAt": "2026-09-21T16:11:46Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e43f5faba18b75a090adde13d330711c7ddbd8f3"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOgfWwg",
+          "commit": {
+            "abbreviatedOid": "93e7b42"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-21T15:33:47Z",
+          "updatedAt": "2026-09-21T15:33:47Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 330,
+      "id": "PR_kwDOJIBkVc8AAAABEe-UdA",
+      "title": "Discuss overflow when representing the ID in dotted decimal",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/330",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This depends on https://github.com/tlswg/tls-trust-anchor-ids/pull/126. Together with that PR, closes https://github.com/ietf-plants-wg/merkle-tree-certs/issues/327.\r\n\r\nCC @ilaril",
+      "createdAt": "2026-09-21T20:34:54Z",
+      "updatedAt": "2026-09-22T00:59:05Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e105857f778e8fe8389dbd3ff2bf8b4fa42cb3be",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "id-conversion",
+      "headRefOid": "1c7a27ac0119339f0b96eb80a4650b216edf5f9a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOjnWuA",
+          "commit": {
+            "abbreviatedOid": "1c7a27a"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-21T21:03:56Z",
+          "updatedAt": "2026-09-21T21:03:56Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOkm0zA",
+          "commit": {
+            "abbreviatedOid": "1c7a27a"
+          },
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-09-21T23:39:52Z",
+          "updatedAt": "2026-09-21T23:40:13Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "signature generation, ok.  but so now verification of a signature requires conversion to dotted decimal before I can say this is valid? \n\nI don't think this should be a MUST for verification ",
+              "createdAt": "2026-09-21T23:39:52Z",
+              "updatedAt": "2026-09-21T23:40:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOk6fRA",
+          "commit": {
+            "abbreviatedOid": "1c7a27a"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-22T00:43:35Z",
+          "updatedAt": "2026-09-22T00:43:36Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Oh, it already requires it. We'd have to change the signature format away from tlog's to avoid this, or make tlog's scheme special case `oid/` on some funny way. (We can tug on that string if that's what people want. That's not this PR though.)",
+              "createdAt": "2026-09-22T00:43:36Z",
+              "updatedAt": "2026-09-22T00:43:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOk-HIw",
+          "commit": {
+            "abbreviatedOid": "1c7a27a"
+          },
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-22T00:57:31Z",
+          "updatedAt": "2026-09-22T00:57:31Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "> Oh, it already requires it. We'd have to change the signature format away from tlog's to avoid this, or make tlog's scheme special case `oid/` on some funny way. (We can tug on that string if that's what people want. That's not this PR though.)\r\n\r\nahhh ok.  well then  meh.. although, perhaps then this isn't the place to say this? (shrug) but more indifferent about it now ;) \r\n",
+              "createdAt": "2026-09-22T00:57:31Z",
+              "updatedAt": "2026-09-22T00:57:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOk-cFw",
+          "commit": {
+            "abbreviatedOid": "1c7a27a"
+          },
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-22T00:59:05Z",
+          "updatedAt": "2026-09-22T00:59:05Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 331,
+      "id": "PR_kwDOJIBkVc8AAAABEfFTFw",
+      "title": "Cite RFC 5912 differently",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/331",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "idnits3 complains:\r\n\r\n> The reference RFC5912 is listed in the References section but is not mentioned in the document text.\r\n> See https://authors.ietf.org/en/required-content#references\r\n\r\nThis is because it's cited only in the ASN.1 module. For RFC 9925, this was our workaround.",
+      "createdAt": "2026-09-21T20:49:42Z",
+      "updatedAt": "2026-09-21T21:01:24Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e105857f778e8fe8389dbd3ff2bf8b4fa42cb3be",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "cite-5912",
+      "headRefOid": "0503cbb5497bcd796b1c58d75e79207efa0f5172",
+      "closedAt": "2026-09-21T21:01:20Z",
+      "mergedAt": "2026-09-21T21:01:20Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "93e08d059762fc54d9a5f19d1a2602816e0414de"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOjkxaQ",
+          "commit": {
+            "abbreviatedOid": "0503cbb"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-21T20:59:25Z",
+          "updatedAt": "2026-09-21T20:59:25Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 333,
+      "id": "PR_kwDOJIBkVc8AAAABEftK9w",
+      "title": "Allow MTCProof to be GREASEd",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/333",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #53.",
+      "createdAt": "2026-09-21T22:20:34Z",
+      "updatedAt": "2026-09-22T01:46:02Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "93e08d059762fc54d9a5f19d1a2602816e0414de",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "grease",
+      "headRefOid": "60c6283eb37f381b731f02e91cdac53310bceee0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOkKMYQ",
+          "commit": {
+            "abbreviatedOid": "60c6283"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-21T22:22:53Z",
+          "updatedAt": "2026-09-21T22:22:53Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOkot_g",
+          "commit": {
+            "abbreviatedOid": "60c6283"
+          },
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-21T23:44:05Z",
+          "updatedAt": "2026-09-21T23:44:05Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOlJ0Ow",
+          "commit": {
+            "abbreviatedOid": "60c6283"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-22T01:46:02Z",
+          "updatedAt": "2026-09-22T01:46:02Z",
           "comments": []
         }
       ]
