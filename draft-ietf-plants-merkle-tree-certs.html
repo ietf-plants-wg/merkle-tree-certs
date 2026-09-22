@@ -1048,7 +1048,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 25 March 2027</td>
+<td class="center">Expires 26 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-21" class="published">21 September 2026</time>
+<time datetime="2026-09-22" class="published">22 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-25">25 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-26">26 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 25 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 26 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -4275,7 +4275,8 @@ struct {
 </li>
         </ul>
 <p id="section-6.2-14">An MTCProof parser <span class="bcp14">MUST</span> reject the input if there are duplicate <code>cosigner_id</code> values, or if they are not ordered correctly. This can be done by checking each <code>cosigner_id</code> value comes strictly after the previous one in the above order.<a href="#section-6.2-14" class="pilcrow">¶</a></p>
-<p id="section-6.2-15">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value <span class="bcp14">SHALL</span> become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which <span class="bcp14">SHALL</span> become the last bit of the bit string.<a href="#section-6.2-15" class="pilcrow">¶</a></p>
+<p id="section-6.2-15">CAs, or other parties, <span class="bcp14">MAY</span> include GREASE <span>[<a href="#RFC8701" class="cite xref">RFC8701</a>]</span> cosignatures in an MTCProof by allocating an unused cosigner ID and inserting it into the <code>signatures</code> field. The <code>cosigner_id</code> is the unused cosigner ID and the <code>signature</code> is an arbitrary byte string. A cosigner ID allocated for GREASE <span class="bcp14">MUST NOT</span> be later repurposed for a real cosigner.<a href="#section-6.2-15" class="pilcrow">¶</a></p>
+<p id="section-6.2-16">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value <span class="bcp14">SHALL</span> become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which <span class="bcp14">SHALL</span> become the last bit of the bit string<a href="#section-6.2-16" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="standalone-certificates">
@@ -5416,6 +5417,10 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <dt id="RFC8555">[RFC8555]</dt>
         <dd>
 <span class="refAuthor">Barnes, R.</span>, <span class="refAuthor">Hoffman-Andrews, J.</span>, <span class="refAuthor">McCarney, D.</span>, and <span class="refAuthor">J. Kasten</span>, <span class="refTitle">"Automatic Certificate Management Environment (ACME)"</span>, <span class="seriesInfo">RFC 8555</span>, <span class="seriesInfo">DOI 10.17487/RFC8555</span>, <time datetime="2019-03" class="refDate">March 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8555">https://www.rfc-editor.org/rfc/rfc8555</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8701">[RFC8701]</dt>
+        <dd>
+<span class="refAuthor">Benjamin, D.</span>, <span class="refTitle">"Applying Generate Random Extensions And Sustain Extensibility (GREASE) to TLS Extensibility"</span>, <span class="seriesInfo">RFC 8701</span>, <span class="seriesInfo">DOI 10.17487/RFC8701</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8701">https://www.rfc-editor.org/rfc/rfc8701</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9110">[RFC9110]</dt>
         <dd>

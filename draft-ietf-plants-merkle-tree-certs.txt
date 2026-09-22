@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 25 March 2027                                        Apple Inc.
+Expires: 26 March 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       21 September 2026
+                                                       22 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 March 2027.
+   This Internet-Draft will expire on 26 March 2027.
 
 Copyright Notice
 
@@ -1849,11 +1849,17 @@ Table of Contents
    be done by checking each cosigner_id value comes strictly after the
    previous one in the above order.
 
+   CAs, or other parties, MAY include GREASE [RFC8701] cosignatures in
+   an MTCProof by allocating an unused cosigner ID and inserting it into
+   the signatures field.  The cosigner_id is the unused cosigner ID and
+   the signature is an arbitrary byte string.  A cosigner ID allocated
+   for GREASE MUST NOT be later repurposed for a real cosigner.
+
    The MTCProof is encoded into the signatureValue with no additional
    ASN.1 wrapping.  The most significant bit of the first octet of the
    signature value SHALL become the first bit of the bit string, and so
    on through the least significant bit of the last octet of the
-   signature value, which SHALL become the last bit of the bit string.
+   signature value, which SHALL become the last bit of the bit string
 
 6.3.  Standalone Certificates
 
@@ -3557,6 +3563,11 @@ Table of Contents
               Kasten, "Automatic Certificate Management Environment
               (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
               <https://www.rfc-editor.org/rfc/rfc8555>.
+
+   [RFC8701]  Benjamin, D., "Applying Generate Random Extensions And
+              Sustain Extensibility (GREASE) to TLS Extensibility",
+              RFC 8701, DOI 10.17487/RFC8701, January 2020,
+              <https://www.rfc-editor.org/rfc/rfc8701>.
 
    [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "HTTP Semantics", STD 97, RFC 9110,
