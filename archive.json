@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-22T04:36:53.855606+00:00",
+  "timestamp": "2026-09-24T04:30:25.471682+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -1414,15 +1414,15 @@
       "id": "I_kwDOJIBkVc5ouGlb",
       "title": "GREASE",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/53",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Where should we add some [GREASE](https://datatracker.ietf.org/doc/rfc8701/)?\r\n\r\n1. We should clearly GREASE `proof_type` so that TA negotiation does not ossify.\r\n2. SubjectType is not negotiated separately, so no GREASE is required, cf #7 \r\n3. RPs must ignore unknown claims in an assertion, so it seems to be a good candidate for grease. However, do we really have flexibility in claims to begin with? For instance, suppose we do not support IP ranges (#9) in the first version, but add it later on. How would the server know it can send an assertion with a range?\r\n4. If we add extensions to TLSSubjectInfo #38, we should GREASE them. \r\n",
       "createdAt": "2023-06-14T13:29:45Z",
-      "updatedAt": "2025-06-21T14:28:34Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-22T18:06:16Z",
+      "closedAt": "2026-09-22T18:06:16Z",
       "comments": [
         {
           "author": "davidben",
@@ -2303,7 +2303,7 @@
       "labels": [],
       "body": "At the moment we have hourly batches with 14 day lifetimes. Those numbers are easy to think about. In practice we might want to tweak them.\n\n**Lifetime.** In the current CA/B baseline requirements, CAs are allowed to forego supporting revocation if their certificates are *short lived*. The latter is defined as less than 7 days. (Strictly speaking it's 10 days now, but that's the transitional value.) I think it makes sense to align here and use 7 days as the default lifetime.\n\n**Batch duration**. Although we don't have good data yet, I think it's safe to say that we can't expect RPs to pull new roots hourly. A batch duration of 6 hours might make more sense.",
       "createdAt": "2025-02-21T14:21:35Z",
-      "updatedAt": "2026-09-21T22:22:51Z",
+      "updatedAt": "2026-09-23T20:54:41Z",
       "closedAt": "2026-09-21T22:22:51Z",
       "comments": [
         {
@@ -2319,6 +2319,13 @@
           "body": "Think we can probably close this? We hint at one hour throughout. Lifetime itself will probably be very deployment-specific.",
           "createdAt": "2026-09-21T22:22:51Z",
           "updatedAt": "2026-09-21T22:22:51Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Still think it makes sense to reconsider the batch duration after a while. We can reopen this then.",
+          "createdAt": "2026-09-23T20:54:40Z",
+          "updatedAt": "2026-09-23T20:54:40Z"
         }
       ]
     },
@@ -4095,7 +4102,7 @@
       "labels": [],
       "body": "When writing some WIP MTC code, I noticed that CosignedMessage `cosigner_name` and `log_origin` fields have a format mismatch. While everything else TLS-part in MTC and TAI seems to use binary ID encoding, those two fields use ASCII encoding.\n\nDoing this format conversion seems very obnoxious to implement:\n* It is base conversion from 128 to 10, which is not an easy special case.\n* There seems to be no explicit limit on how big the numbers can be (other than the first, which fits in 32 bits).\n* This happens in extremely critical place (certificate verification).\n* Performance matters, so easy brute force is out.\n* It is still fallible as the output buffer can overflow\n  * The encoding can be up to 1035 bytes, but there is space for only 255.\n  * `>60` byte ID can overflow, `>120` byte ID will overflow.\n\n(The log ID in issuer was recently switched to use the binary encoding.)",
       "createdAt": "2026-09-20T15:29:30Z",
-      "updatedAt": "2026-09-21T20:35:50Z",
+      "updatedAt": "2026-09-22T12:28:00Z",
       "closedAt": null,
       "comments": [
         {
@@ -4139,6 +4146,27 @@
           "body": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/330 to add the MTC side of this text. In principle redundant with https://github.com/tlswg/tls-trust-anchor-ids/pull/126 but, as you say, there is some risk here and I think it is worthwhile to point implementations in reasonable directions.",
           "createdAt": "2026-09-21T20:35:50Z",
           "updatedAt": "2026-09-21T20:35:50Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "> > I do not think the key has enough information to validate MTC signature (even without legacy stuff like RSA, there is the log hash, which needs to be known, but is not part of the key).\n> \n> Sorry, terminology. By \"key\" I did not mean the just SPKI, but the complete configuration of a cosigner on the sign or verify side. That includes both the actual RSA/ML-DSA/whatever key, but also the signature algorithm. So _if_ we wanted to, there _is_ a natural place to put in a separate version of the signed message.\n\nWhat I consider input to signature validation is SPKI of issuer plus whatever is in the certificate.\n\n> I _also_ agree we should define allowed IDs such that these cases cannot happen. It's just unhelpful to have a unwritten precondition. Hopefully [tlswg/tls-trust-anchor-ids#126](https://github.com/tlswg/tls-trust-anchor-ids/pull/126) will resolve that. \n\nIt does, the IDs under those rules are 143 bytes at most. Ignoring magnitude checks does not allow longer IDs, however one can get mis-encoded outputs (e.g., encoding 0x82808080808080808000 as \".0\").\n\n> But if one is worried about _risks_ and does not want the system to be too sensitive to this, I think a fallible `make_cosigned_message` is a very straightforward risk mitigation.\n\nIt is not just my code. There are a lot of programmers that are a _lot_ less careful. The code I wrote tried to check and got it wrong. But there will be plenty of code that will not even try to check.\n\n",
+          "createdAt": "2026-09-22T09:12:52Z",
+          "updatedAt": "2026-09-22T09:12:52Z"
+        },
+        {
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Another idea would be to use something like `oidb/` followed by raw binary OID representation (the field is 8-bit clean, right?).\n\nFWIW, this was my initial suggestion, and then the discussion went towards keeping the decimal encoding around not being too onerous.\n\n> > But being able to define a new algorithm isn't the same thing as some algorithm being defined and implemented everywhere. Early iterations of the MTC draft defined a custom one because, at the time, the only tlog algorithm was Ed25519 and took a totally plain text signed message. When tlog added an ML-DSA-44 construction, we [tried to align them a bit](https://mailarchive.ietf.org/arch/msg/plants/1gWq4trUrbb60XdLme4wI2IluG4/).\n> \n> I meant exactly this sort of stuff.\n\nI am not sure what sort of stuff you refer to exactly, but I think that'd be me. Let's not import the IETF style of hand-to-hand combat to PLANTS, ok?\n\n> What I consider input to signature validation is SPKI of issuer plus whatever is in the certificate.\n\nWhy? This whole problem goes away if you just store in your trusted roots both the ASN.1 and the decimal formats of the relative OID, along with whatever else makes verification easy for you. We don't have intermediates anyway, so I am not even sure why you'd have the SPKI of the issuer handy. It's a great opportunity to shed X.509 complexities and constraints.\n\nAlso, you need some way to express the cosigners as well, right? Those are not in the SPKI of the issuer.\n\nThis is also much safer against all sorts of SPKI parsing issues, because you are verifying against trusted configuration data.",
+          "createdAt": "2026-09-22T11:36:54Z",
+          "updatedAt": "2026-09-22T11:36:54Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "Silly idea: Hexadecimal encoding (128 and 16 have common base 2, so it hits easy case in base conversion). Another silly idea: base64url.\n\nAnd unfortunately, MTC does have intermediates (with subtle interoperability and security issues). And if you try to stick MTC along with X.509 code, you only multiply complexity. Easiest way is to deal with that is only support single certificate with totally separate code (which is what I am planning doing).\n\n\n\n",
+          "createdAt": "2026-09-22T12:28:00Z",
+          "updatedAt": "2026-09-22T12:28:00Z"
         }
       ]
     },
@@ -22824,24 +22852,26 @@
       "id": "PR_kwDOJIBkVc8AAAABEftK9w",
       "title": "Allow MTCProof to be GREASEd",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/333",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #53.",
       "createdAt": "2026-09-21T22:20:34Z",
-      "updatedAt": "2026-09-22T01:46:02Z",
+      "updatedAt": "2026-09-22T18:06:18Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "93e08d059762fc54d9a5f19d1a2602816e0414de",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "grease",
       "headRefOid": "60c6283eb37f381b731f02e91cdac53310bceee0",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-22T18:06:15Z",
+      "mergedAt": "2026-09-22T18:06:14Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "9cf30baa47e93c0b51c5779cdeb7ef2e6fd8a893"
+      },
       "comments": [],
       "reviews": [
         {
@@ -22881,6 +22911,61 @@
           "body": "",
           "createdAt": "2026-09-22T01:46:02Z",
           "updatedAt": "2026-09-22T01:46:02Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOsw0Zg",
+          "commit": {
+            "abbreviatedOid": "60c6283"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-22T17:26:15Z",
+          "updatedAt": "2026-09-22T17:26:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 334,
+      "id": "PR_kwDOJIBkVc8AAAABEofQyg",
+      "title": "Bump the experiment OID for id-alg-mtcProof",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/334",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See https://mailarchive.ietf.org/arch/msg/plants/IjmmPfsEHfx2EpPWcB2ZNmlUJLg/",
+      "createdAt": "2026-09-22T19:12:12Z",
+      "updatedAt": "2026-09-22T20:05:46Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e42b8fe101519031d1991b6d796f28776af8416a",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "bump-exp-oid",
+      "headRefOid": "1d92be5442a4da763e42affcc463b388b4b09b85",
+      "closedAt": "2026-09-22T20:05:43Z",
+      "mergedAt": "2026-09-22T20:05:43Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f1fa43c6baeb7990b9b927bd741e639272b3f4c8"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABOuR-gA",
+          "commit": {
+            "abbreviatedOid": "1d92be5"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-22T19:55:37Z",
+          "updatedAt": "2026-09-22T19:55:37Z",
           "comments": []
         }
       ]
