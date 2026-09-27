@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-24T04:30:25.471682+00:00",
+  "timestamp": "2026-09-27T05:06:33.869815+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -22966,6 +22966,120 @@
           "body": "",
           "createdAt": "2026-09-22T19:55:37Z",
           "updatedAt": "2026-09-22T19:55:37Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 335,
+      "id": "PR_kwDOJIBkVc8AAAABFDhaKg",
+      "title": "Take a stab at setting up registries",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/335",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #332\r\n\r\n@robstradling ",
+      "createdAt": "2026-09-25T04:51:59Z",
+      "updatedAt": "2026-09-25T18:16:33Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "f1fa43c6baeb7990b9b927bd741e639272b3f4c8",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "registries",
+      "headRefOid": "3c6763694e9c41318cbbfb70dd9f5d627cd71e33",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABPOoV5w",
+          "commit": {
+            "abbreviatedOid": "3c67636"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-25T11:10:58Z",
+          "updatedAt": "2026-09-25T11:10:58Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABPRnUDw",
+          "commit": {
+            "abbreviatedOid": "3c67636"
+          },
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-25T16:26:41Z",
+          "updatedAt": "2026-09-25T18:16:32Z",
+          "comments": [
+            {
+              "originalPosition": 71,
+              "body": "For RFC9162, we requested that the top-level registry be named after the WG (\"Public Notary Transparency\") rather than the specific technology that the WG was working on at that time (\"Certificate Transparency\").\nJust in case PLANTS ever takes on work items unrelated to MTC:\nWould it be better for this new top-level registry to be named \"PKI, Logs, And Tree Signatures\" and to prefix each of the subregistry names we're requesting with \"MTC \"?\nOr do we instead take the view that there's no reason PLANTS couldn't request a second top-level registry if the need ever arises?",
+              "createdAt": "2026-09-25T16:26:41Z",
+              "updatedAt": "2026-09-25T18:16:32Z"
+            },
+            {
+              "originalPosition": 71,
+              "body": "Also, a nit: s/, to/, to the/",
+              "createdAt": "2026-09-25T16:35:07Z",
+              "updatedAt": "2026-09-25T18:16:32Z"
+            },
+            {
+              "originalPosition": 83,
+              "body": "https://datatracker.ietf.org/doc/html/rfc8126#section-2.2\n>       Initial assignments and reservations\n> \n>       Any initial assignments or registrations to be included.  In\n>       addition, any ranges that are to be reserved for \"Private Use\",\n>       \"Reserved\", \"Unassigned\", etc. (see [Section 6](https://datatracker.ietf.org/doc/html/rfc8126#section-6)) should be\n>       indicated.\n\nMinimally...\n\n```suggestion\n2 - 65535 | Unassigned |\n\n```\n\nOr maybe express the Values in hex, like we did for https://www.rfc-editor.org/info/rfc9162/#section-10.2.3 ?\n\nHow about reserving some ranges in these subregistries for Private Use and Experimental Use (again, like we did for https://www.rfc-editor.org/info/rfc9162/#section-10.2.3) ?\n\n",
+              "createdAt": "2026-09-25T18:14:27Z",
+              "updatedAt": "2026-09-25T18:16:32Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 336,
+      "id": "PR_kwDOJIBkVc8AAAABFStnVg",
+      "title": "encode trust anchor ID patterns per draft-ietf-tls-trust-anchor-ids-05",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/336",
+      "state": "MERGED",
+      "author": "bob-beck",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "TrustAnchorIDToPattern wrote each ID component once instead of as a min/max pair, so every generated trust_anchor_groups pattern was malformed. Landmark-relative certificates also matched any log number at or above their own, rather than exactly their log, as in caID.2.N.{L-}.\r\n\r\nAt least I *think* this is where we landed after 05? right?",
+      "createdAt": "2026-09-26T22:34:13Z",
+      "updatedAt": "2026-09-27T04:08:49Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "f1fa43c6baeb7990b9b927bd741e639272b3f4c8",
+      "headRepository": "bob-beck/merkle-tree-certs",
+      "headRefName": "fix-for-tai-05",
+      "headRefOid": "2791018df0fabe2b05405ccff8885e99138aedfe",
+      "closedAt": "2026-09-27T04:08:49Z",
+      "mergedAt": "2026-09-27T04:08:49Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f68314ecc276f2aa5ed570fe973f22f562bacee3"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABPZ6g2A",
+          "commit": {
+            "abbreviatedOid": "2791018"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Whoops, yes, you're right. Thanks!",
+          "createdAt": "2026-09-27T04:08:34Z",
+          "updatedAt": "2026-09-27T04:08:34Z",
           "comments": []
         }
       ]
