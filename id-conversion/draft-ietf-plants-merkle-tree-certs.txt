@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 25 March 2027                                        Apple Inc.
+Expires: 1 April 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       21 September 2026
+                                                       28 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 March 2027.
+   This Internet-Draft will expire on 1 April 2027.
 
 Copyright Notice
 
@@ -217,7 +217,7 @@ Table of Contents
    larger.  For example, ML-DSA-44 [FIPS204] uses 1,312 bytes per public
    key and 2,420 bytes per signature.  ML-DSA-65 uses 1,952 bytes per
    public key and 3,309 bytes per signature.  Even with a directly-
-   trusted intermediate (Section 8.5 of
+   trusted intermediate (Section 9.5 of
    [I-D.ietf-tls-trust-anchor-ids]), two SCTs and a leaf certificate
    signature add 7,260 bytes of authentication overhead with ML-DSA-44
    and 9,927 bytes with ML-DSA-65.
@@ -1524,16 +1524,12 @@ Table of Contents
    For example, the trust anchor ID 32473.1 would be encoded as the
    ASCII string oid/1.3.6.1.4.1.32473.1.
 
-   Section 4 of [I-D.ietf-tls-trust-anchor-ids] limits OID components in
-   trust anchor ID, such that the above value fits in 2^8-1 bytes.
-   However, a general RELATIVE-OID can be arbitrarily long, with
-   arbitrarily large components.  Implementations that do not validate
-   these bounds earlier MUST fail signature generation or verification
-   if cosigner_name or log_origin would be too long.  Implementations
-   MAY accept larger OID components than allowed in trust anchor IDs,
-   but MUST support OID components up to at least 2^63-1 and MUST fail
-   signature generation or verification if conversion to dotted decimal
-   overflows any implementation limit.
+   OID components in a trust anchor ID can be arbitrarily large.
+   Implementations MAY set an upper bound on supported OID components,
+   based on the guidance in Section 8 of
+   [I-D.ietf-tls-trust-anchor-ids].  Such implementations MUST fail
+   signature generation or verification if an OID component is out of
+   range.
 
    start and end MUST define a valid subtree of the log, and
    subtree_hash MUST be the subtree's hash value in the cosigner's view
@@ -2167,7 +2163,10 @@ Table of Contents
    This information may be obtained from a CA certificate structure,
    defined in Section 5.5:
 
-   *  The CA ID is determined from the certificate's subject.
+   *  The CA ID is determined from the certificate's subject.  Note
+      that, while a general RELATIVE-OID can be arbitrarily long,
+      Section 4 of [I-D.ietf-tls-trust-anchor-ids] limits trust anchor
+      IDs to 32 bytes.
 
    *  The log hash algorithm is determined from the type of the Merkle
       Tree CA extension.
@@ -3015,7 +3014,7 @@ Table of Contents
 
 11.  Privacy Considerations
 
-   The Privacy Considerations described in Section 9 of
+   The Privacy Considerations described in Section 10 of
    [I-D.ietf-tls-trust-anchor-ids] apply to their use with Merkle Tree
    Certificates.
 
