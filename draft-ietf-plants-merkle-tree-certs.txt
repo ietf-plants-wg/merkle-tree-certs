@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 31 March 2027                                        Apple Inc.
+Expires: 2 April 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       27 September 2026
+                                                       29 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 31 March 2027.
+   This Internet-Draft will expire on 2 April 2027.
 
 Copyright Notice
 
@@ -2041,8 +2041,8 @@ Table of Contents
    *  A sequence of num_active_landmarks + 1 lines, where
       num_active_landmarks is the number of active landmarks at the time
       of publishing.  Decoders MUST reject documents where there are
-      greater than latest_landmark such lines.  Numbered consecutively
-      from zero, line i in this sequence consists of:
+      greater than latest_landmark + 1 such lines.  Numbered
+      consecutively from zero, line i in this sequence consists of:
 
       -  The tree size for landmark latest_landmark - i as a decimal
          integer.  This value MUST be at most 2^48-1.
