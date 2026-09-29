@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-27T05:06:33.869815+00:00",
+  "timestamp": "2026-09-29T05:31:51.105580+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -22704,18 +22704,26 @@
       "labels": [],
       "body": "This depends on https://github.com/tlswg/tls-trust-anchor-ids/pull/126. Together with that PR, closes https://github.com/ietf-plants-wg/merkle-tree-certs/issues/327.\r\n\r\nCC @ilaril",
       "createdAt": "2026-09-21T20:34:54Z",
-      "updatedAt": "2026-09-22T00:59:05Z",
+      "updatedAt": "2026-09-28T21:15:55Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "e105857f778e8fe8389dbd3ff2bf8b4fa42cb3be",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "id-conversion",
-      "headRefOid": "1c7a27ac0119339f0b96eb80a4650b216edf5f9a",
+      "headRefOid": "841d3abc4435eab7c1145e6a97ba2c9113d5a4a7",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Reworked this text a bit based on where TAI ended up.",
+          "createdAt": "2026-09-28T21:06:05Z",
+          "updatedAt": "2026-09-28T21:06:05Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc8AAAABOjnWuA",
@@ -22736,7 +22744,7 @@
             "abbreviatedOid": "1c7a27a"
           },
           "author": "bob-beck",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "CHANGES_REQUESTED",
           "body": "",
           "createdAt": "2026-09-21T23:39:52Z",
@@ -22776,7 +22784,7 @@
             "abbreviatedOid": "1c7a27a"
           },
           "author": "bob-beck",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-09-22T00:57:31Z",
@@ -22796,11 +22804,44 @@
             "abbreviatedOid": "1c7a27a"
           },
           "author": "bob-beck",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "APPROVED",
           "body": "",
           "createdAt": "2026-09-22T00:59:05Z",
           "updatedAt": "2026-09-22T00:59:05Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABPpIfLw",
+          "commit": {
+            "abbreviatedOid": "841d3ab"
+          },
+          "author": "bob-beck",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-28T21:14:05Z",
+          "updatedAt": "2026-09-28T21:14:23Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Given that section 4 already specifies that this is a trust anchor id - why do we need to restate this here? ",
+              "createdAt": "2026-09-28T21:14:05Z",
+              "updatedAt": "2026-09-28T21:14:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABPpJnDw",
+          "commit": {
+            "abbreviatedOid": "841d3ab"
+          },
+          "author": "bob-beck",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "one nit - honestly, Id drop the \"copying of the TAI RFC\" into the \"note that\" - once youve said it's a trust anchor identifier, well, read that draft. \n",
+          "createdAt": "2026-09-28T21:15:55Z",
+          "updatedAt": "2026-09-28T21:15:55Z",
           "comments": []
         }
       ]
