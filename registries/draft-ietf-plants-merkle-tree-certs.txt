@@ -4939,6 +4939,8 @@ Since draft-ietf-plants-merkle-tree-certs-06
    *  Bump the experimental OID for id-alg-mtcProof, to reflect the
       format change.
 
+   *  Set up registries for extensible parameters
+
 Authors' Addresses
 
    David Benjamin
