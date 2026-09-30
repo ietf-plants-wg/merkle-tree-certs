@@ -3893,20 +3893,14 @@ def find_subtrees(start, end):
 <pre>
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD }
+    mechanisms(5) pkix(7) rdna(25) 3 }
 </pre><a href="#section-5.1-6" class="pilcrow">¶</a>
 </div>
 <p id="section-5.1-7">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a CA with ID <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.1-7" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.1-8">
 <pre>
-1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
+1.3.6.1.5.5.7.25.3=#0d0481fd5901
 </pre><a href="#section-5.1-8" class="pilcrow">¶</a>
-</div>
-<p id="section-5.1-9">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.3 instead of <code>id-rdna-trustAnchorID</code>. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document. For example, the distinguished name for an experimental CA with ID <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.1-9" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.1-10">
-<pre>
-1.3.6.1.4.1.44363.47.3=#0d0481fd5901
-</pre><a href="#section-5.1-10" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -4178,7 +4172,7 @@ struct {
 <pre>
 id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) pe(1) TBD }
+    mechanisms(5) pkix(7) pe(1) 38 }
 
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
@@ -4199,19 +4193,18 @@ MTCCertificationAuthority ::= SEQUENCE {
 }
 </pre><a href="#section-5.5-7" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5-8">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.4 instead of <code>id-pe-mtcCertificationAuthority-SHA256</code>. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.<a href="#section-5.5-8" class="pilcrow">¶</a></p>
-<p id="section-5.5-9">The fields of an MTCCertificationAuthority structure are defined as follows:<a href="#section-5.5-9" class="pilcrow">¶</a></p>
+<p id="section-5.5-8">The fields of an MTCCertificationAuthority structure are defined as follows:<a href="#section-5.5-8" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.5-10.1">
-            <p id="section-5.5-10.1.1"><code>sigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.3.3</a>).<a href="#section-5.5-10.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.5-9.1">
+            <p id="section-5.5-9.1.1"><code>sigAlg</code> is the CA cosigner's signature algorithm (<a href="#signature-algorithms" class="auto internal xref">Section 5.3.3</a>).<a href="#section-5.5-9.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-10.2">
-            <p id="section-5.5-10.2.1"><code>minSerial</code> and <code>maxSerial</code> describe the minimum and maximum allowed serial numbers from this CA, respectively. See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> for discussion on setting these values.<a href="#section-5.5-10.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-9.2">
+            <p id="section-5.5-9.2.1"><code>minSerial</code> and <code>maxSerial</code> describe the minimum and maximum allowed serial numbers from this CA, respectively. See <a href="#revoked-ranges" class="auto internal xref">Section 7.5</a> for discussion on setting these values.<a href="#section-5.5-9.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-11">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>. In particular, it <span class="bcp14">MUST NOT</span> be used to directly sign TBSCertificate structures.<a href="#section-5.5-11" class="pilcrow">¶</a></p>
-<p id="section-5.5-12">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. If a later version of the protocol defines a new format, this <span class="bcp14">SHOULD</span> be represented in CA certificates with a new extension type.<a href="#section-5.5-12" class="pilcrow">¶</a></p>
-<p id="section-5.5-13">A CA certificate using this format <span class="bcp14">SHOULD NOT</span> be self-signed by the CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate <span class="bcp14">SHOULD</span> be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-5.5-13" class="pilcrow">¶</a></p>
+<p id="section-5.5-10">If this extension is present, the key described in <code>subjectPublicKeyInfo</code> is a CA cosigner key and subject to the usage restrictions described in <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>. In particular, it <span class="bcp14">MUST NOT</span> be used to directly sign TBSCertificate structures.<a href="#section-5.5-10" class="pilcrow">¶</a></p>
+<p id="section-5.5-11">This extension indicates the subtree signature format defined in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. If a later version of the protocol defines a new format, this <span class="bcp14">SHOULD</span> be represented in CA certificates with a new extension type.<a href="#section-5.5-11" class="pilcrow">¶</a></p>
+<p id="section-5.5-12">A CA certificate using this format <span class="bcp14">SHOULD NOT</span> be self-signed by the CA. Doing so would require writing the information in the issuance log. Instead, if used to represent a trust anchor, the certificate <span class="bcp14">SHOULD</span> be an unsigned certificate <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>.<a href="#section-5.5-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4259,12 +4252,11 @@ MTCCertificationAuthority ::= SEQUENCE {
 <pre>
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD }
+    mechanisms(5) pkix(7) algorithms(6) 67 }
 </pre><a href="#section-6.2-6" class="pilcrow">¶</a>
 </div>
-<p id="section-6.2-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.5 instead of <code>id-alg-mtcProof</code>. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
-<p id="section-6.2-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>):<a href="#section-6.2-8" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-6.2-9">
+<p id="section-6.2-7">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc9846#section-3" class="relref">Section 3</a> of [<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>):<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-6.2-8">
 <pre>
 /* From Section 4 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorID&lt;1..2^8-1&gt;;
@@ -4283,22 +4275,22 @@ struct {
     HashValue inclusion_proof&lt;0..2^16-1&gt;;
     SubtreeSignature signatures&lt;0..2^24-1&gt;;
 } MTCProof;
-</pre><a href="#section-6.2-9" class="pilcrow">¶</a>
+</pre><a href="#section-6.2-8" class="pilcrow">¶</a>
 </div>
-<p id="section-6.2-10"><code>extensions</code> <span class="bcp14">MUST</span> contain the log entry's <code>extensions</code> value (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>).<a href="#section-6.2-10" class="pilcrow">¶</a></p>
-<p id="section-6.2-11"><code>start</code> and <code>end</code> <span class="bcp14">MUST</span> contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> <span class="bcp14">MUST</span> contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for the log entry and the subtree. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-05#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. The <code>timestamp</code> field used when computing the signature <span class="bcp14">MUST</span> be zero.<a href="#section-6.2-11" class="pilcrow">¶</a></p>
-<p id="section-6.2-12">Each element of the <code>signatures</code> field <span class="bcp14">MUST</span> have a unique <code>cosigner_id</code>. Elements <span class="bcp14">MUST</span> be ordered by <code>cosigner_id</code> (excluding length prefix) as follows:<a href="#section-6.2-12" class="pilcrow">¶</a></p>
+<p id="section-6.2-9"><code>extensions</code> <span class="bcp14">MUST</span> contain the log entry's <code>extensions</code> value (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>).<a href="#section-6.2-9" class="pilcrow">¶</a></p>
+<p id="section-6.2-10"><code>start</code> and <code>end</code> <span class="bcp14">MUST</span> contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> <span class="bcp14">MUST</span> contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for the log entry and the subtree. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-05#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. The <code>timestamp</code> field used when computing the signature <span class="bcp14">MUST</span> be zero.<a href="#section-6.2-10" class="pilcrow">¶</a></p>
+<p id="section-6.2-11">Each element of the <code>signatures</code> field <span class="bcp14">MUST</span> have a unique <code>cosigner_id</code>. Elements <span class="bcp14">MUST</span> be ordered by <code>cosigner_id</code> (excluding length prefix) as follows:<a href="#section-6.2-11" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.2-13.1">
-            <p id="section-6.2-13.1.1">Shorter byte strings are ordered before longer byte strings<a href="#section-6.2-13.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.2-12.1">
+            <p id="section-6.2-12.1.1">Shorter byte strings are ordered before longer byte strings<a href="#section-6.2-12.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.2-13.2">
-            <p id="section-6.2-13.2.1">Byte strings of the same length are ordered lexicographically<a href="#section-6.2-13.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-12.2">
+            <p id="section-6.2-12.2.1">Byte strings of the same length are ordered lexicographically<a href="#section-6.2-12.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.2-14">An MTCProof parser <span class="bcp14">MUST</span> reject the input if there are duplicate <code>cosigner_id</code> values, or if they are not ordered correctly. This can be done by checking each <code>cosigner_id</code> value comes strictly after the previous one in the above order.<a href="#section-6.2-14" class="pilcrow">¶</a></p>
-<p id="section-6.2-15">CAs, or other parties, <span class="bcp14">MAY</span> include GREASE <span>[<a href="#RFC8701" class="cite xref">RFC8701</a>]</span> cosignatures in an MTCProof by allocating an unused cosigner ID and inserting it into the <code>signatures</code> field. The <code>cosigner_id</code> is the unused cosigner ID and the <code>signature</code> is an arbitrary byte string. A cosigner ID allocated for GREASE <span class="bcp14">MUST NOT</span> be later repurposed for a real cosigner.<a href="#section-6.2-15" class="pilcrow">¶</a></p>
-<p id="section-6.2-16">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value <span class="bcp14">SHALL</span> become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which <span class="bcp14">SHALL</span> become the last bit of the bit string<a href="#section-6.2-16" class="pilcrow">¶</a></p>
+<p id="section-6.2-13">An MTCProof parser <span class="bcp14">MUST</span> reject the input if there are duplicate <code>cosigner_id</code> values, or if they are not ordered correctly. This can be done by checking each <code>cosigner_id</code> value comes strictly after the previous one in the above order.<a href="#section-6.2-13" class="pilcrow">¶</a></p>
+<p id="section-6.2-14">CAs, or other parties, <span class="bcp14">MAY</span> include GREASE <span>[<a href="#RFC8701" class="cite xref">RFC8701</a>]</span> cosignatures in an MTCProof by allocating an unused cosigner ID and inserting it into the <code>signatures</code> field. The <code>cosigner_id</code> is the unused cosigner ID and the <code>signature</code> is an arbitrary byte string. A cosigner ID allocated for GREASE <span class="bcp14">MUST NOT</span> be later repurposed for a real cosigner.<a href="#section-6.2-14" class="pilcrow">¶</a></p>
+<p id="section-6.2-15">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value <span class="bcp14">SHALL</span> become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which <span class="bcp14">SHALL</span> become the last bit of the bit string<a href="#section-6.2-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="standalone-certificates">
@@ -5309,7 +5301,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             </thead>
             <tbody>
               <tr>
-                <td class="text-left" rowspan="1" colspan="1">TBD</td>
+                <td class="text-left" rowspan="1" colspan="1">67</td>
                 <td class="text-left" rowspan="1" colspan="1">id-alg-mtcProof</td>
                 <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
               </tr>
@@ -5334,7 +5326,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             </thead>
             <tbody>
               <tr>
-                <td class="text-left" rowspan="1" colspan="1">TBD</td>
+                <td class="text-left" rowspan="1" colspan="1">38</td>
                 <td class="text-left" rowspan="1" colspan="1">id-pe-mtcCertificationAuthority-SHA256</td>
                 <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
               </tr>
@@ -5359,7 +5351,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             </thead>
             <tbody>
               <tr>
-                <td class="text-left" rowspan="1" colspan="1">TBD</td>
+                <td class="text-left" rowspan="1" colspan="1">3</td>
                 <td class="text-left" rowspan="1" colspan="1">id-rdna-trustAnchorID</td>
                 <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
               </tr>
@@ -5811,7 +5803,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
 
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD }
+    mechanisms(5) pkix(7) algorithms(6) 67 }
 
 sa-mtcProof SIGNATURE-ALGORITHM ::= {
     IDENTIFIER id-alg-mtcProof
@@ -5820,7 +5812,7 @@ sa-mtcProof SIGNATURE-ALGORITHM ::= {
 
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD }
+    mechanisms(5) pkix(7) rdna(25) 3 }
 
 at-trustAnchorID ATTRIBUTE ::= {
     TYPE RELATIVE-OID
@@ -5829,7 +5821,7 @@ at-trustAnchorID ATTRIBUTE ::= {
 
 id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) pe(1) TBD }
+    mechanisms(5) pkix(7) pe(1) 38 }
 
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
@@ -7663,7 +7655,7 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
         </h3>
 <ul class="normal">
 <li class="normal" id="appendix-E.18-1.1">
-            <p id="appendix-E.18-1.1.1">Bump the experimental OID for id-alg-mtcProof, to reflect the format change.<a href="#appendix-E.18-1.1.1" class="pilcrow">¶</a></p>
+            <p id="appendix-E.18-1.1.1">OIDs have been allocated.<a href="#appendix-E.18-1.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-E.18-1.2">
             <p id="appendix-E.18-1.2.1">Set up registries for extensible parameters<a href="#appendix-E.18-1.2.1" class="pilcrow">¶</a></p>
