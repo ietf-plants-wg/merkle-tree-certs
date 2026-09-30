@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 29 March 2027                                        Apple Inc.
+Expires: 3 April 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       25 September 2026
+                                                       30 September 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 March 2027.
+   This Internet-Draft will expire on 3 April 2027.
 
 Copyright Notice
 
@@ -162,9 +162,9 @@ Table of Contents
        13.1.4.  Relative Distinguished Name Attribute
        13.1.5.  Link Relation Type
      13.2.  New Registries
-       13.2.1.  Log Entry Types
-       13.2.2.  Log Entry Extension Types
-       13.2.3.  CA Identifier Child Components
+       13.2.1.  MTC Log Entry Types
+       13.2.2.  MTC Log Entry Extension Types
+       13.2.3.  MTC CA Identifier Child Components
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -3519,42 +3519,74 @@ Table of Contents
 
 13.2.  New Registries
 
-   IANA is requested to add a new top-level registry, "Merkle Tree
-   Certificates", to "Protocol Registries" page at https://www.iana.org/
-   protocols (https://www.iana.org/protocols)
+   IANA is requested to add a new top-level registry, "PKI, Logs, And
+   Tree Signatures", to the "Protocol Registries" page at
+   https://www.iana.org/protocols (https://www.iana.org/protocols)
 
    The rest of this section defines the subregistries requested within
-   the new "Merkle Tree Certificates" registry.
+   the new "PKI, Logs, And Tree Signatures" registry.
 
-13.2.1.  Log Entry Types
+13.2.1.  MTC Log Entry Types
 
-   IANA is requested to add a new registry, "Log Entry Types", whose
-   registration policy is Specification Required [RFC8126].  Values
-   shall be in the range 0 to 65536 (2^16-1).  The registry initially
-   consists of:
+   IANA is requested to add a new registry, "MTC Log Entry Types" with
+   the following registration policies from [RFC8126]:
 
-                  +=======+================+============+
-                  | Value | Name           | Reference  |
-                  +=======+================+============+
-                  | 0     | null_entry     | [this-RFC] |
-                  +-------+----------------+------------+
-                  | 1     | tbs_cert_entry | [this-RFC] |
-                  +-------+----------------+------------+
+               +=================+========================+
+               | Range           | Registration Policy    |
+               +=================+========================+
+               | 0x0000 - 0xEFFF | Specification Required |
+               +-----------------+------------------------+
+               | 0xF000 - 0xFFFF | Private Use            |
+               +-----------------+------------------------+
 
-                                  Table 5
+                                 Table 5
 
-13.2.2.  Log Entry Extension Types
+   The registry initially consists of:
 
-   IANA is requested to add a new registry, "Log Entry Entension Types",
-   whose registration policy is Specification Required [RFC8126].
-   Values shall be in the range 0 to 65536 (2^16-1).
+        +=================+==========================+============+
+        | Value           | Name                     | Reference  |
+        +=================+==========================+============+
+        | 0x0000          | null_entry               | [this-RFC] |
+        +-----------------+--------------------------+------------+
+        | 0x0001          | tbs_cert_entry           | [this-RFC] |
+        +-----------------+--------------------------+------------+
+        | 0x0002 - 0xEFFF | Unassigned               |            |
+        +-----------------+--------------------------+------------+
+        | 0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC] |
+        +-----------------+--------------------------+------------+
 
-   The registry is initially empty, but has columns Value, Name, and
-   Reference.
+                                  Table 6
 
-13.2.3.  CA Identifier Child Components
+13.2.2.  MTC Log Entry Extension Types
 
-   IANA is requested to add a new registry, "CA Identifier Child
+   IANA is requested to add a new registry, "MTC Log Entry Extension
+   Types" with the following registration policies from [RFC8126]:
+
+               +=================+========================+
+               | Range           | Registration Policy    |
+               +=================+========================+
+               | 0x0000 - 0xEFFF | Specification Required |
+               +-----------------+------------------------+
+               | 0xF000 - 0xFFFF | Private Use            |
+               +-----------------+------------------------+
+
+                                 Table 7
+
+   The registry initially consists of:
+
+        +=================+==========================+============+
+        | Value           | Name                     | Reference  |
+        +=================+==========================+============+
+        | 0x0000 - 0xEFFF | Unassigned               |            |
+        +-----------------+--------------------------+------------+
+        | 0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC] |
+        +-----------------+--------------------------+------------+
+
+                                  Table 8
+
+13.2.3.  MTC CA Identifier Child Components
+
+   IANA is requested to add a new registry, "MTC CA Identifier Child
    Components", whose registration policy is Specification Required
    [RFC8126].  Values shall be any non-negative integer.  The registry
    initially consists of:
@@ -3569,7 +3601,7 @@ Table of Contents
                   | 2     | landmarkGroups | [this-RFC] |
                   +-------+----------------+------------+
 
-                                  Table 6
+                                  Table 9
 
 14.  References
 

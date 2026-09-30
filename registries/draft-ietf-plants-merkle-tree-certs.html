@@ -1048,7 +1048,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 29 March 2027</td>
+<td class="center">Expires 3 April 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-25" class="published">25 September 2026</time>
+<time datetime="2026-09-30" class="published">30 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-29">29 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-04-03">3 April 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1443,13 +1443,13 @@ svg {
                 <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-new-registries" class="internal xref">New Registries</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2.2.1">
-                    <p id="section-toc.1-1.13.2.2.2.1.1"><a href="#section-13.2.1" class="auto internal xref">13.2.1</a>.  <a href="#name-log-entry-types" class="internal xref">Log Entry Types</a></p>
+                    <p id="section-toc.1-1.13.2.2.2.1.1"><a href="#section-13.2.1" class="auto internal xref">13.2.1</a>.  <a href="#name-mtc-log-entry-types" class="internal xref">MTC Log Entry Types</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2.2.2">
-                    <p id="section-toc.1-1.13.2.2.2.2.1"><a href="#section-13.2.2" class="auto internal xref">13.2.2</a>.  <a href="#name-log-entry-extension-types" class="internal xref">Log Entry Extension Types</a></p>
+                    <p id="section-toc.1-1.13.2.2.2.2.1"><a href="#section-13.2.2" class="auto internal xref">13.2.2</a>.  <a href="#name-mtc-log-entry-extension-typ" class="internal xref">MTC Log Entry Extension Types</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2.2.3">
-                    <p id="section-toc.1-1.13.2.2.2.3.1"><a href="#section-13.2.3" class="auto internal xref">13.2.3</a>.  <a href="#name-ca-identifier-child-compone" class="internal xref">CA Identifier Child Components</a></p>
+                    <p id="section-toc.1-1.13.2.2.2.3.1"><a href="#section-13.2.3" class="auto internal xref">13.2.3</a>.  <a href="#name-mtc-ca-identifier-child-com" class="internal xref">MTC CA Identifier Child Components</a></p>
 </li>
                 </ul>
 </li>
@@ -3887,7 +3887,7 @@ def find_subtrees(start, end):
             <p id="section-5.1-3.3.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarkGroups(2) N L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-05#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark <code>L</code> of log <code>N</code> and earlier landmarks of that log, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.1-4">Future extensions to this protocol <span class="bcp14">MAY</span> define further allocations by adding to the registry defined in <a href="#ca-identifier-child-components" class="auto internal xref">Section 13.2.3</a>.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">Future extensions to this protocol <span class="bcp14">MAY</span> define further allocations by adding to the registry defined in <a href="#mtc-ca-identifier-child-components" class="auto internal xref">Section 13.2.3</a>.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.1-5">A CA ID determines a PKIX distinguished name (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.4" class="relref">Section 4.1.2.4</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) that can be used in the issuer or subject field of an X.509 TBSCertificate. This distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type <code>id-rdna-trustAnchorID</code>, defined below:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-5.1-6">
 <pre>
@@ -4007,7 +4007,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
 </li>
           </ul>
 <p id="section-5.2.1-10">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.2.1-10" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-11">MTCLogEntry is an extensible structure. Future documents <span class="bcp14">MAY</span> define new values for MTCLogEntryType or MTCLogEntryExtensionType by adding to the registries defined in <a href="#log-entry-types" class="auto internal xref">Section 13.2.1</a> and <a href="#log-entry-extension-types" class="auto internal xref">Section 13.2.2</a>, respectively. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> and <a href="#extensibility" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-11">MTCLogEntry is an extensible structure. Future documents <span class="bcp14">MAY</span> define new values for MTCLogEntryType or MTCLogEntryExtensionType by adding to the registries defined in <a href="#mtc-log-entry-types" class="auto internal xref">Section 13.2.1</a> and <a href="#mtc-log-entry-extension-types" class="auto internal xref">Section 13.2.2</a>, respectively. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a> and <a href="#extensibility" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-12">An MTCLogEntry's size <span class="bcp14">MUST NOT</span> exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.<a href="#section-5.2.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -5399,16 +5399,37 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-new-registries">
 <a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-new-registries" class="section-name selfRef">New Registries</a>
         </h3>
-<p id="section-13.2-1">IANA is requested to add a new top-level registry, "Merkle Tree Certificates", to "Protocol Registries" page at <a href="https://www.iana.org/protocols">https://www.iana.org/protocols</a><a href="#section-13.2-1" class="pilcrow">¶</a></p>
-<p id="section-13.2-2">The rest of this section defines the subregistries requested within the new "Merkle Tree Certificates" registry.<a href="#section-13.2-2" class="pilcrow">¶</a></p>
-<div id="log-entry-types">
+<p id="section-13.2-1">IANA is requested to add a new top-level registry, "PKI, Logs, And Tree Signatures", to the "Protocol Registries" page at <a href="https://www.iana.org/protocols">https://www.iana.org/protocols</a><a href="#section-13.2-1" class="pilcrow">¶</a></p>
+<p id="section-13.2-2">The rest of this section defines the subregistries requested within the new "PKI, Logs, And Tree Signatures" registry.<a href="#section-13.2-2" class="pilcrow">¶</a></p>
+<div id="mtc-log-entry-types">
 <section id="section-13.2.1">
-          <h4 id="name-log-entry-types">
-<a href="#section-13.2.1" class="section-number selfRef">13.2.1. </a><a href="#name-log-entry-types" class="section-name selfRef">Log Entry Types</a>
+          <h4 id="name-mtc-log-entry-types">
+<a href="#section-13.2.1" class="section-number selfRef">13.2.1. </a><a href="#name-mtc-log-entry-types" class="section-name selfRef">MTC Log Entry Types</a>
           </h4>
-<p id="section-13.2.1-1">IANA is requested to add a new registry, "Log Entry Types", whose registration policy is Specification Required <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>. Values shall be in the range 0 to 65536 (2<sup>16</sup>-1). The registry initially consists of:<a href="#section-13.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-13.2.1-1">IANA is requested to add a new registry, "MTC Log Entry Types" with the
+following registration policies from <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>:<a href="#section-13.2.1-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-5">
             <caption><a href="#table-5" class="selfRef">Table 5</a></caption>
+<thead>
+              <tr>
+                <th class="text-left" rowspan="1" colspan="1">Range</th>
+                <th class="text-left" rowspan="1" colspan="1">Registration Policy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0x0000 - 0xEFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Specification Required</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0xF000 - 0xFFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Private Use</td>
+              </tr>
+            </tbody>
+          </table>
+<p id="section-13.2.1-3">The registry initially consists of:<a href="#section-13.2.1-3" class="pilcrow">¶</a></p>
+<table class="center" id="table-6">
+            <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Value</th>
@@ -5418,36 +5439,88 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
             </thead>
             <tbody>
               <tr>
-                <td class="text-left" rowspan="1" colspan="1">0</td>
+                <td class="text-left" rowspan="1" colspan="1">0x0000</td>
                 <td class="text-left" rowspan="1" colspan="1">null_entry</td>
                 <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
               </tr>
               <tr>
-                <td class="text-left" rowspan="1" colspan="1">1</td>
+                <td class="text-left" rowspan="1" colspan="1">0x0001</td>
                 <td class="text-left" rowspan="1" colspan="1">tbs_cert_entry</td>
+                <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0x0002 - 0xEFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+                <td class="text-left" rowspan="1" colspan="1"> </td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0xF000 - 0xFFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Reserved for Private Use</td>
                 <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
               </tr>
             </tbody>
           </table>
 </section>
 </div>
-<div id="log-entry-extension-types">
+<div id="mtc-log-entry-extension-types">
 <section id="section-13.2.2">
-          <h4 id="name-log-entry-extension-types">
-<a href="#section-13.2.2" class="section-number selfRef">13.2.2. </a><a href="#name-log-entry-extension-types" class="section-name selfRef">Log Entry Extension Types</a>
+          <h4 id="name-mtc-log-entry-extension-typ">
+<a href="#section-13.2.2" class="section-number selfRef">13.2.2. </a><a href="#name-mtc-log-entry-extension-typ" class="section-name selfRef">MTC Log Entry Extension Types</a>
           </h4>
-<p id="section-13.2.2-1">IANA is requested to add a new registry, "Log Entry Entension Types", whose registration policy is Specification Required <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>. Values shall be in the range 0 to 65536 (2<sup>16</sup>-1).<a href="#section-13.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-13.2.2-2">The registry is initially empty, but has columns Value, Name, and Reference.<a href="#section-13.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-13.2.2-1">IANA is requested to add a new registry, "MTC Log Entry Extension Types" with the
+following registration policies from <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>:<a href="#section-13.2.2-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-7">
+            <caption><a href="#table-7" class="selfRef">Table 7</a></caption>
+<thead>
+              <tr>
+                <th class="text-left" rowspan="1" colspan="1">Range</th>
+                <th class="text-left" rowspan="1" colspan="1">Registration Policy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0x0000 - 0xEFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Specification Required</td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0xF000 - 0xFFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Private Use</td>
+              </tr>
+            </tbody>
+          </table>
+<p id="section-13.2.2-3">The registry initially consists of:<a href="#section-13.2.2-3" class="pilcrow">¶</a></p>
+<table class="center" id="table-8">
+            <caption><a href="#table-8" class="selfRef">Table 8</a></caption>
+<thead>
+              <tr>
+                <th class="text-left" rowspan="1" colspan="1">Value</th>
+                <th class="text-left" rowspan="1" colspan="1">Name</th>
+                <th class="text-left" rowspan="1" colspan="1">Reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0x0000 - 0xEFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+                <td class="text-left" rowspan="1" colspan="1"> </td>
+              </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">0xF000 - 0xFFFF</td>
+                <td class="text-left" rowspan="1" colspan="1">Reserved for Private Use</td>
+                <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
+              </tr>
+            </tbody>
+          </table>
 </section>
 </div>
-<div id="ca-identifier-child-components">
+<div id="mtc-ca-identifier-child-components">
 <section id="section-13.2.3">
-          <h4 id="name-ca-identifier-child-compone">
-<a href="#section-13.2.3" class="section-number selfRef">13.2.3. </a><a href="#name-ca-identifier-child-compone" class="section-name selfRef">CA Identifier Child Components</a>
+          <h4 id="name-mtc-ca-identifier-child-com">
+<a href="#section-13.2.3" class="section-number selfRef">13.2.3. </a><a href="#name-mtc-ca-identifier-child-com" class="section-name selfRef">MTC CA Identifier Child Components</a>
           </h4>
-<p id="section-13.2.3-1">IANA is requested to add a new registry, "CA Identifier Child Components", whose registration policy is Specification Required <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>. Values shall be any non-negative integer. The registry initially consists of:<a href="#section-13.2.3-1" class="pilcrow">¶</a></p>
-<table class="center" id="table-6">
-            <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
+<p id="section-13.2.3-1">IANA is requested to add a new registry, "MTC CA Identifier Child Components", whose registration policy is Specification Required <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>. Values shall be any non-negative integer. The registry initially consists of:<a href="#section-13.2.3-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-9">
+            <caption><a href="#table-9" class="selfRef">Table 9</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Value</th>
