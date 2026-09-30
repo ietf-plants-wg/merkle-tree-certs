@@ -3519,12 +3519,12 @@ Table of Contents
 
 13.2.  New Registries
 
-   IANA is requested to add a new top-level registry, "PKI, Logs, And
-   Tree Signatures", to the "Protocol Registries" page at
+   IANA is requested to add a new top-level registry, "Merkle Tree
+   Certificates", to the "Protocol Registries" page at
    https://www.iana.org/protocols (https://www.iana.org/protocols)
 
    The rest of this section defines the subregistries requested within
-   the new "PKI, Logs, And Tree Signatures" registry.
+   the new "Merkle Tree Certificates" registry.
 
 13.2.1.  MTC Log Entry Types
 
