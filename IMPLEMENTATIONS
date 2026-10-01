@@ -1,0 +1,14 @@
+# Implementations
+
+- The Go [demo](./demo) in this repository
+
+## CA
+
+- [Azul](https://github.com/cloudflare/azul), Rust, draft-davidben-tls-merkle-tree-certs-06
+
+# Deployments
+
+- Cloudflare [experimental deployment](https://blog.cloudflare.com/bootstrap-mtc/) across ~1000 zones.
+  Example zone: [dadrian.io](https://dadrian.io). Only served over QUIC.
+  CA [monitoring endpoint](https://bootstrap-mtca-shard3.cloudflareresearch.com/landmark).
+  On draft-davidben-tls-merkle-tree-certs-06.
