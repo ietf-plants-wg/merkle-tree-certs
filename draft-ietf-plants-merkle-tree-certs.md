@@ -2655,6 +2655,8 @@ The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gabl
 
 The idea to mint tree heads infrequently was originally described by Richard Barnes in {{STH-Discipline}}. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.
 
+The transparency log architecture and APIs are based on designs developed by the Go and Sigsum projects.
+
 # Change log
 {:numbered="false"}
 
