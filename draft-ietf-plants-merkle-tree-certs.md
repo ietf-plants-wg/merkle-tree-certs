@@ -2891,4 +2891,6 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - OIDs have been allocated.
 
-- Set up registries for extensible parameters
+- Set up registries for extensible parameters.
+
+- Allow GREASE cosignatures in MTCProof.
