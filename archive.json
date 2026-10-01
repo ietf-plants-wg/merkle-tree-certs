@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-29T05:31:51.105580+00:00",
+  "timestamp": "2026-10-01T05:35:05.921127+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -1390,15 +1390,15 @@
       "id": "I_kwDOJIBkVc5oTIRj",
       "title": "Truncated hashes",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/48",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We might be able to get away with 16 byte hashes, by complicating the design significantly. I do not think that this  is worthwhile for the first version, but I'll write the thoughts down in this issue for future reference.\r\n\r\nIf we truncate hashes to 16 bytes, then a CA (even with the CA chosen randomiser #45) can find two different batches with the same root in 2^64 work. This allows the CA to issue certificates for assertions that escape transparency.\r\n\r\nWe can prevent this, if the CA does not control the randomiser, and only learns it after having committed to the batch.\r\n\r\nThis can be done as follows. We have two CAs. The seconds mirrors the first with an offset, so batch `n` in the first is mirrored in batch `n+offset` of the second. The first uses 32 byte hashes, and the second truncates to 16 bytes. The second uses as randomiser, public randomness that's not known before say `n+grace` where `0 < grace \u2264 offset`. For this a post-quantum version of [drand](https://drand.love) could do.\r\n\r\nBefore a TS would trust the truncated mirror, it must:\r\n\r\n1. Fetch the `n`th batch from the original before `n+grace`. This is essential, because if the first CA can delay publication of the batch until `n+grace`, it can cheat in collusion with the mirror.\r\n2. Check whether assertions of the mirror matches the original.\r\n3. Compute the root of the mirror with the correct public randomness.\r\n\r\nThe mirror could be run by a TS.\r\n\r\nThis proposal will be much harder to run, as CAs wouldn't be allowed to issue batches late, and monitors need to watch closely for late issuance.",
       "createdAt": "2023-06-09T12:59:04Z",
-      "updatedAt": "2025-06-21T14:27:55Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-01T02:34:45Z",
+      "closedAt": "2026-10-01T02:34:45Z",
       "comments": [
         {
           "author": "davidben",
@@ -1406,6 +1406,13 @@
           "body": "Post-Photosynthesis triage: Hmm. I guess, like #45, this is much less likely to happen now that we're getting our tree structure from elsewhere. I dunno, being able to halve the hashes would have been quite nice, but it does seem to be have been kind of a pain, even in the pre-Photosynthesis picture. :-/\n\nI think we can probably close this? I dunno, thoughts?",
           "createdAt": "2025-06-21T14:27:55Z",
           "updatedAt": "2025-06-21T14:27:55Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Think we can probably close this for now. We have an extension point for a randomizer, and a plan of record for how to define a new hash construction (even with truncation) in the future by making a new CA extension OID.",
+          "createdAt": "2026-10-01T02:34:45Z",
+          "updatedAt": "2026-10-01T02:34:45Z"
         }
       ]
     },
@@ -3079,9 +3086,17 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-02-09T11:13:18Z",
-      "updatedAt": "2026-02-09T11:13:18Z",
+      "updatedAt": "2026-10-01T02:33:17Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Since log serving is on the tlog side, probably this needs to be a C2SP spec, but I do agree it makes sense to define something. Probably the upki people will end up defining some sort of format. I'm guessing that'll end up writing down the bulk consistency proof construction and probably, along the way, spell this out.",
+          "createdAt": "2026-10-01T02:33:17Z",
+          "updatedAt": "2026-10-01T02:33:17Z"
+        }
+      ]
     },
     {
       "number": 183,
@@ -4095,15 +4110,15 @@
       "id": "I_kwDOJIBkVc8AAAABSPETkg",
       "title": "cosigner_name/log_origin use different encoding from the rest",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/327",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ilaril",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "When writing some WIP MTC code, I noticed that CosignedMessage `cosigner_name` and `log_origin` fields have a format mismatch. While everything else TLS-part in MTC and TAI seems to use binary ID encoding, those two fields use ASCII encoding.\n\nDoing this format conversion seems very obnoxious to implement:\n* It is base conversion from 128 to 10, which is not an easy special case.\n* There seems to be no explicit limit on how big the numbers can be (other than the first, which fits in 32 bits).\n* This happens in extremely critical place (certificate verification).\n* Performance matters, so easy brute force is out.\n* It is still fallible as the output buffer can overflow\n  * The encoding can be up to 1035 bytes, but there is space for only 255.\n  * `>60` byte ID can overflow, `>120` byte ID will overflow.\n\n(The log ID in issuer was recently switched to use the binary encoding.)",
       "createdAt": "2026-09-20T15:29:30Z",
-      "updatedAt": "2026-09-22T12:28:00Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-30T15:34:40Z",
+      "closedAt": "2026-09-30T15:34:40Z",
       "comments": [
         {
           "author": "davidben",
@@ -4175,16 +4190,118 @@
       "id": "I_kwDOJIBkVc8AAAABScsBIA",
       "title": "Set up some registries",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/332",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "@robstradling pointed out we have some parameters that could do with registries:\n\n1. MTCLogEntryType, seeded with `null_entry` and `tbs_cert_entry`\n2. MTCLogEntryExtensionType, seeded with nothing.\n3. The CA ID oid arc, seeded with `logs(0)`, `landmarks(1)`, `landmarkGroups(2)`.",
       "createdAt": "2026-09-21T22:10:22Z",
-      "updatedAt": "2026-09-21T22:10:22Z",
+      "updatedAt": "2026-09-30T02:11:56Z",
+      "closedAt": "2026-09-30T02:11:56Z",
+      "comments": []
+    },
+    {
+      "number": 338,
+      "id": "I_kwDOJIBkVc8AAAABT-i5Gw",
+      "title": "Consider a technical comparison of an IETF SCITT Receipt to a Merkle Tree Certificate",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/338",
+      "state": "CLOSED",
+      "author": "rjb4standards",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "An IETF SCITT Receipt provides proof that a digital object, like a digital certificate, has been registered in a SCITT Registry. This gives the public an easy to use method to verify trust in a digital certificate, as of right  now.\n\nPlease consider performing a technical comparison of a Public Trust Infrastructure (PTI) Trust Registry SCITT Receipt linked to a SCITT VDS ledger (Merkle Tree) versus a Merkle Tree Certificate to answer the consumer/public question \"Is this digital certificate trusted as of right now?\" ",
+      "createdAt": "2026-09-29T19:07:46Z",
+      "updatedAt": "2026-09-30T01:44:35Z",
+      "closedAt": "2026-09-30T01:44:34Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I believe this has been considered, several times, on list. https://mailarchive.ietf.org/arch/msg/plants/VC0R7pLL53rsyNInwdWnMKTui1A/ and other threads.\n\nCC @thomwiggers ",
+          "createdAt": "2026-09-30T01:44:35Z",
+          "updatedAt": "2026-09-30T01:44:35Z"
+        }
+      ]
+    },
+    {
+      "number": 339,
+      "id": "I_kwDOJIBkVc8AAAABUAMGEQ",
+      "title": "Switch (non-normative) C2SP references to tagged versions",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/339",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "They're non-normative, so it's not crucial, but it would probably be helpful if we cited versions nonetheless, once we tag things.",
+      "createdAt": "2026-09-29T21:30:59Z",
+      "updatedAt": "2026-09-29T21:30:59Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 341,
+      "id": "I_kwDOJIBkVc8AAAABUJ73bA",
+      "title": "demo: the checkpoint's signature lines are not tlog-cosignature lines (no timestamped_signature)",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/341",
+      "state": "OPEN",
+      "author": "atoranzo",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "`demo generate` writes a signed `checkpoint` whose signature lines are\n`\u2014 <origin> base64(key_id || signature)`, where `signature` is the bare\nsubtree signature over `[0, size)` with `timestamp = 0` in the\nCosignedMessage (`generate.go`, the loop after the tiles are written, and\n`cosign.go: cosignedMessage`, which always adds a zero timestamp).\n\nC2SP's mtc-tlog says each issuance log \"MUST serve a checkpoint that\nincludes a signature from its CA cosigner, formatted as a note signature\"\nwith the CA cosigner mapped to a tlog-cosignature cosigner, and\ntlog-cosignature says the signature \"MUST be a `timestamped_signature`\nstructure\" (`u64 timestamp` followed by the ML-DSA-44 signature), with the\ntimestamp inside the signed message. The draft itself only requires the\nsubtree *signature format* to be compatible with tlog-cosignature's\nML-DSA-44 construction (section \"Signature Format\"), so the draft is not\ncontradicted; the demo's checkpoint, as written, cannot be consumed by a\nwitness or client that follows tlog-cosignature.\n\nHow I found it: an independent Rust implementation rebuilds the demo's log\nfrom its entry tiles (2122 entries, same root as the checkpoint) and\nchecks the CA's line: the key ID matches\n`SHA-256(name || \"\\n\" || 0x06 || pk)[:4]`, and the line verifies only as a\nbare subtree signature with timestamp 0, not as a `timestamped_signature`.\n\nIs the demo's `checkpoint` meant to be tlog-cosignature-consumable? If so,\nthe fix is to sign `[0, size)` with a non-zero timestamp and write\n`key_id || timestamp || signature` (the same `Sign` path with the\ntimestamp). If it is only illustrative, a comment in `generate.go` saying\nso would save the next implementer the detour.\n\nDemo at 99097c9e0af9641a85311b68f7642978b882d385, `-version plants-07`.",
+      "createdAt": "2026-09-30T13:53:00Z",
+      "updatedAt": "2026-09-30T16:13:52Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah, nice catch. Thanks!\n\n> Is the demo's checkpoint meant to be tlog-cosignature-consumable?\n\n\"Meant to\" is a strong phrase, haha. :-) I wanted to write out the log, and well, tlog seems a pretty solid format. But I don't believe anyone before you has ever tried consuming it, certainly not with something that actually understands tlog.\n\nAlso this was first written before we had an aligned tlog/MTC signature scheme, so there was no way to plug in general tlog software at the time. But now those are aligned, so fixing this makes sense to me!",
+          "createdAt": "2026-09-30T14:39:40Z",
+          "updatedAt": "2026-09-30T14:39:40Z"
+        },
+        {
+          "author": "atoranzo",
+          "authorAssociation": "NONE",
+          "body": "Thanks! Happy to send a PR for this after draft-07 is cut, alongside #342:\nsign [0, size) with a non-zero timestamp and write\nkey_id || timestamp || signature on the line. My reader already checks that\nform, so I can verify the output before sending. One detail to settle in the\nPR: only ML-DSA-44 cosigners have a tlog-defined key ID; the other\nalgorithms would keep the placeholder.",
+          "createdAt": "2026-09-30T16:13:52Z",
+          "updatedAt": "2026-09-30T16:13:52Z"
+        }
+      ]
+    },
+    {
+      "number": 342,
+      "id": "I_kwDOJIBkVc8AAAABUJ-INQ",
+      "title": "demo: the six trusted-subtree lines in policy.txt do not match the output of mtc.json",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/342",
+      "state": "OPEN",
+      "author": "atoranzo",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The sample `demo/policy.txt` ends with six `trusted-subtree 32473.1 1 \u2026`\nlines. Their hashes do not match what `./demo generate` produces from the\nshipped `mtc.json`, neither with `\"Version\": \"plants-06\"` nor with\n`\"plants-07\"` (the landmark hashes are the same in both, since the entry\ndoes not contain the proof OID). As a result, with the sample policy the\ndemo rejects its own landmark-relative certificates:\n\n    ./demo generate -config mtc.json -out out\n    ./demo verify -version plants-06 -ca-cert out/ca_cert.pem -policy policy.txt out/cert_10_12.pem out/cert_2035_1.pem\n    out/cert_10_12.pem: trusted subtree hash mismatch: expected 16e0754b\u2026, got a1ae9032\u2026\n    out/cert_2035_1.pem: trusted subtree hash mismatch: expected 9eb1f00f\u2026, got 90067a9a\u2026\n\nThe six lines `generate` prints today for that configuration are:\n\n    trusted-subtree 32473.1 1 0 32 oa6QMleLNSitORGbqKjvLwnQNlVu9sqRcXGychQkOmI=\n    trusted-subtree 32473.1 1 32 34 UvjrKbCk/EMgFwpXzsLQXwt2saiMQZeeMZ7I5pgofFE=\n    trusted-subtree 32473.1 1 0 1024 qB4Q6PIQm4Q4WUWX8ryEMInIYsVwKSPODzTgWqp2BAE=\n    trusted-subtree 32473.1 1 1024 2036 kAZ6mrwRZfprcrvk9DFIz4ICs8WPOEGOadsb0Rcf02Y=\n    trusted-subtree 32473.1 1 2032 2048 1afncFPIzrEX3a+7MKWMBjGGliCNN55asXFKbKUBKPc=\n    trusted-subtree 32473.1 1 2048 2122 90p0r7eRRQ5J3hbJI25OUf8z8O6hQULKdVjPYPAzsAk=\n\nPresumably the sample was generated from an earlier `mtc.json`. Happy to\nsend a PR with the six lines if that helps.\n\nDemo at 99097c9e0af9641a85311b68f7642978b882d385, Go 1.27.1.",
+      "createdAt": "2026-09-30T13:55:45Z",
+      "updatedAt": "2026-09-30T16:18:06Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah yeah, that diverged a bit. Thanks! We're lining things up to cut draft-07, now that we've got OIDs and all, so I think let's park this until just after draft-07 is cut and we can target that one.",
+          "createdAt": "2026-09-30T14:40:26Z",
+          "updatedAt": "2026-09-30T14:40:26Z"
+        },
+        {
+          "author": "atoranzo",
+          "authorAssociation": "NONE",
+          "body": "Sounds good. Once draft-07 is cut I'll regenerate the six lines against it and send the PR.",
+          "createdAt": "2026-09-30T16:18:06Z",
+          "updatedAt": "2026-09-30T16:18:06Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -22697,24 +22814,26 @@
       "id": "PR_kwDOJIBkVc8AAAABEe-UdA",
       "title": "Discuss overflow when representing the ID in dotted decimal",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/330",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This depends on https://github.com/tlswg/tls-trust-anchor-ids/pull/126. Together with that PR, closes https://github.com/ietf-plants-wg/merkle-tree-certs/issues/327.\r\n\r\nCC @ilaril",
       "createdAt": "2026-09-21T20:34:54Z",
-      "updatedAt": "2026-09-28T21:15:55Z",
+      "updatedAt": "2026-09-30T15:52:46Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "e105857f778e8fe8389dbd3ff2bf8b4fa42cb3be",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "id-conversion",
       "headRefOid": "841d3abc4435eab7c1145e6a97ba2c9113d5a4a7",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-30T15:34:38Z",
+      "mergedAt": "2026-09-30T15:34:38Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3b99d966fe81005473630e8525e7b4cbd2c00711"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -22843,6 +22962,46 @@
           "createdAt": "2026-09-28T21:15:55Z",
           "updatedAt": "2026-09-28T21:15:55Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP_yc-Q",
+          "commit": {
+            "abbreviatedOid": "841d3ab"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-30T15:33:46Z",
+          "updatedAt": "2026-09-30T15:33:46Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "It's just that the ASN.1 schema only says RELATIVE-OID, so your parser might not check everything. \ud83e\udd37 ",
+              "createdAt": "2026-09-30T15:33:46Z",
+              "updatedAt": "2026-09-30T15:33:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP__pJA",
+          "commit": {
+            "abbreviatedOid": "841d3ab"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-30T15:52:46Z",
+          "updatedAt": "2026-09-30T15:52:46Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "AFAICT, one can write:\r\n\r\nRELATIVE-OID (CONSTRAINED BY { -- Must be of length 1 to 32 bytes inclusive --})\r\n\r\nWhich is not automatically applied, but at least documents the limits.\r\n\r\nMight also be a good idea to note the limit in last paragraph of section 5.1. Certification Authority Identifiers.\r\n",
+              "createdAt": "2026-09-30T15:52:46Z",
+              "updatedAt": "2026-09-30T15:58:56Z"
+            }
+          ]
         }
       ]
     },
@@ -23016,24 +23175,26 @@
       "id": "PR_kwDOJIBkVc8AAAABFDhaKg",
       "title": "Take a stab at setting up registries",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/335",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #332\r\n\r\n@robstradling ",
       "createdAt": "2026-09-25T04:51:59Z",
-      "updatedAt": "2026-09-25T18:16:33Z",
+      "updatedAt": "2026-09-30T02:12:01Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "f1fa43c6baeb7990b9b927bd741e639272b3f4c8",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "registries",
-      "headRefOid": "3c6763694e9c41318cbbfb70dd9f5d627cd71e33",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "aa598c805b4b50051bb6aa2d097464bbc4e53eed",
+      "closedAt": "2026-09-30T02:11:55Z",
+      "mergedAt": "2026-09-30T02:11:55Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "99097c9e0af9641a85311b68f7642978b882d385"
+      },
       "comments": [],
       "reviews": [
         {
@@ -23080,6 +23241,79 @@
               "updatedAt": "2026-09-25T18:16:32Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP4FN3Q",
+          "commit": {
+            "abbreviatedOid": "3c67636"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-30T01:24:25Z",
+          "updatedAt": "2026-09-30T01:24:25Z",
+          "comments": [
+            {
+              "originalPosition": 71,
+              "body": "No particular opinions. Happy to follow that precedent. Done.",
+              "createdAt": "2026-09-30T01:24:25Z",
+              "updatedAt": "2026-09-30T01:24:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP4GEQA",
+          "commit": {
+            "abbreviatedOid": "3c67636"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-30T01:26:58Z",
+          "updatedAt": "2026-09-30T01:26:58Z",
+          "comments": [
+            {
+              "originalPosition": 71,
+              "body": "I guess the counterargument is that WG names are ephemeral and often joke-y while protocol names are lasting? So maybe Merkle Tree Certificates makes more sense and then, yeah, PLANTS can always request another if needed.",
+              "createdAt": "2026-09-30T01:26:58Z",
+              "updatedAt": "2026-09-30T01:26:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP4GkKQ",
+          "commit": {
+            "abbreviatedOid": "3c67636"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-30T01:28:25Z",
+          "updatedAt": "2026-09-30T01:28:25Z",
+          "comments": [
+            {
+              "originalPosition": 83,
+              "body": "Done",
+              "createdAt": "2026-09-30T01:28:25Z",
+              "updatedAt": "2026-09-30T01:28:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP4PkTg",
+          "commit": {
+            "abbreviatedOid": "aa598c8"
+          },
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-30T01:53:59Z",
+          "updatedAt": "2026-09-30T01:53:59Z",
+          "comments": []
         }
       ]
     },
@@ -23124,6 +23358,614 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 337,
+      "id": "PR_kwDOJIBkVc8AAAABFsrq3A",
+      "title": "Fix off-by-one in landmark publication row limit",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/337",
+      "state": "MERGED",
+      "author": "fcasal",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "# Fix off-by-one in landmark publication row limit\r\n\r\nThis fixes a contradiction that can prevent a strict decoder from accepting\r\nlandmark publications during a log's startup, blocking use of the landmark\r\noptimization through that distribution path.\r\n\r\n## Context\r\n\r\nIn \u00a76.4.3 (Publishing Landmarks), raise the maximum number of data rows from\r\n`latest_landmark` to `latest_landmark + 1` so a publication can include the\r\nrequired expired boundary landmark when all nonzero landmarks are active.\r\n\r\nThe [landmark definition][landmark-definition] numbers landmarks from zero,\r\ngives landmark 0 tree size 0 and expiration 0, and makes it never active.\r\nThe [mandatory publication format][required-rows] requires\r\n`num_active_landmarks + 1` data rows: the active landmarks plus the preceding\r\nexpired landmark. However, the [decoder rule on line 1394][faulty-limit]\r\nrequires rejection of documents with more than `latest_landmark` data rows.\r\nWhen all nonzero landmarks are active, following this MUST-reject rule forces\r\nthe decoder to reject the publication the format requires.\r\n\r\nDropping the extra row cannot resolve the contradiction: the spec also\r\n[explicitly requires an expired landmark and rejection if it is missing][expired-boundary].\r\n\r\nFor example, at time 1000 seconds since the Epoch, suppose landmark 1 has tree\r\nsize 1 and expiration 2000. The required publication is:\r\n\r\n```text\r\n1\r\n1 2000\r\n0 0\r\n```\r\n\r\nThe header identifies latest landmark 1. The two\r\ndata rows contain active landmark 1 and expired landmark 0. The existing limit\r\nrejects this document because `2 > 1`. A log\r\ncontaining only landmark 0 has the same problem: its one required data row\r\nexceeds the current limit of zero.\r\n\r\n\r\n[landmark-definition]: https://github.com/ietf-plants-wg/merkle-tree-certs/blob/f68314ecc276f2aa5ed570fe973f22f562bacee3/draft-ietf-plants-merkle-tree-certs.md?plain=1#L1357-L1367\r\n[required-rows]: https://github.com/ietf-plants-wg/merkle-tree-certs/blob/f68314ecc276f2aa5ed570fe973f22f562bacee3/draft-ietf-plants-merkle-tree-certs.md?plain=1#L1390-L1394\r\n[faulty-limit]: https://github.com/ietf-plants-wg/merkle-tree-certs/blob/f68314ecc276f2aa5ed570fe973f22f562bacee3/draft-ietf-plants-merkle-tree-certs.md?plain=1#L1394\r\n[expired-boundary]: https://github.com/ietf-plants-wg/merkle-tree-certs/blob/f68314ecc276f2aa5ed570fe973f22f562bacee3/draft-ietf-plants-merkle-tree-certs.md?plain=1#L1400-L1402\r\n",
+      "createdAt": "2026-09-29T12:47:38Z",
+      "updatedAt": "2026-09-29T13:02:43Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "f68314ecc276f2aa5ed570fe973f22f562bacee3",
+      "headRepository": "fcasal/merkle-tree-certs",
+      "headRefName": "fix/landmark-publication-row-limit",
+      "headRefOid": "561d1087e60dd5a90506ef023fd625d84fd7a30b",
+      "closedAt": "2026-09-29T13:02:42Z",
+      "mergedAt": "2026-09-29T13:02:42Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0e66cea4bddf780bd736ab0f727bc5664fcfa2d1"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABPw-SRQ",
+          "commit": {
+            "abbreviatedOid": "561d108"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-29T13:01:37Z",
+          "updatedAt": "2026-09-29T13:01:37Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 340,
+      "id": "PR_kwDOJIBkVc8AAAABFzn-vg",
+      "title": "We have PKIX OIDs!",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/340",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-09-30T01:40:40Z",
+      "updatedAt": "2026-09-30T14:44:39Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "99097c9e0af9641a85311b68f7642978b882d385",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "pkix-oids",
+      "headRefOid": "ad4256bc67d448898b0e061730b4fc204ae3f996",
+      "closedAt": "2026-09-30T14:24:27Z",
+      "mergedAt": "2026-09-30T14:24:27Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "eb3e5859de86970c4f7e8ed3d7fd4aabb19c6214"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABP96T7A",
+          "commit": {
+            "abbreviatedOid": "0051528"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-30T13:02:11Z",
+          "updatedAt": "2026-09-30T13:02:11Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 343,
+      "id": "PR_kwDOJIBkVc8AAAABF-VB3A",
+      "title": "Make MTC Proof sig alg specific to SHA-256",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/343",
+      "state": "CLOSED",
+      "author": "CBonnell",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR restricts the signature value for MTCProof to only contain SHA-256 hashes. Other hash algorithms require a new OID.\r\n\r\nTying this document's signature algorithm to a single hash algorithm makes the signature format fully self-describing, as no out-of-band information (i.e., the CA log's `HASH`) is needed to decode the signature value.\r\n\r\nNo wire format changes are introduced, only a rename of the OID and some changes to the prose to allow for other proof algorithms to be slotted into the validation routine.",
+      "createdAt": "2026-09-30T20:50:17Z",
+      "updatedAt": "2026-10-01T01:58:16Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3b99d966fe81005473630e8525e7b4cbd2c00711",
+      "headRepository": "CBonnell/merkle-tree-certs",
+      "headRefName": "mtcproof-sha256",
+      "headRefOid": "8a83ec92d43495235182890d7079831ec578a95f",
+      "closedAt": "2026-10-01T01:58:15Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "CBonnell",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> But I might suggest an alternate option: it is already the case that the MTCProof structure does not require knowing the hash to parse.\r\n\r\nThe top-level structure readable without knowledge of the hash algorithm, but the elements of the inclusion proof cannot be read correctly without knowing the hash algorithm.\r\n\r\nI've seen a (to-be released) certificate viewer that someone created that displays the hashes of the inclusion proof, but that can currently be done robustly only by using out-of-band issuer information. It would be nice to facilitate decoding without any out-of-band information. ",
+          "createdAt": "2026-09-30T21:17:14Z",
+          "updatedAt": "2026-09-30T21:17:14Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> The top-level structure readable without knowledge of the hash algorithm, but the elements of the inclusion proof cannot be read correctly without knowing the hash algorithm.\r\n\r\nSure, but I think that's an abstraction question. I.e. do you believe the inclusion proof is a list of hashes or a byte string? An ECDSA signature doesn't tell you the curve it's for, and we're OK with that, for example. Or, for that matter, a cosignature doesn't tell you the algorithm and we're also OK with that.",
+          "createdAt": "2026-10-01T01:05:13Z",
+          "updatedAt": "2026-10-01T01:05:13Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(I'm also OK with splitting it. Don't particular care. Just seems we need to work on the wording a little bit.)",
+          "createdAt": "2026-10-01T01:21:52Z",
+          "updatedAt": "2026-10-01T01:21:52Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/345 is how the alternate would look like.",
+          "createdAt": "2026-10-01T01:25:01Z",
+          "updatedAt": "2026-10-01T01:25:01Z"
+        },
+        {
+          "author": "CBonnell",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "With the definition in -06, it\u2019s a list of hashes as it\u2019s an encoding error if the size (in bytes) of inclusion_proof is not a multiple of HASH_SIZE. So the decoder needs to know the out-of-band HASH value to know whether to reject the input.\r\n\r\nYou raise a good point about signatures being opaque. I\u2019m fine with your alternate approach that you suggested in the first comment. At least then proofs and signatures will be handled consistently.",
+          "createdAt": "2026-10-01T01:26:28Z",
+          "updatedAt": "2026-10-01T01:26:28Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's true. The separation between the decoder and the verifier is slightly academic, but happy to settle it on the verifier side if it makes the specification shorter. :-)",
+          "createdAt": "2026-10-01T01:32:59Z",
+          "updatedAt": "2026-10-01T01:32:59Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(Closing in favor of the other one per above.)",
+          "createdAt": "2026-10-01T01:58:15Z",
+          "updatedAt": "2026-10-01T01:58:15Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQDFKAA",
+          "commit": {
+            "abbreviatedOid": "8a83ec9"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Hmm. This does make the text a bit awkward, but perhaps some wordsmithing can fix that? I left some suggestions here.\n\nBut I might suggest an alternate option: it is _already_ the case that the MTCProof structure does not require knowing the hash to parse. Although it says `HashValue inclusion_proof<0..2^16-1>`, the length prefix is a byte count.\n\nThat means we could instead just redefine MTCProof to say:\n```\nstruct {\n    MTCLogEntryExtension extensions<0..2^16-1>;\n    uint48 start;\n    uint48 end;\n    opaque inclusion_proof<0..2^16-1>;\n    SubtreeSignature signatures<0..2^24-1>;\n} MTCProof;\n```\n\nAnd then maybe we just say:\n\n> `inclusion_proof` MUST contain a subtree inclusion proof ([Section 4.3](https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#subtree-inclusion-proofs)) for the log entry and the subtree. Each hash in the proof is concatenated in order.\n\nPerhaps that is simpler and still achieves the same thing?",
+          "createdAt": "2026-09-30T21:00:31Z",
+          "updatedAt": "2026-09-30T21:09:23Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "There's a second instance of `HashValue` up in the Signature Format section. Defining the same thing twice, but differently, is probably not what we want. I guess we can call this `HashValueSHA256`?",
+              "createdAt": "2026-09-30T21:00:31Z",
+              "updatedAt": "2026-09-30T21:09:23Z"
+            },
+            {
+              "originalPosition": 45,
+              "body": "Changing MTCProof from the name of a type to the name of a variable, but still saying a mix of \"the MTCProof\" and \"the `MTCProof`\" is a little confusing. Maybe consistently `mtcProof` and no more \"the\"?",
+              "createdAt": "2026-09-30T21:03:07Z",
+              "updatedAt": "2026-09-30T21:09:23Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "This paragraph reads... very awkwardly. What is \"an algorithm identifier for an MTC Proof\"? We haven't defined any of those. Possibly we need to define more explicitly that this kind of CA makes these kinds of signatures and so on.",
+              "createdAt": "2026-09-30T21:04:58Z",
+              "updatedAt": "2026-09-30T21:09:23Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 344,
+      "id": "PR_kwDOJIBkVc8AAAABGAT5LA",
+      "title": "Landmark-relative certificates are allowed to have GREASE cosignatures",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/344",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Matthew McPherrin pointed out that the GREASE text technically conflicts with the landmark-relative one. Since the relying party behavior is actually to just ignore cosignatures in this case, we can be looser here.\r\n\r\n(Also add him to acknowlegments. I'm pretty sure this is far from the first contribution too.)\r\n\r\nCC @mcpherrinm ",
+      "createdAt": "2026-10-01T01:19:51Z",
+      "updatedAt": "2026-10-01T01:50:55Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3b99d966fe81005473630e8525e7b4cbd2c00711",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "grease-landmark",
+      "headRefOid": "148d9f32aff604a9cc6dc0a9a44672f07b21891b",
+      "closedAt": "2026-10-01T01:50:52Z",
+      "mergedAt": "2026-10-01T01:50:52Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "77a8af1cc0133521887dad86d3e1f2fec23ff87d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQFDi0A",
+          "commit": {
+            "abbreviatedOid": "bce7ba5"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T01:47:48Z",
+          "updatedAt": "2026-10-01T01:47:48Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 345,
+      "id": "PR_kwDOJIBkVc8AAAABGAV9BQ",
+      "title": "Make the MTCProof structure more obviously hash-independent",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/345",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It's actually already hash-independent because the length prefix is a byte count rather than an element count, but this makes it more obvious. This is a possible alternative to #343.\r\n\r\n(Uploaded to demonstrate how that would look.)\r\n\r\nCC @CBonnell",
+      "createdAt": "2026-10-01T01:24:48Z",
+      "updatedAt": "2026-10-01T01:55:59Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3b99d966fe81005473630e8525e7b4cbd2c00711",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "mtc-proof-generic",
+      "headRefOid": "4bfeba333e339858f1f359d02a2adcc3f99b8cac",
+      "closedAt": "2026-10-01T01:55:55Z",
+      "mergedAt": "2026-10-01T01:55:55Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "c9fe27bad4eb1d595f51df02902ae20065f99ee3"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQFEo4w",
+          "commit": {
+            "abbreviatedOid": "4bfeba3"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T01:51:07Z",
+          "updatedAt": "2026-10-01T01:51:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 346,
+      "id": "PR_kwDOJIBkVc8AAAABGAX4Dg",
+      "title": "Acknowledge Go and Sigsum projects in document",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/346",
+      "state": "MERGED",
+      "author": "FiloSottile",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-01T01:29:19Z",
+      "updatedAt": "2026-10-01T01:31:59Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3b99d966fe81005473630e8525e7b4cbd2c00711",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "filippo/ack",
+      "headRefOid": "b41b19d9af5d059942282faeccf5d7134f968cc9",
+      "closedAt": "2026-10-01T01:31:37Z",
+      "mergedAt": "2026-10-01T01:31:37Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "85e2c4f97799a4bbe7d8fbab124a23c19171b8b9"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQE9RIA",
+          "commit": {
+            "abbreviatedOid": "b41b19d"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T01:31:30Z",
+          "updatedAt": "2026-10-01T01:31:30Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 347,
+      "id": "PR_kwDOJIBkVc8AAAABGAeXsQ",
+      "title": "Clean up old TODOs in advance of the first deployments",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/347",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Bulk subtree consistency proofs would be very useful for some applications, but out of scope for this document. (Although you can get 90% of the benefit by just running through gzip.)\r\n\r\nCosigner negotiation is punted to later. We can probably construct it out of creative interpretations of IDs but, in the meantime, the CT strategies (clients shutting off transparency enforcement when stale) will do to get the system deployed to start.",
+      "createdAt": "2026-10-01T01:44:25Z",
+      "updatedAt": "2026-10-01T01:57:44Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "c9fe27bad4eb1d595f51df02902ae20065f99ee3",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "trim-todos",
+      "headRefOid": "ce2d4c840139081b0c94254fa9a5c2cb0986c45a",
+      "closedAt": "2026-10-01T01:57:42Z",
+      "mergedAt": "2026-10-01T01:57:42Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "4116118590d69590cd1b011308567a4afb884d74"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQFFIFw",
+          "commit": {
+            "abbreviatedOid": "ce2d4c8"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T01:52:39Z",
+          "updatedAt": "2026-10-01T01:57:23Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 348,
+      "id": "PR_kwDOJIBkVc8AAAABGAvXiA",
+      "title": "Add an RFC editors' note about IETF/C2SP document clustering",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/348",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Just so we don't forget to do this at the end.",
+      "createdAt": "2026-10-01T02:23:16Z",
+      "updatedAt": "2026-10-01T03:42:22Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4116118590d69590cd1b011308567a4afb884d74",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "rfc-ed-cluster",
+      "headRefOid": "fbcd83760a49ab912d0a5506bbfec5a819150609",
+      "closedAt": "2026-10-01T03:42:19Z",
+      "mergedAt": "2026-10-01T03:42:19Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "651dd62e3a7cc5ceba1ff5b158226ccd99ab3b8b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQFrfAQ",
+          "commit": {
+            "abbreviatedOid": "fbcd837"
+          },
+          "author": "FiloSottile",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T03:36:16Z",
+          "updatedAt": "2026-10-01T03:36:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 349,
+      "id": "PR_kwDOJIBkVc8AAAABGBOgeg",
+      "title": "Rename SubtreeSignature to Cosignature",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/349",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-01T03:33:09Z",
+      "updatedAt": "2026-10-01T03:44:37Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4116118590d69590cd1b011308567a4afb884d74",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "rename_subtreesignature_to_cosignature",
+      "headRefOid": "67d3c82aa6b720fe48b61c5b974633f67e5db692",
+      "closedAt": "2026-10-01T03:34:40Z",
+      "mergedAt": "2026-10-01T03:34:40Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "fccd296922a9b37aa9da67b290876cf219f93cee"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQFq-Sg",
+          "commit": {
+            "abbreviatedOid": "67d3c82"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-01T03:34:31Z",
+          "updatedAt": "2026-10-01T03:34:31Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 350,
+      "id": "PR_kwDOJIBkVc8AAAABGBRMjg",
+      "title": "Rename CosignedMessage to CosignedSubtree",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/350",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Based on feedback from @robstradling. See also https://github.com/C2SP/C2SP/pull/364",
+      "createdAt": "2026-10-01T03:39:40Z",
+      "updatedAt": "2026-10-01T03:39:40Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "fccd296922a9b37aa9da67b290876cf219f93cee",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "struct-rename",
+      "headRefOid": "ae160f650cbed8501b187b3f46b6bca24658d40e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 351,
+      "id": "PR_kwDOJIBkVc8AAAABGBWG3g",
+      "title": "Landmark-relative certificates may have cosignatures that are not subtree cosignatures",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/351",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Further changes in line with #344.",
+      "createdAt": "2026-10-01T03:48:48Z",
+      "updatedAt": "2026-10-01T04:33:25Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "651dd62e3a7cc5ceba1ff5b158226ccd99ab3b8b",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "more_greaseability",
+      "headRefOid": "77388480db59e7a3dd33bc087d3f66b481cfab63",
+      "closedAt": "2026-10-01T04:33:24Z",
+      "mergedAt": "2026-10-01T04:33:24Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "ccc616d8752027de0b5bf474a33ece60a7ae5785"
+      },
+      "comments": [
+        {
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "LGTM!",
+          "createdAt": "2026-10-01T04:31:12Z",
+          "updatedAt": "2026-10-01T04:31:12Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQF-PIQ",
+          "commit": {
+            "abbreviatedOid": "60776e1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Ah, whoops. Nice catch! A couple suggestions to match the particular flavor of noncommittal text that I used in the other PR. WDYT?",
+          "createdAt": "2026-10-01T04:25:44Z",
+          "updatedAt": "2026-10-01T04:28:10Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "The strategy I took in the other text was to say things like \"No cosignatures are required to authenticate the subtree\", which avoids splitting hairs over whether other things are \"subtree signatures\". WDYT about:\n\n```suggestion\n: An optimized certificate containing an inclusion proof to a landmark subtree. The landmark subtree is assumed to be known to the relying party, rather than authenticated by a cosignature.\n```",
+              "createdAt": "2026-10-01T04:25:44Z",
+              "updatedAt": "2026-10-01T04:28:10Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "In a similar vein, perhaps...\n\n```suggestion\nThis same issuance process also produces a *landmark-relative certificate*. This is an optional, optimized certificate that does not need subtree cosignatures, including any from the CA. Landmark-relative certificates are available after a short period of time and usable with up-to-date relying parties.\n```",
+              "createdAt": "2026-10-01T04:26:58Z",
+              "updatedAt": "2026-10-01T04:28:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQF_YzQ",
+          "commit": {
+            "abbreviatedOid": "60776e1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-01T04:29:28Z",
+          "updatedAt": "2026-10-01T04:29:29Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Or perhaps what @mcpherrinm had in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/352, which is quite a bit shorter.",
+              "createdAt": "2026-10-01T04:29:28Z",
+              "updatedAt": "2026-10-01T04:29:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQGAkzg",
+          "commit": {
+            "abbreviatedOid": "d87db89"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-01T04:33:00Z",
+          "updatedAt": "2026-10-01T04:33:00Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "My bad, but I guess this should say cosignatures plural. (I'll just go ahead and apply that because it's a simple fix.)\n\n```suggestion\n: An optimized certificate containing an inclusion proof to a landmark subtree. The landmark subtree is assumed to be known to the relying party, rather than authenticated by cosignatures.\n```",
+              "createdAt": "2026-10-01T04:33:00Z",
+              "updatedAt": "2026-10-01T04:33:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 352,
+      "id": "PR_kwDOJIBkVc8AAAABGBa8Hw",
+      "title": "Additional \"no signatures\" removal for landmark-relative certs",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/352",
+      "state": "CLOSED",
+      "author": "mcpherrinm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This follows #344, as an extra place where we say the landmark-relative certs have \"no signatures\". I'm open to alternate wordings here.",
+      "createdAt": "2026-10-01T03:59:11Z",
+      "updatedAt": "2026-10-01T05:08:41Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "651dd62e3a7cc5ceba1ff5b158226ccd99ab3b8b",
+      "headRepository": "mcpherrinm/merkle-tree-certs",
+      "headRefName": "main",
+      "headRefOid": "f192899c8d2abc8d27873fc61ab597948e0c24ea",
+      "closedAt": "2026-10-01T05:08:41Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah whoops, you and @robstradling crossed mid-air with https://github.com/ietf-plants-wg/merkle-tree-certs/pull/351",
+          "createdAt": "2026-10-01T04:29:03Z",
+          "updatedAt": "2026-10-01T04:29:03Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
