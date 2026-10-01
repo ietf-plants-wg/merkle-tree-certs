@@ -324,7 +324,7 @@ Standalone certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
 
 Landmark-relative certificate:
-: An optimized certificate containing an inclusion proof to a landmark subtree, and no subtree cosignatures.
+: An optimized certificate containing an inclusion proof to a landmark subtree. The landmark subtree is assumed to be known to the relying party, rather than authenticated by a cosignature.
 
 Directly-signed certificate:
 : A certificate issued using the existing, non-MTC construction, where the TBSCertificate is passed directly to the private key's signing operation.
