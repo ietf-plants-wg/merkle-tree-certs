@@ -1334,7 +1334,9 @@ This document does not prescribe the specific cosigner roles, or a particular pr
 
 ## Landmark-Relative Certificates
 
-A *landmark-relative certificate* is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC9846}}.
+A *landmark-relative certificate* is a Merkle Tree certificate which authenticates its subtree by assuming the relying party had predistributed information about which subtrees were trusted. This allows the certificate to omit cosignatures.
+
+Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC9846}}.
 
 ### Landmark Tree Sizes
 
@@ -1403,7 +1405,7 @@ Given the inputs in {{certificate-inputs}} and the corresponding log's landmark 
 
 3. Determine the `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `idx`.
 
-4. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
+4. Construct a certificate ({{certificate-format}}) using the selected subtree. No cosignatures are required, though the certificate MAY include GREASE {{!RFC8701}} cosignatures as described in {{certificate-format}}.
 
 The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
 
@@ -2651,7 +2653,7 @@ Given range `[0xffffffffffffffff, 0xffffffffffffffff)`, the subtrees are:
 
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication, X.509, and Certificate Transparency. The authors would like to thank all those who have contributed over the history of these protocols.
 
-The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Mike Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, Emily Stark, and Rob Stradling for many valuable discussions and insights which led to this document, as well as feedback and contributions to the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
+The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson, Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis Jackson, Ilari Liusvaara, Matthew McPherrin, Sanketh Menda, Matt Mueller, Mike Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, Emily Stark, and Rob Stradling for many valuable discussions and insights which led to this document, as well as feedback and contributions to the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
 
 The idea to mint tree heads infrequently was originally described by Richard Barnes in {{STH-Discipline}}. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.
 
