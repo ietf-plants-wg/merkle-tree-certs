@@ -1405,7 +1405,7 @@ Given the inputs in {{certificate-inputs}} and the corresponding log's landmark 
 
 3. Determine the `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `idx`.
 
-4. Construct a certificate ({{certificate-format}}) using the selected subtree. No cosignatures are required, though the certificate MAY include GREASE {{!RFC8701}} cosignatures as described in {{certificate-format}}.
+4. Construct a certificate ({{certificate-format}}) using the selected subtree. No cosignatures are required to authenticate the subtree, though the certificate MAY include cosignatures for other purposes, such as GREASE {{!RFC8701}} cosignatures as described in {{certificate-format}}.
 
 The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
 
