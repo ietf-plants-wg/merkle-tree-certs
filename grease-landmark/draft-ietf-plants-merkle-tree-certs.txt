@@ -2077,8 +2077,9 @@ Table of Contents
        one whose [start, end) interval contains idx.
 
    4.  Construct a certificate (Section 6.2) using the selected subtree.
-       No cosignatures are required, though the certificate MAY include
-       GREASE [RFC8701] cosignatures as described in Section 6.2.
+       No cosignatures are required to authenticate the subtree, though
+       the certificate MAY include cosignatures for other purposes, such
+       as GREASE [RFC8701] cosignatures as described in Section 6.2.
 
    The procedure above is not specific to the CA.  Any party holding a
    standalone certificate (Section 6.3) can construct the corresponding
