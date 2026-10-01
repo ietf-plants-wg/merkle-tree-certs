@@ -1440,6 +1440,14 @@ Table of Contents
    For example, [MTC-TLOG] defines a profile for Merkle Tree
    Certificates that uses [TLOG-TILES].
 
+      *RFC Editor's Note:* [MTC-TLOG] and other non-normative C2SP
+      references cite this document and are themselves versioned.
+      Ideally, the final RFC would reference C2SP versions that
+      reference the final RFC.  After the final RFC number is allocated,
+      the authors can help coordinate the document clustering across
+      those references, including tagging the appropriate versions of
+      the C2SP documents.
+
 5.3.  Cosigners
 
    This section defines a log _cosigner_. A cosigner follows some
