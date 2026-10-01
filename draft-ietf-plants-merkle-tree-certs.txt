@@ -1918,8 +1918,10 @@ Table of Contents
 6.4.  Landmark-Relative Certificates
 
    A _landmark-relative certificate_ is a Merkle Tree certificate which
-   contains no signatures and instead assumes the relying party had
-   predistributed information about which subtrees were trusted.
+   authenticates its subtree by assuming the relying party had
+   predistributed information about which subtrees were trusted.  This
+   allows the certificate to omit cosignatures.
+
    Landmark-relative certificates are an optional size optimization.
    They require a processing delay to construct, and only work in a
    sufficiently up-to-date relying party.  Authenticating parties thus
@@ -2074,8 +2076,10 @@ Table of Contents
    3.  Determine the L's subtrees (Section 6.4.1) and select the unique
        one whose [start, end) interval contains idx.
 
-   4.  Construct a certificate (Section 6.2) using the selected subtree
-       and no signatures.
+   4.  Construct a certificate (Section 6.2) using the selected subtree.
+       No cosignatures are required to authenticate the subtree, though
+       the certificate MAY include cosignatures for other purposes, such
+       as GREASE [RFC8701] cosignatures as described in Section 6.2.
 
    The procedure above is not specific to the CA.  Any party holding a
    standalone certificate (Section 6.3) can construct the corresponding
@@ -4646,12 +4650,13 @@ Acknowledgements
 
    The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson,
    Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis
-   Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Mike
-   Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, Emily
-   Stark, and Rob Stradling for many valuable discussions and insights
-   which led to this document, as well as feedback and contributions to
-   the document itself.  We wish to thank Mia Celeste in particular,
-   whose implementation of an earlier draft revealed several pitfalls.
+   Jackson, Ilari Liusvaara, Matthew McPherrin, Sanketh Menda, Matt
+   Mueller, Mike Ounsworth, Chris Patton, Michael Richardson, Ryan
+   Sleevi, Emily Stark, and Rob Stradling for many valuable discussions
+   and insights which led to this document, as well as feedback and
+   contributions to the document itself.  We wish to thank Mia Celeste
+   in particular, whose implementation of an earlier draft revealed
+   several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
    Richard Barnes in [STH-Discipline].  The size optimization in Merkle
