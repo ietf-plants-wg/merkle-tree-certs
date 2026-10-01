@@ -1560,8 +1560,6 @@ This criterion can be checked given:
   * A cosigned checkpoint containing the referenced checkpoint and a valid Merkle consistency proof ({{Section 2.1.4 of !RFC9162}}) between the two
 * For each subtree, a valid subtree consistency proof ({{subtree-consistency-proofs}}) between the subtree and the reference checkpoint
 
-[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]
-
 If a relying party is unable to validate some active landmark, it MAY discard that landmark, along with all landmarks in the log newer than it, while still using the older active landmarks that it was able to validate. For example, suppose the active landmarks have tree sizes 200, 300, 400, and 500, and the relying party was unable to validate any reference checkpoint of size 500 or higher. If the relying party is able to validate a reference checkpoint of size 350, it MAY incorporate subtrees from the first two landmarks.
 
 To bound local state, the relying party SHOULD define some upper bound on the number of active landmarks accepted per CA. If the CA exceeds this bound, the relying party SHOULD similarly discard the newest active landmarks to meet its limit.
@@ -1607,8 +1605,6 @@ Relying parties SHOULD NOT include Merkle Tree CAs in the `certificate_authoriti
 Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding CA ID ({{ca-ids}}). This trust anchor ID is additionally contained in the trust anchor groups defined in {{single-log-landmark-groups}}.
 
 CA IDs MAY be incorporated into other trust anchor groups, following the guidance in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}.
-
-[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]
 
 A standalone certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.
 
