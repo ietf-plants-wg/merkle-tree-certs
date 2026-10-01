@@ -324,7 +324,7 @@ Standalone certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
 
 Landmark-relative certificate:
-: An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.
+: An optimized certificate containing an inclusion proof to a landmark subtree, and no subtree cosignatures.
 
 Directly-signed certificate:
 : A certificate issued using the existing, non-MTC construction, where the TBSCertificate is passed directly to the private key's signing operation.
@@ -395,7 +395,7 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 A certificate with cosignatures is known as a *standalone certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures, which do not scale with public key or signature size.
 
-This same issuance process also produces a *landmark-relative certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Landmark-relative certificates are available after a short period of time and usable with up-to-date relying parties.
+This same issuance process also produces a *landmark-relative certificate*. This is an optional, optimized certificate that avoids all subtree cosignatures, including the CA signature. Landmark-relative certificates are available after a short period of time and usable with up-to-date relying parties.
 
 ~~~aasvg
 +-- Certification Authority -----+
@@ -1334,7 +1334,7 @@ This document does not prescribe the specific cosigner roles, or a particular pr
 
 ## Landmark-Relative Certificates
 
-A *landmark-relative certificate* is a Merkle Tree certificate which authenticates its subtree by assuming the relying party had predistributed information about which subtrees were trusted. This allows the certificate to omit cosignatures.
+A *landmark-relative certificate* is a Merkle Tree certificate which authenticates its subtree by assuming the relying party had predistributed information about which subtrees were trusted. This allows the certificate to omit subtree cosignatures.
 
 Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC9846}}.
 
