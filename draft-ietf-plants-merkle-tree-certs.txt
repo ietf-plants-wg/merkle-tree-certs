@@ -2411,10 +2411,6 @@ Table of Contents
    *  For each subtree, a valid subtree consistency proof (Section 4.4)
       between the subtree and the reference checkpoint
 
-   [[TODO: The subtree consistency proofs have many nodes in common.  It
-   is possible to define a single "bulk consistency proof" that verifies
-   all the hashes at once, but it's a lot more complex.]]
-
    If a relying party is unable to validate some active landmark, it MAY
    discard that landmark, along with all landmarks in the log newer than
    it, while still using the older active landmarks that it was able to
@@ -2538,14 +2534,6 @@ Table of Contents
 
    CA IDs MAY be incorporated into other trust anchor groups, following
    the guidance in Section 6 of [I-D.ietf-tls-trust-anchor-ids].
-
-   [[TODO: Ideally we would negotiate cosigners.
-   https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch
-   of how one might do this, though other designs are possible.
-   Negotiating cosigners allows the ecosystem to manage cosigners
-   efficiently, without needing to collect every possible cosignature
-   and send them all at once.  This is wasteful, particularly with post-
-   quantum algorithms.]]
 
    A standalone certificate MAY also be sent without explicit relying
    party trust signals, however doing so means the authenticating party
