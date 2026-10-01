@@ -1286,14 +1286,14 @@ opaque TrustAnchorID<1..2^8-1>;
 struct {
     TrustAnchorID cosigner_id;
     opaque signature<0..2^16-1>;
-} SubtreeSignature;
+} Cosignature;
 
 struct {
     MTCLogEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
     opaque inclusion_proof<0..2^16-1>;
-    SubtreeSignature signatures<0..2^24-1>;
+    Cosignature signatures<0..2^24-1>;
 } MTCProof;
 ~~~
 
