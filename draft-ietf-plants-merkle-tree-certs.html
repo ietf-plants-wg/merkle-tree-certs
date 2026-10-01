@@ -1745,7 +1745,7 @@ uint8 uint48[6];
           <dd class="break"></dd>
 <dt id="section-2.1-4.19">Landmark-relative certificate:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.20">
-            <p id="section-2.1-4.20.1">An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.<a href="#section-2.1-4.20.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.20.1">An optimized certificate containing an inclusion proof to a landmark subtree. The landmark subtree is assumed to be known to the relying party, rather than authenticated by cosignatures.<a href="#section-2.1-4.20.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.21">Directly-signed certificate:</dt>
@@ -1941,7 +1941,7 @@ uint8 uint48[6];
 </li>
       </ol>
 <p id="section-3-5">A certificate with cosignatures is known as a <em>standalone certificate</em>. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>) structures, which do not scale with public key or signature size.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">This same issuance process also produces a <em>landmark-relative certificate</em>. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Landmark-relative certificates are available after a short period of time and usable with up-to-date relying parties.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-6">This same issuance process also produces a <em>landmark-relative certificate</em>. This is an optional, optimized certificate that does not need subtree cosignatures, including any from the CA. Landmark-relative certificates are available after a short period of time and usable with up-to-date relying parties.<a href="#section-3-6" class="pilcrow">¶</a></p>
 <span id="name-a-diagram-of-landmark-relat"></span><div id="fig-landmark-cert-overview">
 <figure id="figure-2">
         <div id="section-3-7.1">
@@ -4331,7 +4331,7 @@ struct {
         <h3 id="name-landmark-relative-certifica">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-landmark-relative-certifica" class="section-name selfRef">Landmark-Relative Certificates</a>
         </h3>
-<p id="section-6.4-1">A <em>landmark-relative certificate</em> is a Merkle Tree certificate which authenticates its subtree by assuming the relying party had predistributed information about which subtrees were trusted. This allows the certificate to omit cosignatures.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">A <em>landmark-relative certificate</em> is a Merkle Tree certificate which authenticates its subtree by assuming the relying party had predistributed information about which subtrees were trusted. This allows the certificate to omit subtree cosignatures.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <p id="section-6.4-2">Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus <span class="bcp14">SHOULD</span> deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 <div id="landmark-tree-sizes">
 <section id="section-6.4.1">

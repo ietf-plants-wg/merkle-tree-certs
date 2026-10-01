@@ -390,7 +390,9 @@ Table of Contents
       to some subtree, and several cosignatures over that subtree.
 
    Landmark-relative certificate:  An optimized certificate containing
-      an inclusion proof to a landmark subtree, and no signatures.
+      an inclusion proof to a landmark subtree.  The landmark subtree is
+      assumed to be known to the relying party, rather than
+      authenticated by cosignatures.
 
    Directly-signed certificate:  A certificate issued using the
       existing, non-MTC construction, where the TBSCertificate is passed
@@ -496,10 +498,10 @@ Table of Contents
    with public key or signature size.
 
    This same issuance process also produces a _landmark-relative
-   certificate_. This is an optional, optimized certificate that avoids
-   all cosignatures, including the CA signature.  Landmark-relative
-   certificates are available after a short period of time and usable
-   with up-to-date relying parties.
+   certificate_. This is an optional, optimized certificate that does
+   not need subtree cosignatures, including any from the CA.  Landmark-
+   relative certificates are available after a short period of time and
+   usable with up-to-date relying parties.
 
    +-- Certification Authority -----+
    |                                |  +-- Update Channel --+
@@ -1927,7 +1929,7 @@ Table of Contents
    A _landmark-relative certificate_ is a Merkle Tree certificate which
    authenticates its subtree by assuming the relying party had
    predistributed information about which subtrees were trusted.  This
-   allows the certificate to omit cosignatures.
+   allows the certificate to omit subtree cosignatures.
 
    Landmark-relative certificates are an optional size optimization.
    They require a processing delay to construct, and only work in a
