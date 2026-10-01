@@ -4265,14 +4265,14 @@ opaque TrustAnchorID&lt;1..2^8-1&gt;;
 struct {
     TrustAnchorID cosigner_id;
     opaque signature&lt;0..2^16-1&gt;;
-} SubtreeSignature;
+} Cosignature;
 
 struct {
     MTCLogEntryExtension extensions&lt;0..2^16-1&gt;;
     uint48 start;
     uint48 end;
     opaque inclusion_proof&lt;0..2^16-1&gt;;
-    SubtreeSignature signatures&lt;0..2^24-1&gt;;
+    Cosignature signatures&lt;0..2^24-1&gt;;
 } MTCProof;
 </pre><a href="#section-6.2-8" class="pilcrow">¶</a>
 </div>
