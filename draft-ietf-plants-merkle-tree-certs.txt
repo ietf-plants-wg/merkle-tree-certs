@@ -4934,7 +4934,9 @@ Since draft-ietf-plants-merkle-tree-certs-06
 
    *  OIDs have been allocated.
 
-   *  Set up registries for extensible parameters
+   *  Set up registries for extensible parameters.
+
+   *  Allow GREASE cosignatures in MTCProof.
 
 Authors' Addresses
 
