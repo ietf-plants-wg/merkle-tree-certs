@@ -1283,8 +1283,6 @@ The `signatureValue` contains an MTCProof structure, defined below using the TLS
 /* From Section 4 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorID<1..2^8-1>;
 
-opaque HashValue[HASH_SIZE];
-
 struct {
     TrustAnchorID cosigner_id;
     opaque signature<0..2^16-1>;
@@ -1294,14 +1292,14 @@ struct {
     MTCLogEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
-    HashValue inclusion_proof<0..2^16-1>;
+    opaque inclusion_proof<0..2^16-1>;
     SubtreeSignature signatures<0..2^24-1>;
 } MTCProof;
 ~~~
 
 `extensions` MUST contain the log entry's `extensions` value ({{log-entries}}).
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 4 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
+`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. Each hash in the proof is concatenated in order. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 4 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
 Each element of the `signatures` field MUST have a unique `cosigner_id`. Elements MUST be ordered by `cosigner_id` (excluding length prefix) as follows:
 
