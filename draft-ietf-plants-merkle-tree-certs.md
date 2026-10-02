@@ -1106,7 +1106,7 @@ A single cosigner, with a single cosigner ID and public key, MAY generate cosign
 
 ### Signature Format
 
-A cosigner computes a *subtree signature* for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
+A cosigner computes a *subtree signature* for a subtree in a log by signing a CosignedSubtree, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
@@ -1119,7 +1119,7 @@ struct {
     uint64 start;
     uint64 end;
     HashValue subtree_hash;
-} CosignedMessage;
+} CosignedSubtree;
 ~~~
 
 This signature format is designed to be compatible with the ML-DSA-44 signature construction in {{TLOG-COSIGNATURE}}, but it supports signature algorithms other than ML-DSA-44 and tree hashes other than SHA-256.
@@ -1167,7 +1167,7 @@ Subtree signatures can be used to sign timestamped log checkpoints by using a no
 
 ### Signature Algorithms
 
-The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. Signatures are computed over the CosignedMessage described in {{signature-format}}.
+The cosigner's public key specifies both the key material and the signature algorithm to use with the key material. In order to change key or signature parameters, a cosigner operator MUST deploy a new cosigner, with a new cosigner ID. Signature algorithms MUST fully specify the algorithm parameters, such as hash functions used. Signatures are computed over the CosignedSubtree described in {{signature-format}}.
 
 Log clients that accept cosignatures from some cosigner are assumed to be configured with all parameters necessary to verify that cosigner's signatures, including the signature algorithm and version of the signature format.
 
@@ -1488,13 +1488,13 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored.
 
-   Signatures are verified as described in {{signature-format}}. For each signature verification, the CosignedMessage structure is constructed as follows:
+   Signatures are verified as described in {{signature-format}}. For each signature verification, the CosignedSubtree structure is constructed as follows:
 
-   1. Set the CosignedMessage's `cosigner_name` based on the cosigner ID as described in {{signature-format}}.
-   1. Set the CosignedMessage's `timestamp` to zero.
-   1. Set the CosignedMessage's `log_origin` based on `log_id` as described in {{signature-format}}.
-   1. Set the CosignedMessage's `start` and `end` to the MTCProof's `start` and `end`, respectively.
-   1. Set the CosignedMessage's `subtree_hash` to `expected_subtree_hash`.
+   1. Set the CosignedSubtree's `cosigner_name` based on the cosigner ID as described in {{signature-format}}.
+   1. Set the CosignedSubtree's `timestamp` to zero.
+   1. Set the CosignedSubtree's `log_origin` based on `log_id` as described in {{signature-format}}.
+   1. Set the CosignedSubtree's `start` and `end` to the MTCProof's `start` and `end`, respectively.
+   1. Set the CosignedSubtree's `subtree_hash` to `expected_subtree_hash`.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
