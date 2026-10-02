@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 4 April 2027                                         Apple Inc.
+Expires: 5 April 2027                                         Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          1 October 2026
+                                                          2 October 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 April 2027.
+   This Internet-Draft will expire on 5 April 2027.
 
 Copyright Notice
 
@@ -1491,7 +1491,7 @@ Table of Contents
 5.3.1.  Signature Format
 
    A cosigner computes a _subtree signature_ for a subtree in a log by
-   signing a CosignedMessage, defined below using the TLS presentation
+   signing a CosignedSubtree, defined below using the TLS presentation
    language (Section 3 of [RFC9846]):
 
    opaque HashValue[HASH_SIZE];
@@ -1504,7 +1504,7 @@ Table of Contents
        uint64 start;
        uint64 end;
        HashValue subtree_hash;
-   } CosignedMessage;
+   } CosignedSubtree;
 
    This signature format is designed to be compatible with the ML-DSA-44
    signature construction in [TLOG-COSIGNATURE], but it supports
@@ -1602,7 +1602,7 @@ Table of Contents
    key or signature parameters, a cosigner operator MUST deploy a new
    cosigner, with a new cosigner ID.  Signature algorithms MUST fully
    specify the algorithm parameters, such as hash functions used.
-   Signatures are computed over the CosignedMessage described in
+   Signatures are computed over the CosignedSubtree described in
    Section 5.3.1.
 
    Log clients that accept cosignatures from some cosigner are assumed
@@ -2263,21 +2263,21 @@ Table of Contents
         Unrecognized cosigners MUST be ignored.
 
         Signatures are verified as described in Section 5.3.1.  For each
-        signature verification, the CosignedMessage structure is
+        signature verification, the CosignedSubtree structure is
         constructed as follows:
 
-        1.  Set the CosignedMessage's cosigner_name based on the
+        1.  Set the CosignedSubtree's cosigner_name based on the
             cosigner ID as described in Section 5.3.1.
 
-        2.  Set the CosignedMessage's timestamp to zero.
+        2.  Set the CosignedSubtree's timestamp to zero.
 
-        3.  Set the CosignedMessage's log_origin based on log_id as
+        3.  Set the CosignedSubtree's log_origin based on log_id as
             described in Section 5.3.1.
 
-        4.  Set the CosignedMessage's start and end to the MTCProof's
+        4.  Set the CosignedSubtree's start and end to the MTCProof's
             start and end, respectively.
 
-        5.  Set the CosignedMessage's subtree_hash to
+        5.  Set the CosignedSubtree's subtree_hash to
             expected_subtree_hash.
 
    This procedure only replaces the signature verification portion of
