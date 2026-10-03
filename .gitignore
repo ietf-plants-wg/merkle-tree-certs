@@ -2,6 +2,7 @@
 /*-[0-9][0-9].xml
 archive.json
 draft-ietf-plants-merkle-tree-certs.xml
+draft-mtc-architecture.xml
 Gemfile.lock
 /.gems/
 *.html
