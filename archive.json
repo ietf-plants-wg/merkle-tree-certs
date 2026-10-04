@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-01T05:35:05.921127+00:00",
+  "timestamp": "2026-10-04T05:37:50.862515+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4213,7 +4213,7 @@
       "labels": [],
       "body": "An IETF SCITT Receipt provides proof that a digital object, like a digital certificate, has been registered in a SCITT Registry. This gives the public an easy to use method to verify trust in a digital certificate, as of right  now.\n\nPlease consider performing a technical comparison of a Public Trust Infrastructure (PTI) Trust Registry SCITT Receipt linked to a SCITT VDS ledger (Merkle Tree) versus a Merkle Tree Certificate to answer the consumer/public question \"Is this digital certificate trusted as of right now?\" ",
       "createdAt": "2026-09-29T19:07:46Z",
-      "updatedAt": "2026-09-30T01:44:35Z",
+      "updatedAt": "2026-10-03T18:34:34Z",
       "closedAt": "2026-09-30T01:44:34Z",
       "comments": [
         {
@@ -4222,6 +4222,13 @@
           "body": "I believe this has been considered, several times, on list. https://mailarchive.ietf.org/arch/msg/plants/VC0R7pLL53rsyNInwdWnMKTui1A/ and other threads.\n\nCC @thomwiggers ",
           "createdAt": "2026-09-30T01:44:35Z",
           "updatedAt": "2026-09-30T01:44:35Z"
+        },
+        {
+          "author": "rjb4standards",
+          "authorAssociation": "NONE",
+          "body": "Thanks for your consideration and response. What was the conclusion from the technical comparison?",
+          "createdAt": "2026-10-03T18:34:34Z",
+          "updatedAt": "2026-10-03T18:34:34Z"
         }
       ]
     },
@@ -23809,26 +23816,42 @@
       "id": "PR_kwDOJIBkVc8AAAABGBRMjg",
       "title": "Rename CosignedMessage to CosignedSubtree",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/350",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Based on feedback from @robstradling. See also https://github.com/C2SP/C2SP/pull/364",
       "createdAt": "2026-10-01T03:39:40Z",
-      "updatedAt": "2026-10-01T03:39:40Z",
+      "updatedAt": "2026-10-02T19:07:40Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "fccd296922a9b37aa9da67b290876cf219f93cee",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "struct-rename",
       "headRefOid": "ae160f650cbed8501b187b3f46b6bca24658d40e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-10-02T19:07:35Z",
+      "mergedAt": "2026-10-02T19:07:35Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "44b1c0b8c54669a35e8d9e96f0e55bb3cab67757"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABQZPMvA",
+          "commit": {
+            "abbreviatedOid": "ae160f6"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-02T18:11:27Z",
+          "updatedAt": "2026-10-02T18:11:27Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 351,
@@ -23842,7 +23865,7 @@
       "labels": [],
       "body": "Further changes in line with #344.",
       "createdAt": "2026-10-01T03:48:48Z",
-      "updatedAt": "2026-10-01T04:33:25Z",
+      "updatedAt": "2026-10-03T21:34:41Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "651dd62e3a7cc5ceba1ff5b158226ccd99ab3b8b",
