@@ -1257,7 +1257,7 @@ A Merkle Tree Certificate is constructed from the following inputs:
 * A TBSCertificateLogEntry ({{log-entries}}) contained in one of the CA's issuance logs ({{issuance-logs}})
 * A subject public key whose hash matches the TBSCertificateLogEntry
 * The `log_number` and the zero-based entry `index` of that log entry within the issuance log, used to construct the certificate's `serialNumber` ({{certificate-format}}).
-* An `MTCProof` ({{certificate-format}}) proving the entry's inclusion in a subtree, along with zero or more signatures ({{cosigners}}) over that subtree, which together satisfy relying party requirements ({{trusted-cosigners}})
+* An `MTCProof` ({{certificate-format}}) proving the entry's inclusion in a subtree, along with zero or more signatures ({{proofsignature-kinds}}), which together satisfy relying party requirements ({{trusted-cosigners}})
 
 By varying the choice of subtree and signatures, there can be multiple ways to prove the entry is in the log, and thus certified by the CA. {{certificate-format}} defines how a certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.
 
@@ -1286,37 +1286,53 @@ The `signatureValue` contains an MTCProof structure, defined below using the TLS
 opaque TrustAnchorID<1..2^8-1>;
 
 struct {
-    TrustAnchorID cosigner_id;
+    TrustAnchorID signer_id;
     opaque signature<0..2^16-1>;
-} Cosignature;
+} MTCProofSignature;
 
 struct {
     MTCLogEntryExtension extensions<0..2^16-1>;
     uint48 start;
     uint48 end;
     opaque inclusion_proof<0..2^16-1>;
-    Cosignature signatures<0..2^24-1>;
+    MTCProofSignature signatures<0..2^24-1>;
 } MTCProof;
 ~~~
 
 `extensions` MUST contain the log entry's `extensions` value ({{log-entries}}).
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. Each hash in the proof is concatenated in order. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 4 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
+`start` and `end` MUST contain the corresponding parameters of the chosen subtree.
 
-Each element of the `signatures` field MUST have a unique `cosigner_id`. Elements MUST be ordered by `cosigner_id` (excluding length prefix) as follows:
+`inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. Each hash in the proof is concatenated in order.
+
+`signatures` contains a list of proof signatures, each of one of the kinds described in {{proofsignature-kinds}}. Each element's `signer_id` contains a trust anchor ID in its binary representation ({{Section 4 of !I-D.ietf-tls-trust-anchor-ids}}), which MUST be unique within the list. Elements MUST be ordered by `signer_id` (excluding length prefix) as follows:
 
 * Shorter byte strings are ordered before longer byte strings
 * Byte strings of the same length are ordered lexicographically
 
-An MTCProof parser MUST reject the input if there are duplicate `cosigner_id` values, or if they are not ordered correctly. This can be done by checking each `cosigner_id` value comes strictly after the previous one in the above order.
-
-CAs, or other parties, MAY include GREASE {{!RFC8701}} cosignatures in an MTCProof by allocating an unused cosigner ID and inserting it into the `signatures` field. The `cosigner_id` is the unused cosigner ID and the `signature` is an arbitrary byte string. A cosigner ID allocated for GREASE MUST NOT be later repurposed for a real cosigner.
+An MTCProof parser MUST reject the input if there are duplicate `signer_id` values, or if they are not ordered correctly. This can be done by checking each `signer_id` value comes strictly after the previous one in the above order.
 
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string
 
+### Kinds of Proof Signature {#proofsignature-kinds}
+
+The `signer_id` of each element of the `signatures` field determines its kind. This document defines two kinds:
+
+Subtree cosignatures:
+: A subtree cosignature is a signature by a cosigner ({{cosigners}}) over the chosen subtree. Its `signer_id` is that cosigner's ID, and its `signature` is the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero. Of the proof signatures in an MTCProof, only subtree cosignatures can satisfy a relying party's cosigner requirements ({{trusted-cosigners}}).
+
+GREASE signatures:
+: CAs, or other parties, MAY include GREASE {{!RFC8701}} signatures by allocating an unused trust anchor ID and inserting it into the `signatures` field. Its `signer_id` is the unused trust anchor ID, and its `signature` is an arbitrary byte string.
+
+Other documents MAY define further kinds of proof signature, by defining trust anchor IDs whose `signature` carries other data. Such a document MUST specify how those trust anchor IDs are allocated, what `signature` contains and which parties include it. It MUST also specify whether a signature of that kind should be kept when a certificate is rebuilt with a different subtree (e.g. {{landmark-relative-certificates}}). It MAY allocate trust anchor IDs beneath each CA ID using the registry in {{mtc-ca-identifier-child-components}}.
+
+The procedures in this document for selecting subtree cosignatures do not determine whether proof signatures of other kinds are included.
+
+A trust anchor ID identifies at most one kind of proof signature. An ID used for one kind, including one allocated for GREASE, MUST NOT later be used for another.
+
 ## Standalone Certificates
 
-A *standalone certificate* is a Merkle Tree certificate which contains sufficient signatures to allow a relying party to trust the choice of subtree, without any predistributed information beyond the cosigner(s) parameters. Standalone certificates can be issued without significant processing delay.
+A *standalone certificate* is a Merkle Tree certificate which contains sufficient subtree cosignatures to allow a relying party to trust the choice of subtree, without any predistributed information beyond the cosigner(s) parameters. Standalone certificates can be issued without significant processing delay.
 
 When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its issuance log. It then schedules a job to construct a checkpoint and collect cosignatures. The job proceeds as follows:
 
@@ -1326,11 +1342,11 @@ When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its 
 4. The CA requests sufficient subtree cosignatures from external cosigners to meet relying party requirements ({{trusted-cosigners}}). Depending on the protocol for requesting subtree cosignatures (e.g. {{TLOG-WITNESS}} and {{TLOG-MIRROR}}), this step may require first requesting a checkpoint cosignature ({{cosigners}}) from each cosigner.
 5. For each log entry in the interval, the CA constructs a certificate ({{certificate-format}}) from the inputs in {{certificate-inputs}}, using the covering subtree and the subtree cosignatures collected in steps 3 and 4.
 
-Step 4 is analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects signatures for many certificates at once. The CA MAY request signatures from a redundant set of cosigners and select the ones that complete first.
+Step 4 is analogous to requesting SCTs from CT logs in Certificate Transparency, except that a single run of this job collects subtree cosignatures for many certificates at once. The CA MAY request subtree cosignatures from a redundant set of cosigners and select the ones that complete first.
 
-This document does not place any requirements on how frequently this job runs. More frequent runs result in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
+This document does not place any requirements on how frequently this job runs. More frequent runs result in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects subtree cosignatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
 
-This document does not prescribe the specific cosigner roles, or a particular protocol for requesting cosignatures. Protocols for cosigners can vary depending on the needs of that cosigner. Some example protocols are described in {{TLOG-WITNESS}} and {{TLOG-MIRROR}}. It is RECOMMENDED that the CA collect cosignatures for the authenticating party, but the authenticating party MAY collect additional cosignatures and add them to the certificate.
+This document does not prescribe the specific cosigner roles, or a particular protocol for requesting cosignatures. Protocols for cosigners can vary depending on the needs of that cosigner. Some example protocols are described in {{TLOG-WITNESS}} and {{TLOG-MIRROR}}. It is RECOMMENDED that the CA collect subtree cosignatures for the authenticating party, but the authenticating party MAY collect additional subtree cosignatures and add them to the certificate.
 
 ## Landmark-Relative Certificates
 
@@ -1405,9 +1421,9 @@ Given the inputs in {{certificate-inputs}} and the corresponding log's landmark 
 
 3. Determine the `L`'s subtrees ({{landmark-tree-sizes}}) and select the unique one whose `[start, end)` interval contains `idx`.
 
-4. Construct a certificate ({{certificate-format}}) using the selected subtree. No cosignatures are required to authenticate the subtree, though the certificate MAY include cosignatures for other purposes, such as GREASE {{!RFC8701}} cosignatures as described in {{certificate-format}}.
+4. Construct a certificate ({{certificate-format}}) using the selected subtree. No subtree cosignatures are required to authenticate the subtree, though the certificate MAY include additional proof signatures ({{proofsignature-kinds}}), such as GREASE signatures.
 
-The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
+The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log. Proof signatures of other kinds ({{proofsignature-kinds}}) are carried over from the standalone certificate only as directed by the documents that define them.
 
 ## Size Estimates
 
@@ -1486,9 +1502,9 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. If `log_number`, `start`, and `end` match a trusted subtree ({{trusted-subtrees}}) for the CA, check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored.
+1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid subtree cosignatures to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Elements whose `signer_id` is not a cosigner recognized by the relying party MUST be ignored for this purpose.
 
-   Signatures are verified as described in {{signature-format}}. For each signature verification, the CosignedSubtree structure is constructed as follows:
+   Subtree cosignatures are verified as described in {{signature-format}}. For each signature verification, the CosignedSubtree structure is constructed as follows:
 
    1. Set the CosignedSubtree's `cosigner_name` based on the cosigner ID as described in {{signature-format}}.
    1. Set the CosignedSubtree's `timestamp` to zero.
@@ -1528,15 +1544,15 @@ Authenticity:
 Transparency:
 : The relying party only accepts entries that are publicly accessible, so that monitors, particularly the subject of the certificate, can notice any unauthorized certificates
 
-Relying parties SHOULD ensure authenticity by requiring a signature from the CA cosigner key. This is analogous to the signature in a directly-signed X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}.
+Relying parties SHOULD ensure authenticity by requiring a cosignature from the CA cosigner key. This is analogous to the signature in a directly-signed X.509 certificate. If the relying party obtains CA information from a CA certificate, the CA cosigner key is determined as in {{relying-party-configuration}}.
 
-While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
+While a CA cosignature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.
 
-To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, {{TLOG-WITNESS}} describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. {{revoked-ranges}} discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, {{TLOG-MIRROR}} describes a "mirror" cosigner role.
+To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of cosignatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, {{TLOG-WITNESS}} describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. {{revoked-ranges}} discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, {{TLOG-MIRROR}} describes a "mirror" cosigner role.
 
 Relying parties MAY accept the same set of additional cosigners across CAs.
 
-In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a signature from the CA cosigner. This fits the pattern of many existing X.509 applications, where CA information is determined directly from a CA certificate, with no additional out-of-band information. Unrecognized cosignatures are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.
+In applications that do not enforce transparency requirements, a relying party MAY implement a policy that only checks for a cosignature from the CA cosigner. This fits the pattern of many existing X.509 applications, where CA information is determined directly from a CA certificate, with no additional out-of-band information. Cosignatures from cosigners not recognized by the relying party are ignored, so such applications can interoperate with certificates issued for transparency-enforcing applications that require additional cosigners.
 
 Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.
 
@@ -1552,7 +1568,7 @@ Each trusted subtree contains:
 * The `start` and `end` values that define the subtree
 * The hash of the subtree
 
-Trusted subtrees for a CA are determined by its active landmark subtrees, as described in {{landmark-tree-sizes}}. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
+Trusted subtrees for a CA are determined by its active landmark subtrees, as described in {{landmark-tree-sizes}}. Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated cosignatures over the specific subtrees, only that they are consistent.
 
 This criterion can be checked given:
 
@@ -1767,7 +1783,7 @@ As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish availabilit
 
 Availability policies MAY permit CAs and mirrors to stop serving old, long-expired entries. If so, such policies SHOULD, at minimum, require CAs and mirrors to retain entries until they have been revoked in up-to-date relying parties. See {{revoked-ranges}} for details. This is analogous to the CT practice of temporal sharding {{CHROME-CT}}, except the issuance log remains compatible with older, unupdated relying parties.
 
-PKIs that require mirror cosignatures ({{trusted-cosigners}}) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.
+PKIs that require cosignatures from trusted mirrors ({{trusted-cosigners}}) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.
 
 However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized issuance, if the entries are not available in another mirror. This does compromise transparency goals. As such, availability policies SHOULD set availability expectations on mirrors. This can also be mitigated by using multiple mirrors, either directly enforced in cosigner requirements, or by keeping mirrors up-to-date with each other.
 
@@ -1882,6 +1898,8 @@ Different cosigner roles interact with extensions differently. Some roles, e.g. 
 Unrecognized entry types do not impact older relying parties. In {{verifying-certificate-signatures}}, the relying party constructs the MTCLogEntry that it expects. The unrecognized entry will have a different `type` value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.
 
 However, unrecognized entry extensions will be ignored by relying parties, analogously to a non-critical X.509 extension. Entry extensions thus SHOULD be defined so that this is safe.
+
+The MTCProof's `signatures` field is also an extension point, through new kinds of proof signature ({{proofsignature-kinds}}). Relying parties ignore trust anchor IDs they do not recognize, so a new kind, like an entry extension, cannot by itself make its own presence mandatory. A kind that carries security-relevant information SHOULD therefore be paired with something committed to the log entry, such as an X.509 extension, whose presence tells a relying party that understands it to require the proof signature. Otherwise an attacker could remove the proof signature undetected.
 
 If a monitor observes an entry with unknown type or entry extension, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.
 
@@ -2893,4 +2911,6 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Set up registries for extensible parameters.
 
-- Allow GREASE cosignatures in MTCProof.
+- Allow GREASE signatures in MTCProof.
+
+- Generalize MTCProof signatures into extensible kinds of proof signature, renaming `SubtreeSignature` and `cosigner_id` to `MTCProofSignature` and `signer_id`.
