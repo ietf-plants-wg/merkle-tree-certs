@@ -25,6 +25,8 @@ const (
 	VersionPlants02
 	VersionPlants04
 	VersionPlants05
+	VersionPlants06
+	VersionPlants07
 )
 
 func (v DraftVersion) String() string {
@@ -41,19 +43,19 @@ func (v DraftVersion) String() string {
 		return "plants-04"
 	case VersionPlants05:
 		return "plants-05"
+	case VersionPlants06:
+		return "plants-06"
+	case VersionPlants07:
+		return "plants-07"
 	}
 	panic(fmt.Sprintf("unknown version %d", v))
 }
 
-func (v *DraftVersion) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
+func (v *DraftVersion) UnmarshalText(text []byte) error {
 	var ok bool
-	*v, ok = DraftVersionFromString(s)
+	*v, ok = DraftVersionFromString(string(text))
 	if !ok {
-		return fmt.Errorf("unknown version %q", s)
+		return fmt.Errorf("unknown version %q", text)
 	}
 	return nil
 }
@@ -72,6 +74,10 @@ func DraftVersionFromString(s string) (v DraftVersion, ok bool) {
 		return VersionPlants04, true
 	case "plants-05":
 		return VersionPlants05, true
+	case "plants-06":
+		return VersionPlants06, true
+	case "plants-07":
+		return VersionPlants07, true
 
 	default:
 		return 0, false
@@ -127,15 +133,11 @@ func (s SignatureAlgorithm) String() string {
 	}
 }
 
-func (s *SignatureAlgorithm) UnmarshalJSON(data []byte) error {
-	var v string
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
+func (s *SignatureAlgorithm) UnmarshalText(text []byte) error {
 	var ok bool
-	*s, ok = SignatureAlgorithmFromString(v)
+	*s, ok = SignatureAlgorithmFromString(string(text))
 	if !ok {
-		return fmt.Errorf("invalid signature algorithm: %q", v)
+		return fmt.Errorf("invalid signature algorithm: %q", text)
 	}
 	return nil
 }
@@ -221,7 +223,14 @@ type CertificateConfig struct {
 	OverrideSignatureAlgorithm []byte
 	// OverrideSignatureAlgorithm, if not empty, overrides the TBSCertificate
 	// signature algorithm with the specified byte string.
-	OverrideTBSSignatureAlgorithm []byte
+	OverrideTBSSignatureAlgorithm   []byte
+	OverrideCertificatePropertyList *CertificatePropertyList
+}
+
+type CertificatePropertyList struct {
+	TrustAnchorID          TrustAnchorID
+	TrustAnchorGroups      []TrustAnchorIDPattern
+	TrustAnchorNegotiation bool
 }
 
 func parseBase128(in []byte) (ret uint32, rest []byte, ok bool) {
@@ -289,9 +298,12 @@ func (t TrustAnchorID) String() string {
 	if len(t) == 0 {
 		return fmt.Sprintf("<invalid: %x>", []byte(t))
 	}
+	rest := t
 	var s strings.Builder
-	for len(t) != 0 {
-		v, rest, ok := parseBase128(t)
+	for len(rest) != 0 {
+		var v uint32
+		var ok bool
+		v, rest, ok = parseBase128(rest)
 		if !ok {
 			return fmt.Sprintf("<invalid: %x>", []byte(t))
 		}
@@ -299,22 +311,126 @@ func (t TrustAnchorID) String() string {
 			s.WriteByte('.')
 		}
 		fmt.Fprintf(&s, "%d", v)
-		t = rest
 	}
 	return s.String()
 }
 
-func (t *TrustAnchorID) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
+func (t *TrustAnchorID) UnmarshalText(text []byte) error {
 	var ok bool
-	*t, ok = TrustAnchorIDFromString(s)
+	*t, ok = TrustAnchorIDFromString(string(text))
 	if !ok {
-		return fmt.Errorf("invalid trust anchor ID: %q", s)
+		return fmt.Errorf("invalid trust anchor ID: %q", text)
 	}
 	return nil
+}
+
+type TrustAnchorIDPattern []byte
+
+func appendPatternRange(pattern TrustAnchorIDPattern, min, max uint32) TrustAnchorIDPattern {
+	pattern = appendBase128(pattern, min)
+	pattern = appendBase128(pattern, max)
+	return pattern
+}
+
+func appendPatternRangeWithInfinity(pattern TrustAnchorIDPattern, min uint32) TrustAnchorIDPattern {
+	pattern = appendBase128(pattern, min)
+	pattern = append(pattern, 0x80)
+	return pattern
+}
+
+func TrustAnchorIDPatternFromString(s string) (t TrustAnchorIDPattern, ok bool) {
+	for _, part := range strings.Split(s, ".") {
+		if part != "" && part[0] == '{' && part[len(part)-1] == '}' {
+			part = part[1 : len(part)-1]
+			minMax := strings.SplitN(part, "-", 2)
+			if len(minMax) != 2 {
+				return
+			}
+			min, err := strconv.ParseUint(minMax[0], 10, 32)
+			if err != nil {
+				return
+			}
+			if minMax[1] == "" {
+				t = appendPatternRangeWithInfinity(t, uint32(min))
+			} else {
+				max, err := strconv.ParseUint(minMax[1], 10, 32)
+				if err != nil {
+					return
+				}
+				t = appendPatternRange(t, uint32(min), uint32(max))
+			}
+		} else {
+			v, err := strconv.ParseUint(part, 10, 32)
+			if err != nil {
+				return
+			}
+			t = appendPatternRange(t, uint32(v), uint32(v))
+		}
+	}
+	if len(t) == 0 {
+		return
+	}
+	ok = true
+	return
+}
+
+func (t TrustAnchorIDPattern) String() string {
+	if len(t) == 0 {
+		return fmt.Sprintf("<invalid: %x>", []byte(t))
+	}
+	var s strings.Builder
+	rest := t
+	for len(rest) != 0 {
+		var min, max uint32
+		var ok bool
+		if s.Len() != 0 {
+			s.WriteByte('.')
+		}
+		min, rest, ok = parseBase128(rest)
+		if !ok {
+			return fmt.Sprintf("<invalid: %x>", []byte(t))
+		}
+		if len(rest) > 0 && rest[0] == 0x80 {
+			fmt.Fprintf(&s, "{%d-}", min)
+			rest = rest[1:]
+		} else {
+			max, rest, ok = parseBase128(rest)
+			if !ok {
+				return fmt.Sprintf("<invalid: %x>", []byte(t))
+			}
+			if min == max {
+				fmt.Fprintf(&s, "%d", min)
+			} else {
+				fmt.Fprintf(&s, "{%d-%d}", min, max)
+			}
+		}
+
+	}
+	return s.String()
+}
+
+func (t *TrustAnchorIDPattern) UnmarshalText(text []byte) error {
+	var ok bool
+	*t, ok = TrustAnchorIDPatternFromString(string(text))
+	if !ok {
+		return fmt.Errorf("invalid trust anchor ID pattern: %q", text)
+	}
+	return nil
+}
+
+func TrustAnchorIDToPattern(id TrustAnchorID) TrustAnchorIDPattern {
+	pattern := make([]byte, 0, len(id)*2)
+	rest := id
+	for len(rest) != 0 {
+		var v uint32
+		var ok bool
+		v, rest, ok = parseBase128(rest)
+		if !ok {
+			panic(fmt.Sprintf("invalid pattern %x", []byte(id)))
+		}
+		pattern = appendPatternRange(pattern, v, v)
+	}
+	return pattern
 }
 
 type KeyUsageConfig x509.KeyUsage
@@ -355,25 +471,21 @@ func (k *KeyUsageConfig) UnmarshalJSON(data []byte) error {
 
 type ExtKeyUsageConfig asn1.ObjectIdentifier
 
-func (e *ExtKeyUsageConfig) UnmarshalJSON(data []byte) error {
-	var value string
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
+func (e *ExtKeyUsageConfig) UnmarshalText(text []byte) error {
 	var oid asn1.ObjectIdentifier
-	switch value {
+	switch s := string(text); s {
 	case "ServerAuth":
 		oid = oidServerAuth
 	default:
-		for _, part := range strings.Split(value, ".") {
+		for _, part := range strings.Split(s, ".") {
 			v, err := strconv.Atoi(part)
 			if err != nil || v < 0 {
-				return fmt.Errorf("invalid extended key usage: %q", value)
+				return fmt.Errorf("invalid extended key usage: %q", s)
 			}
 			oid = append(oid, v)
 		}
 		if len(oid) < 2 || oid[0] > 2 || (oid[0] < 2 && oid[1] >= 40) {
-			return fmt.Errorf("invalid extended key usage: %q", value)
+			return fmt.Errorf("invalid extended key usage: %q", s)
 		}
 	}
 	*e = ExtKeyUsageConfig(oid)

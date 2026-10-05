@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/x509"
 	"encoding/hex"
 	"testing"
@@ -99,6 +100,36 @@ func TestMarshalTBSCertificate(t *testing.T) {
 			expectedTBSHex:      "3081e7a003020102020204d2300c060a2b0601040182da4b2f00301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3010310e300c06035504031305412043413f3059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1a3263024300e0603551d0f0101ff04040302020430120603551d130101ff040830060101ff020105",
 			expectedLogEntryHex: "0001a003020102301931173015060a2b0601040182da4b2f010c0733323437332e31301e170d3230303130313030303030305a170d3230313233313233353935395a3010310e300c06035504031305412043413f301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5a3263024300e0603551d0f0101ff04040302020430120603551d130101ff040830060101ff020105",
 		},
+		// draft-plants-06 uses RELATIVE-OID for the X.509 name.
+		{
+			version: VersionPlants06,
+			issuer:  issuer,
+			serial:  1234,
+			entry: &EntryConfig{
+				PublicKey: publicKey,
+				CertConfigBase: CertConfigBase{
+					NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				},
+			},
+			expectedTBSHex:      "3081aca003020102020204d2300c060a2b0601040182da4b2f00301631143012060a2b0601040182da4b2f030d0481fd5901301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
+			expectedLogEntryHex: "00000001a003020102301631143012060a2b0601040182da4b2f030d0481fd5901301e170d3230303130313030303030305a170d3230313233313233353935395a3000301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
+		},
+		// draft-plants-07 has PKIX OIDs.
+		{
+			version: VersionPlants07,
+			issuer:  issuer,
+			serial:  1234,
+			entry: &EntryConfig{
+				PublicKey: publicKey,
+				CertConfigBase: CertConfigBase{
+					NotBefore: time.Unix(1577836800, 0), // 2020-01-01 00:00:00
+					NotAfter:  time.Unix(1609459199, 0), // 2020-12-31 23:59:59
+				},
+			},
+			expectedTBSHex:      "3081a8a003020102020204d2300a06082b0601050507064330143112301006082b060105050719030d0481fd5901301e170d3230303130313030303030305a170d3230313233313233353935395a30003059301306072a8648ce3d020106082a8648ce3d03010703420004e62b69e2bf659f97be2f1e0d948a4cd5976bb7a91e0d46fbdda9a91e9ddcba5a01e7d697a80a18f9c3c4a31e56e27c8348db161a1cf51d7ef1942d4bcf7222c1",
+			expectedLogEntryHex: "00000001a00302010230143112301006082b060105050719030d0481fd5901301e170d3230303130313030303030305a170d3230313233313233353935395a3000301306072a8648ce3d020106082a8648ce3d0301070420b3aea0f0a50538874f2b4c912f2676bd25ccc3dae700e20dcad42d3d5c074ca5",
+		},
 		// draft-plants-04 added an extensions field to
 		// MerkleTreeCertEntry.
 		{
@@ -149,7 +180,7 @@ func TestMarshalTBSCertificate(t *testing.T) {
 	for i, tt := range tests {
 		if !tt.entry.Null {
 			b := cryptobyte.NewBuilder(nil)
-			AddTBSCertificate(b, tt.issuer, tt.serial, tt.entry, &CertificateConfig{})
+			AddTBSCertificate(b, tt.version, tt.issuer, tt.serial, tt.entry, &CertificateConfig{})
 			tbs, err := b.Bytes()
 			if err != nil {
 				t.Errorf("%d. AddTBSCertificate() failed: %s", i, err)
@@ -164,5 +195,61 @@ func TestMarshalTBSCertificate(t *testing.T) {
 		} else if got := hex.EncodeToString(log); got != tt.expectedLogEntryHex {
 			t.Errorf("%d. MarshalTBSCertificateLogEntry() gave %s, wanted %s", i, got, tt.expectedLogEntryHex)
 		}
+	}
+}
+
+func TestMTCProofSignaturesLengthPrefix(t *testing.T) {
+	tests := []struct {
+		name      string
+		version   DraftVersion
+		length    int
+		prefixLen int
+		wantError bool
+	}{
+		{"plants-05", VersionPlants05, 123, 2, false},
+		{"plants-05-too-long", VersionPlants05, 1 << 16, 2, true},
+		{"plants-06", VersionPlants06, 123, 3, false},
+		{"plants-06-above-old-limit", VersionPlants06, 1 << 16, 3, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			payload := bytes.Repeat([]byte{0x42}, tt.length)
+			b := cryptobyte.NewBuilder(nil)
+			addMTCProofSignatures(b, tt.version, func(child *cryptobyte.Builder) {
+				child.AddBytes(payload)
+			})
+			encoded, err := b.Bytes()
+			if tt.wantError {
+				if err == nil {
+					t.Fatal("encoding unexpectedly succeeded")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("encoding failed: %v", err)
+			}
+			if len(encoded) != tt.prefixLen+len(payload) {
+				t.Fatalf("encoded length = %d, want %d", len(encoded), tt.prefixLen+len(payload))
+			}
+
+			in := cryptobyte.String(encoded)
+			var decoded cryptobyte.String
+			if !readMTCProofSignatures(&in, tt.version, &decoded) || !in.Empty() {
+				t.Fatal("decoding failed")
+			}
+			if !bytes.Equal(decoded, payload) {
+				t.Fatal("decoded payload does not match input")
+			}
+
+			otherVersion := VersionPlants05
+			if tt.version == VersionPlants05 {
+				otherVersion = VersionPlants06
+			}
+			in = encoded
+			if readMTCProofSignatures(&in, otherVersion, &decoded) && in.Empty() {
+				t.Fatal("decoding with another draft version unexpectedly succeeded")
+			}
+		})
 	}
 }

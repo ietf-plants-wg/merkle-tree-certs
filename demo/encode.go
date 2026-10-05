@@ -28,9 +28,15 @@ var (
 	oidBasicConstraints = asn1.ObjectIdentifier{2, 5, 29, 19}
 	oidExtKeyUsage      = asn1.ObjectIdentifier{2, 5, 29, 37}
 
-	oidMTCProofExperiment          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
-	oidRDNATrustAnchorIDExperiment = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}
-	oidMTCCAExperiment             = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 2}
+	oidMTCProofExperiment1          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
+	oidRDNATrustAnchorIDExperiment1 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}
+	oidMTCCAExperiment              = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 2}
+	oidRDNATrustAnchorIDExperiment2 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 3}
+	oidMTCCAWithSHA256Experiment    = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 4}
+
+	oidMTCCAWithSHA256   = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 1, 38}
+	oidMTCProof          = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 6, 67}
+	oidRDNATrustAnchorID = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 25, 3}
 
 	oidAlgUnsigned  = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 6, 36}
 	oidRDNAUnsigned = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 25, 1}
@@ -43,6 +49,8 @@ var (
 	oidMLDSA44         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 17}
 	oidMLDSA65         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 18}
 	oidMLDSA87         = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 3, 19}
+
+	tagRelativeOID = cbasn1.Tag(13)
 )
 
 func addASN1ImplicitString(bb *cryptobyte.Builder, tag cbasn1.Tag, b []byte) {
@@ -61,9 +69,13 @@ func addX509V3Version(b *cryptobyte.Builder) {
 	})
 }
 
-func addMTCProofSigAlg(b *cryptobyte.Builder) {
+func addMTCProofSigAlg(b *cryptobyte.Builder, version DraftVersion) {
 	b.AddASN1(cbasn1.SEQUENCE, func(alg *cryptobyte.Builder) {
-		alg.AddASN1ObjectIdentifier(oidMTCProofExperiment)
+		if version >= VersionPlants07 {
+			alg.AddASN1ObjectIdentifier(oidMTCProof)
+		} else {
+			alg.AddASN1ObjectIdentifier(oidMTCProofExperiment1)
+		}
 	})
 }
 
@@ -73,14 +85,25 @@ func addUnsignedSigAlg(b *cryptobyte.Builder) {
 	})
 }
 
-func addX509Name(b *cryptobyte.Builder, id TrustAnchorID) {
+func addX509Name(b *cryptobyte.Builder, version DraftVersion, id TrustAnchorID) {
 	b.AddASN1(cbasn1.SEQUENCE, func(dn *cryptobyte.Builder) {
 		dn.AddASN1(cbasn1.SET, func(rdn *cryptobyte.Builder) {
 			rdn.AddASN1(cbasn1.SEQUENCE, func(attr *cryptobyte.Builder) {
-				attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorIDExperiment)
-				attr.AddASN1(cbasn1.UTF8String, func(val *cryptobyte.Builder) {
-					val.AddBytes([]byte(id.String()))
-				})
+				if version >= VersionPlants06 {
+					if version >= VersionPlants07 {
+						attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorID)
+					} else {
+						attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorIDExperiment2)
+					}
+					attr.AddASN1(tagRelativeOID, func(val *cryptobyte.Builder) {
+						val.AddBytes(id)
+					})
+				} else {
+					attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorIDExperiment1)
+					attr.AddASN1(cbasn1.UTF8String, func(val *cryptobyte.Builder) {
+						val.AddBytes([]byte(id.String()))
+					})
+				}
 			})
 		})
 	})
@@ -219,13 +242,22 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 
 		if mtcCA != nil {
 			exts.AddASN1(cbasn1.SEQUENCE, func(ext *cryptobyte.Builder) {
-				ext.AddASN1ObjectIdentifier(oidMTCCAExperiment)
+				// In plants-05 and earlier, the log hash was separate from the top-level OID.
+				if mtcCA.version <= VersionPlants05 {
+					ext.AddASN1ObjectIdentifier(oidMTCCAExperiment)
+				} else if mtcCA.version <= VersionPlants06 {
+					ext.AddASN1ObjectIdentifier(oidMTCCAWithSHA256Experiment)
+				} else {
+					ext.AddASN1ObjectIdentifier(oidMTCCAWithSHA256)
+				}
 				ext.AddASN1Boolean(true)
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
 					extVal.AddASN1(cbasn1.SEQUENCE, func(seq *cryptobyte.Builder) {
-						seq.AddASN1(cbasn1.SEQUENCE, func(logHash *cryptobyte.Builder) {
-							logHash.AddASN1ObjectIdentifier(oidSHA256)
-						})
+						if mtcCA.version <= VersionPlants05 {
+							seq.AddASN1(cbasn1.SEQUENCE, func(logHash *cryptobyte.Builder) {
+								logHash.AddASN1ObjectIdentifier(oidSHA256)
+							})
+						}
 						seq.AddASN1(cbasn1.SEQUENCE, func(sigAlg *cryptobyte.Builder) {
 							switch mtcCA.cosigner.SignatureAlgorithm {
 							case SignatureAlgorithmP256WithSHA256:
@@ -255,16 +287,16 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 	})
 }
 
-func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial uint64, entry *EntryConfig, certConfig *CertificateConfig) {
+func AddTBSCertificate(b *cryptobyte.Builder, version DraftVersion, issuer TrustAnchorID, serial uint64, entry *EntryConfig, certConfig *CertificateConfig) {
 	b.AddASN1(cbasn1.SEQUENCE, func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
 		tbs.AddASN1Uint64(serial)
 		if len(certConfig.OverrideTBSSignatureAlgorithm) != 0 {
 			tbs.AddBytes(certConfig.OverrideTBSSignatureAlgorithm)
 		} else {
-			addMTCProofSigAlg(tbs)
+			addMTCProofSigAlg(tbs, version)
 		}
-		addX509Name(tbs, issuer)
+		addX509Name(tbs, version, issuer)
 		addValidity(tbs, &entry.CertConfigBase)
 		addSubject(tbs, entry)
 		tbs.AddBytes(entry.PublicKey)
@@ -277,6 +309,14 @@ func AddTBSCertificate(b *cryptobyte.Builder, issuer TrustAnchorID, serial uint6
 func addEmptyMTCEntryExtensions(b *cryptobyte.Builder, version DraftVersion) {
 	if version >= VersionPlants04 {
 		b.AddUint16LengthPrefixed(func(_ *cryptobyte.Builder) {})
+	}
+}
+
+func addMTCProofSignatures(b *cryptobyte.Builder, version DraftVersion, f func(*cryptobyte.Builder)) {
+	if version >= VersionPlants06 {
+		b.AddUint24LengthPrefixed(f)
+	} else {
+		b.AddUint16LengthPrefixed(f)
 	}
 }
 
@@ -300,7 +340,7 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 
 	marshalContents := func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
-		addX509Name(tbs, issuer)
+		addX509Name(tbs, version, issuer)
 		addValidity(tbs, &entry.CertConfigBase)
 		addSubject(tbs, entry)
 		// Starting draft-plants-02, the public key algorithm is included in
@@ -368,11 +408,11 @@ func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Co
 			}
 			serial |= uint64(config.LogNumber) << 48
 		}
-		AddTBSCertificate(cert, config.ID, serial, entry, certConfig)
+		AddTBSCertificate(cert, config.Version, config.ID, serial, entry, certConfig)
 		if len(certConfig.OverrideSignatureAlgorithm) != 0 {
 			cert.AddBytes(certConfig.OverrideSignatureAlgorithm)
 		} else {
-			addMTCProofSigAlg(cert)
+			addMTCProofSigAlg(cert, config.Version)
 		}
 		cert.AddASN1(cbasn1.BIT_STRING, func(certSig *cryptobyte.Builder) {
 			proof, err := SubtreeInclusionProof(issuanceLog, index, start, end)
@@ -407,7 +447,7 @@ func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Co
 				certSig.AddUint64(end)
 			}
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
-			certSig.AddUint16LengthPrefixed(func(cosigs *cryptobyte.Builder) {
+			addMTCProofSignatures(certSig, config.Version, func(cosigs *cryptobyte.Builder) {
 				// plants-04 canonicalizes the cosigner order.
 				if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
 					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *Cosigner) int {
@@ -470,7 +510,7 @@ func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 			addUnsignedSigAlg(tbs)
 			addUnsignedX509NamePlaceholder(tbs) // No issuer
 			addValidity(tbs, &config.CACert.CertConfigBase)
-			addX509Name(tbs, config.ID) // Subject
+			addX509Name(tbs, config.Version, config.ID) // Subject
 			tbs.AddBytes(spki)
 
 			addExtensions(tbs, &config.CACert.CertConfigBase, &mtcCAInfo{
@@ -482,6 +522,48 @@ func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 		})
 		addUnsignedSigAlg(cert)
 		cert.AddASN1BitString(nil)
+	})
+	return b.Bytes()
+}
+
+const (
+	propertyTrustAnchorID          = 0
+	propertyTrustAnchorGroups      = 1
+	propertyTrustAnchorNegotiation = 2
+)
+
+func MarshalCertificatePropertyList(l *CertificatePropertyList) ([]byte, error) {
+	b := cryptobyte.NewBuilder(nil)
+	b.AddUint16LengthPrefixed(func(props *cryptobyte.Builder) {
+		if len(l.TrustAnchorID) != 0 {
+			props.AddUint16(propertyTrustAnchorID)
+			props.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {
+				// No extra length prefix because we said that the `data` field
+				// simply is the trust anchor ID.
+				child.AddBytes(l.TrustAnchorID)
+			})
+		}
+		if len(l.TrustAnchorGroups) != 0 {
+			props.AddUint16(propertyTrustAnchorGroups)
+			// TLS's presentation language leads to many redundant length prefixes.
+			// First we have a length prefix for the property's `data` field.
+			props.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {
+				// Now the TrustAnchorIDPatternList needs a length prefix.
+				child.AddUint16LengthPrefixed(func(list *cryptobyte.Builder) {
+					for _, p := range l.TrustAnchorGroups {
+						// The ID is encoded as a TrustAnchorIDPattern, so it needs a length prefix,
+						// or the parsing will be ambiguous.
+						list.AddUint8LengthPrefixed(func(pattern *cryptobyte.Builder) {
+							pattern.AddBytes(p)
+						})
+					}
+				})
+			})
+		}
+		if l.TrustAnchorNegotiation {
+			props.AddUint16(propertyTrustAnchorNegotiation)
+			props.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {})
+		}
 	})
 	return b.Bytes()
 }

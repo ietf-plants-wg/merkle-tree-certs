@@ -60,7 +60,7 @@ type TrustedSubtree struct {
 	Hash       HashValue
 }
 
-func caIDFromX509Name(name []byte) (TrustAnchorID, error) {
+func parseSingleAttributeX509Name(name []byte, wantOID asn1.ObjectIdentifier) (cryptobyte.String, error) {
 	s := cryptobyte.String(name)
 	var dn, rdn, attr cryptobyte.String
 	var attrOID asn1.ObjectIdentifier
@@ -71,21 +71,45 @@ func caIDFromX509Name(name []byte) (TrustAnchorID, error) {
 		!attr.ReadASN1ObjectIdentifier(&attrOID) {
 		return nil, errors.New("malformed X.509 name")
 	}
-	if !attrOID.Equal(oidRDNATrustAnchorIDExperiment) {
-		return nil, fmt.Errorf("unexpected X.509 name attribute %s", attrOID)
-	}
-	var utf8Val cryptobyte.String
-	if !attr.ReadASN1(&utf8Val, cbasn1.UTF8String) || !attr.Empty() {
-		return nil, errors.New("malformed trust anchor ID UTF8String")
-	}
-	id, ok := TrustAnchorIDFromString(string(utf8Val))
-	if !ok {
-		return nil, fmt.Errorf("invalid trust anchor ID string %q", string(utf8Val))
+	if !attrOID.Equal(wantOID) {
+		return nil, fmt.Errorf("unexpected X.509 name attribute %s, wanted %s", attrOID, wantOID)
 	}
 	if !rdn.Empty() || !dn.Empty() {
 		return nil, errors.New("extra attributes in X.509 name")
 	}
-	return id, nil
+	return attr, nil
+}
+
+func caIDFromX509Name(version DraftVersion, name []byte) (TrustAnchorID, error) {
+	if version <= VersionPlants05 {
+		attr, err := parseSingleAttributeX509Name(name, oidRDNATrustAnchorIDExperiment1)
+		if err != nil {
+			return nil, err
+		}
+		var utf8Val cryptobyte.String
+		if !attr.ReadASN1(&utf8Val, cbasn1.UTF8String) || !attr.Empty() {
+			return nil, errors.New("malformed trust anchor ID UTF8String")
+		}
+		id, ok := TrustAnchorIDFromString(string(utf8Val))
+		if !ok {
+			return nil, fmt.Errorf("invalid trust anchor ID string %q", string(utf8Val))
+		}
+		return id, nil
+	}
+
+	oid := oidRDNATrustAnchorID
+	if version <= VersionPlants06 {
+		oid = oidRDNATrustAnchorIDExperiment2
+	}
+	attr, err := parseSingleAttributeX509Name(name, oid)
+	if err != nil {
+		return nil, err
+	}
+	var relativeOIDVal cryptobyte.String
+	if !attr.ReadASN1(&relativeOIDVal, tagRelativeOID) || !attr.Empty() {
+		return nil, errors.New("malformed trust anchor ID RELATIVE-OID")
+	}
+	return TrustAnchorID(relativeOIDVal), nil
 }
 
 func isEmptyOrASN1Null(s cryptobyte.String) bool {
@@ -93,7 +117,7 @@ func isEmptyOrASN1Null(s cryptobyte.String) bool {
 }
 
 func (p *Policy) AddCA(ca *x509.Certificate) error {
-	caID, err := caIDFromX509Name(ca.RawSubject)
+	caID, err := caIDFromX509Name(p.Version, ca.RawSubject)
 	if err != nil {
 		return fmt.Errorf("failed to extract CA ID from subject: %w", err)
 	}
@@ -105,9 +129,16 @@ func (p *Policy) AddCA(ca *x509.Certificate) error {
 		return fmt.Errorf("CA %s already defined", caID)
 	}
 
+	wantOID := oidMTCCAWithSHA256
+	if p.Version <= VersionPlants05 {
+		wantOID = oidMTCCAExperiment
+	} else if p.Version <= VersionPlants06 {
+		wantOID = oidMTCCAWithSHA256Experiment
+	}
+
 	var caExt *pkix.Extension
 	for i := range ca.Extensions {
-		if ca.Extensions[i].Id.Equal(oidMTCCAExperiment) {
+		if ca.Extensions[i].Id.Equal(wantOID) {
 			caExt = &ca.Extensions[i]
 			break
 		}
@@ -120,10 +151,19 @@ func (p *Policy) AddCA(ca *x509.Certificate) error {
 	var seq, logHashSeq, sigAlgSeq cryptobyte.String
 	var logHashOID, sigAlgOID asn1.ObjectIdentifier
 	minSerial, maxSerial := uint64(0), uint64(math.MaxUint64)
-	if !extVal.ReadASN1(&seq, cbasn1.SEQUENCE) || !extVal.Empty() ||
-		!seq.ReadASN1(&logHashSeq, cbasn1.SEQUENCE) ||
-		!logHashSeq.ReadASN1ObjectIdentifier(&logHashOID) ||
-		!seq.ReadASN1(&sigAlgSeq, cbasn1.SEQUENCE) ||
+	if !extVal.ReadASN1(&seq, cbasn1.SEQUENCE) || !extVal.Empty() {
+		return fmt.Errorf("malformed MTC CA extension")
+	}
+	if p.Version <= VersionPlants05 {
+		if !seq.ReadASN1(&logHashSeq, cbasn1.SEQUENCE) ||
+			!logHashSeq.ReadASN1ObjectIdentifier(&logHashOID) {
+			return fmt.Errorf("malformed MTC CA extension")
+		}
+		if !logHashOID.Equal(oidSHA256) || !isEmptyOrASN1Null(logHashSeq) {
+			return errors.New("unsupported log hash algorithm")
+		}
+	}
+	if !seq.ReadASN1(&sigAlgSeq, cbasn1.SEQUENCE) ||
 		!sigAlgSeq.ReadASN1ObjectIdentifier(&sigAlgOID) ||
 		!seq.ReadASN1Integer(&minSerial) {
 		return fmt.Errorf("malformed MTC CA extension")
@@ -135,10 +175,6 @@ func (p *Policy) AddCA(ca *x509.Certificate) error {
 	}
 	if !seq.Empty() {
 		return fmt.Errorf("malformed MTC CA extension")
-	}
-
-	if !logHashOID.Equal(oidSHA256) || !isEmptyOrASN1Null(logHashSeq) {
-		return errors.New("unsupported log hash algorithm")
 	}
 
 	var sigAlg SignatureAlgorithm
