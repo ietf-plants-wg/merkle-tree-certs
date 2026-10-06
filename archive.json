@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-04T05:37:50.862515+00:00",
+  "timestamp": "2026-10-06T06:04:36.091971+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -21548,13 +21548,13 @@
       "labels": [],
       "body": "## Summary\r\n- Adds a regenerable end-to-end certificate encoding test vector in the demo tool (`demo/e2e_test.go`, `demo/e2e_certificate.{txt,json}`), covering intermediates from `TBSCertificateLogEntry` through leaf hash, inclusion proof, CosignedMessage, `MTCProof`, and Certificate.\r\n- Uses a small plants-05 example (two-entry log, Ed25519 CA cosigner for deterministic signatures) and round-trips through `VerifyMTCProof`.\r\n- Adds a short draft appendix under Test Vectors with the worked intermediate values and an informative reference to the demo files.\r\n\r\nFixes #291\r\n\r\n## Test plan\r\n- [ ] `cd demo && go test ./...`\r\n- [ ] `cd demo && go test -run TestE2ECertificateVector -update` regenerates goldens that match the committed files\r\n- [ ] Spot-check draft appendix hex against `demo/e2e_certificate.txt`",
       "createdAt": "2026-08-31T21:53:57Z",
-      "updatedAt": "2026-09-04T12:41:52Z",
+      "updatedAt": "2026-10-05T11:51:01Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "1bf9277eacbc45ab0e6d0b943f0550304cbe4c4c",
+      "baseRefOid": "44b1c0b8c54669a35e8d9e96f0e55bb3cab67757",
       "headRepository": "nad33mahm3d/merkle-tree-certs",
       "headRefName": "e2e-certificate-test-vector",
-      "headRefOid": "0273d16148096d016abb4df1b28956ce81989a2e",
+      "headRefOid": "52017abc58d99d6b053173e2aa5ccf740456dae1",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -23988,6 +23988,32 @@
           "updatedAt": "2026-10-01T04:29:03Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 353,
+      "id": "PR_kwDOJIBkVc8AAAABGvESjg",
+      "title": "Generalize MTCProof signatures into extensible kinds of proof signature",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/353",
+      "state": "OPEN",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Rename Cosignature/cosigner_id to MTCProofSignature/signer_id, define subtree cosignatures and GREASE signatures as kinds, and let other documents define further kinds.\r\n\r\nThe aim is to make \"funny cosignatures\" (for GREASE and for my revocation idea) less funny.",
+      "createdAt": "2026-10-05T15:09:04Z",
+      "updatedAt": "2026-10-05T15:09:04Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "44b1c0b8c54669a35e8d9e96f0e55bb3cab67757",
+      "headRepository": "robstradling/merkle-tree-certs",
+      "headRefName": "proofsignature-kinds",
+      "headRefOid": "f0690aa3aaffb7576c356989937ee483fd417c12",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
