@@ -3755,7 +3755,7 @@ Table of Contents
               <https://letsencrypt.org/stats/>.
 
    [MTC-TLOG] C2SP, "Merkle Tree Certificates With Tiled Transparency
-              Logs", October 2026, <https://c2sp.org/mtc-tlog@v1.0.0>.
+              Logs", October 2026, <https://c2sp.org/mtc-tlog@v0.1.0>.
 
    [RFC4514]  Zeilenga, K., Ed., "Lightweight Directory Access Protocol
               (LDAP): String Representation of Distinguished Names",
@@ -3804,7 +3804,7 @@ Table of Contents
 
    [TLOG-MIRROR]
               C2SP, "Transparency Log Mirrors", October 2026,
-              <https://c2sp.org/tlog-mirror@v1.0.0>.
+              <https://c2sp.org/tlog-mirror@v0.1.0>.
 
    [TLOG-TILES]
               C2SP, "Tiled Transparency Logs", October 2026,
