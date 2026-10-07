@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strconv"
+	"time"
 
 	"golang.org/x/crypto/cryptobyte"
 )
@@ -331,8 +332,11 @@ func generate(args []string) error {
 	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(LogIDForConfig(&config)))
 	fmt.Fprintf(&signedNote, "%d\n", len(entries))
 	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
+	// Checkpoint cosignatures carry the time they were made
+	// (https://c2sp.org/tlog-cosignature@v1.1.0).
+	timestamp := uint64(time.Now().Unix())
 	for _, cosigner := range cosigners {
-		cosig, err := cosigner.Sign(LogIDForConfig(&config), 0, uint64(len(entries)), &checkpointHash)
+		cosig, err := cosigner.SignCheckpoint(LogIDForConfig(&config), uint64(len(entries)), timestamp, &checkpointHash)
 		if err != nil {
 			return err
 		}
