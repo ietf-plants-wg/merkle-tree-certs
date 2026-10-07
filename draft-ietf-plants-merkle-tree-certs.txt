@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 5 April 2027                                         Apple Inc.
+Expires: 10 April 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          2 October 2026
+                                                          7 October 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 April 2027.
+   This Internet-Draft will expire on 10 April 2027.
 
 Copyright Notice
 
@@ -3755,7 +3755,7 @@ Table of Contents
               <https://letsencrypt.org/stats/>.
 
    [MTC-TLOG] C2SP, "Merkle Tree Certificates With Tiled Transparency
-              Logs", July 2026, <https://c2sp.org/mtc-tlog>.
+              Logs", October 2026, <https://c2sp.org/mtc-tlog@v0.1.0>.
 
    [RFC4514]  Zeilenga, K., Ed., "Lightweight Directory Access Protocol
               (LDAP): String Representation of Distinguished Names",
@@ -3799,20 +3799,20 @@ Table of Contents
               Zm4NqyRc7LDsOtV56EchBIT9r4c/>.
 
    [TLOG-COSIGNATURE]
-              C2SP, "Transparency Log Cosignatures", April 2026,
-              <https://c2sp.org/tlog-cosignature>.
+              C2SP, "Transparency Log Cosignatures", October 2026,
+              <https://c2sp.org/tlog-cosignature@v1.1.0>.
 
    [TLOG-MIRROR]
-              C2SP, "Transparency Log Mirrors", July 2025,
-              <https://c2sp.org/tlog-mirror>.
+              C2SP, "Transparency Log Mirrors", October 2026,
+              <https://c2sp.org/tlog-mirror@v0.1.0>.
 
    [TLOG-TILES]
-              C2SP, "Tiled Transparency Logs", June 2025,
-              <https://c2sp.org/tlog-tiles>.
+              C2SP, "Tiled Transparency Logs", October 2026,
+              <https://c2sp.org/tlog-tiles@v1.0.0>.
 
    [TLOG-WITNESS]
-              C2SP, "Transparency Log Witness Protocol", June 2025,
-              <https://c2sp.org/tlog-witness>.
+              C2SP, "Transparency Log Witness Protocol", October 2026,
+              <https://c2sp.org/tlog-witness@v1.1.0>.
 
 Appendix A.  ASN.1 Module
 
@@ -4937,6 +4937,8 @@ Since draft-ietf-plants-merkle-tree-certs-06
    *  Set up registries for extensible parameters.
 
    *  Allow GREASE cosignatures in MTCProof.
+
+   *  Use versioned URLs for (non-normative) C2SP references.
 
 Authors' Addresses
 
