@@ -156,36 +156,36 @@ informative:
 
   MTC-TLOG:
     title: Merkle Tree Certificates With Tiled Transparency Logs
-    target: https://c2sp.org/mtc-tlog
-    date: July 2026
+    target: https://c2sp.org/mtc-tlog@v0.1.0
+    date: October 2026
     author:
       org: C2SP
 
   TLOG-TILES:
     title: Tiled Transparency Logs
-    target: https://c2sp.org/tlog-tiles
-    date: June 2025
+    target: https://c2sp.org/tlog-tiles@v1.0.0
+    date: October 2026
     author:
       org: C2SP
 
   TLOG-WITNESS:
     title: Transparency Log Witness Protocol
-    target: https://c2sp.org/tlog-witness
-    date: June 2025
+    target: https://c2sp.org/tlog-witness@v1.1.0
+    date: October 2026
     author:
       org: C2SP
 
   TLOG-MIRROR:
     title: Transparency Log Mirrors
-    target: https://c2sp.org/tlog-mirror
-    date: July 2025
+    target: https://c2sp.org/tlog-mirror@v0.1.0
+    date: October 2026
     author:
       org: C2SP
 
   TLOG-COSIGNATURE:
     title: Transparency Log Cosignatures
-    target: https://c2sp.org/tlog-cosignature
-    date: April 2026
+    target: https://c2sp.org/tlog-cosignature@v1.1.0
+    date: October 2026
     author:
       org: C2SP
 
@@ -2894,3 +2894,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Set up registries for extensible parameters.
 
 - Allow GREASE cosignatures in MTCProof.
+
+- Use versioned URLs for (non-normative) C2SP references.
