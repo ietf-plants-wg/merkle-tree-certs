@@ -83,9 +83,9 @@ require-cosigners 32473.1 independent-cosigner-from-B
 revoke-range 32473.1 1:2100 max
 
 # Landmark subtrees copied out from output of the demo program.
-trusted-subtree 32473.1 1    0   32 FuB1S/AVQxq3AkJmS+motlqcwNSi6FOJG3Noa4KaGF4=
-trusted-subtree 32473.1 1   32   34 n45YX8aNgPT/JiC5jjTDOE4l1ZF/te899ttPlHJIb5A=
-trusted-subtree 32473.1 1    0 1024 XDQGoZVQpbPJTvy/9j/vEbV9+VZIOmw8mmB8As7a1Oc=
-trusted-subtree 32473.1 1 1024 2036 nrHwDwyamzxb3tc44WcvnQrcgyHoydtC9FedzUZFQ24=
-trusted-subtree 32473.1 1 2032 2048 EhUZWbsNhnFxw1uITvqZyVOXz3uJmHxhMNtGrz4rRaE=
-trusted-subtree 32473.1 1 2048 2122 c5G7ogrVRBwqk/VGTvwrJOLovIPf5PL+mcmx3o3El0w=
+trusted-subtree 32473.1 1    0   32 h8Kw2BqVjlYaB3esivVVSwmRQfwVIb6E71DEeK3YQwc=
+trusted-subtree 32473.1 1   32   34 aQ7rLTwjwLuYX6KLJpERloBQERVSWgFUxcOiSIwvNPg=
+trusted-subtree 32473.1 1    0 1024 blLA+9WDzuzi1pEWyHy06XW17rgrWhiKbDaV7WxXzpw=
+trusted-subtree 32473.1 1 1024 2036 xc/+sJddkjD4FL8rGdrkbMItGKsWrhfhIRp8vYprdiI=
+trusted-subtree 32473.1 1 2032 2048 H89Du5MigjGfW+Dd+K2HSnMi5S5JPBeLAf+IoZHO8jY=
+trusted-subtree 32473.1 1 2048 2122 NI0xeg7ALqrMDJYtMMIcnU6b5E4dFYdWd6dI8yH2wh0=
