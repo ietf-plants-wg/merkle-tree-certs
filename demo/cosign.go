@@ -10,6 +10,7 @@ import (
 	"crypto/sha256"
 	_ "crypto/sha512"
 	"crypto/x509"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -27,18 +28,27 @@ func tlogOrigin(id TrustAnchorID) string {
 	return fmt.Sprintf("oid/1.3.6.1.4.1.%s", id)
 }
 
-func cosignedMessage(version DraftVersion, cosignerID, logID TrustAnchorID, start, end uint64, hash *HashValue) ([]byte, error) {
+// cosignedMessage returns the message a cosigner signs. timestamp is zero for
+// a subtree cosignature, and the signing time for a checkpoint cosignature
+// (see https://c2sp.org/tlog-cosignature@v1.1.0), which covers [0, end).
+func cosignedMessage(version DraftVersion, cosignerID, logID TrustAnchorID, timestamp, start, end uint64, hash *HashValue) ([]byte, error) {
+	if timestamp != 0 && start != 0 {
+		return nil, fmt.Errorf("only a checkpoint cosignature, with start zero, has a timestamp")
+	}
 	b := cryptobyte.NewBuilder(nil)
 	if version >= VersionPlants04 {
 		b.AddBytes([]byte("subtree/v1\n\x00"))
 		b.AddUint8LengthPrefixed(func(cosignerName *cryptobyte.Builder) {
 			cosignerName.AddBytes([]byte(tlogOrigin(cosignerID)))
 		})
-		b.AddUint64(0) // timestamp
+		b.AddUint64(timestamp)
 		b.AddUint8LengthPrefixed(func(logOrigin *cryptobyte.Builder) {
 			logOrigin.AddBytes([]byte(tlogOrigin(logID)))
 		})
 	} else {
+		if timestamp != 0 {
+			return nil, fmt.Errorf("timestamped cosignatures require plants-04 or later")
+		}
 		b.AddBytes([]byte("mtc-subtree/v1\n\x00"))
 		addTrustAnchorID(b, cosignerID)
 		addTrustAnchorID(b, logID)
@@ -147,8 +157,30 @@ func NewCosignerFromConfig(version DraftVersion, config *CosignerConfig) (*Cosig
 	}, nil
 }
 
+// Sign returns a subtree cosignature: the signature alone, over a message with
+// a zero timestamp.
 func (c *Cosigner) Sign(logID TrustAnchorID, start, end uint64, hash *HashValue) ([]byte, error) {
-	inp, err := cosignedMessage(c.Version, c.ID, logID, start, end, hash)
+	return c.sign(logID, 0, start, end, hash)
+}
+
+// SignCheckpoint returns a checkpoint cosignature for the log's first size
+// entries, as https://c2sp.org/tlog-cosignature@v1.1.0 defines it: the
+// timestamp as an eight-byte, big-endian integer, followed by the signature
+// over a message carrying the same timestamp. Before plants-04 the message has
+// no timestamp, so the signature alone is returned.
+func (c *Cosigner) SignCheckpoint(logID TrustAnchorID, size, timestamp uint64, hash *HashValue) ([]byte, error) {
+	if c.Version < VersionPlants04 {
+		return c.sign(logID, 0, 0, size, hash)
+	}
+	sig, err := c.sign(logID, timestamp, 0, size, hash)
+	if err != nil {
+		return nil, err
+	}
+	return append(binary.BigEndian.AppendUint64(nil, timestamp), sig...), nil
+}
+
+func (c *Cosigner) sign(logID TrustAnchorID, timestamp, start, end uint64, hash *HashValue) ([]byte, error) {
+	inp, err := cosignedMessage(c.Version, c.ID, logID, timestamp, start, end, hash)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +225,7 @@ func NewCosignerPublic(vers DraftVersion, id TrustAnchorID, sigAlg SignatureAlgo
 }
 
 func (c *CosignerPublic) Verify(logID TrustAnchorID, start, end uint64, hash *HashValue, sig []byte) error {
-	inp, err := cosignedMessage(c.Version, c.ID, logID, start, end, hash)
+	inp, err := cosignedMessage(c.Version, c.ID, logID, 0, start, end, hash)
 	if err != nil {
 		return err
 	}
