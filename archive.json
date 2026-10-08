@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-06T06:04:36.091971+00:00",
+  "timestamp": "2026-10-08T05:48:36.324542+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4237,31 +4237,39 @@
       "id": "I_kwDOJIBkVc8AAAABUAMGEQ",
       "title": "Switch (non-normative) C2SP references to tagged versions",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/339",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "They're non-normative, so it's not crucial, but it would probably be helpful if we cited versions nonetheless, once we tag things.",
       "createdAt": "2026-09-29T21:30:59Z",
-      "updatedAt": "2026-09-29T21:30:59Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-10-07T18:18:05Z",
+      "closedAt": "2026-10-07T18:18:05Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is done now.",
+          "createdAt": "2026-10-07T18:18:05Z",
+          "updatedAt": "2026-10-07T18:18:05Z"
+        }
+      ]
     },
     {
       "number": 341,
       "id": "I_kwDOJIBkVc8AAAABUJ73bA",
       "title": "demo: the checkpoint's signature lines are not tlog-cosignature lines (no timestamped_signature)",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/341",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "atoranzo",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "`demo generate` writes a signed `checkpoint` whose signature lines are\n`\u2014 <origin> base64(key_id || signature)`, where `signature` is the bare\nsubtree signature over `[0, size)` with `timestamp = 0` in the\nCosignedMessage (`generate.go`, the loop after the tiles are written, and\n`cosign.go: cosignedMessage`, which always adds a zero timestamp).\n\nC2SP's mtc-tlog says each issuance log \"MUST serve a checkpoint that\nincludes a signature from its CA cosigner, formatted as a note signature\"\nwith the CA cosigner mapped to a tlog-cosignature cosigner, and\ntlog-cosignature says the signature \"MUST be a `timestamped_signature`\nstructure\" (`u64 timestamp` followed by the ML-DSA-44 signature), with the\ntimestamp inside the signed message. The draft itself only requires the\nsubtree *signature format* to be compatible with tlog-cosignature's\nML-DSA-44 construction (section \"Signature Format\"), so the draft is not\ncontradicted; the demo's checkpoint, as written, cannot be consumed by a\nwitness or client that follows tlog-cosignature.\n\nHow I found it: an independent Rust implementation rebuilds the demo's log\nfrom its entry tiles (2122 entries, same root as the checkpoint) and\nchecks the CA's line: the key ID matches\n`SHA-256(name || \"\\n\" || 0x06 || pk)[:4]`, and the line verifies only as a\nbare subtree signature with timestamp 0, not as a `timestamped_signature`.\n\nIs the demo's `checkpoint` meant to be tlog-cosignature-consumable? If so,\nthe fix is to sign `[0, size)` with a non-zero timestamp and write\n`key_id || timestamp || signature` (the same `Sign` path with the\ntimestamp). If it is only illustrative, a comment in `generate.go` saying\nso would save the next implementer the detour.\n\nDemo at 99097c9e0af9641a85311b68f7642978b882d385, `-version plants-07`.",
       "createdAt": "2026-09-30T13:53:00Z",
-      "updatedAt": "2026-09-30T16:13:52Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-07T19:08:29Z",
+      "closedAt": "2026-10-07T19:08:29Z",
       "comments": [
         {
           "author": "davidben",
@@ -4272,7 +4280,7 @@
         },
         {
           "author": "atoranzo",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Thanks! Happy to send a PR for this after draft-07 is cut, alongside #342:\nsign [0, size) with a non-zero timestamp and write\nkey_id || timestamp || signature on the line. My reader already checks that\nform, so I can verify the output before sending. One detail to settle in the\nPR: only ML-DSA-44 cosigners have a tlog-defined key ID; the other\nalgorithms would keep the placeholder.",
           "createdAt": "2026-09-30T16:13:52Z",
           "updatedAt": "2026-09-30T16:13:52Z"
@@ -4284,15 +4292,15 @@
       "id": "I_kwDOJIBkVc8AAAABUJ-INQ",
       "title": "demo: the six trusted-subtree lines in policy.txt do not match the output of mtc.json",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/342",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "atoranzo",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The sample `demo/policy.txt` ends with six `trusted-subtree 32473.1 1 \u2026`\nlines. Their hashes do not match what `./demo generate` produces from the\nshipped `mtc.json`, neither with `\"Version\": \"plants-06\"` nor with\n`\"plants-07\"` (the landmark hashes are the same in both, since the entry\ndoes not contain the proof OID). As a result, with the sample policy the\ndemo rejects its own landmark-relative certificates:\n\n    ./demo generate -config mtc.json -out out\n    ./demo verify -version plants-06 -ca-cert out/ca_cert.pem -policy policy.txt out/cert_10_12.pem out/cert_2035_1.pem\n    out/cert_10_12.pem: trusted subtree hash mismatch: expected 16e0754b\u2026, got a1ae9032\u2026\n    out/cert_2035_1.pem: trusted subtree hash mismatch: expected 9eb1f00f\u2026, got 90067a9a\u2026\n\nThe six lines `generate` prints today for that configuration are:\n\n    trusted-subtree 32473.1 1 0 32 oa6QMleLNSitORGbqKjvLwnQNlVu9sqRcXGychQkOmI=\n    trusted-subtree 32473.1 1 32 34 UvjrKbCk/EMgFwpXzsLQXwt2saiMQZeeMZ7I5pgofFE=\n    trusted-subtree 32473.1 1 0 1024 qB4Q6PIQm4Q4WUWX8ryEMInIYsVwKSPODzTgWqp2BAE=\n    trusted-subtree 32473.1 1 1024 2036 kAZ6mrwRZfprcrvk9DFIz4ICs8WPOEGOadsb0Rcf02Y=\n    trusted-subtree 32473.1 1 2032 2048 1afncFPIzrEX3a+7MKWMBjGGliCNN55asXFKbKUBKPc=\n    trusted-subtree 32473.1 1 2048 2122 90p0r7eRRQ5J3hbJI25OUf8z8O6hQULKdVjPYPAzsAk=\n\nPresumably the sample was generated from an earlier `mtc.json`. Happy to\nsend a PR with the six lines if that helps.\n\nDemo at 99097c9e0af9641a85311b68f7642978b882d385, Go 1.27.1.",
       "createdAt": "2026-09-30T13:55:45Z",
-      "updatedAt": "2026-09-30T16:18:06Z",
-      "closedAt": null,
+      "updatedAt": "2026-10-07T18:17:54Z",
+      "closedAt": "2026-10-07T18:17:54Z",
       "comments": [
         {
           "author": "davidben",
@@ -4303,10 +4311,17 @@
         },
         {
           "author": "atoranzo",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Sounds good. Once draft-07 is cut I'll regenerate the six lines against it and send the PR.",
           "createdAt": "2026-09-30T16:18:06Z",
           "updatedAt": "2026-09-30T16:18:06Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "draft-07 is published. I went ahead and fixed these while I was bumping the default. Thanks for the report!",
+          "createdAt": "2026-10-07T18:17:54Z",
+          "updatedAt": "2026-10-07T18:17:54Z"
         }
       ]
     }
@@ -24015,6 +24030,84 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 354,
+      "id": "PR_kwDOJIBkVc8AAAABHIqHzw",
+      "title": "Use versioned URLs for (non-normative) C2SP references",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/354",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "These URLs don't currently work but will shortly. See https://github.com/C2SP/C2SP/pull/380",
+      "createdAt": "2026-10-07T14:04:35Z",
+      "updatedAt": "2026-10-07T18:02:04Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "44b1c0b8c54669a35e8d9e96f0e55bb3cab67757",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "tlog-versions",
+      "headRefOid": "1d12067aac1226e1b7a628bbbaedb0d56ef5be87",
+      "closedAt": "2026-10-07T18:02:00Z",
+      "mergedAt": "2026-10-07T18:02:00Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "6c5896d587c4ba19a229231a7a7d59d61b29ec14"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 355,
+      "id": "PR_kwDOJIBkVc8AAAABHLyPYw",
+      "title": "demo: write checkpoint cosignatures in the tlog-cosignature form",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/355",
+      "state": "MERGED",
+      "author": "atoranzo",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #341.\r\n\r\nThe demo's `checkpoint` carried, for each cosigner, a subtree cosignature over `[0, size)`: the key ID and the signature, with a zero timestamp in the signed `CosignedSubtree`. [tlog-cosignature@v1.1.0](https://c2sp.org/tlog-cosignature@v1.1.0), which the draft now cites, defines a checkpoint cosignature as the timestamp (eight bytes, big-endian) followed by the signature over a `CosignedSubtree` carrying that same timestamp. A log client or witness reading the demo's checkpoint could not verify it.\r\n\r\nThis adds `Cosigner.SignCheckpoint`, used for the checkpoint with the time of generation. `Sign`, used for the subtree cosignatures in certificates, is unchanged, and so is their verification. Before plants-04 the signed message has no timestamp, and the bare signature is kept.\r\n\r\nTesting:\r\n\r\n- New `TestCheckpointCosignature`: the line starts with the timestamp; the signature verifies over the timestamped message and not over the zero-timestamp one; subtree cosignatures still verify; a timestamp with a non-zero start is refused. `gofmt`, `go vet` and `go test ./...` are clean.\r\n- `filippo.io/torchwood` v0.10.0 (`CosignatureVerifier` through `note.Open`) refuses the checkpoint the demo writes at `main` today, `bc93fb6` (\"invalid signature for key oid/1.3.6.1.4.1.32473.1+e5375464\"), and accepts the one written with this change.\r\n- mtc-core's interop run reads the new checkpoint line as a timestamped tlog-cosignature.\r\n\r\nOnly the ML-DSA-44 lines are tlog-cosignature lines as such; the other algorithms keep the demo's placeholder key IDs, as before, now with the same line shape.\r\n\r\n",
+      "createdAt": "2026-10-07T18:55:59Z",
+      "updatedAt": "2026-10-07T19:08:28Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "bc93fb6b3bcd8d0d5e13f95b35998aa7c6fb258e",
+      "headRepository": "atoranzo/merkle-tree-certs",
+      "headRefName": "checkpoint-tlog-cosignature",
+      "headRefOid": "bfb754ff821153176667a9b9a06f08703f134728",
+      "closedAt": "2026-10-07T19:08:28Z",
+      "mergedAt": "2026-10-07T19:08:28Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "26db9f2b93d0dcd0d4e8b01308570108294e2e71"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks!",
+          "createdAt": "2026-10-07T19:08:18Z",
+          "updatedAt": "2026-10-07T19:08:18Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABRKuCqw",
+          "commit": {
+            "abbreviatedOid": "bfb754f"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-07T19:08:06Z",
+          "updatedAt": "2026-10-07T19:08:06Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
