@@ -16,6 +16,8 @@ var (
 
 type DraftVersion int
 
+const DefaultDraftVersion = VersionPlants07
+
 // Support versions for as long as it is easy to support and useful. If we need
 // to remove one, older versions of the demo tool are always available.
 const (

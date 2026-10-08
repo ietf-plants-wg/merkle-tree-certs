@@ -11,8 +11,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage: %s COMMAND [ARGS...]\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Available commands:\n")
-		fmt.Fprintf(os.Stderr, "  generate - Generate test MTC certificates\n")
-		fmt.Fprintf(os.Stderr, "  verify   - Verify MTC certificates\n")
+		fmt.Fprintf(os.Stderr, "  generate    - Generate test MTC certificates\n")
+		fmt.Fprintf(os.Stderr, "  verify      - Verify MTC certificates\n")
+		fmt.Fprintf(os.Stderr, "  print-proof - Print MTC proofs\n")
 	}
 
 	flag.Parse()
@@ -30,6 +31,11 @@ func main() {
 	case "verify":
 		if err := verify(flag.Args()[1:]); err != nil {
 			fmt.Fprintf(os.Stderr, "Error verifying certificates: %s\n", err)
+			os.Exit(1)
+		}
+	case "print-proof":
+		if err := printProof(flag.Args()[1:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error printing certificate proofs: %s\n", err)
 			os.Exit(1)
 		}
 	default:

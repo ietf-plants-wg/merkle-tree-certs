@@ -28,7 +28,7 @@ func (s *repeatableString) Set(value string) error {
 var (
 	verifyFlags = flag.NewFlagSet("verify", flag.ExitOnError)
 
-	flagVersion = verifyFlags.String("version", "plants-07", "the draft version to target")
+	flagVersion = verifyFlags.String("version", DefaultDraftVersion.String(), "the draft version to target")
 	flagPolicy  = verifyFlags.String("policy", "", "path to an optional certificate policy file")
 	flagCACerts repeatableString
 )
@@ -282,7 +282,7 @@ func verify(args []string) error {
 				return fmt.Errorf("failed to parse certificate from %q: %w", certPath, err)
 			}
 			numCerts++
-			result, err := VerifyMTCProof(cert, &policy, version)
+			result, err := VerifyMTCProof(cert, &policy)
 			if err != nil {
 				failed = true
 				fmt.Printf("%s: %s\n", certPath, err)
