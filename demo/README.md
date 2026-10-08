@@ -1,9 +1,10 @@
 # Merkle Tree Certificates Demo
 
-This tool includes a demo Merkle Tree Certificates generator and verifier. To build it, install [Go 1.27 or later](https://go.dev/) and run `go build` from this directory. From there, there are two subcommands:
+This tool includes a demo Merkle Tree Certificates generator and verifier. To build it, install [Go 1.27 or later](https://go.dev/) and run `go build` from this directory. It supports several subcommands:
 
 * `./demo generate` to [generate test certificates](#generating-certificates)
 * `./demo verify` to [verify certificates](#verifying-certificates)
+* `./demo print-proof` to print the MTCProof structure in a cetificate
 
 ## Generating Certificates
 
