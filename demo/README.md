@@ -4,7 +4,7 @@ This tool includes a demo Merkle Tree Certificates generator and verifier. To bu
 
 * `./demo generate` to [generate test certificates](#generating-certificates)
 * `./demo verify` to [verify certificates](#verifying-certificates)
-* `./demo print-proof` to print the MTCProof structure in a cetificate
+* `./demo print-proof` to extract and print MTCProof structures from certificates
 
 ## Generating Certificates
 
