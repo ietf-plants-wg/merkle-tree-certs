@@ -397,7 +397,40 @@ func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Co
 		return nil, errors.New("cannot construct certificate for null entry")
 	}
 
+	// Collect cosignatures.
 	logID := LogIDForConfig(config)
+	subtree, err := SubtreeHash(issuanceLog, start, end)
+	if err != nil {
+		return nil, err
+	}
+
+	var attempts int
+RetryCosigs:
+	cosigs := slices.Clip(certConfig.ExtraCosignatures)
+	for _, cosigner := range cosigners {
+		cosig, err := cosigner.Sign(logID, start, end, &subtree)
+		if err != nil {
+			return nil, err
+		}
+		cosigs = append(cosigs, Cosignature{CosignerID: cosigner.ID, Signature: cosig})
+	}
+	// plants-04 canonicalizes the cosigner order.
+	if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
+		cosigs = slices.SortedFunc(slices.Values(cosigs), func(a, b Cosignature) int {
+			return compareCosignerIDs(a.CosignerID, b.CosignerID)
+		})
+	}
+	// If UnusedBit is set, we require the last cosignature to end in a zero bit.
+	// ECDSA and ML-DSA signing are non-deterministic, so try a few times before
+	// giving up.
+	if certConfig.UnusedBit && attempts < 32 && len(cosigs) > 0 {
+		last := cosigs[len(cosigs)-1]
+		if len(last.Signature) > 0 && last.Signature[len(last.Signature)-1]&1 != 0 {
+			attempts++
+			goto RetryCosigs
+		}
+	}
+
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		serial := index
@@ -427,11 +460,6 @@ func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Co
 				}
 				proof[0] ^= 1
 			}
-			subtree, err := SubtreeHash(issuanceLog, start, end)
-			if err != nil {
-				certSig.SetError(err)
-				return
-			}
 
 			if certConfig.UnusedBit {
 				certSig.AddBytes([]byte{1})
@@ -447,32 +475,10 @@ func CreateCertificate(config *CAConfig, issuanceLog MerkleTree, cosigners []*Co
 				certSig.AddUint64(end)
 			}
 			certSig.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(proof) })
-			addMTCProofSignatures(certSig, config.Version, func(cosigs *cryptobyte.Builder) {
-				// plants-04 canonicalizes the cosigner order.
-				if !certConfig.DontSortCosigners && config.Version >= VersionPlants04 {
-					cosigners = slices.SortedFunc(slices.Values(cosigners), func(a, b *Cosigner) int {
-						return compareCosignerIDs(a.ID, b.ID)
-					})
-				}
-				for i, cosigner := range cosigners {
-					var attempts int
-				RetryCosig:
-					cosig, err := cosigner.Sign(logID, start, end, &subtree)
-					if err != nil {
-						cosigs.SetError(err)
-						return
-					}
-					// If UnusedBit is set, we require the last cosignature to end in a zero bit.
-					// ECDSA and ML-DSA signing are non-deterministic, so try a few times before
-					// giving up.
-					if certConfig.UnusedBit && i == len(cosigners)-1 && cosig[len(cosig)-1]&1 != 0 {
-						attempts++
-						if attempts < 32 {
-							goto RetryCosig
-						}
-					}
-					addTrustAnchorID(cosigs, cosigner.ID)
-					cosigs.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(cosig) })
+			addMTCProofSignatures(certSig, config.Version, func(cosigsB *cryptobyte.Builder) {
+				for _, cosig := range cosigs {
+					addTrustAnchorID(cosigsB, cosig.CosignerID)
+					cosigsB.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(cosig.Signature) })
 				}
 			})
 			if certConfig.UnusedBit {

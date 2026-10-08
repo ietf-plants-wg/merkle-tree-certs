@@ -278,6 +278,9 @@ func generate(args []string) error {
 		for _, cosigner := range info.cosigners {
 			fmt.Printf("  Cosigned by %s\n", cosigner.ID)
 		}
+		for _, cosig := range info.certConfig.ExtraCosignatures {
+			fmt.Printf("  Extra cosignature from %s\n", cosig.CosignerID)
+		}
 		fmt.Printf("\n")
 	}
 

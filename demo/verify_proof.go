@@ -12,6 +12,19 @@ import (
 	cbasn1 "golang.org/x/crypto/cryptobyte/asn1"
 )
 
+type parsedProof struct {
+	entryExtsRaw   []byte
+	entryExts      []parsedEntryExtension
+	start, end     uint64
+	inclusionProof []byte
+	signatures     []parsedSignature
+}
+
+type parsedEntryExtension struct {
+	extType  uint16
+	extValue []byte
+}
+
 type parsedSignature struct {
 	cosignerID TrustAnchorID
 	signature  []byte
@@ -22,6 +35,84 @@ func readMTCProofSignatures(s *cryptobyte.String, version DraftVersion, out *cry
 		return s.ReadUint24LengthPrefixed(out)
 	}
 	return s.ReadUint16LengthPrefixed(out)
+}
+
+func readUint16LengthPrefixedBytes(s *cryptobyte.String, out *[]byte) bool {
+	var child cryptobyte.String
+	if !s.ReadUint16LengthPrefixed(&child) {
+		return false
+	}
+	*out = child
+	return true
+}
+
+func parseMTCProof(version DraftVersion, cert *x509.Certificate) (*parsedProof, error) {
+	// A real implementation would probably save this as static data.
+	mtcProofSigAlg := cryptobyte.NewBuilder(nil)
+	addMTCProofSigAlg(mtcProofSigAlg, version)
+	if !bytes.Equal(cert.RawSignatureAlgorithm, mtcProofSigAlg.BytesOrPanic()) {
+		return nil, errors.New("signature algorithm was not mtcProof")
+	}
+
+	sig, err := certSignatureBytes(cert)
+	if err != nil {
+		return nil, err
+	}
+
+	s := cryptobyte.String(sig)
+	ret := new(parsedProof)
+	if version < VersionPlants04 {
+		// Before draft-04, there were no extensions and the coordinates
+		// were 64-bit.
+		if !s.ReadUint64(&ret.start) || !s.ReadUint64(&ret.end) {
+			return nil, fmt.Errorf("malformed MTCProof")
+		}
+	} else {
+		var entryExts cryptobyte.String
+		if !s.ReadUint16LengthPrefixed(&entryExts) ||
+			!s.ReadUint48(&ret.start) ||
+			!s.ReadUint48(&ret.end) {
+			return nil, fmt.Errorf("malformed MTCProof")
+		}
+		ret.entryExtsRaw = entryExts
+		lastExtType := -1
+		for !entryExts.Empty() {
+			var ext parsedEntryExtension
+			if !entryExts.ReadUint16(&ext.extType) ||
+				!readUint16LengthPrefixedBytes(&entryExts, &ext.extValue) ||
+				int(ext.extType) <= lastExtType {
+				return nil, fmt.Errorf("malformed MTCProof")
+			}
+			lastExtType = int(ext.extType)
+			ret.entryExts = append(ret.entryExts, ext)
+		}
+	}
+
+	var sigs cryptobyte.String
+	if !readUint16LengthPrefixedBytes(&s, &ret.inclusionProof) ||
+		!readMTCProofSignatures(&s, version, &sigs) ||
+		!s.Empty() {
+		return nil, fmt.Errorf("malformed MTCProof")
+	}
+
+	var prevID TrustAnchorID
+	for !sigs.Empty() {
+		var cosignerID, sigVal cryptobyte.String
+		if !sigs.ReadUint8LengthPrefixed(&cosignerID) || len(cosignerID) == 0 ||
+			!sigs.ReadUint16LengthPrefixed(&sigVal) {
+			return nil, fmt.Errorf("malformed signature in MTCProof")
+		}
+		if prevID != nil && compareCosignerIDs(prevID, TrustAnchorID(cosignerID)) >= 0 {
+			return nil, fmt.Errorf("cosigners not in canonical order or duplicate: %s and %s", prevID, TrustAnchorID(cosignerID))
+		}
+		prevID = TrustAnchorID(cosignerID)
+		ret.signatures = append(ret.signatures, parsedSignature{
+			cosignerID: TrustAnchorID(cosignerID),
+			signature:  sigVal,
+		})
+	}
+
+	return ret, nil
 }
 
 func hashU16(dst hash.Hash, v uint16) {
@@ -72,7 +163,7 @@ type VerifyResult struct {
 	UnsatisfiedRequirements []PolicyIndex
 }
 
-func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion) (*VerifyResult, error) {
+func VerifyMTCProof(cert *x509.Certificate, policy *Policy) (*VerifyResult, error) {
 	caID, err := caIDFromX509Name(policy.Version, cert.RawIssuer)
 	if err != nil {
 		return nil, fmt.Errorf("issuer not an MTC CA: %w", err)
@@ -82,66 +173,19 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 		return nil, fmt.Errorf("issuer %s not a known MTC CA", caID)
 	}
 
-	// A real implementation would probably save this as static data.
-	mtcProofSigAlg := cryptobyte.NewBuilder(nil)
-	addMTCProofSigAlg(mtcProofSigAlg, policy.Version)
-
-	if !bytes.Equal(cert.RawSignatureAlgorithm, mtcProofSigAlg.BytesOrPanic()) {
-		return nil, errors.New("signature algorithm was not an mtcProof")
-	}
-
-	sig, err := certSignatureBytes(cert)
+	proof, err := parseMTCProof(policy.Version, cert)
 	if err != nil {
 		return nil, err
-	}
-	proofStr := cryptobyte.String(sig)
-	var start, end uint64
-	var signatures []parsedSignature
-	var entryExtensions, inclusionProof, sigs cryptobyte.String
-	if !proofStr.ReadUint16LengthPrefixed(&entryExtensions) ||
-		!proofStr.ReadUint48(&start) ||
-		!proofStr.ReadUint48(&end) ||
-		!proofStr.ReadUint16LengthPrefixed(&inclusionProof) ||
-		!readMTCProofSignatures(&proofStr, version, &sigs) ||
-		!proofStr.Empty() {
-		return nil, fmt.Errorf("malformed MTCProof")
-	}
-
-	// No proof extensions are defined, but validate their syntax.
-	lastExtType := -1
-	extsCopy := entryExtensions
-	for !extsCopy.Empty() {
-		var typ uint16
-		var data cryptobyte.String
-		if !extsCopy.ReadUint16(&typ) ||
-			!extsCopy.ReadUint16LengthPrefixed(&data) ||
-			int(typ) <= lastExtType {
-			return nil, fmt.Errorf("malformed MTCProof")
-		}
-		lastExtType = int(typ)
-	}
-
-	var prevID TrustAnchorID
-	for !sigs.Empty() {
-		var cosignerID, sigVal cryptobyte.String
-		if !sigs.ReadUint8LengthPrefixed(&cosignerID) || len(cosignerID) == 0 ||
-			!sigs.ReadUint16LengthPrefixed(&sigVal) {
-			return nil, fmt.Errorf("malformed signature in MTCProof")
-		}
-		if prevID != nil && compareCosignerIDs(prevID, TrustAnchorID(cosignerID)) >= 0 {
-			return nil, fmt.Errorf("cosigners not in canonical order or duplicate: %s and %s", prevID, TrustAnchorID(cosignerID))
-		}
-		prevID = TrustAnchorID(cosignerID)
-		signatures = append(signatures, parsedSignature{
-			cosignerID: TrustAnchorID(cosignerID),
-			signature:  sigVal,
-		})
 	}
 
 	entryHash := sha256.New()
 	entryHash.Write([]byte{0x00}) // MTC leaf domain separator
-	hashU16LengthPrefixed(entryHash, entryExtensions)
+	hashU16LengthPrefixed(entryHash, proof.entryExtsRaw)
 	hashU16(entryHash, entryTypeTBSCert)
+
+	// A real implementation would probably save this as static data.
+	mtcProofSigAlg := cryptobyte.NewBuilder(nil)
+	addMTCProofSigAlg(mtcProofSigAlg, policy.Version)
 
 	var tbs cryptobyte.String
 	tbsElem := cryptobyte.String(cert.RawTBSCertificate)
@@ -183,14 +227,14 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 	if log == 0 {
 		return nil, fmt.Errorf("invalid log number 0 in serial")
 	}
-	logID := LogID(version, caID, log)
+	logID := LogID(policy.Version, caID, log)
 
-	subtreeHash, err := EvaluateSubtreeInclusionProof(index, start, end, (*HashValue)(entryHash.Sum(nil)), inclusionProof)
+	subtreeHash, err := EvaluateSubtreeInclusionProof(index, proof.start, proof.end, (*HashValue)(entryHash.Sum(nil)), proof.inclusionProof)
 	if err != nil {
 		return nil, fmt.Errorf("inclusion proof evaluation failed: %w", err)
 	}
 
-	if expected, ok := ca.FindTrustedSubtree(log, start, end); ok {
+	if expected, ok := ca.FindTrustedSubtree(log, proof.start, proof.end); ok {
 		if !bytes.Equal(expected[:], subtreeHash[:]) {
 			return nil, fmt.Errorf("trusted subtree hash mismatch: expected %x, got %x", expected, subtreeHash)
 		}
@@ -199,14 +243,14 @@ func VerifyMTCProof(cert *x509.Certificate, policy *Policy, version DraftVersion
 
 	cosignersSatisfied := make([]bool, len(policy.Cosigners))
 	ret := &VerifyResult{}
-	for _, sig := range signatures {
+	for _, sig := range proof.signatures {
 		idx, ok := policy.Names[sig.cosignerID.String()]
 		if !ok || idx.IsGroup {
 			// Unrecognized cosigners MUST be ignored.
 			continue
 		}
 		cosigner := policy.Cosigners[idx.Index]
-		if err := cosigner.Verify(logID, start, end, &subtreeHash, sig.signature); err != nil {
+		if err := cosigner.Verify(logID, proof.start, proof.end, &subtreeHash, sig.signature); err != nil {
 			ret.VerifyErrors = append(ret.VerifyErrors, fmt.Errorf("invalid signature from cosigner %s: %w", sig.cosignerID, err))
 		} else {
 			cosignersSatisfied[idx.Index] = true
