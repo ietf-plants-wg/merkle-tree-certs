@@ -90,7 +90,22 @@
           }
         },
         {"SubtreeStart": 8, "SubtreeEnd": 16, "Cosigners": ["32473.1", "32473.2.3"]},
-        {"Checkpoint": "landmark"}
+        {"Checkpoint": "landmark"},
+        {
+          "Checkpoint": "landmark",
+          "ExtraCosignatures": [
+            {"CosignerID": "32473.0", "Signature": ""},
+            {"CosignerID": "32473.4", "Signature": "AA=="}
+          ]
+        },
+        {
+          "Checkpoint": "standalone",
+          "Cosigners": ["32473.1", "32473.2.1", "32473.2.2"],
+          "ExtraCosignatures": [
+            {"CosignerID": "32473.0", "Signature": ""},
+            {"CosignerID": "32473.4.5.6", "Signature": "AA=="}
+          ]
+        }
       ]
     },
     {

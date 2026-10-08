@@ -211,6 +211,8 @@ type CertificateConfig struct {
 	Checkpoint               string
 	// Must refer to a cosigner defined in the CAConfig.
 	Cosigners []TrustAnchorID
+	// Additional extra cosignatures to include verbatim.
+	ExtraCosignatures []Cosignature
 	// BitFlipProof, if true, flips a bit in the inclusion proof.
 	BitFlipProof bool
 	// UnusedBit, if true, encodes the last bit in the signatureValue, which
@@ -227,6 +229,11 @@ type CertificateConfig struct {
 	// signature algorithm with the specified byte string.
 	OverrideTBSSignatureAlgorithm   []byte
 	OverrideCertificatePropertyList *CertificatePropertyList
+}
+
+type Cosignature struct {
+	CosignerID TrustAnchorID
+	Signature  []byte
 }
 
 type CertificatePropertyList struct {
