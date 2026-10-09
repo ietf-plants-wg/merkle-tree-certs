@@ -156,6 +156,10 @@ type mtcCAInfo struct {
 	cosigner  *Cosigner
 	minSerial uint64
 	maxSerial uint64
+	// overrideOID, if not empty, replaces the extension's OID.
+	overrideOID asn1.ObjectIdentifier
+	// overrideValue, if not empty, replaces the extension's contents.
+	overrideValue []byte
 }
 
 func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAInfo) {
@@ -242,16 +246,23 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 
 		if mtcCA != nil {
 			exts.AddASN1(cbasn1.SEQUENCE, func(ext *cryptobyte.Builder) {
+				oid := oidMTCCAWithSHA256
 				// In plants-05 and earlier, the log hash was separate from the top-level OID.
 				if mtcCA.version <= VersionPlants05 {
-					ext.AddASN1ObjectIdentifier(oidMTCCAExperiment)
+					oid = oidMTCCAExperiment
 				} else if mtcCA.version <= VersionPlants06 {
-					ext.AddASN1ObjectIdentifier(oidMTCCAWithSHA256Experiment)
-				} else {
-					ext.AddASN1ObjectIdentifier(oidMTCCAWithSHA256)
+					oid = oidMTCCAWithSHA256Experiment
 				}
+				if len(mtcCA.overrideOID) != 0 {
+					oid = mtcCA.overrideOID
+				}
+				ext.AddASN1ObjectIdentifier(oid)
 				ext.AddASN1Boolean(true)
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
+					if len(mtcCA.overrideValue) != 0 {
+						extVal.AddBytes(mtcCA.overrideValue)
+						return
+					}
 					extVal.AddASN1(cbasn1.SEQUENCE, func(seq *cryptobyte.Builder) {
 						if mtcCA.version <= VersionPlants05 {
 							seq.AddASN1(cbasn1.SEQUENCE, func(logHash *cryptobyte.Builder) {
@@ -520,10 +531,12 @@ func CreateCACertificate(config *CAConfig, cosigner *Cosigner) ([]byte, error) {
 			tbs.AddBytes(spki)
 
 			addExtensions(tbs, &config.CACert.CertConfigBase, &mtcCAInfo{
-				version:   config.Version,
-				cosigner:  cosigner,
-				minSerial: minSerial,
-				maxSerial: maxSerial,
+				version:       config.Version,
+				cosigner:      cosigner,
+				minSerial:     minSerial,
+				maxSerial:     maxSerial,
+				overrideOID:   asn1.ObjectIdentifier(config.CACert.OverrideMTCCAExtensionOID),
+				overrideValue: config.CACert.OverrideMTCCAExtensionValue,
 			})
 		})
 		addUnsignedSigAlg(cert)
