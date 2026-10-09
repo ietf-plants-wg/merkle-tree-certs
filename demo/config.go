@@ -167,6 +167,13 @@ type SerialConfig struct {
 type CACertConfig struct {
 	CertConfigBase
 	MinSerial, MaxSerial SerialConfig
+	// OverrideMTCCAExtensionOID, if not empty, overrides the Merkle Tree CA
+	// extension's OID, which is otherwise determined by the draft version.
+	OverrideMTCCAExtensionOID OverrideExtOIDConfig
+	// OverrideMTCCAExtensionValue, if not empty, overrides the Merkle Tree CA
+	// extension's OCTET STRING contents, which is otherwise encoded according to
+	// the draft version and `CAConfig`.
+	OverrideMTCCAExtensionValue []byte
 }
 
 type CertConfigBase struct {
@@ -478,7 +485,31 @@ func (k *KeyUsageConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type OverrideExtOIDConfig asn1.ObjectIdentifier
 type ExtKeyUsageConfig asn1.ObjectIdentifier
+
+func parseObjectIdentifier(s string) (oid asn1.ObjectIdentifier, ok bool) {
+	for _, part := range strings.Split(s, ".") {
+		v, err := strconv.Atoi(part)
+		if err != nil || v < 0 {
+			return nil, false
+		}
+		oid = append(oid, v)
+	}
+	if len(oid) < 2 || oid[0] > 2 || (oid[0] < 2 && oid[1] >= 40) {
+		return nil, false
+	}
+	return oid, true
+}
+
+func (o *OverrideExtOIDConfig) UnmarshalText(text []byte) error {
+	oid, ok := parseObjectIdentifier(string(text))
+	if !ok {
+		return fmt.Errorf("invalid override OID: %q", text)
+	}
+	*o = OverrideExtOIDConfig(oid)
+	return nil
+}
 
 func (e *ExtKeyUsageConfig) UnmarshalText(text []byte) error {
 	var oid asn1.ObjectIdentifier
@@ -486,14 +517,9 @@ func (e *ExtKeyUsageConfig) UnmarshalText(text []byte) error {
 	case "ServerAuth":
 		oid = oidServerAuth
 	default:
-		for _, part := range strings.Split(s, ".") {
-			v, err := strconv.Atoi(part)
-			if err != nil || v < 0 {
-				return fmt.Errorf("invalid extended key usage: %q", s)
-			}
-			oid = append(oid, v)
-		}
-		if len(oid) < 2 || oid[0] > 2 || (oid[0] < 2 && oid[1] >= 40) {
+		var ok bool
+		oid, ok = parseObjectIdentifier(s)
+		if !ok {
 			return fmt.Errorf("invalid extended key usage: %q", s)
 		}
 	}

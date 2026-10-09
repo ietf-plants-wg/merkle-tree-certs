@@ -3,11 +3,14 @@ package main
 import (
 	"bytes"
 	"crypto/x509"
+	"encoding/asn1"
 	"encoding/hex"
+	"slices"
 	"testing"
 	"time"
 
 	"golang.org/x/crypto/cryptobyte"
+	cbasn1 "golang.org/x/crypto/cryptobyte/asn1"
 )
 
 func ptrOf[T any](t T) *T { return &t }
@@ -251,5 +254,80 @@ func TestMTCProofSignaturesLengthPrefix(t *testing.T) {
 				t.Fatal("decoding with another draft version unexpectedly succeeded")
 			}
 		})
+	}
+}
+
+type parsedX509Extension struct {
+	oid      asn1.ObjectIdentifier
+	critical bool
+	value    []byte
+}
+
+// mtcCAExtensions encodes the extensions for info and returns all extensions.
+func mtcCAExtensions(t *testing.T, info *mtcCAInfo) []parsedX509Extension {
+	t.Helper()
+	b := cryptobyte.NewBuilder(nil)
+	addExtensions(b, &CertConfigBase{}, info)
+	s := cryptobyte.String(b.BytesOrPanic())
+	var explicit, exts cryptobyte.String
+	if !s.ReadASN1(&explicit, cbasn1.Tag(3).Constructed().ContextSpecific()) ||
+		!explicit.ReadASN1(&exts, cbasn1.SEQUENCE) {
+		t.Fatal("malformed extensions")
+	}
+	var ret []parsedX509Extension
+	for !exts.Empty() {
+		var ext, value cryptobyte.String
+		var parsed parsedX509Extension
+		if !exts.ReadASN1(&ext, cbasn1.SEQUENCE) ||
+			!ext.ReadASN1ObjectIdentifier(&parsed.oid) ||
+			(ext.PeekASN1Tag(cbasn1.BOOLEAN) && !ext.ReadASN1Boolean(&parsed.critical)) ||
+			!ext.ReadASN1(&value, cbasn1.OCTET_STRING) {
+			t.Fatal("malformed extension")
+		}
+		parsed.value = value
+		ret = append(ret, parsed)
+	}
+	return ret
+}
+
+func TestOverrideMTCCAExtensionOID(t *testing.T) {
+	// Override the extension with the old, experimental OID.
+	exts := mtcCAExtensions(t, &mtcCAInfo{
+		version:     VersionPlants07,
+		cosigner:    &Cosigner{SignatureAlgorithm: SignatureAlgorithmP256WithSHA256},
+		overrideOID: oidMTCCAExperiment,
+	})
+	countMatch := 0
+	for _, ext := range exts {
+		if ext.oid.Equal(oidMTCCAExperiment) {
+			countMatch += 1
+			if !ext.critical {
+				t.Fatal("MTC CA extension was not critical")
+			}
+		}
+		if ext.oid.Equal(oidMTCCAWithSHA256) || ext.oid.Equal(oidMTCCAWithSHA256Experiment) {
+			t.Fatal("found un-overridden MTC CA extension OID")
+		}
+	}
+	if countMatch != 1 {
+		t.Fatalf("expected 1 extension matching the override OID, found %d", countMatch)
+	}
+}
+
+func TestOverrideMTCCAExtensionValue(t *testing.T) {
+	value := []byte{0x05, 0x00}
+	exts := mtcCAExtensions(t, &mtcCAInfo{version: VersionPlants07, overrideValue: value})
+	countMatch := 0
+	for _, ext := range exts {
+		if ext.oid.Equal(oidMTCCAWithSHA256) {
+			if !slices.Equal(ext.value, value) {
+				t.Fatal("MTC CA extension value was not overridden as expected")
+			} else {
+				countMatch += 1
+			}
+		}
+	}
+	if countMatch != 1 {
+		t.Fatalf("expected 1 extension matching the override value, found %d", countMatch)
 	}
 }
