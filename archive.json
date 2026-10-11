@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-08T05:48:36.324542+00:00",
+  "timestamp": "2026-10-11T05:32:09.953612+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -24108,6 +24108,74 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 356,
+      "id": "PR_kwDOJIBkVc8AAAABHZpdyA",
+      "title": "demo: Add an option to inject extra cosignatures into a certificate",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/356",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Also add a tool to print MTCProof objects as I found debugging this to be more annoying than it had any reason to be.",
+      "createdAt": "2026-10-08T19:13:00Z",
+      "updatedAt": "2026-10-08T20:06:38Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "26db9f2b93d0dcd0d4e8b01308570108294e2e71",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "demo-sigs",
+      "headRefOid": "59b38f207d31731c59d84703aef0174d3e3ec947",
+      "closedAt": "2026-10-08T20:06:33Z",
+      "mergedAt": "2026-10-08T20:06:33Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "57fbe5de9b47ab8bb737aed0c8e34e6e110cab65"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABRY4NXw",
+          "commit": {
+            "abbreviatedOid": "7fba9df"
+          },
+          "author": "chlily1",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-08T19:34:51Z",
+          "updatedAt": "2026-10-08T19:34:51Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 357,
+      "id": "PR_kwDOJIBkVc8AAAABHn4w_Q",
+      "title": "demo: Add options to override MTC CA extension oid or value",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/357",
+      "state": "OPEN",
+      "author": "chlily1",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-09T22:31:28Z",
+      "updatedAt": "2026-10-09T22:31:28Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "57fbe5de9b47ab8bb737aed0c8e34e6e110cab65",
+      "headRepository": "chlily1/merkle-tree-certs",
+      "headRefName": "main",
+      "headRefOid": "95ab0237ef670bed59b465cf0956d716983d1857",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
