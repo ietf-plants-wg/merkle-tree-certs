@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-11T05:32:09.953612+00:00",
+  "timestamp": "2026-10-13T06:37:33.068194+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -24163,19 +24163,106 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-10-09T22:31:28Z",
-      "updatedAt": "2026-10-09T22:31:28Z",
+      "updatedAt": "2026-10-12T16:33:11Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "57fbe5de9b47ab8bb737aed0c8e34e6e110cab65",
+      "baseRefOid": "99fed602288ebaef555882a11ae79eab88f0ee90",
       "headRepository": "chlily1/merkle-tree-certs",
       "headRefName": "main",
-      "headRefOid": "95ab0237ef670bed59b465cf0956d716983d1857",
+      "headRefOid": "e1eeb1049d6b57b5a0ddd1f674f8cc7b174901bd",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABRs3kXg",
+          "commit": {
+            "abbreviatedOid": "95ab023"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks!",
+          "createdAt": "2026-10-11T10:06:11Z",
+          "updatedAt": "2026-10-11T10:12:05Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "This is just one of these, which should work with encoding/asn1: https://pkg.go.dev/crypto/x509/pkix#Extension\n\n(Though see comment below.)",
+              "createdAt": "2026-10-11T10:06:12Z",
+              "updatedAt": "2026-10-11T10:12:05Z"
+            },
+            {
+              "originalPosition": 53,
+              "body": "Since `addExtensions` is expected to be deterministic anyway, maybe we just test this by writing down the expected byte strings. Then we don't need a whole lot of machinery like this.\n\nI might also suggest we test at the level of `CreateCACertificate` so we can cover the others too. I.e. mimic `TestMarshalTBSCertificate` instead of `TestMTCProofSignaturesLengthPrefix`.",
+              "createdAt": "2026-10-11T10:11:19Z",
+              "updatedAt": "2026-10-11T10:12:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABRs_6tA",
+          "commit": {
+            "abbreviatedOid": "95ab023"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-11T10:46:04Z",
+          "updatedAt": "2026-10-11T10:46:05Z",
+          "comments": [
+            {
+              "originalPosition": 53,
+              "body": "I filled in some tests on `main` to start with. Hopefully you can add the tests you want there.",
+              "createdAt": "2026-10-11T10:46:04Z",
+              "updatedAt": "2026-10-11T10:46:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABR3FiZA",
+          "commit": {
+            "abbreviatedOid": "95ab023"
+          },
+          "author": "chlily1",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-12T16:32:59Z",
+          "updatedAt": "2026-10-12T16:33:00Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "(Removed this in favor of the direct tests.)",
+              "createdAt": "2026-10-12T16:32:59Z",
+              "updatedAt": "2026-10-12T16:33:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABR3FoqQ",
+          "commit": {
+            "abbreviatedOid": "95ab023"
+          },
+          "author": "chlily1",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-12T16:33:10Z",
+          "updatedAt": "2026-10-12T16:33:10Z",
+          "comments": [
+            {
+              "originalPosition": 53,
+              "body": "Done, thanks!",
+              "createdAt": "2026-10-12T16:33:10Z",
+              "updatedAt": "2026-10-12T16:33:11Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
