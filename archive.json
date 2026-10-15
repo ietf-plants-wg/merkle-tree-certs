@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-13T06:37:33.068194+00:00",
+  "timestamp": "2026-10-15T04:21:26.360288+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -747,7 +747,7 @@
       "labels": [],
       "body": "We do leave the exact RP <-> TS protocol out of scope, so that it can slot into existing RP update protocols, but it's probably worth calling out a couple things here:\r\n\r\n- The RP doesn't contact the TS on each TLS connection, only periodically and out-of-band\r\n- There's no reason for the RP to tell the TS anything about TLS connections. The RP just says \"give me the latest thing\" and the TS passes it along\r\n\r\nSo the only information passed along is \"I exist\", same as any other periodic update protocol.",
       "createdAt": "2023-04-06T00:10:20Z",
-      "updatedAt": "2025-06-21T14:14:41Z",
+      "updatedAt": "2026-10-14T19:59:41Z",
       "closedAt": null,
       "comments": [
         {
@@ -763,6 +763,13 @@
           "body": "Post-Photosynthesis triage: TS is now the application-specific update process that's not really covered here, but might still be worth some text here.",
           "createdAt": "2025-06-21T14:14:41Z",
           "updatedAt": "2025-06-21T14:14:41Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "As part of expanding on privacy considerations, we should also talk about how revealing your update recency impacts things. Some things we could talk about:\n\n- Privacy implications of picking up landmarks more vs less frequently \n- Snapshotting the full set of landmarks across CAs every N hours, vs updating CAs independently \n- Intentionally shutting it off on older clients once the proportion of clients is low enough to make too small of anonymity sets\n- Doing softer measures like rounding down to a decreased frequency once you're in the stale long tail\n- If you're worried about being one of the first to pick up a landmark, the client can intentionally wait until the landmark is a few hours old before activating it",
+          "createdAt": "2026-10-14T19:59:41Z",
+          "updatedAt": "2026-10-14T19:59:41Z"
         }
       ]
     },
@@ -24156,24 +24163,26 @@
       "id": "PR_kwDOJIBkVc8AAAABHn4w_Q",
       "title": "demo: Add options to override MTC CA extension oid or value",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/357",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "chlily1",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-10-09T22:31:28Z",
-      "updatedAt": "2026-10-12T16:33:11Z",
+      "updatedAt": "2026-10-13T08:18:28Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "99fed602288ebaef555882a11ae79eab88f0ee90",
       "headRepository": "chlily1/merkle-tree-certs",
       "headRefName": "main",
       "headRefOid": "e1eeb1049d6b57b5a0ddd1f674f8cc7b174901bd",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-10-13T08:18:28Z",
+      "mergedAt": "2026-10-13T08:18:28Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7f5561c8f105f40fcb32a420825778eb2964759b"
+      },
       "comments": [],
       "reviews": [
         {
@@ -24228,7 +24237,7 @@
             "abbreviatedOid": "95ab023"
           },
           "author": "chlily1",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-10-12T16:32:59Z",
@@ -24248,7 +24257,7 @@
             "abbreviatedOid": "95ab023"
           },
           "author": "chlily1",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2026-10-12T16:33:10Z",
@@ -24261,6 +24270,19 @@
               "updatedAt": "2026-10-12T16:33:11Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABR93OmQ",
+          "commit": {
+            "abbreviatedOid": "e1eeb10"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-13T08:18:17Z",
+          "updatedAt": "2026-10-13T08:18:17Z",
+          "comments": []
         }
       ]
     }
