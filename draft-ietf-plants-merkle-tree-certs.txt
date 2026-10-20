@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 16 April 2027                                        Apple Inc.
+Expires: 23 April 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         13 October 2026
+                                                         20 October 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 April 2027.
+   This Internet-Draft will expire on 23 April 2027.
 
 Copyright Notice
 
@@ -2079,7 +2079,7 @@ Table of Contents
    2.  Let L be the lowest numbered landmark whose tree size is strictly
        greater than idx.  If no such landmark has been allocated yet,
        wait for one to be allocated.  If the entry has already expired
-       and historical landmark information is unavoidable, abort the
+       and historical landmark information is unavailable, abort the
        procedure.
 
    3.  Determine the L's subtrees (Section 6.4.1) and select the unique
