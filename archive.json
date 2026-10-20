@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-15T04:21:26.360288+00:00",
+  "timestamp": "2026-10-20T04:34:20.267482+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4331,6 +4331,22 @@
           "updatedAt": "2026-10-07T18:17:54Z"
         }
       ]
+    },
+    {
+      "number": 358,
+      "id": "I_kwDOJIBkVc8AAAABYXfY_g",
+      "title": "Terminology: subtree signature vs cosignature",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/358",
+      "state": "OPEN",
+      "author": "jsha",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I count 6 instances of \"subtree signature\" in the draft and 4 instances of \"subtree cosignature.\" We should consolidate on one; I'm guessing the preference is for the latter?",
+      "createdAt": "2026-10-19T19:30:52Z",
+      "updatedAt": "2026-10-19T19:30:52Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
