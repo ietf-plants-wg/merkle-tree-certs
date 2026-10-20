@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 21 March 2027                                        Apple Inc.
+Expires: 23 April 2027                                        Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       17 September 2026
+                                                         20 October 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 March 2027.
+   This Internet-Draft will expire on 23 April 2027.
 
 Copyright Notice
 
@@ -155,11 +155,16 @@ Table of Contents
      12.8.  Signature Domain Separation
      12.9.  Subordinate Certification Authorities
    13. IANA Considerations
-     13.1.  Module Identifier
-     13.2.  Algorithm
-     13.3.  Certificate Extension
-     13.4.  Relative Distinguished Name Attribute
-     13.5.  Link Relation Type
+     13.1.  Additions to Existing Registries
+       13.1.1.  Module Identifier
+       13.1.2.  Algorithm
+       13.1.3.  Certificate Extension
+       13.1.4.  Relative Distinguished Name Attribute
+       13.1.5.  Link Relation Type
+     13.2.  New Registries
+       13.2.1.  MTC Log Entry Types
+       13.2.2.  MTC Log Entry Extension Types
+       13.2.3.  MTC CA Identifier Child Components
    14. References
      14.1.  Normative References
      14.2.  Informative References
@@ -200,6 +205,7 @@ Table of Contents
      Since draft-ietf-plants-merkle-tree-certs-03
      Since draft-ietf-plants-merkle-tree-certs-04
      Since draft-ietf-plants-merkle-tree-certs-05
+     Since draft-ietf-plants-merkle-tree-certs-06
    Authors' Addresses
 
 1.  Introduction
@@ -217,7 +223,7 @@ Table of Contents
    larger.  For example, ML-DSA-44 [FIPS204] uses 1,312 bytes per public
    key and 2,420 bytes per signature.  ML-DSA-65 uses 1,952 bytes per
    public key and 3,309 bytes per signature.  Even with a directly-
-   trusted intermediate (Section 8.5 of
+   trusted intermediate (Section 9.5 of
    [I-D.ietf-tls-trust-anchor-ids]), two SCTs and a leaf certificate
    signature add 7,260 bytes of authentication overhead with ML-DSA-44
    and 9,927 bytes with ML-DSA-65.
@@ -384,7 +390,9 @@ Table of Contents
       to some subtree, and several cosignatures over that subtree.
 
    Landmark-relative certificate:  An optimized certificate containing
-      an inclusion proof to a landmark subtree, and no signatures.
+      an inclusion proof to a landmark subtree.  The landmark subtree is
+      assumed to be known to the relying party, rather than
+      authenticated by cosignatures.
 
    Directly-signed certificate:  A certificate issued using the
       existing, non-MTC construction, where the TBSCertificate is passed
@@ -490,10 +498,10 @@ Table of Contents
    with public key or signature size.
 
    This same issuance process also produces a _landmark-relative
-   certificate_. This is an optional, optimized certificate that avoids
-   all cosignatures, including the CA signature.  Landmark-relative
-   certificates are available after a short period of time and usable
-   with up-to-date relying parties.
+   certificate_. This is an optional, optimized certificate that does
+   not need subtree cosignatures, including any from the CA.  Landmark-
+   relative certificates are available after a short period of time and
+   usable with up-to-date relying parties.
 
    +-- Certification Authority -----+
    |                                |  +-- Update Channel --+
@@ -726,6 +734,9 @@ Table of Contents
    sufficient to reconstruct the subtree hash, MTH(D[start:end]), out of
    the hash for entry index, MTH({d[index]}), thus demonstrating that
    the subtree hash contains the entry's hash.
+
+   A subtree inclusion proof for a subtree of size n contains at most
+   ceil(log2(n)) hashes, or BIT_WIDTH(n - 1) hashes.
 
 4.3.1.  Example Subtree Inclusion Proofs
 
@@ -1042,13 +1053,17 @@ Table of Contents
 
    This document uses subtrees to sign over arbitrary intervals, [start,
    end), of a Merkle Tree.  However, not all intervals are valid
-   subtrees.  While subtrees containing the intervals would suffice, the
-   smallest subtree containing [start, end) may be much larger than
-   [start, end).
+   subtrees.  While a protocol could build a smaller Merkle Tree,
+   MTH(D[start:end]), and compute inclusion proofs of any element, this
+   smaller Merkle Tree cannot, in general, be efficiently proven
+   consistent with the overall Merkle Tree.
 
-   For example, Figure 9 shows the smallest subtree that contains [7, 9)
-   in a 9-element tree.  The smallest single subtree that contains the
-   interval is [0, 9), but this is the entire tree.
+   Enlarging the interval to a valid subtree would mitigate this.
+   However, the smallest subtree containing [start, end) may be much
+   larger than [start, end).  For example, Figure 9 shows the smallest
+   subtree that contains [7, 9) in a 9-element tree.  The smallest
+   single subtree that contains the interval is [0, 9), but this is the
+   entire tree.
 
                    +~~~~~~~~~~~~~~~~~~~+
                    |      [0, 9)       |
@@ -1078,22 +1093,27 @@ Table of Contents
 
 4.5.1.  Selecting Two Subtrees
 
-   This section defines a procedure for selecting two subtrees given any
-   interval.  Combined, the subtrees contain [start, end) with bounded
-   excess elements.  The procedure returns two subtrees, left and right,
-   that satisfy the following properties:
+   Given any interval, [start, end), this section defines a procedure
+   for selecting two subtrees, left and right, such that:
 
-   *  The two subtrees cover adjacent intervals.  That is, left.end =
-      right.start.
+   *  left and right are valid subtrees, so it is possible to compute
+      subtree consistency proofs.
 
-   *  The two subtrees together contain the entire interval [start,
-      end).  There are no extra entries after end, but there may be
-      extra entries before start.  That is, left.start <= start and end
-      = right.end.
+   *  The disjoint union of left, followed by right, contains [start,
+      end).  That is, left.start <= start <= left.end = right.start <=
+      end <= right.end.
 
-   *  If the interval is not empty, the extra entries before start are
-      less than half of left.  That is, start - left.start < left.end -
-      start.
+   *  While left may contain extra elements before start, right does not
+      contain any extra elements.  That is, end = right.end.
+
+   *  Each subtree's size is at most BIT_CEIL(end - start).
+
+   The pair of subtree hashes for left and right can support inclusion
+   proofs for any element of [start, end).  The largest such inclusion
+   proof is no bigger than the largest inclusion proof in
+   MTH(D[start:end]).  Unlike MTH(D[start:end]), these subtree hashes
+   can be shown consistent with the overall Merkle Tree using subtree
+   consistency proofs.
 
    The subtrees are selected as follows:
 
@@ -1230,7 +1250,8 @@ Table of Contents
       and earlier landmarks of that log, as defined in Section 8.2.1.
       These OIDs may be used to advertise a series of landmarks at once.
 
-   Future extensions to this protocol MAY define further allocations.
+   Future extensions to this protocol MAY define further allocations by
+   adding to the registry defined in Section 13.2.3.
 
    A CA ID determines a PKIX distinguished name (Section 4.1.2.4 of
    [RFC5280]) that can be used in the issuer or subject field of an
@@ -1240,22 +1261,13 @@ Table of Contents
 
    id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) rdna(25) TBD }
+       mechanisms(5) pkix(7) rdna(25) 3 }
 
    The attribute's value is a RELATIVE-OID containing the trust anchor
    ID's ASN.1 representation.  For example, the distinguished name for a
    CA with ID 32473.1 would be represented in syntax of [RFC4514] as:
 
-   1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
-
-   For initial experimentation, early implementations of this design
-   will use the OID 1.3.6.1.4.1.44363.47.3 instead of id-rdna-
-   trustAnchorID.  Cloudflare has kindly donated the
-   1.3.6.1.4.1.44363.47 OID arc for use in this document.  For example,
-   the distinguished name for an experimental CA with ID 32473.1 would
-   be represented in syntax of [RFC4514] as:
-
-   1.3.6.1.4.1.44363.47.3=#0d0481fd5901
+   1.3.6.1.5.5.7.25.3=#0d0481fd5901
 
 5.2.  Issuance Logs
 
@@ -1398,9 +1410,10 @@ Table of Contents
    subjectPublicKeyAlgorithm and subjectPublicKeyInfoHash.
 
    MTCLogEntry is an extensible structure.  Future documents MAY define
-   new values for MTCLogEntryType or MTCLogEntryExtensionType, with
-   corresponding semantics.  See Section 5.4 and Section 12.5 for
-   additional discussion.
+   new values for MTCLogEntryType or MTCLogEntryExtensionType by adding
+   to the registries defined in Section 13.2.1 and Section 13.2.2,
+   respectively.  See Section 5.4 and Section 12.5 for additional
+   discussion.
 
    An MTCLogEntry's size MUST NOT exceed 65535 (2^16-1) bytes.
    TBSCertificateLogEntry does not include signatures and hashes public
@@ -1428,6 +1441,14 @@ Table of Contents
 
    For example, [MTC-TLOG] defines a profile for Merkle Tree
    Certificates that uses [TLOG-TILES].
+
+      *RFC Editor's Note:* [MTC-TLOG] and other non-normative C2SP
+      references cite this document and are themselves versioned.
+      Ideally, the final RFC would reference C2SP versions that
+      reference the final RFC.  After the final RFC number is allocated,
+      the authors can help coordinate the document clustering across
+      those references, including tagging the appropriate versions of
+      the C2SP documents.
 
 5.3.  Cosigners
 
@@ -1470,7 +1491,7 @@ Table of Contents
 5.3.1.  Signature Format
 
    A cosigner computes a _subtree signature_ for a subtree in a log by
-   signing a CosignedMessage, defined below using the TLS presentation
+   signing a CosignedSubtree, defined below using the TLS presentation
    language (Section 3 of [RFC9846]):
 
    opaque HashValue[HASH_SIZE];
@@ -1483,7 +1504,7 @@ Table of Contents
        uint64 start;
        uint64 end;
        HashValue subtree_hash;
-   } CosignedMessage;
+   } CosignedSubtree;
 
    This signature format is designed to be compatible with the ML-DSA-44
    signature construction in [TLOG-COSIGNATURE], but it supports
@@ -1511,6 +1532,13 @@ Table of Contents
 
    For example, the trust anchor ID 32473.1 would be encoded as the
    ASCII string oid/1.3.6.1.4.1.32473.1.
+
+   OID components in a trust anchor ID can be arbitrarily large.
+   Implementations MAY set an upper bound on supported OID components,
+   based on the guidance in Section 8 of
+   [I-D.ietf-tls-trust-anchor-ids].  Such implementations MUST fail
+   signature generation or verification if an OID component is out of
+   range.
 
    start and end MUST define a valid subtree of the log, and
    subtree_hash MUST be the subtree's hash value in the cosigner's view
@@ -1574,7 +1602,7 @@ Table of Contents
    key or signature parameters, a cosigner operator MUST deploy a new
    cosigner, with a new cosigner ID.  Signature algorithms MUST fully
    specify the algorithm parameters, such as hash functions used.
-   Signatures are computed over the CosignedMessage described in
+   Signatures are computed over the CosignedSubtree described in
    Section 5.3.1.
 
    Log clients that accept cosignatures from some cosigner are assumed
@@ -1671,7 +1699,7 @@ Table of Contents
 
    id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) pe(1) TBD }
+       mechanisms(5) pkix(7) pe(1) 38 }
 
    ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
        SYNTAX MTCCertificationAuthority
@@ -1679,19 +1707,17 @@ Table of Contents
        CRITICALITY TRUE
    }
 
+   -- This is 2^48, the minimum possible serial number in this protocol.
+   mtcMinSerial INTEGER ::= 281474976710656
+
    -- This is 2^64-1, the maximum possible serial number in this protocol.
    mtcMaxSerial INTEGER ::= 18446744073709551615
 
    MTCCertificationAuthority ::= SEQUENCE {
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER (0..mtcMaxSerial),
-       maxSerial INTEGER (0..mtcMaxSerial)
+       minSerial INTEGER (mtcMinSerial..mtcMaxSerial),
+       maxSerial INTEGER (mtcMinSerial..mtcMaxSerial)
    }
-
-   For initial experimentation, early implementations of this design
-   will use the OID 1.3.6.1.4.1.44363.47.4 instead of id-pe-
-   mtcCertificationAuthority-SHA256.  Cloudflare has kindly donated the
-   1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
    The fields of an MTCCertificationAuthority structure are defined as
    follows:
@@ -1781,12 +1807,7 @@ Table of Contents
 
    id-alg-mtcProof OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) algorithms(6) TBD }
-
-   For initial experimentation, early implementations of this design
-   will use the OID 1.3.6.1.4.1.44363.47.0 instead of id-alg-mtcProof.
-   Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for
-   use in this document.
+       mechanisms(5) pkix(7) algorithms(6) 67 }
 
    The signatureValue contains an MTCProof structure, defined below
    using the TLS presentation language (Section 3 of [RFC9846]):
@@ -1794,19 +1815,17 @@ Table of Contents
    /* From Section 4 of draft-ietf-tls-trust-anchor-ids */
    opaque TrustAnchorID<1..2^8-1>;
 
-   opaque HashValue[HASH_SIZE];
-
    struct {
        TrustAnchorID cosigner_id;
        opaque signature<0..2^16-1>;
-   } SubtreeSignature;
+   } Cosignature;
 
    struct {
        MTCLogEntryExtension extensions<0..2^16-1>;
        uint48 start;
        uint48 end;
-       HashValue inclusion_proof<0..2^16-1>;
-       SubtreeSignature signatures<0..2^24-1>;
+       opaque inclusion_proof<0..2^16-1>;
+       Cosignature signatures<0..2^24-1>;
    } MTCProof;
 
    extensions MUST contain the log entry's extensions value
@@ -1814,12 +1833,13 @@ Table of Contents
 
    start and end MUST contain the corresponding parameters of the chosen
    subtree. inclusion_proof MUST contain a subtree inclusion proof
-   (Section 4.3) for the log entry and the subtree. signatures contains
-   the chosen subtree signatures.  In each signature, cosigner_id
-   contains the cosigner ID (Section 5.3) in its binary representation
-   (Section 4 of [I-D.ietf-tls-trust-anchor-ids]), and signature
-   contains the signature value as described in Section 5.3.1.  The
-   timestamp field used when computing the signature MUST be zero.
+   (Section 4.3) for the log entry and the subtree.  Each hash in the
+   proof is concatenated in order. signatures contains the chosen
+   subtree signatures.  In each signature, cosigner_id contains the
+   cosigner ID (Section 5.3) in its binary representation (Section 4 of
+   [I-D.ietf-tls-trust-anchor-ids]), and signature contains the
+   signature value as described in Section 5.3.1.  The timestamp field
+   used when computing the signature MUST be zero.
 
    Each element of the signatures field MUST have a unique cosigner_id.
    Elements MUST be ordered by cosigner_id (excluding length prefix) as
@@ -1834,11 +1854,17 @@ Table of Contents
    be done by checking each cosigner_id value comes strictly after the
    previous one in the above order.
 
+   CAs, or other parties, MAY include GREASE [RFC8701] cosignatures in
+   an MTCProof by allocating an unused cosigner ID and inserting it into
+   the signatures field.  The cosigner_id is the unused cosigner ID and
+   the signature is an arbitrary byte string.  A cosigner ID allocated
+   for GREASE MUST NOT be later repurposed for a real cosigner.
+
    The MTCProof is encoded into the signatureValue with no additional
    ASN.1 wrapping.  The most significant bit of the first octet of the
    signature value SHALL become the first bit of the bit string, and so
    on through the least significant bit of the last octet of the
-   signature value, which SHALL become the last bit of the bit string.
+   signature value, which SHALL become the last bit of the bit string
 
 6.3.  Standalone Certificates
 
@@ -1901,8 +1927,10 @@ Table of Contents
 6.4.  Landmark-Relative Certificates
 
    A _landmark-relative certificate_ is a Merkle Tree certificate which
-   contains no signatures and instead assumes the relying party had
-   predistributed information about which subtrees were trusted.
+   authenticates its subtree by assuming the relying party had
+   predistributed information about which subtrees were trusted.  This
+   allows the certificate to omit subtree cosignatures.
+
    Landmark-relative certificates are an optional size optimization.
    They require a processing delay to construct, and only work in a
    sufficiently up-to-date relying party.  Authenticating parties thus
@@ -2019,8 +2047,8 @@ Table of Contents
    *  A sequence of num_active_landmarks + 1 lines, where
       num_active_landmarks is the number of active landmarks at the time
       of publishing.  Decoders MUST reject documents where there are
-      greater than latest_landmark such lines.  Numbered consecutively
-      from zero, line i in this sequence consists of:
+      greater than latest_landmark + 1 such lines.  Numbered
+      consecutively from zero, line i in this sequence consists of:
 
       -  The tree size for landmark latest_landmark - i as a decimal
          integer.  This value MUST be at most 2^48-1.
@@ -2051,14 +2079,16 @@ Table of Contents
    2.  Let L be the lowest numbered landmark whose tree size is strictly
        greater than idx.  If no such landmark has been allocated yet,
        wait for one to be allocated.  If the entry has already expired
-       and historical landmark information is unavoidable, abort the
+       and historical landmark information is unavailable, abort the
        procedure.
 
    3.  Determine the L's subtrees (Section 6.4.1) and select the unique
        one whose [start, end) interval contains idx.
 
-   4.  Construct a certificate (Section 6.2) using the selected subtree
-       and no signatures.
+   4.  Construct a certificate (Section 6.2) using the selected subtree.
+       No cosignatures are required to authenticate the subtree, though
+       the certificate MAY include cosignatures for other purposes, such
+       as GREASE [RFC8701] cosignatures as described in Section 6.2.
 
    The procedure above is not specific to the CA.  Any party holding a
    standalone certificate (Section 6.3) can construct the corresponding
@@ -2074,15 +2104,15 @@ Table of Contents
    assume the issuance log's hash function is SHA-256.
 
    Some organizations have published statistics which can be used to
-   estimate this rate for the Web PKI.  As of June 9th, 2025:
+   estimate this rate for the Web PKI.  As of September 18th, 2026:
 
-   *  [LetsEncrypt] reported around 558,000,000 active certificates for
+   *  [LetsEncrypt] reported around 682,000,000 active certificates for
       a single CA
 
-   *  [MerkleTown] reported around 2,100,000,000 unexpired certificates
-      in CT logs, across all CAs
+   *  [CloudflareRadar] reported around 2,900,000,000 unexpired
+      certificates in CT logs, across all CAs
 
-   *  [MerkleTown] reported an issuance rate of around 444,000
+   *  [CloudflareRadar] reported an issuance rate of around 591,000
       certificates per hour, across all CAs
 
    The current issuance rate across the Web PKI may not necessarily be
@@ -2091,18 +2121,18 @@ Table of Contents
    subscribers will update their certificates 75% of the way through
    their lifetime (see Section 10.4), every certificate will be reissued
    every 126 hours.  This gives issuance rate estimates of around
-   4,400,000 certificates per hour and 17,000,000 certificates per hour,
+   5,400,000 certificates per hour and 23,000,000 certificates per hour,
    for the first two values above.  Note the larger estimate is across
    all CAs, while subtrees would only span one CA.
 
    Using the per-CA short lifetime estimate, if the CA mints a
    checkpoint every 2 seconds, standalone certificate subtrees will span
-   around 2,500 certificates, leading to 12 hashes in the inclusion
+   around 3,000 certificates, leading to 12 hashes in the inclusion
    proof, or 384 bytes.  Standalone certificates additionally must carry
    a sufficient set of signatures to meet relying party requirements.
 
    If a new landmark is allocated every hour, landmark-relative
-   certificate subtrees will span around 4,400,000 certificates, leading
+   certificate subtrees will span around 5,400,000 certificates, leading
    to 23 hashes in the inclusion proof, giving an inclusion proof size
    of 736 bytes, with no signatures.  This is significantly smaller than
    a single ML-DSA-44 signature, 2,420 bytes, and almost ten times
@@ -2141,7 +2171,10 @@ Table of Contents
    This information may be obtained from a CA certificate structure,
    defined in Section 5.5:
 
-   *  The CA ID is determined from the certificate's subject.
+   *  The CA ID is determined from the certificate's subject.  Note
+      that, while a general RELATIVE-OID can be arbitrarily long,
+      Section 4 of [I-D.ietf-tls-trust-anchor-ids] limits trust anchor
+      IDs to 32 bytes.
 
    *  The log hash algorithm is determined from the type of the Merkle
       Tree CA extension.
@@ -2230,21 +2263,21 @@ Table of Contents
         Unrecognized cosigners MUST be ignored.
 
         Signatures are verified as described in Section 5.3.1.  For each
-        signature verification, the CosignedMessage structure is
+        signature verification, the CosignedSubtree structure is
         constructed as follows:
 
-        1.  Set the CosignedMessage's cosigner_name based on the
+        1.  Set the CosignedSubtree's cosigner_name based on the
             cosigner ID as described in Section 5.3.1.
 
-        2.  Set the CosignedMessage's timestamp to zero.
+        2.  Set the CosignedSubtree's timestamp to zero.
 
-        3.  Set the CosignedMessage's log_origin based on log_id as
+        3.  Set the CosignedSubtree's log_origin based on log_id as
             described in Section 5.3.1.
 
-        4.  Set the CosignedMessage's start and end to the MTCProof's
+        4.  Set the CosignedSubtree's start and end to the MTCProof's
             start and end, respectively.
 
-        5.  Set the CosignedMessage's subtree_hash to
+        5.  Set the CosignedSubtree's subtree_hash to
             expected_subtree_hash.
 
    This procedure only replaces the signature verification portion of
@@ -2388,10 +2421,6 @@ Table of Contents
    *  For each subtree, a valid subtree consistency proof (Section 4.4)
       between the subtree and the reference checkpoint
 
-   [[TODO: The subtree consistency proofs have many nodes in common.  It
-   is possible to define a single "bulk consistency proof" that verifies
-   all the hashes at once, but it's a lot more complex.]]
-
    If a relying party is unable to validate some active landmark, it MAY
    discard that landmark, along with all landmarks in the log newer than
    it, while still using the older active landmarks that it was able to
@@ -2498,6 +2527,12 @@ Table of Contents
    use application-specific criteria in addition to, or instead of, this
    recommendation.
 
+   Relying parties SHOULD NOT include Merkle Tree CAs in the
+   certificate_authorities extension (Section 4.3.4 of [RFC9846]).
+   Doing so might inadvertently signal an unsupported landmark-relative
+   certificate because they have the same issuer field as standalone
+   certificates.
+
 8.1.  Standalone Certificates
 
    Authenticating and relying parties SHOULD use the trust_anchors
@@ -2509,14 +2544,6 @@ Table of Contents
 
    CA IDs MAY be incorporated into other trust anchor groups, following
    the guidance in Section 6 of [I-D.ietf-tls-trust-anchor-ids].
-
-   [[TODO: Ideally we would negotiate cosigners.
-   https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch
-   of how one might do this, though other designs are possible.
-   Negotiating cosigners allows the ecosystem to manage cosigners
-   efficiently, without needing to collect every possible cosignature
-   and send them all at once.  This is wasteful, particularly with post-
-   quantum algorithms.]]
 
    A standalone certificate MAY also be sent without explicit relying
    party trust signals, however doing so means the authenticating party
@@ -2983,7 +3010,7 @@ Table of Contents
 
 11.  Privacy Considerations
 
-   The Privacy Considerations described in Section 9 of
+   The Privacy Considerations described in Section 10 of
    [I-D.ietf-tls-trust-anchor-ids] apply to their use with Merkle Tree
    Certificates.
 
@@ -3413,7 +3440,9 @@ Table of Contents
 
 13.  IANA Considerations
 
-13.1.  Module Identifier
+13.1.  Additions to Existing Registries
+
+13.1.1.  Module Identifier
 
    IANA is requested to add the following entry in the "SMI Security for
    PKIX Module Identifier" registry [RFC7299]:
@@ -3426,7 +3455,7 @@ Table of Contents
 
                                  Table 1
 
-13.2.  Algorithm
+13.1.2.  Algorithm
 
    IANA is requested to add the following entry to the "SMI Security for
    PKIX Algorithms" registry [RFC7299]:
@@ -3434,12 +3463,12 @@ Table of Contents
                 +=========+=================+============+
                 | Decimal | Description     | References |
                 +=========+=================+============+
-                | TBD     | id-alg-mtcProof | [this-RFC] |
+                | 67      | id-alg-mtcProof | [this-RFC] |
                 +---------+-----------------+------------+
 
                                  Table 2
 
-13.3.  Certificate Extension
+13.1.3.  Certificate Extension
 
    IANA is requested to add the following entry to the "SMI Security for
    PKIX Certificate Extension" registry [RFC7299]:
@@ -3447,12 +3476,12 @@ Table of Contents
      +=========+========================================+============+
      | Decimal | Description                            | References |
      +=========+========================================+============+
-     | TBD     | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
+     | 38      | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
      +---------+----------------------------------------+------------+
 
                                   Table 3
 
-13.4.  Relative Distinguished Name Attribute
+13.1.4.  Relative Distinguished Name Attribute
 
    IANA is requested to add the following entry to the "SMI Security for
    PKIX Relative Distinguished Name Attribute" registry [RFC9925]:
@@ -3460,12 +3489,12 @@ Table of Contents
              +=========+=======================+============+
              | Decimal | Description           | References |
              +=========+=======================+============+
-             | TBD     | id-rdna-trustAnchorID | [this-RFC] |
+             | 3       | id-rdna-trustAnchorID | [this-RFC] |
              +---------+-----------------------+------------+
 
                                  Table 4
 
-13.5.  Link Relation Type
+13.1.5.  Link Relation Type
 
    IANA is requested to add the following entry to the "Link Relation
    Types" registry [RFC8288]:
@@ -3480,6 +3509,92 @@ Table of Contents
 
    Reference:  [this-RFC], Section 9.1
 
+13.2.  New Registries
+
+   IANA is requested to add a new top-level registry, "Merkle Tree
+   Certificates", to the "Protocol Registries" page at
+   https://www.iana.org/protocols (https://www.iana.org/protocols)
+
+   The rest of this section defines the subregistries requested within
+   the new "Merkle Tree Certificates" registry.
+
+13.2.1.  MTC Log Entry Types
+
+   IANA is requested to add a new registry, "MTC Log Entry Types" with
+   the following registration policies from [RFC8126]:
+
+               +=================+========================+
+               | Range           | Registration Policy    |
+               +=================+========================+
+               | 0x0000 - 0xEFFF | Specification Required |
+               +-----------------+------------------------+
+               | 0xF000 - 0xFFFF | Private Use            |
+               +-----------------+------------------------+
+
+                                 Table 5
+
+   The registry initially consists of:
+
+        +=================+==========================+============+
+        | Value           | Name                     | Reference  |
+        +=================+==========================+============+
+        | 0x0000          | null_entry               | [this-RFC] |
+        +-----------------+--------------------------+------------+
+        | 0x0001          | tbs_cert_entry           | [this-RFC] |
+        +-----------------+--------------------------+------------+
+        | 0x0002 - 0xEFFF | Unassigned               |            |
+        +-----------------+--------------------------+------------+
+        | 0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC] |
+        +-----------------+--------------------------+------------+
+
+                                  Table 6
+
+13.2.2.  MTC Log Entry Extension Types
+
+   IANA is requested to add a new registry, "MTC Log Entry Extension
+   Types" with the following registration policies from [RFC8126]:
+
+               +=================+========================+
+               | Range           | Registration Policy    |
+               +=================+========================+
+               | 0x0000 - 0xEFFF | Specification Required |
+               +-----------------+------------------------+
+               | 0xF000 - 0xFFFF | Private Use            |
+               +-----------------+------------------------+
+
+                                 Table 7
+
+   The registry initially consists of:
+
+        +=================+==========================+============+
+        | Value           | Name                     | Reference  |
+        +=================+==========================+============+
+        | 0x0000 - 0xEFFF | Unassigned               |            |
+        +-----------------+--------------------------+------------+
+        | 0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC] |
+        +-----------------+--------------------------+------------+
+
+                                  Table 8
+
+13.2.3.  MTC CA Identifier Child Components
+
+   IANA is requested to add a new registry, "MTC CA Identifier Child
+   Components", whose registration policy is Specification Required
+   [RFC8126].  Values shall be any non-negative integer.  The registry
+   initially consists of:
+
+                  +=======+================+============+
+                  | Value | Name           | Reference  |
+                  +=======+================+============+
+                  | 0     | logs           | [this-RFC] |
+                  +-------+----------------+------------+
+                  | 1     | landmarks      | [this-RFC] |
+                  +-------+----------------+------------+
+                  | 2     | landmarkGroups | [this-RFC] |
+                  +-------+----------------+------------+
+
+                                  Table 9
+
 14.  References
 
 14.1.  Normative References
@@ -3487,9 +3602,9 @@ Table of Contents
    [I-D.ietf-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-ietf-tls-trust-anchor-ids-05, 14 September
+              Draft, draft-ietf-tls-trust-anchor-ids-06, 30 September
               2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              tls-trust-anchor-ids-05>.
+              tls-trust-anchor-ids-06>.
 
    [POSIX]    "IEEE/Open Group Standard for Information Technology--
               Portable Operating System Interface (POSIX™) Base
@@ -3524,6 +3639,11 @@ Table of Contents
               RFC 6960, DOI 10.17487/RFC6960, June 2013,
               <https://www.rfc-editor.org/rfc/rfc6960>.
 
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8126>.
+
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
@@ -3536,6 +3656,11 @@ Table of Contents
               Kasten, "Automatic Certificate Management Environment
               (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
               <https://www.rfc-editor.org/rfc/rfc8555>.
+
+   [RFC8701]  Benjamin, D., "Applying Generate Random Extensions And
+              Sustain Extensibility (GREASE) to TLS Extensibility",
+              RFC 8701, DOI 10.17487/RFC8701, January 2020,
+              <https://www.rfc-editor.org/rfc/rfc8701>.
 
    [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "HTTP Semantics", STD 97, RFC 9110,
@@ -3598,6 +3723,11 @@ Table of Contents
               <https://chromium.googlesource.com/chromium/src/+/main/
               components/component_updater/README.md>.
 
+   [CloudflareRadar]
+              Cloudflare, Inc., "Cloudflare Radar Certificate
+              Transparency", 18 September 2026,
+              <https://radar.cloudflare.com/certificate-transparency>.
+
    [FIPS204]  "Module-lattice-based digital signature standard",
               National Institute of Standards and Technology (U.S.),
               DOI 10.6028/nist.fips.204, August 2024,
@@ -3621,15 +3751,11 @@ Table of Contents
               certs/tree/main/demo/large_inclusion_proofs.txt>.
 
    [LetsEncrypt]
-              Let's Encrypt, "Let's Encrypt Stats", 7 March 2023,
+              Let's Encrypt, "Let's Encrypt Stats", 18 September 2026,
               <https://letsencrypt.org/stats/>.
 
-   [MerkleTown]
-              Cloudflare, Inc., "Merkle Town", 7 March 2023,
-              <https://ct.cloudflare.com/>.
-
    [MTC-TLOG] C2SP, "Merkle Tree Certificates With Tiled Transparency
-              Logs", July 2026, <https://c2sp.org/mtc-tlog>.
+              Logs", October 2026, <https://c2sp.org/mtc-tlog@v0.1.0>.
 
    [RFC4514]  Zeilenga, K., Ed., "Lightweight Directory Access Protocol
               (LDAP): String Representation of Distinguished Names",
@@ -3673,22 +3799,24 @@ Table of Contents
               Zm4NqyRc7LDsOtV56EchBIT9r4c/>.
 
    [TLOG-COSIGNATURE]
-              C2SP, "Transparency Log Cosignatures", April 2026,
-              <https://c2sp.org/tlog-cosignature>.
+              C2SP, "Transparency Log Cosignatures", October 2026,
+              <https://c2sp.org/tlog-cosignature@v1.1.0>.
 
    [TLOG-MIRROR]
-              C2SP, "Transparency Log Mirrors", July 2025,
-              <https://c2sp.org/tlog-mirror>.
+              C2SP, "Transparency Log Mirrors", October 2026,
+              <https://c2sp.org/tlog-mirror@v0.1.0>.
 
    [TLOG-TILES]
-              C2SP, "Tiled Transparency Logs", June 2025,
-              <https://c2sp.org/tlog-tiles>.
+              C2SP, "Tiled Transparency Logs", October 2026,
+              <https://c2sp.org/tlog-tiles@v1.0.0>.
 
    [TLOG-WITNESS]
-              C2SP, "Transparency Log Witness Protocol", June 2025,
-              <https://c2sp.org/tlog-witness>.
+              C2SP, "Transparency Log Witness Protocol", October 2026,
+              <https://c2sp.org/tlog-witness@v1.1.0>.
 
 Appendix A.  ASN.1 Module
+
+   This ASN.1 module uses the conventions established by [RFC5912].
 
    MerkleTreeCertificates
      { iso(1) identified-organization(3) dod(6) internet(1)
@@ -3736,7 +3864,7 @@ Appendix A.  ASN.1 Module
 
    id-alg-mtcProof OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) algorithms(6) TBD }
+       mechanisms(5) pkix(7) algorithms(6) 67 }
 
    sa-mtcProof SIGNATURE-ALGORITHM ::= {
        IDENTIFIER id-alg-mtcProof
@@ -3745,7 +3873,7 @@ Appendix A.  ASN.1 Module
 
    id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) rdna(25) TBD }
+       mechanisms(5) pkix(7) rdna(25) 3 }
 
    at-trustAnchorID ATTRIBUTE ::= {
        TYPE RELATIVE-OID
@@ -3754,7 +3882,7 @@ Appendix A.  ASN.1 Module
 
    id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) pe(1) TBD }
+       mechanisms(5) pkix(7) pe(1) 38 }
 
    ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
        SYNTAX MTCCertificationAuthority
@@ -3762,13 +3890,16 @@ Appendix A.  ASN.1 Module
        CRITICALITY TRUE
    }
 
+   -- This is 2^48, the minimum possible serial number in this protocol.
+   mtcMinSerial INTEGER ::= 281474976710656
+
    -- This is 2^64-1, the maximum possible serial number in this protocol.
    mtcMaxSerial INTEGER ::= 18446744073709551615
 
    MTCCertificationAuthority ::= SEQUENCE {
        sigAlg    AlgorithmIdentifier{SIGNATURE-ALGORITHM, {...}},
-       minSerial INTEGER (0..mtcMaxSerial),
-       maxSerial INTEGER (0..mtcMaxSerial)
+       minSerial INTEGER (mtcMinSerial..mtcMaxSerial),
+       maxSerial INTEGER (mtcMinSerial..mtcMaxSerial)
    }
 
    END
@@ -4516,17 +4647,21 @@ Acknowledgements
 
    The authors additionally thank Bob Beck, Corey Bonnell, Ryan Dickson,
    Aaron Gable, Nick Harper, Jacob Hoffman-Andrews, Russ Housley, Dennis
-   Jackson, Ilari Liusvaara, Sanketh Menda, Matt Mueller, Mike
-   Ounsworth, Chris Patton, Michael Richardson, Ryan Sleevi, Emily
-   Stark, and Rob Stradling for many valuable discussions and insights
-   which led to this document, as well as feedback and contributions to
-   the document itself.  We wish to thank Mia Celeste in particular,
-   whose implementation of an earlier draft revealed several pitfalls.
+   Jackson, Ilari Liusvaara, Matthew McPherrin, Sanketh Menda, Matt
+   Mueller, Mike Ounsworth, Chris Patton, Michael Richardson, Ryan
+   Sleevi, Emily Stark, and Rob Stradling for many valuable discussions
+   and insights which led to this document, as well as feedback and
+   contributions to the document itself.  We wish to thank Mia Celeste
+   in particular, whose implementation of an earlier draft revealed
+   several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
    Richard Barnes in [STH-Discipline].  The size optimization in Merkle
    Tree Certificates is an application of this idea to the certificate
    itself.
+
+   The transparency log architecture and APIs are based on designs
+   developed by the Go and Sigsum projects.
 
 Change log
 
@@ -4791,6 +4926,19 @@ Since draft-ietf-plants-merkle-tree-certs-05
 
    *  Define active landmarks around landmark expiry and put the expiry
       time in the landmark format.
+
+   *  Fix an interaction between landmark-relative certs and TLS
+      certificate_authorities.
+
+Since draft-ietf-plants-merkle-tree-certs-06
+
+   *  OIDs have been allocated.
+
+   *  Set up registries for extensible parameters.
+
+   *  Allow GREASE cosignatures in MTCProof.
+
+   *  Use versioned URLs for (non-normative) C2SP references.
 
 Authors' Addresses
 
