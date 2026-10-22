@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-20T04:34:20.267482+00:00",
+  "timestamp": "2026-10-22T04:25:24.421006+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4344,9 +4344,17 @@
       "labels": [],
       "body": "I count 6 instances of \"subtree signature\" in the draft and 4 instances of \"subtree cosignature.\" We should consolidate on one; I'm guessing the preference is for the latter?",
       "createdAt": "2026-10-19T19:30:52Z",
-      "updatedAt": "2026-10-19T19:30:52Z",
+      "updatedAt": "2026-10-21T22:23:12Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "https://c2sp.org/tlog-cosignature uses \"subtree cosignature\" so yeah let's go with that one.",
+          "createdAt": "2026-10-21T22:23:12Z",
+          "updatedAt": "2026-10-21T22:23:12Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -24298,6 +24306,98 @@
           "body": "",
           "createdAt": "2026-10-13T08:18:17Z",
           "updatedAt": "2026-10-13T08:18:17Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 359,
+      "id": "PR_kwDOJIBkVc8AAAABJmDw-g",
+      "title": "Fix typo in landmark description",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/359",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-20T16:20:27Z",
+      "updatedAt": "2026-10-20T17:33:27Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7f5561c8f105f40fcb32a420825778eb2964759b",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "fix-typo",
+      "headRefOid": "6c1fe2538d3df3312a3f1cdc9a249a8645573021",
+      "closedAt": "2026-10-20T17:33:22Z",
+      "mergedAt": "2026-10-20T17:33:22Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e75a28898bfca9ce7c6976070667ced0f2a21334"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABTR9xjg",
+          "commit": {
+            "abbreviatedOid": "6c1fe25"
+          },
+          "author": "devonobrien",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-20T17:19:23Z",
+          "updatedAt": "2026-10-20T17:19:23Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 360,
+      "id": "PR_kwDOJIBkVc8AAAABJ37lgQ",
+      "title": "demo: Add config option to provide entry extensions",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/360",
+      "state": "MERGED",
+      "author": "chlily1",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-21T20:02:03Z",
+      "updatedAt": "2026-10-21T20:11:25Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e75a28898bfca9ce7c6976070667ced0f2a21334",
+      "headRepository": "chlily1/merkle-tree-certs",
+      "headRefName": "main",
+      "headRefOid": "8e05b31704c43c5b0391f632cf11561d51fec0d8",
+      "closedAt": "2026-10-21T20:11:25Z",
+      "mergedAt": "2026-10-21T20:11:25Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "cc8797a94f4933e660f6ce369f3bfa5c6573db01"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Perhaps we'll eventually want to make this a little more featureful and break the extensions up but we can cross that bridge later.",
+          "createdAt": "2026-10-21T20:11:20Z",
+          "updatedAt": "2026-10-21T20:11:20Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABTh64mA",
+          "commit": {
+            "abbreviatedOid": "8e05b31"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-10-21T20:10:55Z",
+          "updatedAt": "2026-10-21T20:10:55Z",
           "comments": []
         }
       ]
