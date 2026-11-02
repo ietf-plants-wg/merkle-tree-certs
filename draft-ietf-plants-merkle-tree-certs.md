@@ -975,19 +975,7 @@ Once allocated, the ID's entire object identifier (OID) arc is reserved by this 
 
 Future extensions to this protocol MAY define further allocations by adding to the registry defined in {{mtc-ca-identifier-child-components}}.
 
-A CA ID determines a PKIX distinguished name ({{Section 4.1.2.4 of !RFC5280}}) that can be used in the issuer or subject field of an X.509 TBSCertificate. This distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type `id-rdna-trustAnchorID`, defined below:
-
-~~~asn.1
-id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) 3 }
-~~~
-
-The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a CA with ID `32473.1` would be represented in syntax of {{?RFC4514}} as:
-
-~~~
-1.3.6.1.5.5.7.25.3=#0d0481fd5901
-~~~
+The CA's ID determine's the CA's PKIX distinguished name using the construction described in {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 ## Issuance Logs
 
@@ -1066,7 +1054,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `version`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` have the same semantics as the corresponding TBSCertificate fields, defined in {{Section 4.1.2 of !RFC5280}}.
 
-* `issuer` is the CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
+* `issuer` is the CA ID as a PKIX distinguished name, as described in {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}.
 
   * The `issuer` field is not human-readable. A TBSCertificateLogEntry MAY carry a human-readable label for the CA, suitable for display in user interfaces, in an issuer alternative name extension ({{Section 4.2.1.7 of !RFC5280}}). If present, the extension MUST be marked non-critical. The `IssuerAltName` SEQUENCE MUST contain a single `GeneralName` of type `directoryName`, whose `Name` MUST use the `rdnSequence` CHOICE. Each `RelativeDistinguishedName` MUST contain a single `AttributeTypeAndValue`. The extension is purely cosmetic, and MUST NOT be used in path validation or any other trust decision. The value MUST NOT be assumed unique across issuance logs and MAY change across entries in the same issuance log.
 
@@ -1192,7 +1180,7 @@ If the CA operator additionally operates a directly-signing X.509 CA, that CA ke
 
 This section defines the X.509 Certificate {{!RFC5280}} representation of a Merkle Tree CA. It identifies the CA cosigner ({{certification-authority-cosigners}}) and associated issuance logs. This information is encoded as follows:
 
-* The `subject` field MUST be the CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
+* The `subject` field MUST be the CA ID as a PKIX distinguished name, as described in {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 * The `subjectPublicKeyInfo` field MUST be the public key of the CA cosigner {{certification-authority-cosigners}}.
 
@@ -1265,7 +1253,7 @@ By varying the choice of subtree and signatures, there can be multiple ways to p
 
 The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
-The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA ID as a PKIX distinguished name, as described in {{ca-ids}}.
+The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA ID as a PKIX distinguished name, as described in {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number ({{issuance-logs}}). The `serialNumber` MUST be equal to `(log_number << 48) | index`. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.
 
@@ -1975,14 +1963,6 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Certi
 |---------|----------------------------------------|------------|
 | 38      | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
 
-### Relative Distinguished Name Attribute
-
-IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{!RFC9925}}:
-
-| Decimal | Description           | References |
-|---------|-----------------------|------------|
-| 3       | id-rdna-trustAnchorID | [this-RFC] |
-
 ### Link Relation Type
 
 IANA is requested to add the following entry to the "Link Relation Types" registry {{!RFC8288}}:
@@ -2069,7 +2049,7 @@ IMPORTS
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-algorithmInformation-02(58) }
-  Extensions{}, ATTRIBUTE
+  Extensions{}
   FROM PKIX-CommonTypes-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -2106,15 +2086,6 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
 sa-mtcProof SIGNATURE-ALGORITHM ::= {
     IDENTIFIER id-alg-mtcProof
     PARAMS ARE absent
-}
-
-id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) 3 }
-
-at-trustAnchorID ATTRIBUTE ::= {
-    TYPE RELATIVE-OID
-    IDENTIFIED BY id-rdna-trustAnchorID
 }
 
 id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
@@ -2896,3 +2867,10 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Allow GREASE cosignatures in MTCProof.
 
 - Use versioned URLs for (non-normative) C2SP references.
+
+## Since draft-ietf-plants-merkle-tree-certs-07
+{:numbered="false"}
+
+- Moved `id-rdna-trustAnchorID` to the trust anchor ID draft.
+
+- No changes were made to the wire format. draft-07 and draft-08 are compatible.
