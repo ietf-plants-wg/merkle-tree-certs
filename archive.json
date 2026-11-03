@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-22T04:25:24.421006+00:00",
+  "timestamp": "2026-11-03T06:26:22.278444+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -22289,21 +22289,21 @@
       "id": "PR_kwDOJIBkVc8AAAABD01Kig",
       "title": "Add a skeleton architecture document",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/321",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "sgmenda",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "This adds a skeleton for the informational architecture document. It is purely additive and does not modify the main document.\r\n\r\nA few questions for the reviewers:\r\n\r\n1. What should the filename and docname be?\r\n2. Is `consensus: true` right?\r\n3. Does the outline look right?\r\n\r\nSee #192",
       "createdAt": "2026-09-16T20:04:09Z",
-      "updatedAt": "2026-09-16T20:30:24Z",
+      "updatedAt": "2026-11-02T23:04:25Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "af644990e8f3b7fe92ba7dcb4285c6c0daf18223",
       "headRepository": "sgmenda/merkle-tree-certs",
       "headRefName": "mtc-architecture-skeleton",
       "headRefOid": "327c624fde8f031fc0f34fde2d091c7dda9cde73",
-      "closedAt": null,
+      "closedAt": "2026-11-02T23:04:15Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -22314,6 +22314,13 @@
           "body": "I misclicked, this PR is not yet ready for review. Sorry for the noise.",
           "createdAt": "2026-09-16T20:11:36Z",
           "updatedAt": "2026-09-16T20:11:36Z"
+        },
+        {
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Superseded by https://datatracker.ietf.org/doc/draft-sanketh-plants-mtc-architecture/. I'll open a new PR that imports that draft.",
+          "createdAt": "2026-11-02T23:04:15Z",
+          "updatedAt": "2026-11-02T23:04:15Z"
         }
       ],
       "reviews": []
