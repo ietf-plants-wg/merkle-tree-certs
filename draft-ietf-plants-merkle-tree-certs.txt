@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 6 May 2027                                           Apple Inc.
+Expires: 9 May 2027                                           Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         2 November 2026
+                                                         5 November 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 May 2027.
+   This Internet-Draft will expire on 9 May 2027.
 
 Copyright Notice
 
@@ -205,6 +205,7 @@ Table of Contents
      Since draft-ietf-plants-merkle-tree-certs-04
      Since draft-ietf-plants-merkle-tree-certs-05
      Since draft-ietf-plants-merkle-tree-certs-06
+     Since draft-ietf-plants-merkle-tree-certs-07
      Since draft-ietf-plants-merkle-tree-certs-07
    Authors' Addresses
 
@@ -3797,12 +3798,12 @@ Appendix A.  ASN.1 Module
    BEGIN
 
    IMPORTS
-     SIGNATURE-ALGORITHM, DIGEST-ALGORITHM, AlgorithmIdentifier{},
+     SIGNATURE-ALGORITHM, AlgorithmIdentifier{}
      FROM AlgorithmInformation-2009 -- in [RFC5912]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
          id-mod-algorithmInformation-02(58) }
-     Extensions{}
+     Extensions{}, EXTENSION
      FROM PKIX-CommonTypes-2009 -- in [RFC5912]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -3848,7 +3849,7 @@ Appendix A.  ASN.1 Module
    ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
        SYNTAX MTCCertificationAuthority
        IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
-       CRITICALITY TRUE
+       CRITICALITY {TRUE}
    }
 
    -- This is 2^48, the minimum possible serial number in this protocol.
@@ -4907,6 +4908,10 @@ Since draft-ietf-plants-merkle-tree-certs-07
 
    *  No changes were made to the wire format. draft-07 and draft-08 are
       compatible.
+
+Since draft-ietf-plants-merkle-tree-certs-07
+
+   *  Fix some mistakes in the ASN.1 module.
 
 Authors' Addresses
 
