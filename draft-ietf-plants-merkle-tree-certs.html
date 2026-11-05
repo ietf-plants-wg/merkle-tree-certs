@@ -4173,7 +4173,7 @@ id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
     IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
-    CRITICALITY TRUE
+    CRITICALITY {TRUE}
 }
 
 -- This is 2^48, the minimum possible serial number in this protocol.
