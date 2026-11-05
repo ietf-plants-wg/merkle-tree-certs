@@ -2044,12 +2044,12 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SIGNATURE-ALGORITHM, DIGEST-ALGORITHM, AlgorithmIdentifier{},
+  SIGNATURE-ALGORITHM, AlgorithmIdentifier{}
   FROM AlgorithmInformation-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-algorithmInformation-02(58) }
-  Extensions{}
+  Extensions{}, EXTENSION
   FROM PKIX-CommonTypes-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -2095,7 +2095,7 @@ id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
     IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
-    CRITICALITY TRUE
+    CRITICALITY {TRUE}
 }
 
 -- This is 2^48, the minimum possible serial number in this protocol.
@@ -2874,3 +2874,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Moved `id-rdna-trustAnchorID` to the trust anchor ID draft.
 
 - No changes were made to the wire format. draft-07 and draft-08 are compatible.
+
+## Since draft-ietf-plants-merkle-tree-certs-07
+{:numbered="false"}
+
+- Fix some mistakes in the ASN.1 module.
