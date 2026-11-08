@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-03T06:26:22.278444+00:00",
+  "timestamp": "2026-11-08T05:47:15.027245+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -24406,6 +24406,90 @@
           "createdAt": "2026-10-21T20:10:55Z",
           "updatedAt": "2026-10-21T20:10:55Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 361,
+      "id": "PR_kwDOJIBkVc8AAAABNHdLfQ",
+      "title": "Fix some mistakes in the ASN.1 module",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/361",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@CBonnell wrote a handy tool to check these!",
+      "createdAt": "2026-11-05T16:43:12Z",
+      "updatedAt": "2026-11-05T17:11:36Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "766dbfe6519819ff2771b1f429106706178bb16a",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "fix-asn1",
+      "headRefOid": "71575cc5a6176828b81701e08b65d2ef5d671c07",
+      "closedAt": "2026-11-05T16:55:25Z",
+      "mergedAt": "2026-11-05T16:55:25Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e311c1dad724f469cf8bfa14b731ea5665c21af7"
+      },
+      "comments": [
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Could we add a CI check for this? I looked into this a while back but wasn't able to get the clanker to come up with a good solution. Maybe @CBonnell's tool can be adapted.",
+          "createdAt": "2026-11-05T16:47:38Z",
+          "updatedAt": "2026-11-05T16:48:50Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ooh, yeah if there were some way to it as part of the build, that'd be handy. Could even imagine integrating it into i-d-template.",
+          "createdAt": "2026-11-05T16:55:16Z",
+          "updatedAt": "2026-11-05T16:55:16Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Filed https://github.com/martinthomson/i-d-template/issues/535 to track the CI check.",
+          "createdAt": "2026-11-05T17:11:36Z",
+          "updatedAt": "2026-11-05T17:11:36Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABWQdBcw",
+          "commit": {
+            "abbreviatedOid": "71575cc"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-05T16:47:55Z",
+          "updatedAt": "2026-11-05T16:47:55Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABWQoOuQ",
+          "commit": {
+            "abbreviatedOid": "71575cc"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-05T17:00:46Z",
+          "updatedAt": "2026-11-05T17:00:46Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "I forgot to fix this in the snippet too, so I just fixed it in post in c8252d7617d51b453aa0e3819c955632f09a3233.",
+              "createdAt": "2026-11-05T17:00:46Z",
+              "updatedAt": "2026-11-05T17:00:46Z"
+            }
+          ]
         }
       ]
     }
