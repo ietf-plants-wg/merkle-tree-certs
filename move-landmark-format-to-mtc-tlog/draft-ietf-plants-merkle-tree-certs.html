@@ -13,22 +13,22 @@
 <meta content="
        This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to existing X.509 constructions and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
     " name="description">
-<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="xml2rfc 3.35.0" name="generator">
 <meta content="draft-ietf-plants-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.1
-    Python 3.14.8
-    ConfigArgParse 1.8.0
+  xml2rfc 3.35.0
+    Python 3.14.10
+    ConfigArgParse 1.9.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.12.2
+    platformdirs 4.14.3
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.9.1
+    wcwidth 0.9.4
 -->
 <link href="draft-ietf-plants-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1029,7 +1029,7 @@ svg {
   & :is([stroke="white"], [stroke^="#fff"]) {
     stroke: var(--background-color);
   }
-  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+  & :is([fill="black"], [fill^="#000"], :not([fill], [fill] *)) {
     fill: var(--text-color);
   }
   & :is([fill="white"], [fill^="#fff"]) {
@@ -1044,11 +1044,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">October 2026</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 11 April 2027</td>
+<td class="center">Expires 14 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1061,12 @@ svg {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-08" class="published">8 October 2026</time>
+<time datetime="2026-11-10" class="published">10 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-11">11 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-14">14 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 11 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 14 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1432,10 +1432,7 @@ svg {
                     <p id="section-toc.1-1.13.2.1.2.3.1"><a href="#section-13.1.3" class="auto internal xref">13.1.3</a>.  <a href="#name-certificate-extension" class="internal xref">Certificate Extension</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.4">
-                    <p id="section-toc.1-1.13.2.1.2.4.1"><a href="#section-13.1.4" class="auto internal xref">13.1.4</a>.  <a href="#name-relative-distinguished-name" class="internal xref">Relative Distinguished Name Attribute</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.5">
-                    <p id="section-toc.1-1.13.2.1.2.5.1"><a href="#section-13.1.5" class="auto internal xref">13.1.5</a>.  <a href="#name-link-relation-type" class="internal xref">Link Relation Type</a></p>
+                    <p id="section-toc.1-1.13.2.1.2.4.1"><a href="#section-13.1.4" class="auto internal xref">13.1.4</a>.  <a href="#name-link-relation-type" class="internal xref">Link Relation Type</a></p>
 </li>
                 </ul>
 </li>
@@ -1588,6 +1585,15 @@ svg {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.18">
                 <p id="section-toc.1-1.19.2.18.1"><a href="#appendix-E.18" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-tr" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-06</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.19">
+                <p id="section-toc.1-1.19.2.19.1"><a href="#appendix-E.19" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-tre" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-07</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.20">
+                <p id="section-toc.1-1.19.2.20.1"><a href="#appendix-E.20" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-tree" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-07</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.21">
+                <p id="section-toc.1-1.19.2.21.1"><a href="#appendix-E.21" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merkle-tree-2" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-08</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
@@ -1603,7 +1609,7 @@ svg {
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
 <p id="section-1-1">In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate <span>[<a href="#APPLE-CT" class="cite xref">APPLE-CT</a>]</span> <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-9.5" class="relref">Section 9.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-2">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-9.5" class="relref">Section 9.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">Additionally, as PKIs transition to shorter-lived certificates <span>[<a href="#CABF-153" class="cite xref">CABF-153</a>]</span> <span>[<a href="#CABF-SC081" class="cite xref">CABF-SC081</a>]</span>, the rate at which entries are added to the log will increase.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">This document introduces Merkle Tree Certificates (MTCs), a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains logs of everything it issues, signing views of its logs to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the logs. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.<a href="#section-1-5" class="pilcrow">¶</a></p>
@@ -3881,27 +3887,14 @@ def find_subtrees(start, end):
             <p id="section-5.1-3.1.1">For each positive integer <code>N</code>, the OID <code>{caID logs(0) N}</code> represents the issuance log <code>N</code> (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>).<a href="#section-5.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-3.2">
-            <p id="section-5.1-3.2.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarks(1) N L}</code> represents landmark <code>L</code> (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) of issuance log <code>N</code>. These OIDs may be used as trust anchor IDs, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the recovery mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-5.6" class="relref">Section 5.6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-3.2.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarks(1) N L}</code> represents landmark <code>L</code> (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) of issuance log <code>N</code>. These OIDs may be used as trust anchor IDs, as described in <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a>. These OIDs are used when it is necessary to identify an individual landmark, e.g. as in the recovery mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-5.6" class="relref">Section 5.6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-3.3">
-            <p id="section-5.1-3.3.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarkGroups(2) N L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark <code>L</code> of log <code>N</code> and earlier landmarks of that log, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.1-3.3.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-3.3.1">For each positive integer <code>N</code> and <code>L</code>, the OID <code>{caID landmarkGroups(2) N L}</code> represents a trust anchor group (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) containing landmark <code>L</code> of log <code>N</code> and earlier landmarks of that log, as defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>. These OIDs may be used to advertise a series of landmarks at once.<a href="#section-5.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.1-4">Future extensions to this protocol <span class="bcp14">MAY</span> define further allocations by adding to the registry defined in <a href="#mtc-ca-identifier-child-components" class="auto internal xref">Section 13.2.3</a>.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">A CA ID determines a PKIX distinguished name (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.4" class="relref">Section 4.1.2.4</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) that can be used in the issuer or subject field of an X.509 TBSCertificate. This distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type <code>id-rdna-trustAnchorID</code>, defined below:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
-<div class="lang-asn.1 sourcecode" id="section-5.1-6">
-<pre>
-id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) 3 }
-</pre><a href="#section-5.1-6" class="pilcrow">¶</a>
-</div>
-<p id="section-5.1-7">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a CA with ID <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.1-7" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.1-8">
-<pre>
-1.3.6.1.5.5.7.25.3=#0d0481fd5901
-</pre><a href="#section-5.1-8" class="pilcrow">¶</a>
-</div>
+<p id="section-5.1-5">The CA's ID determine's the CA's PKIX distinguished name using the construction described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="issuance-logs">
@@ -3986,7 +3979,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
               <p id="section-5.2.1-9.1.1"><code>version</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> have the same semantics as the corresponding TBSCertificate fields, defined in <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.<a href="#section-5.2.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-5.2.1-9.2">
-              <p id="section-5.2.1-9.2.1"><code>issuer</code> is the CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-5.2.1-9.2.1" class="pilcrow">¶</a></p>
+              <p id="section-5.2.1-9.2.1"><code>issuer</code> is the CA ID as a PKIX distinguished name, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.2.1-9.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.2.1-9.2.2.1">
                   <p id="section-5.2.1-9.2.2.1.1">The <code>issuer</code> field is not human-readable. A TBSCertificateLogEntry <span class="bcp14">MAY</span> carry a human-readable label for the CA, suitable for display in user interfaces, in an issuer alternative name extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.7" class="relref">Section 4.2.1.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>). If present, the extension <span class="bcp14">MUST</span> be marked non-critical. The <code>IssuerAltName</code> SEQUENCE <span class="bcp14">MUST</span> contain a single <code>GeneralName</code> of type <code>directoryName</code>, whose <code>Name</code> <span class="bcp14">MUST</span> use the <code>rdnSequence</code> CHOICE. Each <code>RelativeDistinguishedName</code> <span class="bcp14">MUST</span> contain a single <code>AttributeTypeAndValue</code>. The extension is purely cosmetic, and <span class="bcp14">MUST NOT</span> be used in path validation or any other trust decision. The value <span class="bcp14">MUST NOT</span> be assumed unique across issuance logs and <span class="bcp14">MAY</span> change across entries in the same issuance log.<a href="#section-5.2.1-9.2.2.1.1" class="pilcrow">¶</a></p>
@@ -4062,7 +4055,7 @@ struct {
               <p id="section-5.3.1-6.1.1">The 16-byte ASCII string <code>oid/1.3.6.1.4.1.</code><a href="#section-5.3.1-6.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-5.3.1-6.2">
-              <p id="section-5.3.1-6.2.1">The trust anchor ID's ASCII representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>)<a href="#section-5.3.1-6.2.1" class="pilcrow">¶</a></p>
+              <p id="section-5.3.1-6.2.1">The trust anchor ID's ASCII representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>)<a href="#section-5.3.1-6.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-5.3.1-7">This is equivalent to the concatenation of:<a href="#section-5.3.1-7" class="pilcrow">¶</a></p>
@@ -4075,7 +4068,7 @@ struct {
 </li>
           </ul>
 <p id="section-5.3.1-9">For example, the trust anchor ID 32473.1 would be encoded as the ASCII string <code>oid/1.3.6.1.4.1.32473.1</code>.<a href="#section-5.3.1-9" class="pilcrow">¶</a></p>
-<p id="section-5.3.1-10">OID components in a trust anchor ID can be arbitrarily large. Implementations <span class="bcp14">MAY</span> set an upper bound on supported OID components, based on the guidance in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Such implementations <span class="bcp14">MUST</span> fail signature generation or verification if an OID component is out of range.<a href="#section-5.3.1-10" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-10">OID components in a trust anchor ID can be arbitrarily large. Implementations <span class="bcp14">MAY</span> set an upper bound on supported OID components, based on the guidance in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Such implementations <span class="bcp14">MUST</span> fail signature generation or verification if an OID component is out of range.<a href="#section-5.3.1-10" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-11"><code>start</code> and <code>end</code> <span class="bcp14">MUST</span> define a valid subtree of the log, and <code>subtree_hash</code> <span class="bcp14">MUST</span> be the subtree's hash value in the cosigner's view of the log. See <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>.<a href="#section-5.3.1-11" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-12">If <code>timestamp</code> is non-zero, it <span class="bcp14">MUST</span> be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>. Additionally, if <code>timestamp</code> is non-zero, the following <span class="bcp14">MUST</span> be true:<a href="#section-5.3.1-12" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -4151,7 +4144,7 @@ struct {
 <p id="section-5.5-1">This section defines the X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> representation of a Merkle Tree CA. It identifies the CA cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>) and associated issuance logs. This information is encoded as follows:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.5-2.1">
-            <p id="section-5.5-2.1.1">The <code>subject</code> field <span class="bcp14">MUST</span> be the CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-5.5-2.1.1">The <code>subject</code> field <span class="bcp14">MUST</span> be the CA ID as a PKIX distinguished name, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-2.2">
             <p id="section-5.5-2.2.1">The <code>subjectPublicKeyInfo</code> field <span class="bcp14">MUST</span> be the public key of the CA cosigner <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.4</a>.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
@@ -4160,7 +4153,7 @@ struct {
             <p id="section-5.5-2.3.1">The <code>extensions</code> field <span class="bcp14">MUST</span> contain a critical Merkle Tree CA extension. This is defined below.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-2.4">
-            <p id="section-5.5-2.4.1">The subject key identifier extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.2" class="relref">Section 4.2.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>), if present, <span class="bcp14">SHOULD</span> be set to the CA ID <a href="#ca-ids" class="auto internal xref">Section 5.1</a>. The CA ID is encoded in its binary representation, as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.5-2.4.1">The subject key identifier extension (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.2" class="relref">Section 4.2.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>), if present, <span class="bcp14">SHOULD</span> be set to the CA ID <a href="#ca-ids" class="auto internal xref">Section 5.1</a>. The CA ID is encoded in its binary representation, as defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.5-3">Other fields and extensions in <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> apply unmodified. In particular:<a href="#section-5.5-3" class="pilcrow">¶</a></p>
@@ -4183,7 +4176,7 @@ id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
     IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
-    CRITICALITY TRUE
+    CRITICALITY {TRUE}
 }
 
 -- This is 2^48, the minimum possible serial number in this protocol.
@@ -4250,7 +4243,7 @@ MTCCertificationAuthority ::= SEQUENCE {
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-certificate-format" class="section-name selfRef">Certificate Format</a>
         </h3>
 <p id="section-6.2-1">The information is encoded in an X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> as follows:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> <span class="bcp14">MUST</span> be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field <span class="bcp14">MUST</span> be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.2.1</a>, this means <code>issuer</code> <span class="bcp14">MUST</span> be the issuance log's CA ID as a PKIX distinguished name, as described in <a href="#ca-ids" class="auto internal xref">Section 5.1</a>.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> <span class="bcp14">MUST</span> be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field <span class="bcp14">MUST</span> be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.2.1</a>, this means <code>issuer</code> <span class="bcp14">MUST</span> be the issuance log's CA ID as a PKIX distinguished name, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.2-3">The TBSCertificate's <code>serialNumber</code> is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the log's number (<a href="#issuance-logs" class="auto internal xref">Section 5.2</a>). The <code>serialNumber</code> <span class="bcp14">MUST</span> be equal to <code>(log_number &lt;&lt; 48) | index</code>. All serial numbers constructed in this way will be positive and at most 2<sup>64</sup>-1.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
 <p id="section-6.2-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its <code>algorithm</code> field <span class="bcp14">MUST</span> match the TBSCertificateLogEntry's <code>subjectPublicKeyAlgorithm</code>. Its hash <span class="bcp14">MUST</span> match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
 <p id="section-6.2-5">The TBSCertificate's <code>signature</code> and the Certificate's <code>signatureAlgorithm</code> <span class="bcp14">MUST</span> contain an AlgorithmIdentifier whose <code>algorithm</code> is id-alg-mtcProof, defined below, and whose <code>parameters</code> is omitted.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
@@ -4282,7 +4275,7 @@ struct {
 </pre><a href="#section-6.2-8" class="pilcrow">¶</a>
 </div>
 <p id="section-6.2-9"><code>extensions</code> <span class="bcp14">MUST</span> contain the log entry's <code>extensions</code> value (<a href="#log-entries" class="auto internal xref">Section 5.2.1</a>).<a href="#section-6.2-9" class="pilcrow">¶</a></p>
-<p id="section-6.2-10"><code>start</code> and <code>end</code> <span class="bcp14">MUST</span> contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> <span class="bcp14">MUST</span> contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for the log entry and the subtree. Each hash in the proof is concatenated in order. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. The <code>timestamp</code> field used when computing the signature <span class="bcp14">MUST</span> be zero.<a href="#section-6.2-10" class="pilcrow">¶</a></p>
+<p id="section-6.2-10"><code>start</code> and <code>end</code> <span class="bcp14">MUST</span> contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> <span class="bcp14">MUST</span> contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.3</a>) for the log entry and the subtree. Each hash in the proof is concatenated in order. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.3</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.3.1</a>. The <code>timestamp</code> field used when computing the signature <span class="bcp14">MUST</span> be zero.<a href="#section-6.2-10" class="pilcrow">¶</a></p>
 <p id="section-6.2-11">Each element of the <code>signatures</code> field <span class="bcp14">MUST</span> have a unique <code>cosigner_id</code>. Elements <span class="bcp14">MUST</span> be ordered by <code>cosigner_id</code> (excluding length prefix) as follows:<a href="#section-6.2-11" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.2-12.1">
@@ -4407,28 +4400,10 @@ struct {
           <h4 id="name-publishing-landmarks">
 <a href="#section-6.4.3" class="section-number selfRef">6.4.3. </a><a href="#name-publishing-landmarks" class="section-name selfRef">Publishing Landmarks</a>
           </h4>
-<p id="section-6.4.3-1">The following format can be used to represent a CA's active landmarks. The format <span class="bcp14">MUST</span> contain the following sequence of lines. Each line <span class="bcp14">MUST</span> be terminated by a newline character (U+000A):<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.4.3-2.1">
-              <p id="section-6.4.3-2.1.1">A header line consisting of a decimal integer, <code>latest_landmark</code>, with the landmark number of the CA's most recent landmark at the time of publishing. This value <span class="bcp14">MUST</span> be at most 2<sup>48</sup>-1.<a href="#section-6.4.3-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-6.4.3-2.2">
-              <p id="section-6.4.3-2.2.1">A sequence of <code>num_active_landmarks + 1</code> lines, where <code>num_active_landmarks</code> is the number of active landmarks at the time of publishing. Decoders <span class="bcp14">MUST</span> reject documents where there are greater than <code>latest_landmark + 1</code> such lines. Numbered consecutively from zero, line <code>i</code> in this sequence consists of:<a href="#section-6.4.3-2.2.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.4.3-2.2.2.1">
-                  <p id="section-6.4.3-2.2.2.1.1">The tree size for landmark <code>latest_landmark - i</code> as a decimal integer. This value <span class="bcp14">MUST</span> be at most 2<sup>48</sup>-1.<a href="#section-6.4.3-2.2.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-6.4.3-2.2.2.2">
-                  <p id="section-6.4.3-2.2.2.2.1">A single space character (U+0020).<a href="#section-6.4.3-2.2.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-6.4.3-2.2.2.3">
-                  <p id="section-6.4.3-2.2.2.3.1">The expiration time for landmark <code>latest_landmark - i</code> as a decimal integer containing seconds since the Epoch (Section 4.19 of Volume 1 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>).<a href="#section-6.4.3-2.2.2.3.1" class="pilcrow">¶</a></p>
-</li>
-              </ul>
-</li>
-          </ul>
-<p id="section-6.4.3-3">Tree sizes <span class="bcp14">MUST</span> be strictly monotonically decreasing, and expiration times <span class="bcp14">MUST</span> be monotonically decreasing. There <span class="bcp14">MUST</span> be at least one expiration time before the current time.<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
-<p id="section-6.4.3-4">Decoders <span class="bcp14">MUST</span> reject documents that do not strictly conform to the above requirements, including extraneous whitespace and the lack of an expired landmark. A decoder <span class="bcp14">MAY</span> process only a prefix of this document, provided there is at least one expired landmark to denote the end of the active landmarks.<a href="#section-6.4.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-1">Relying parties, and parties constructing landmark-relative certificates (<a href="#constructing-landmark-relative-certificates" class="auto internal xref">Section 6.4.4</a>), need to obtain the CA's active landmarks, including each landmark's tree size and expiration time. Relying parties additionally use them to determine the trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>).<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-2">This document does not prescribe a particular format or protocol for publishing a landmark sequence. As with issuance logs (<a href="#publishing-logs" class="auto internal xref">Section 5.2.2</a>), the access protocols do not affect certificate interoperability, and different applications could have different needs. Relying parties <span class="bcp14">SHOULD</span> define landmark publishing requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support.<a href="#section-6.4.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-3">A serving protocol that publishes landmarks <span class="bcp14">SHOULD</span> publish enough information to determine each active landmark's number, tree size, and expiration time. A serving protocol <span class="bcp14">MAY</span> additionally publish cosignatures on the landmark subtrees (<a href="#cosigners" class="auto internal xref">Section 5.3</a>).<a href="#section-6.4.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.3-4">For example, <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span> defines a format for publishing active landmarks and landmark subtree cosignatures, for Merkle Tree Certificates that use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>.<a href="#section-6.4.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="constructing-landmark-relative-certificates">
@@ -4442,7 +4417,7 @@ struct {
               <p id="section-6.4.4-2.1.1">Let <code>idx</code> be the entry index.<a href="#section-6.4.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-2.2">
-              <p id="section-6.4.4-2.2.1">Let <code>L</code> be the lowest numbered landmark whose tree size is strictly greater than <code>idx</code>. If no such landmark has been allocated yet, wait for one to be allocated. If the entry has already expired and historical landmark information is unavoidable, abort the procedure.<a href="#section-6.4.4-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.4.4-2.2.1">Let <code>L</code> be the lowest numbered landmark whose tree size is strictly greater than <code>idx</code>. If no such landmark has been allocated yet, wait for one to be allocated. If the entry has already expired and historical landmark information is unavailable, abort the procedure.<a href="#section-6.4.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.4.4-2.3">
               <p id="section-6.4.4-2.3.1">Determine the <code>L</code>'s subtrees (<a href="#landmark-tree-sizes" class="auto internal xref">Section 6.4.1</a>) and select the unique one whose <code>[start, end)</code> interval contains <code>idx</code>.<a href="#section-6.4.4-2.3.1" class="pilcrow">¶</a></p>
@@ -4451,7 +4426,7 @@ struct {
               <p id="section-6.4.4-2.4.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.2</a>) using the selected subtree. No cosignatures are required to authenticate the subtree, though the certificate <span class="bcp14">MAY</span> include cosignatures for other purposes, such as GREASE <span>[<a href="#RFC8701" class="cite xref">RFC8701</a>]</span> cosignatures as described in <a href="#certificate-format" class="auto internal xref">Section 6.2</a>.<a href="#section-6.4.4-2.4.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.4.4-3">The procedure above is not specific to the CA. Any party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
+<p id="section-6.4.4-3">The procedure above is not specific to the CA. Any party holding a standalone certificate (<a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence (<a href="#publishing-landmarks" class="auto internal xref">Section 6.4.3</a>) and inclusion proof hashes from the issuance log.<a href="#section-6.4.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4517,7 +4492,7 @@ struct {
 <p id="section-7.1-3">This information may be obtained from a CA certificate structure, defined in <a href="#representing-certification-authorities" class="auto internal xref">Section 5.5</a>:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-4.1">
-            <p id="section-7.1-4.1.1">The CA ID is determined from the certificate's subject. Note that, while a general RELATIVE-OID can be arbitrarily long, <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> limits trust anchor IDs to 32 bytes.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-4.1.1">The CA ID is determined from the certificate's subject. Note that, while a general RELATIVE-OID can be arbitrarily long, <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> limits trust anchor IDs to 32 bytes.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-4.2">
             <p id="section-7.1-4.2.1">The log hash algorithm is determined from the type of the Merkle Tree CA extension.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
@@ -4782,7 +4757,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-standalone-certificates-2" class="section-name selfRef">Standalone Certificates</a>
         </h3>
 <p id="section-8.1-1">Authenticating and relying parties <span class="bcp14">SHOULD</span> use the <code>trust_anchors</code> extension to determine whether a standalone certificate would be acceptable. A standalone certificate has a trust anchor ID of the corresponding CA ID (<a href="#ca-ids" class="auto internal xref">Section 5.1</a>). This trust anchor ID is additionally contained in the trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">CA IDs <span class="bcp14">MAY</span> be incorporated into other trust anchor groups, following the guidance in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">CA IDs <span class="bcp14">MAY</span> be incorporated into other trust anchor groups, following the guidance in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
 <p id="section-8.1-3">A standalone certificate <span class="bcp14">MAY</span> also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4791,17 +4766,17 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
         <h3 id="name-landmark-relative-certificat">
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-landmark-relative-certificat" class="section-name selfRef">Landmark-Relative Certificates</a>
         </h3>
-<p id="section-8.2-1">An authenticating party <span class="bcp14">SHOULD NOT</span> send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees. This can be represented with the <code>trust_anchor_negotiation</code> property in a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-7.3" class="relref">Section 7.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), or other local configuration.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-1">An authenticating party <span class="bcp14">SHOULD NOT</span> send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees. This can be represented with the <code>trust_anchor_negotiation</code> property in a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-7.3" class="relref">Section 7.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), or other local configuration.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2-2">TLS implementations <span class="bcp14">SHOULD</span> use the <code>trust_anchors</code> extension to determine this. A landmark-relative certificate issued by a CA with ID <code>caID</code>, log number <code>N</code>, and constructed from landmark <code>L</code> has a trust anchor ID of <code>{caID landmarks(1) N L}</code>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2-3">For example, the trust anchor ID for landmark 42 of CA <code>32473.100</code> and log number <code>8</code> is <code>32473.100.1.8.42</code>.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the recovery mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-5.6" class="relref">Section 5.6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying parties to express their landmark state with a single ID.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">These trust anchor IDs are used when it is necessary to identify an individual landmark, e.g. as in the recovery mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-5.6" class="relref">Section 5.6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. To more efficiently express a relying party's complete landmark state, these IDs are contained in trust anchor groups defined in <a href="#single-log-landmark-groups" class="auto internal xref">Section 8.2.1</a>, which allow relying parties to express their landmark state with a single ID.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 <p id="section-8.2-5">If both a landmark-relative and a standalone certificate are usable, an authenticating party <span class="bcp14">SHOULD</span> preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
 <div id="single-log-landmark-groups">
 <section id="section-8.2.1">
           <h4 id="name-single-log-landmark-groups">
 <a href="#section-8.2.1" class="section-number selfRef">8.2.1. </a><a href="#name-single-log-landmark-groups" class="section-name selfRef">Single-Log Landmark Groups</a>
           </h4>
-<p id="section-8.2.1-1">Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines a series of trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) called <em>landmark groups</em>.<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-1">Relying parties support many landmarks per log at a time. To compactly represent this, each log ID implicitly defines a series of trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) called <em>landmark groups</em>.<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
 <p id="section-8.2.1-2">For each Merkle Tree Certificates CA with ID <code>caID</code>, each log number <code>N</code>, and each landmark number <code>L</code>, the ID <code>{caID landmarkGroups(2) N L}</code> defines a landmark group. It contains the following trust anchor IDs:<a href="#section-8.2.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.1-3.1">
@@ -4811,7 +4786,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
               <p id="section-8.2.1-3.2.1"><code>{caID landmarks(1) N M}</code> for all <code>M</code> from 0 to <code>L</code>, inclusive. This selects landmark-relative certificates from active landmarks up to <code>L</code>.<a href="#section-8.2.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-8.2.1-4">To support these groups in the authenticating party, CAs <span class="bcp14">SHOULD</span> configure certificates to match the following trust anchor groups (Sections <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-5.3" class="relref">5.3</a> and <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-7.2" class="relref">7.2</a> of <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>):<a href="#section-8.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-4">To support these groups in the authenticating party, CAs <span class="bcp14">SHOULD</span> configure certificates to match the following trust anchor groups (Sections <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-5.3" class="relref">5.3</a> and <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-7.2" class="relref">7.2</a> of <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>):<a href="#section-8.2.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.1-5.1">
               <p id="section-8.2.1-5.1.1">A standalone certificate <span class="bcp14">SHOULD</span> include a trust anchor ID pattern of <code>caID.2.{0-}.{0-}</code>.<a href="#section-8.2.1-5.1.1" class="pilcrow">¶</a></p>
@@ -4846,7 +4821,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           <h4 id="name-timestamped-landmark-groups">
 <a href="#section-8.2.2" class="section-number selfRef">8.2.2. </a><a href="#name-timestamped-landmark-groups" class="section-name selfRef">Timestamped Landmark Groups</a>
           </h4>
-<p id="section-8.2.2-1">Landmark groups for a single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state. When needed, <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> describes how PKIs can use trust anchor groups that span multiple CAs. This section defines a variation of the versioning construction described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-6.1" class="relref">Section 6.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>, as applied to landmarks.<a href="#section-8.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2.2-1">Landmark groups for a single CA, described above, allow relying parties to advertise one ID per supported CA. Depending on the number of trust anchors, this can be sufficient to efficiently represent relying party state. When needed, <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> describes how PKIs can use trust anchor groups that span multiple CAs. This section defines a variation of the versioning construction described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-6.1" class="relref">Section 6.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>, as applied to landmarks.<a href="#section-8.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2.2-2">Trust anchor groups containing Merkle Tree CAs can represent landmarks with an OID component based on a predictable clock. Concretely, the family of groups is parameterized by:<a href="#section-8.2.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.2-3.1">
@@ -4868,7 +4843,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
               <p id="section-8.2.2-5.2.1">Landmark-relative certificates issued one of the above CAs, provided the landmark was active at time <code>start_time + T * tick_duration</code>.<a href="#section-8.2.2-5.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-8.2.2-6"><code>start_time</code> <span class="bcp14">SHOULD</span> be set to sometime before the group is in use. <code>tick_duration</code> <span class="bcp14">SHOULD</span> be set near the expected time between landmarks in the group, e.g. one hour. This predictable cadence allows the CA to describe the trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-7.2" class="relref">Section 7.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) for issued certificates without additional coordination. Concretely, if a CA was added in <code>V_min</code>, was removed in <code>V_max + 1</code>, and issues a certificate whose landmark was first active at time <code>T_min</code> and last active at time <code>T_max</code>:<a href="#section-8.2.2-6" class="pilcrow">¶</a></p>
+<p id="section-8.2.2-6"><code>start_time</code> <span class="bcp14">SHOULD</span> be set to sometime before the group is in use. <code>tick_duration</code> <span class="bcp14">SHOULD</span> be set near the expected time between landmarks in the group, e.g. one hour. This predictable cadence allows the CA to describe the trust anchor groups (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-7.2" class="relref">Section 7.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) for issued certificates without additional coordination. Concretely, if a CA was added in <code>V_min</code>, was removed in <code>V_max + 1</code>, and issues a certificate whose landmark was first active at time <code>T_min</code> and last active at time <code>T_max</code>:<a href="#section-8.2.2-6" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2.2-7.1">
               <p id="section-8.2.2-7.1.1">The standalone certificate is contained in groups <code>base.{V_min-V_max}</code> and <code>base.{V_min-V_max}.{0-}</code>.<a href="#section-8.2.2-7.1.1" class="pilcrow">¶</a></p>
@@ -4877,7 +4852,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
               <p id="section-8.2.2-7.2.1">The landmark-relative certificate is contained in groups <code>base.{V_min-V_max}.{T_min-T_max}</code><a href="#section-8.2.2-7.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-8.2.2-8">If the CA has not been removed in the latest version, <code>V_max</code> is infinity, similar to the construction described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-6.1" class="relref">Section 6.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <code>T_min</code> and <code>T_max</code> are measured based on <code>start_time</code> and <code>tick_duration</code> as described above.<a href="#section-8.2.2-8" class="pilcrow">¶</a></p>
+<p id="section-8.2.2-8">If the CA has not been removed in the latest version, <code>V_max</code> is infinity, similar to the construction described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-6.1" class="relref">Section 6.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <code>T_min</code> and <code>T_max</code> are measured based on <code>start_time</code> and <code>tick_duration</code> as described above.<a href="#section-8.2.2-8" class="pilcrow">¶</a></p>
 <p id="section-8.2.2-9">A relying party sets <code>V</code> based on its current trust anchors and <code>T</code> based on the age of its landmark information. If its landmarks are too stale, it sends <code>base.V</code> without any landmark timestamp.<a href="#section-8.2.2-9" class="pilcrow">¶</a></p>
 <p id="section-8.2.2-10">In some cases, the relying party's landmark information may only be partially up-to-date. The relying party, or its update service, may be unable to reach one CA in the group, e.g. due to a transient outage. This complicates timestamp-based strategies:<a href="#section-8.2.2-10" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -4897,7 +4872,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
               <p id="section-8.2.2-13.2.1">The relying party can opt to send the group with an older timestamp, combined with other, smaller groups at newer timestamps to better describe its state.<a href="#section-8.2.2-13.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-8.2.2-13.3">
-              <p id="section-8.2.2-13.3.1">A client relying party can send the newer timestamp and, in the event the unreachable CA did issue recent landmark-relative certificates, rely on the recovery mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-5.6" class="relref">Section 5.6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> to recover from any signaling failures.<a href="#section-8.2.2-13.3.1" class="pilcrow">¶</a></p>
+              <p id="section-8.2.2-13.3.1">A client relying party can send the newer timestamp and, in the event the unreachable CA did issue recent landmark-relative certificates, rely on the recovery mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-5.6" class="relref">Section 5.6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> to recover from any signaling failures.<a href="#section-8.2.2-13.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -4931,7 +4906,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 <p id="section-9.2-1">Standalone and landmark-relative certificates represent a single issuance event, so they are returned from the same order. When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state after the standalone certificate is available. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.3</a>.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <p id="section-9.2-2">The standalone certificate response <span class="bcp14">SHOULD</span> additionally carry an "acme-optional-alternate" URL for the landmark-relative certificate. The landmark-relative certificate will typically not yet be available, so it initially serves an HTTP 202 response, as described in <a href="#optional-certificates" class="auto internal xref">Section 9.1</a>. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in <a href="#landmark-relative-certificates" class="auto internal xref">Section 6.4</a>, and serves it from the "acme-optional-alternate" URL.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
 <p id="section-9.2-3">When downloading either certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates <span class="bcp14">SHOULD</span> send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates <span class="bcp14">SHOULD</span> then respond with that content type to include a CertificatePropertyList.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
-<p id="section-9.2-4">The CertificatePropertyList <span class="bcp14">SHOULD</span> include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> describes the trust anchor ID assignments for standalone and landmark-relative certificates. At minimum, the ACME server <span class="bcp14">SHOULD</span> include:<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+<p id="section-9.2-4">The CertificatePropertyList <span class="bcp14">SHOULD</span> include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> describes the trust anchor ID assignments for standalone and landmark-relative certificates. At minimum, the ACME server <span class="bcp14">SHOULD</span> include:<a href="#section-9.2-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-9.2-5.1">
             <p id="section-9.2-5.1.1">A <code>trust_anchor_id</code> property with the trust anchor IDs described in <a href="#standalone-certificates-tls" class="auto internal xref">Section 8.1</a> and <a href="#landmark-relative-certificates-tls" class="auto internal xref">Section 8.2</a><a href="#section-9.2-5.1.1" class="pilcrow">¶</a></p>
@@ -4941,7 +4916,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
 </li>
         </ul>
 <p id="section-9.2-6">If the CA participates in other landmark groups, e.g. <a href="#timestamped-landmark-groups" class="auto internal xref">Section 8.2.2</a>, the ACME server <span class="bcp14">SHOULD</span> include the corresponding information in <code>trust_anchor_groups</code>.<a href="#section-9.2-6" class="pilcrow">¶</a></p>
-<p id="section-9.2-7">The ACME server <span class="bcp14">SHOULD</span> include a <code>trust_anchor_negotiation</code> property with the landmark-relative certificate. This indicates the landmark-relative certificate requires a trust anchor ID match to indicate that the relying party recognizes the landmark. The ACME server <span class="bcp14">MAY</span> include or omit <code>trust_anchor_negotiation</code> with the standalone certificate, based on the criteria described in Sections <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-7.3" class="relref">7.3</a> and <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-7.5" class="relref">7.5</a> of <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-9.2-7" class="pilcrow">¶</a></p>
+<p id="section-9.2-7">The ACME server <span class="bcp14">SHOULD</span> include a <code>trust_anchor_negotiation</code> property with the landmark-relative certificate. This indicates the landmark-relative certificate requires a trust anchor ID match to indicate that the relying party recognizes the landmark. The ACME server <span class="bcp14">MAY</span> include or omit <code>trust_anchor_negotiation</code> with the standalone certificate, based on the criteria described in Sections <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-7.3" class="relref">7.3</a> and <a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-7.5" class="relref">7.5</a> of <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-9.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5033,7 +5008,7 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
       <h2 id="name-privacy-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06#section-10" class="relref">Section 10</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to their use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07#section-10" class="relref">Section 10</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to their use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <p id="section-11-2">In particular, relying parties that share an update process for trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. gated on the recovery flow, the trust anchor list will require active probing.<a href="#section-11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -5337,51 +5312,26 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           </table>
 </section>
 </div>
-<div id="relative-distinguished-name-attribute">
-<section id="section-13.1.4">
-          <h4 id="name-relative-distinguished-name">
-<a href="#section-13.1.4" class="section-number selfRef">13.1.4. </a><a href="#name-relative-distinguished-name" class="section-name selfRef">Relative Distinguished Name Attribute</a>
-          </h4>
-<p id="section-13.1.4-1">IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry <span>[<a href="#RFC9925" class="cite xref">RFC9925</a>]</span>:<a href="#section-13.1.4-1" class="pilcrow">¶</a></p>
-<table class="center" id="table-4">
-            <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
-<thead>
-              <tr>
-                <th class="text-left" rowspan="1" colspan="1">Decimal</th>
-                <th class="text-left" rowspan="1" colspan="1">Description</th>
-                <th class="text-left" rowspan="1" colspan="1">References</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1">3</td>
-                <td class="text-left" rowspan="1" colspan="1">id-rdna-trustAnchorID</td>
-                <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
-              </tr>
-            </tbody>
-          </table>
-</section>
-</div>
 <div id="link-relation-type">
-<section id="section-13.1.5">
+<section id="section-13.1.4">
           <h4 id="name-link-relation-type">
-<a href="#section-13.1.5" class="section-number selfRef">13.1.5. </a><a href="#name-link-relation-type" class="section-name selfRef">Link Relation Type</a>
+<a href="#section-13.1.4" class="section-number selfRef">13.1.4. </a><a href="#name-link-relation-type" class="section-name selfRef">Link Relation Type</a>
           </h4>
-<p id="section-13.1.5-1">IANA is requested to add the following entry to the "Link Relation Types" registry <span>[<a href="#RFC8288" class="cite xref">RFC8288</a>]</span>:<a href="#section-13.1.5-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-13.1.5-2">
-            <dt id="section-13.1.5-2.1">Relation Name:</dt>
-            <dd style="margin-left: 1.5em" id="section-13.1.5-2.2">
-              <p id="section-13.1.5-2.2.1">acme-optional-alternate<a href="#section-13.1.5-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-13.1.4-1">IANA is requested to add the following entry to the "Link Relation Types" registry <span>[<a href="#RFC8288" class="cite xref">RFC8288</a>]</span>:<a href="#section-13.1.4-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-13.1.4-2">
+            <dt id="section-13.1.4-2.1">Relation Name:</dt>
+            <dd style="margin-left: 1.5em" id="section-13.1.4-2.2">
+              <p id="section-13.1.4-2.2.1">acme-optional-alternate<a href="#section-13.1.4-2.2.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-13.1.5-2.3">Description:</dt>
-            <dd style="margin-left: 1.5em" id="section-13.1.5-2.4">
-              <p id="section-13.1.5-2.4.1">Refers to an optional alternate certificate chain, which may not be available immediately. Relying parties that accept the alternate are expected to also accept the original certificate, so it is not an error if the alternate is unavailable.<a href="#section-13.1.5-2.4.1" class="pilcrow">¶</a></p>
+<dt id="section-13.1.4-2.3">Description:</dt>
+            <dd style="margin-left: 1.5em" id="section-13.1.4-2.4">
+              <p id="section-13.1.4-2.4.1">Refers to an optional alternate certificate chain, which may not be available immediately. Relying parties that accept the alternate are expected to also accept the original certificate, so it is not an error if the alternate is unavailable.<a href="#section-13.1.4-2.4.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-13.1.5-2.5">Reference:</dt>
-            <dd style="margin-left: 1.5em" id="section-13.1.5-2.6">
-              <p id="section-13.1.5-2.6.1">[this-RFC], <a href="#optional-certificates" class="auto internal xref">Section 9.1</a><a href="#section-13.1.5-2.6.1" class="pilcrow">¶</a></p>
+<dt id="section-13.1.4-2.5">Reference:</dt>
+            <dd style="margin-left: 1.5em" id="section-13.1.4-2.6">
+              <p id="section-13.1.4-2.6.1">[this-RFC], <a href="#optional-certificates" class="auto internal xref">Section 9.1</a><a href="#section-13.1.4-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 </dl>
@@ -5403,8 +5353,8 @@ Signatures are verified as described in <a href="#signature-format" class="auto 
           </h4>
 <p id="section-13.2.1-1">IANA is requested to add a new registry, "MTC Log Entry Types" with the
 following registration policies from <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>:<a href="#section-13.2.1-1" class="pilcrow">¶</a></p>
-<table class="center" id="table-5">
-            <caption><a href="#table-5" class="selfRef">Table 5</a></caption>
+<table class="center" id="table-4">
+            <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Range</th>
@@ -5423,8 +5373,8 @@ following registration policies from <span>[<a href="#RFC8126" class="cite xref"
             </tbody>
           </table>
 <p id="section-13.2.1-3">The registry initially consists of:<a href="#section-13.2.1-3" class="pilcrow">¶</a></p>
-<table class="center" id="table-6">
-            <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
+<table class="center" id="table-5">
+            <caption><a href="#table-5" class="selfRef">Table 5</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Value</th>
@@ -5464,8 +5414,8 @@ following registration policies from <span>[<a href="#RFC8126" class="cite xref"
           </h4>
 <p id="section-13.2.2-1">IANA is requested to add a new registry, "MTC Log Entry Extension Types" with the
 following registration policies from <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>:<a href="#section-13.2.2-1" class="pilcrow">¶</a></p>
-<table class="center" id="table-7">
-            <caption><a href="#table-7" class="selfRef">Table 7</a></caption>
+<table class="center" id="table-6">
+            <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Range</th>
@@ -5484,8 +5434,8 @@ following registration policies from <span>[<a href="#RFC8126" class="cite xref"
             </tbody>
           </table>
 <p id="section-13.2.2-3">The registry initially consists of:<a href="#section-13.2.2-3" class="pilcrow">¶</a></p>
-<table class="center" id="table-8">
-            <caption><a href="#table-8" class="selfRef">Table 8</a></caption>
+<table class="center" id="table-7">
+            <caption><a href="#table-7" class="selfRef">Table 7</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Value</th>
@@ -5514,8 +5464,8 @@ following registration policies from <span>[<a href="#RFC8126" class="cite xref"
 <a href="#section-13.2.3" class="section-number selfRef">13.2.3. </a><a href="#name-mtc-ca-identifier-child-com" class="section-name selfRef">MTC CA Identifier Child Components</a>
           </h4>
 <p id="section-13.2.3-1">IANA is requested to add a new registry, "MTC CA Identifier Child Components", whose registration policy is Specification Required <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>. Values shall be any non-negative integer. The registry initially consists of:<a href="#section-13.2.3-1" class="pilcrow">¶</a></p>
-<table class="center" id="table-9">
-            <caption><a href="#table-9" class="selfRef">Table 9</a></caption>
+<table class="center" id="table-8">
+            <caption><a href="#table-8" class="selfRef">Table 8</a></caption>
 <thead>
               <tr>
                 <th class="text-left" rowspan="1" colspan="1">Value</th>
@@ -5560,7 +5510,7 @@ following registration policies from <span>[<a href="#RFC8126" class="cite xref"
 <dl class="references">
 <dt id="I-D.ietf-tls-trust-anchor-ids">[I-D.ietf-tls-trust-anchor-ids]</dt>
         <dd>
-<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, <span class="refAuthor">O'Brien, D.</span>, and <span class="refAuthor">K. Nekritz</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-trust-anchor-ids-06</span>, <time datetime="2026-09-30" class="refDate">30 September 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06">https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-06</a>&gt;</span>. </dd>
+<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, <span class="refAuthor">O'Brien, D.</span>, and <span class="refAuthor">K. Nekritz</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-trust-anchor-ids-07</span>, <time datetime="2026-11-01" class="refDate">1 November 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07">https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-07</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="POSIX">[POSIX]</dt>
         <dd>
@@ -5699,10 +5649,6 @@ following registration policies from <span>[<a href="#RFC8126" class="cite xref"
         <dd>
 <span class="refAuthor">C2SP</span>, <span class="refTitle">"Merkle Tree Certificates With Tiled Transparency Logs"</span>, <time datetime="2026-10" class="refDate">October 2026</time>, <span>&lt;<a href="https://c2sp.org/mtc-tlog@v0.1.0">https://c2sp.org/mtc-tlog@v0.1.0</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC4514">[RFC4514]</dt>
-        <dd>
-<span class="refAuthor">Zeilenga, K., Ed.</span>, <span class="refTitle">"Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names"</span>, <span class="seriesInfo">RFC 4514</span>, <span class="seriesInfo">DOI 10.17487/RFC4514</span>, <time datetime="2006-06" class="refDate">June 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4514">https://www.rfc-editor.org/rfc/rfc4514</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC6962">[RFC6962]</dt>
         <dd>
 <span class="refAuthor">Laurie, B.</span>, <span class="refAuthor">Langley, A.</span>, and <span class="refAuthor">E. Kasper</span>, <span class="refTitle">"Certificate Transparency"</span>, <span class="seriesInfo">RFC 6962</span>, <span class="seriesInfo">DOI 10.17487/RFC6962</span>, <time datetime="2013-06" class="refDate">June 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6962">https://www.rfc-editor.org/rfc/rfc6962</a>&gt;</span>. </dd>
@@ -5769,12 +5715,12 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SIGNATURE-ALGORITHM, DIGEST-ALGORITHM, AlgorithmIdentifier{},
+  SIGNATURE-ALGORITHM, AlgorithmIdentifier{}
   FROM AlgorithmInformation-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-algorithmInformation-02(58) }
-  Extensions{}, ATTRIBUTE
+  Extensions{}, EXTENSION
   FROM PKIX-CommonTypes-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -5813,15 +5759,6 @@ sa-mtcProof SIGNATURE-ALGORITHM ::= {
     PARAMS ARE absent
 }
 
-id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) 3 }
-
-at-trustAnchorID ATTRIBUTE ::= {
-    TYPE RELATIVE-OID
-    IDENTIFIED BY id-rdna-trustAnchorID
-}
-
 id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) pe(1) 38 }
@@ -5829,7 +5766,7 @@ id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
     IDENTIFIED BY id-pe-mtcCertificationAuthority-SHA256
-    CRITICALITY TRUE
+    CRITICALITY {TRUE}
 }
 
 -- This is 2^48, the minimum possible serial number in this protocol.
@@ -7669,6 +7606,45 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.18-1.4">
             <p id="appendix-E.18-1.4.1">Use versioned URLs for (non-normative) C2SP references.<a href="#appendix-E.18-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-ietf-plants-merkle-tree-certs-07">
+<section id="appendix-E.19">
+        <h3 id="name-since-draft-ietf-plants-merkle-tre">
+<a href="#name-since-draft-ietf-plants-merkle-tre" class="section-name selfRef">Since draft-ietf-plants-merkle-tree-certs-07</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.19-1.1">
+            <p id="appendix-E.19-1.1.1">Moved <code>id-rdna-trustAnchorID</code> to the trust anchor ID draft.<a href="#appendix-E.19-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.19-1.2">
+            <p id="appendix-E.19-1.2.1">No changes were made to the wire format. draft-07 and draft-08 are compatible.<a href="#appendix-E.19-1.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-ietf-plants-merkle-tree-certs-07-1">
+<section id="appendix-E.20">
+        <h3 id="name-since-draft-ietf-plants-merkle-tree">
+<a href="#name-since-draft-ietf-plants-merkle-tree" class="section-name selfRef">Since draft-ietf-plants-merkle-tree-certs-07</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.20-1.1">
+            <p id="appendix-E.20-1.1.1">Fix some mistakes in the ASN.1 module.<a href="#appendix-E.20-1.1.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-ietf-plants-merkle-tree-certs-08">
+<section id="appendix-E.21">
+        <h3 id="name-since-draft-ietf-plants-merkle-tree-2">
+<a href="#name-since-draft-ietf-plants-merkle-tree-2" class="section-name selfRef">Since draft-ietf-plants-merkle-tree-certs-08</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.21-1.1">
+            <p id="appendix-E.21-1.1.1">Moved the landmark sequence publishing format to <span>[<a href="#MTC-TLOG" class="cite xref">MTC-TLOG</a>]</span>.<a href="#appendix-E.21-1.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
