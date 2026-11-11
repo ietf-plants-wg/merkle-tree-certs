@@ -1369,19 +1369,13 @@ This procedure ensures there are at most `ceil(max_cert_lifetime / time_between_
 
 ### Publishing Landmarks
 
-The following format can be used to represent a CA's active landmarks. The format MUST contain the following sequence of lines. Each line MUST be terminated by a newline character (U+000A):
+Relying parties, and parties constructing landmark-relative certificates ({{constructing-landmark-relative-certificates}}), need to obtain the CA's active landmarks, including each landmark's tree size and expiration time. Relying parties additionally use them to determine the trusted subtrees ({{trusted-subtrees}}).
 
-* A header line consisting of a decimal integer, `latest_landmark`, with the landmark number of the CA's most recent landmark at the time of publishing. This value MUST be at most 2<sup>48</sup>-1.
+This document does not prescribe a particular format or protocol for publishing a landmark sequence. As with issuance logs ({{publishing-logs}}), the access protocols do not affect certificate interoperability, and different applications could have different needs. Relying parties SHOULD define landmark publishing requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support.
 
-* A sequence of `num_active_landmarks + 1` lines, where `num_active_landmarks` is the number of active landmarks at the time of publishing. Decoders MUST reject documents where there are greater than `latest_landmark + 1` such lines. Numbered consecutively from zero, line `i` in this sequence consists of:
+A serving protocol that publishes landmarks SHOULD publish enough information to determine each active landmark's number, tree size, and expiration time. A serving protocol MAY additionally publish cosignatures on the landmark subtrees ({{cosigners}}).
 
-  * The tree size for landmark `latest_landmark - i` as a decimal integer. This value MUST be at most 2<sup>48</sup>-1.
-  * A single space character (U+0020).
-  * The expiration time for landmark `latest_landmark - i` as a decimal integer containing seconds since the Epoch (Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}).
-
-Tree sizes MUST be strictly monotonically decreasing, and expiration times MUST be monotonically decreasing. There MUST be at least one expiration time before the current time.
-
-Decoders MUST reject documents that do not strictly conform to the above requirements, including extraneous whitespace and the lack of an expired landmark. A decoder MAY process only a prefix of this document, provided there is at least one expired landmark to denote the end of the active landmarks.
+For example, {{MTC-TLOG}} defines a format for publishing active landmarks and landmark subtree cosignatures, for Merkle Tree Certificates that use {{TLOG-TILES}}.
 
 ### Constructing Landmark-Relative Certificates
 
@@ -1395,7 +1389,7 @@ Given the inputs in {{certificate-inputs}} and the corresponding log's landmark 
 
 4. Construct a certificate ({{certificate-format}}) using the selected subtree. No cosignatures are required to authenticate the subtree, though the certificate MAY include cosignatures for other purposes, such as GREASE {{!RFC8701}} cosignatures as described in {{certificate-format}}.
 
-The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence and inclusion proof hashes from the issuance log.
+The procedure above is not specific to the CA. Any party holding a standalone certificate ({{standalone-certificates}}) can construct the corresponding landmark-relative certificate by recovering the certificate inputs from it and obtaining the landmark sequence ({{publishing-landmarks}}) and inclusion proof hashes from the issuance log.
 
 ## Size Estimates
 
@@ -2879,3 +2873,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Fix some mistakes in the ASN.1 module.
+
+## Since draft-ietf-plants-merkle-tree-certs-08
+{:numbered="false"}
+
+- Moved the landmark sequence publishing format to {{MTC-TLOG}}.
