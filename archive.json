@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-08T05:47:15.027245+00:00",
+  "timestamp": "2026-11-12T06:57:10.464911+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -24490,6 +24490,46 @@
               "updatedAt": "2026-11-05T17:00:46Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 362,
+      "id": "PR_kwDOJIBkVc8AAAABOQJKag",
+      "title": "Move the landmark sequence format to mtc-tlog",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/362",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Along with https://github.com/C2SP/C2SP/pull/398, closes https://github.com/C2SP/C2SP/pull/397, following the discussion at https://mailarchive.ietf.org/arch/msg/plants/uPs5UCop2qOdvRcNPsYkZ-p4PVA/.",
+      "createdAt": "2026-11-11T00:30:42Z",
+      "updatedAt": "2026-11-11T21:23:33Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "c8252d7617d51b453aa0e3819c955632f09a3233",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "move-landmark-format-to-mtc-tlog",
+      "headRefOid": "b7f5114f199412327b6adf2cef9199108916de65",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABXZwEaQ",
+          "commit": {
+            "abbreviatedOid": "b7f5114"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM though we should wait for the C2SP PR to merge before merging this one. :-)",
+          "createdAt": "2026-11-11T21:23:33Z",
+          "updatedAt": "2026-11-11T21:23:33Z",
+          "comments": []
         }
       ]
     }
