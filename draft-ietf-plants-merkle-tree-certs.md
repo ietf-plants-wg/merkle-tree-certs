@@ -1978,9 +1978,9 @@ Reference:
 
 ## New Registries
 
-IANA is requested to add a new top-level registry, "Merkle Tree Certificates", to the "Protocol Registries" page at <https://www.iana.org/protocols>
+IANA is requested to add a new registry group, "Merkle Tree Certificates", to the "Protocol Registries" page at <https://www.iana.org/protocols>
 
-The rest of this section defines the subregistries requested within the new "Merkle Tree Certificates" registry.
+The rest of this section defines the registries requested within the new "Merkle Tree Certificates" registry group.
 
 ### MTC Log Entry Types
 
@@ -2879,3 +2879,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Fix some mistakes in the ASN.1 module.
+
+- Address feedback from IANA.
