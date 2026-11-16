@@ -2875,7 +2875,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - No changes were made to the wire format. draft-07 and draft-08 are compatible.
 
-## Since draft-ietf-plants-merkle-tree-certs-07
+## Since draft-ietf-plants-merkle-tree-certs-08
 {:numbered="false"}
 
 - Fix some mistakes in the ASN.1 module.
