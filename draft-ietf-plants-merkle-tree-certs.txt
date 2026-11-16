@@ -3487,12 +3487,12 @@ Table of Contents
 
 13.2.  New Registries
 
-   IANA is requested to add a new top-level registry, "Merkle Tree
+   IANA is requested to add a new registry group, "Merkle Tree
    Certificates", to the "Protocol Registries" page at
    https://www.iana.org/protocols (https://www.iana.org/protocols)
 
-   The rest of this section defines the subregistries requested within
-   the new "Merkle Tree Certificates" registry.
+   The rest of this section defines the registries requested within the
+   new "Merkle Tree Certificates" registry group.
 
 13.2.1.  MTC Log Entry Types
 
@@ -4912,6 +4912,8 @@ Since draft-ietf-plants-merkle-tree-certs-07
 Since draft-ietf-plants-merkle-tree-certs-08
 
    *  Fix some mistakes in the ASN.1 module.
+
+   *  Address feedback from IANA.
 
 Authors' Addresses
 
