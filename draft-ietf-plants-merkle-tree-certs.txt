@@ -2026,38 +2026,26 @@ Table of Contents
 
 6.4.3.  Publishing Landmarks
 
-   The following format can be used to represent a CA's active
-   landmarks.  The format MUST contain the following sequence of lines.
-   Each line MUST be terminated by a newline character (U+000A):
+   Relying parties, and parties constructing landmark-relative
+   certificates (Section 6.4.4), need to obtain the CA's active
+   landmarks, including each landmark's tree size and expiration time.
+   Relying parties additionally use them to determine the trusted
+   subtrees (Section 7.4).
 
-   *  A header line consisting of a decimal integer, latest_landmark,
-      with the landmark number of the CA's most recent landmark at the
-      time of publishing.  This value MUST be at most 2^48-1.
+   This document does not prescribe a particular format or protocol for
+   publishing a landmark sequence.  As with issuance logs
+   (Section 5.2.2), the access protocols do not affect certificate
+   interoperability, and different applications could have different
+   needs.  Relying parties SHOULD define landmark publishing
+   requirements, including the allowed protocols and expected
+   availability, as part of their policies on which CAs to support.
 
-   *  A sequence of num_active_landmarks + 1 lines, where
-      num_active_landmarks is the number of active landmarks at the time
-      of publishing.  Decoders MUST reject documents where there are
-      greater than latest_landmark + 1 such lines.  Numbered
-      consecutively from zero, line i in this sequence consists of:
+   A serving protocol that publishes landmarks SHOULD publish enough
+   information to determine each active landmark's number, tree size,
+   and expiration time.
 
-      -  The tree size for landmark latest_landmark - i as a decimal
-         integer.  This value MUST be at most 2^48-1.
-
-      -  A single space character (U+0020).
-
-      -  The expiration time for landmark latest_landmark - i as a
-         decimal integer containing seconds since the Epoch
-         (Section 4.19 of Volume 1 of [POSIX]).
-
-   Tree sizes MUST be strictly monotonically decreasing, and expiration
-   times MUST be monotonically decreasing.  There MUST be at least one
-   expiration time before the current time.
-
-   Decoders MUST reject documents that do not strictly conform to the
-   above requirements, including extraneous whitespace and the lack of
-   an expired landmark.  A decoder MAY process only a prefix of this
-   document, provided there is at least one expired landmark to denote
-   the end of the active landmarks.
+   For example, [MTC-TLOG] defines a format for publishing active
+   landmarks for Merkle Tree Certificates that use [TLOG-TILES].
 
 6.4.4.  Constructing Landmark-Relative Certificates
 
@@ -2083,8 +2071,8 @@ Table of Contents
    The procedure above is not specific to the CA.  Any party holding a
    standalone certificate (Section 6.3) can construct the corresponding
    landmark-relative certificate by recovering the certificate inputs
-   from it and obtaining the landmark sequence and inclusion proof
-   hashes from the issuance log.
+   from it and obtaining the landmark sequence (Section 6.4.3) and
+   inclusion proof hashes from the issuance log.
 
 6.5.  Size Estimates
 
@@ -4915,6 +4903,8 @@ Since draft-ietf-plants-merkle-tree-certs-08
    *  Fix some mistakes in the ASN.1 module.
 
    *  Address feedback from IANA.
+
+   *  Moved the landmark sequence publishing format to [MTC-TLOG].
 
 Authors' Addresses
 
