@@ -1373,9 +1373,9 @@ Relying parties, and parties constructing landmark-relative certificates ({{cons
 
 This document does not prescribe a particular format or protocol for publishing a landmark sequence. As with issuance logs ({{publishing-logs}}), the access protocols do not affect certificate interoperability, and different applications could have different needs. Relying parties SHOULD define landmark publishing requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support.
 
-A serving protocol that publishes landmarks SHOULD publish enough information to determine each active landmark's number, tree size, and expiration time. A serving protocol MAY additionally publish cosignatures on the landmark subtrees ({{cosigners}}).
+A serving protocol that publishes landmarks SHOULD publish enough information to determine each active landmark's number, tree size, and expiration time.
 
-For example, {{MTC-TLOG}} defines a format for publishing active landmarks and landmark subtree cosignatures, for Merkle Tree Certificates that use {{TLOG-TILES}}.
+For example, {{MTC-TLOG}} defines a format for publishing active landmarks for Merkle Tree Certificates that use {{TLOG-TILES}}.
 
 ### Constructing Landmark-Relative Certificates
 
