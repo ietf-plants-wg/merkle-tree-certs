@@ -652,7 +652,7 @@ Subtree consistency proofs contain sufficient nodes to reconstruct both the subt
 
 ### Generating a Subtree Consistency Proof
 
-The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}.
+For all subtrees `[start, end)` that describe a valid subtree of `D_n` ({{definition-of-a-subtree}}), the subtree consistency proof `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}.
 
 If `start = end`, the consistency proof is empty:
 
