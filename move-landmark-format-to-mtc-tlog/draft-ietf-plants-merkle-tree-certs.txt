@@ -2041,12 +2041,10 @@ Table of Contents
 
    A serving protocol that publishes landmarks SHOULD publish enough
    information to determine each active landmark's number, tree size,
-   and expiration time.  A serving protocol MAY additionally publish
-   cosignatures on the landmark subtrees (Section 5.3).
+   and expiration time.
 
    For example, [MTC-TLOG] defines a format for publishing active
-   landmarks and landmark subtree cosignatures, for Merkle Tree
-   Certificates that use [TLOG-TILES].
+   landmarks for Merkle Tree Certificates that use [TLOG-TILES].
 
 6.4.4.  Constructing Landmark-Relative Certificates
 
