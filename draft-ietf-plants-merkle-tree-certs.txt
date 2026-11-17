@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 20 May 2027                                          Apple Inc.
+Expires: 21 May 2027                                          Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        16 November 2026
+                                                        17 November 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 May 2027.
+   This Internet-Draft will expire on 21 May 2027.
 
 Copyright Notice
 
@@ -836,8 +836,9 @@ Table of Contents
 
 4.4.1.  Generating a Subtree Consistency Proof
 
-   The subtree consistency proof, SUBTREE_PROOF(start, end, D_n) is
-   defined similarly to Section 2.1.4.1 of [RFC9162].
+   For all subtrees [start, end) that describe a valid subtree of D_n
+   (Section 4.1), the subtree consistency proof SUBTREE_PROOF(start,
+   end, D_n) is defined similarly to Section 2.1.4.1 of [RFC9162].
 
    If start = end, the consistency proof is empty:
 
