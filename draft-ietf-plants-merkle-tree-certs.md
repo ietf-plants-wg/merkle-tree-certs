@@ -654,6 +654,8 @@ Subtree consistency proofs contain sufficient nodes to reconstruct both the subt
 
 The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}.
 
+`[start, end)` is checked for validity ({{definition-of-a-subtree}}). If the subtree is invalid, proof generation is failed.
+
 If `start = end`, the consistency proof is empty:
 
 ~~~pseudocode
