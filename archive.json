@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-15T06:06:42.414109+00:00",
+  "timestamp": "2026-11-17T07:41:37.599344+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4368,7 +4368,7 @@
       "labels": [],
       "body": "Per IANA feedback in https://mailarchive.ietf.org/arch/msg/plants/Z7VdjgAwzDN2ZroDotQTOFKygkQ/\n\nLooking around, TLS just has the expert look for a specification, but they have a very defined process for this.\nhttps://www.rfc-editor.org/info/rfc8447/#section-17\n\nIf we need to go quite that far, that'll probably need guidance from the chairs and folks. I would not expect these registries to get quite the amount of traffic that TLS does.\n\nIt also has this text in the registries themselves:\n\n> Note:  The role of the designated expert is described in [RFC 8447](https://www.rfc-editor.org/info/rfc8447/).\n>      The designated expert [[RFC8126](https://www.rfc-editor.org/info/rfc8126/)] ensures that the specification is\n>      publicly available.  It is sufficient to have an Internet-Draft\n>      (that is posted and never published as an RFC) or a document from\n>      another standards body, industry consortium, university site, etc.\n>      The expert may provide more in-depth reviews, but their approval\n>      should not be taken as an endorsement of the extension.\n\nRFC 9162 just has a very short instruction:\nhttps://www.rfc-editor.org/rfc/rfc9162.html#name-new-ct-related-registries:~:text=RFC%209162-,The%20designated%20expert(s)%20should%20review%20the%20public%20specification%20to%20ensure%20that%20it%20is%20detailed%20enough%20to%20ensure%20implementation%20interoperability.,-10.2.4.%20Log\n\nPKIX OID arcs ask that the registration be strongly related to the PKIX WG's work, but that's probably less analogous because it's just an OID arc.\nhttps://www.rfc-editor.org/info/rfc7299/#section-3",
       "createdAt": "2026-11-14T20:23:47Z",
-      "updatedAt": "2026-11-14T21:08:56Z",
+      "updatedAt": "2026-11-15T21:31:13Z",
       "closedAt": null,
       "comments": [
         {
@@ -4402,9 +4402,9 @@
         {
           "author": "rjb4standards",
           "authorAssociation": "NONE",
-          "body": "David, SCITT Receipts do indeed achieve the same objective as MTC, with regard to answering the question \"Is this digital certificate trusted, as of right now?\" but it's more accurate than MTC because the \"current trust status\" is always recorded in the SCITT ledger, including revoked certificate status.\nI've been running a PTI Trust Registry since June 2021, so I can provide empirical data if needed.",
+          "body": "David, SCITT Receipts do indeed achieve the same objective as MTC, with regard to answering the question \"Is this digital certificate trusted, as of right now?\" but it's more accurate than MTC because the \"current trust status\" is always recorded in the SCITT ledger, including revoked certificate status. SAG-CTR operates as a high performance cache with the most current status of registered objects in the ledger that is returned to the users when asking the question \"Is this thing trusted, as of right now?\" \n\nI've been running the SAG-CTR PTI Trust Registry since June 2021, so I can provide empirical data if needed.",
           "createdAt": "2026-11-14T21:07:40Z",
-          "updatedAt": "2026-11-14T21:08:56Z"
+          "updatedAt": "2026-11-15T21:31:13Z"
         }
       ]
     }
@@ -24590,26 +24590,42 @@
       "id": "PR_kwDOJIBkVc8AAAABPNgO_g",
       "title": "Address some feedback from IANA",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/363",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "See https://mailarchive.ietf.org/arch/msg/plants/Z7VdjgAwzDN2ZroDotQTOFKygkQ/\n\nThis PR does not address guidance for designated experts, which probably warrants some discussion on what's best here, but I'll file a bug to make sure we remember.",
       "createdAt": "2026-11-14T20:16:48Z",
-      "updatedAt": "2026-11-14T20:16:48Z",
+      "updatedAt": "2026-11-16T23:12:47Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "c8252d7617d51b453aa0e3819c955632f09a3233",
+      "baseRefOid": "509b27caf9f4e7cbcbc6882c27d2cc4a9f976078",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "iana-feedback",
-      "headRefOid": "6d8cbd2ad7b32ba27ba19b592867ad5d62570760",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "943f45b659301e1c2e14951f9c2b73b332f1d78d",
+      "closedAt": "2026-11-16T23:12:44Z",
+      "mergedAt": "2026-11-16T23:12:44Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "14194261f3190e0ddedb28042a31389667bf8c3d"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYRswjQ",
+          "commit": {
+            "abbreviatedOid": "6d8cbd2"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-16T17:09:00Z",
+          "updatedAt": "2026-11-16T17:09:00Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
