@@ -95,6 +95,9 @@ const (
 	SignatureAlgorithmMLDSA44
 	SignatureAlgorithmMLDSA65
 	SignatureAlgorithmMLDSA87
+	// SignatureAlgorithmP256WithSHA1 is not recommended. It is provided to test
+	// that relying parties reject it.
+	SignatureAlgorithmP256WithSHA1
 )
 
 func SignatureAlgorithmFromString(s string) (SignatureAlgorithm, bool) {
@@ -111,6 +114,8 @@ func SignatureAlgorithmFromString(s string) (SignatureAlgorithm, bool) {
 		return SignatureAlgorithmMLDSA65, true
 	case "mldsa87":
 		return SignatureAlgorithmMLDSA87, true
+	case "ecdsa_p256_sha1":
+		return SignatureAlgorithmP256WithSHA1, true
 
 	}
 	return 0, false
@@ -130,6 +135,8 @@ func (s SignatureAlgorithm) String() string {
 		return "mldsa65"
 	case SignatureAlgorithmMLDSA87:
 		return "mldsa87"
+	case SignatureAlgorithmP256WithSHA1:
+		return "ecdsa_p256_sha1"
 	default:
 		panic(fmt.Sprintf("unexpected SignatureAlgorithm: %#v", s))
 	}

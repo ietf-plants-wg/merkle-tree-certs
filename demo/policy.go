@@ -183,6 +183,8 @@ func (p *Policy) AddCA(ca *x509.Certificate) error {
 		sigAlg = SignatureAlgorithmP256WithSHA256
 	case sigAlgOID.Equal(oidECDSAWithSHA384) && sigAlgSeq.Empty():
 		sigAlg = SignatureAlgorithmP384WithSHA384
+	case sigAlgOID.Equal(oidECDSAWithSHA1) && sigAlgSeq.Empty():
+		sigAlg = SignatureAlgorithmP256WithSHA1
 	case sigAlgOID.Equal(oidEd25519) && sigAlgSeq.Empty():
 		sigAlg = SignatureAlgorithmEd25519
 	case sigAlgOID.Equal(oidMLDSA44) && sigAlgSeq.Empty():

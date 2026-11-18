@@ -43,6 +43,7 @@ var (
 
 	oidSHA256 = asn1.ObjectIdentifier{2, 16, 840, 1, 101, 3, 4, 2, 1}
 
+	oidECDSAWithSHA1   = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 1}
 	oidECDSAWithSHA256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 2}
 	oidECDSAWithSHA384 = asn1.ObjectIdentifier{1, 2, 840, 10045, 4, 3, 3}
 	oidEd25519         = asn1.ObjectIdentifier{1, 3, 101, 112}
@@ -275,6 +276,8 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA256)
 							case SignatureAlgorithmP384WithSHA384:
 								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA384)
+							case SignatureAlgorithmP256WithSHA1:
+								sigAlg.AddASN1ObjectIdentifier(oidECDSAWithSHA1)
 							case SignatureAlgorithmEd25519:
 								sigAlg.AddASN1ObjectIdentifier(oidEd25519)
 							case SignatureAlgorithmMLDSA44:
