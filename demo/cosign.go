@@ -7,6 +7,7 @@ import (
 	"crypto/elliptic"
 	"crypto/mldsa"
 	"crypto/rand"
+	_ "crypto/sha1"
 	"crypto/sha256"
 	_ "crypto/sha512"
 	"crypto/x509"
@@ -80,6 +81,8 @@ func ecdsaParamsFromAlg(alg SignatureAlgorithm) (elliptic.Curve, crypto.Hash) {
 		return elliptic.P256(), crypto.SHA256
 	case SignatureAlgorithmP384WithSHA384:
 		return elliptic.P384(), crypto.SHA384
+	case SignatureAlgorithmP256WithSHA1:
+		return elliptic.P256(), crypto.SHA1
 	}
 	panic("unknown signature algorithm")
 }
@@ -102,7 +105,7 @@ func NewCosignerFromConfig(version DraftVersion, config *CosignerConfig) (*Cosig
 	var signer crypto.Signer
 	var opts crypto.SignerOpts
 	switch config.SignatureAlgorithm {
-	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384:
+	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384, SignatureAlgorithmP256WithSHA1:
 		curve, hash := ecdsaParamsFromAlg(config.SignatureAlgorithm)
 		ec, ok := priv.(*ecdsa.PrivateKey)
 		if !ok {
@@ -208,7 +211,7 @@ func NewCosignerPublic(vers DraftVersion, id TrustAnchorID, sigAlg SignatureAlgo
 		if !ok || ml.Parameters() != params {
 			return nil, fmt.Errorf("not a %s key", params)
 		}
-	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384:
+	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384, SignatureAlgorithmP256WithSHA1:
 		curve, _ := ecdsaParamsFromAlg(sigAlg)
 		ec, ok := pubkey.(*ecdsa.PublicKey)
 		if !ok {
@@ -240,7 +243,7 @@ func (c *CosignerPublic) Verify(logID TrustAnchorID, start, end uint64, hash *Ha
 		return nil
 	case SignatureAlgorithmMLDSA44, SignatureAlgorithmMLDSA65, SignatureAlgorithmMLDSA87:
 		return mldsa.Verify(c.PublicKey.(*mldsa.PublicKey), inp, sig, nil)
-	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384:
+	case SignatureAlgorithmP256WithSHA256, SignatureAlgorithmP384WithSHA384, SignatureAlgorithmP256WithSHA1:
 		_, hash := ecdsaParamsFromAlg(c.SignatureAlgorithm)
 		h := hash.New()
 		h.Write(inp)
