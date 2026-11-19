@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-17T07:41:37.599344+00:00",
+  "timestamp": "2026-11-19T07:05:08.681109+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4407,6 +4407,22 @@
           "updatedAt": "2026-11-15T21:31:13Z"
         }
       ]
+    },
+    {
+      "number": 366,
+      "id": "I_kwDOJIBkVc8AAAABgUDaGQ",
+      "title": "Update trust anchor ID guidance for PR 144",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/366",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "When/if https://github.com/tlswg/tls-trust-anchor-ids/pull/144 goes in, update the corresponding text here.",
+      "createdAt": "2026-11-18T08:53:12Z",
+      "updatedAt": "2026-11-18T08:53:12Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -24550,24 +24566,26 @@
       "id": "PR_kwDOJIBkVc8AAAABOQJKag",
       "title": "Move the landmark sequence format to mtc-tlog",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/362",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "lukevalenta",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "Along with https://github.com/C2SP/C2SP/pull/398, closes https://github.com/C2SP/C2SP/pull/397, following the discussion at https://mailarchive.ietf.org/arch/msg/plants/uPs5UCop2qOdvRcNPsYkZ-p4PVA/.",
+      "body": "Along with https://github.com/C2SP/C2SP/pull/401, move landmark sequence format to mtc-tlog following discussion in https://github.com/C2SP/C2SP/pull/397 and https://mailarchive.ietf.org/arch/msg/plants/uPs5UCop2qOdvRcNPsYkZ-p4PVA/.",
       "createdAt": "2026-11-11T00:30:42Z",
-      "updatedAt": "2026-11-11T21:23:33Z",
+      "updatedAt": "2026-11-17T20:39:16Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "c8252d7617d51b453aa0e3819c955632f09a3233",
+      "baseRefOid": "14194261f3190e0ddedb28042a31389667bf8c3d",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "move-landmark-format-to-mtc-tlog",
-      "headRefOid": "b7f5114f199412327b6adf2cef9199108916de65",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "b394459bc2b43064f7fb21258423bd5bb70c9363",
+      "closedAt": "2026-11-17T20:39:16Z",
+      "mergedAt": "2026-11-17T20:39:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3110a9498b68a1484d94b24eca034f6597df0937"
+      },
       "comments": [],
       "reviews": [
         {
@@ -24581,6 +24599,59 @@
           "body": "LGTM though we should wait for the C2SP PR to merge before merging this one. :-)",
           "createdAt": "2026-11-11T21:23:33Z",
           "updatedAt": "2026-11-11T21:23:33Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYlDrbQ",
+          "commit": {
+            "abbreviatedOid": "d6575bb"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T18:38:53Z",
+          "updatedAt": "2026-11-17T18:38:54Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\nFor example, {{MTC-TLOG}} defines a format for publishing active landmarks for Merkle Tree Certificates that use {{TLOG-TILES}}.\n```",
+              "createdAt": "2026-11-17T18:38:53Z",
+              "updatedAt": "2026-11-17T18:38:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYlEBJA",
+          "commit": {
+            "abbreviatedOid": "d6575bb"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T18:39:19Z",
+          "updatedAt": "2026-11-17T18:39:19Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "```suggestion\nA serving protocol that publishes landmarks SHOULD publish enough information to determine each active landmark's number, tree size, and expiration time.\n```",
+              "createdAt": "2026-11-17T18:39:19Z",
+              "updatedAt": "2026-11-17T18:39:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYmxILw",
+          "commit": {
+            "abbreviatedOid": "b394459"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-17T20:39:00Z",
+          "updatedAt": "2026-11-17T20:39:00Z",
           "comments": []
         }
       ]
@@ -24623,6 +24694,150 @@
           "body": "",
           "createdAt": "2026-11-16T17:09:00Z",
           "updatedAt": "2026-11-16T17:09:00Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 365,
+      "id": "PR_kwDOJIBkVc8AAAABP5Mo2w",
+      "title": "Validate subtree when generating subtree consistency proof",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/365",
+      "state": "MERGED",
+      "author": "inahga",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Might go without saying, but still I missed this on my first attempt at artisanally implementing this. Consistent with https://github.com/ietf-plants-wg/merkle-tree-certs/blob/main/demo/log.go#L163.",
+      "createdAt": "2026-11-17T17:17:11Z",
+      "updatedAt": "2026-11-17T19:45:49Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "14194261f3190e0ddedb28042a31389667bf8c3d",
+      "headRepository": "inahga/merkle-tree-certs",
+      "headRefName": "inahga/validate",
+      "headRefOid": "57d6f5b6c67202c3fa0ce4439dcf036398311cdb",
+      "closedAt": "2026-11-17T19:45:49Z",
+      "mergedAt": "2026-11-17T19:45:49Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7757f14a8e64864b8818a3b2a88da9e24cc2ea36"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYk9qHg",
+          "commit": {
+            "abbreviatedOid": "d6449a3"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T18:31:31Z",
+          "updatedAt": "2026-11-17T18:31:31Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "I guess this is a question of whether you believe valid subtree is a precondition of this algorithm or that this algorithm is fallible. But it's good to be explicit. Since the inclusion proof section talks about it as preconditions, WDYT about this phrasing:\n\n```suggestion\nFor all `[start, end)` that describe a valid subtree ({{definition-of-a-subtree}}) of `MTH(D_n)`, the subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}.\n```",
+              "createdAt": "2026-11-17T18:31:31Z",
+              "updatedAt": "2026-11-17T18:31:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYl9AFA",
+          "commit": {
+            "abbreviatedOid": "57d6f5b"
+          },
+          "author": "inahga",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T19:43:40Z",
+          "updatedAt": "2026-11-17T19:43:40Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "I think this text ends up being less clearer overall, but is more consistent with the definition style of this section. So I'm fine with it.\n\nWe can probably fixup overall clarity and consistency by rewriting the section in an active or step-by-step voice, matching Evaluating a Subtree Inclusion Proof. But then it's not consistent with RFC9162. Maybe that's fine, happy to wordsmith in other PRs.\n\n(Along those lines there's also a slight disconnect between defining the proof while calling the section \"generating\" a proof).",
+              "createdAt": "2026-11-17T19:43:40Z",
+              "updatedAt": "2026-11-17T19:43:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYl-dmw",
+          "commit": {
+            "abbreviatedOid": "57d6f5b"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-17T19:45:13Z",
+          "updatedAt": "2026-11-17T19:45:13Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABYl-_MQ",
+          "commit": {
+            "abbreviatedOid": "d6449a3"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-11-17T19:45:42Z",
+          "updatedAt": "2026-11-17T19:45:42Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Yeah. I... do not love how this is defined and I suspect there's a better way to write all this. (It was mimicking RFC 9162 at first but that was clearly not worked out.)",
+              "createdAt": "2026-11-17T19:45:42Z",
+              "updatedAt": "2026-11-17T19:45:43Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 367,
+      "id": "PR_kwDOJIBkVc8AAAABQOGNLQ",
+      "title": "demo: Add an ECDSA P-256 with SHA-1 cosigner signature algorithm",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/367",
+      "state": "MERGED",
+      "author": "chlily1",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "SHA-1 is not recommended, but this allows generating test certificates whose cosigner uses ecdsa-with-SHA1, for testing that relying parties reject it.",
+      "createdAt": "2026-11-18T20:24:34Z",
+      "updatedAt": "2026-11-18T22:25:07Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3110a9498b68a1484d94b24eca034f6597df0937",
+      "headRepository": "chlily1/merkle-tree-certs",
+      "headRefName": "demo-sha1-test-option",
+      "headRefOid": "14ab31615be1f3af95787b7c2cd3789fa0f63959",
+      "closedAt": "2026-11-18T22:25:07Z",
+      "mergedAt": "2026-11-18T22:25:07Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a551ed6750af1badac841359c3828208ac6f958f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABY5yEGg",
+          "commit": {
+            "abbreviatedOid": "14ab316"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-18T22:25:00Z",
+          "updatedAt": "2026-11-18T22:25:00Z",
           "comments": []
         }
       ]
