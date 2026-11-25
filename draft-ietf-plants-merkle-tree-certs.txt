@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 22 May 2027                                          Apple Inc.
+Expires: 29 May 2027                                          Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        18 November 2026
+                                                        25 November 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 May 2027.
+   This Internet-Draft will expire on 29 May 2027.
 
 Copyright Notice
 
@@ -2535,10 +2535,7 @@ Table of Contents
    certificate without a signal that the relying party trusts the
    corresponding landmark subtree.  Even if the relying party is assumed
    to trust the issuing CA, the relying party may not have sufficiently
-   up-to-date trusted subtrees.  This can be represented with the
-   trust_anchor_negotiation property in a CertificatePropertyList (see
-   Section 7.3 of [I-D.ietf-tls-trust-anchor-ids]), or other local
-   configuration.
+   up-to-date trusted subtrees.
 
    TLS implementations SHOULD use the trust_anchors extension to
    determine this.  A landmark-relative certificate issued by a CA with
@@ -2785,14 +2782,6 @@ Table of Contents
    If the CA participates in other landmark groups, e.g. Section 8.2.2,
    the ACME server SHOULD include the corresponding information in
    trust_anchor_groups.
-
-   The ACME server SHOULD include a trust_anchor_negotiation property
-   with the landmark-relative certificate.  This indicates the landmark-
-   relative certificate requires a trust anchor ID match to indicate
-   that the relying party recognizes the landmark.  The ACME server MAY
-   include or omit trust_anchor_negotiation with the standalone
-   certificate, based on the criteria described in Sections 7.3 and 7.5
-   of [I-D.ietf-tls-trust-anchor-ids].
 
 10.  Deployment Considerations
 
