@@ -2875,3 +2875,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Address feedback from IANA.
 
 - Moved the landmark sequence publishing format to {{MTC-TLOG}}.
+
+- Remove references to old `trust_anchor_negotiation` certificate property.
