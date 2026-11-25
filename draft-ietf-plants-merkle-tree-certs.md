@@ -1972,7 +1972,7 @@ Reference:
 
 IANA is requested to add a new registry group, "Merkle Tree Certificates", to the "Protocol Registries" page at <https://www.iana.org/protocols>
 
-The rest of this section defines the registries requested within the new "Merkle Tree Certificates" registry group.
+The rest of this section defines the registries requested within the new "Merkle Tree Certificates" registry group. For each of these registries, the designated expert or experts verify that a specification exists and is readily accessible.
 
 ### MTC Log Entry Types
 
