@@ -4895,6 +4895,9 @@ Since draft-ietf-plants-merkle-tree-certs-08
 
    *  Moved the landmark sequence publishing format to [MTC-TLOG].
 
+   *  Remove references to old trust_anchor_negotiation certificate
+      property.
+
 Authors' Addresses
 
    David Benjamin
