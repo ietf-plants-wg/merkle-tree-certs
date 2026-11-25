@@ -1594,7 +1594,7 @@ A standalone certificate MAY also be sent without explicit relying party trust s
 
 ## Landmark-Relative Certificates {#landmark-relative-certificates-tls}
 
-An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees. This can be represented with the `trust_anchor_negotiation` property in a CertificatePropertyList (see {{Section 7.3 of !I-D.ietf-tls-trust-anchor-ids}}), or other local configuration.
+An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
 
 TLS implementations SHOULD use the `trust_anchors` extension to determine this. A landmark-relative certificate issued by a CA with ID `caID`, log number `N`, and constructed from landmark `L` has a trust anchor ID of `{caID landmarks(1) N L}`.
 
@@ -1696,8 +1696,6 @@ The CertificatePropertyList SHOULD include trust anchor ID information as descri
 * A `trust_anchor_groups` property with the information described in {{single-log-landmark-groups}}
 
 If the CA participates in other landmark groups, e.g. {{timestamped-landmark-groups}}, the ACME server SHOULD include the corresponding information in `trust_anchor_groups`.
-
-The ACME server SHOULD include a `trust_anchor_negotiation` property with the landmark-relative certificate. This indicates the landmark-relative certificate requires a trust anchor ID match to indicate that the relying party recognizes the landmark. The ACME server MAY include or omit `trust_anchor_negotiation` with the standalone certificate, based on the criteria described in {{Sections 7.3 and 7.5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 # Deployment Considerations
 
