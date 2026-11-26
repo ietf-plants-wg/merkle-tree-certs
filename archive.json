@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-19T07:05:08.681109+00:00",
+  "timestamp": "2026-11-26T07:58:50.235259+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -4368,7 +4368,7 @@
       "labels": [],
       "body": "Per IANA feedback in https://mailarchive.ietf.org/arch/msg/plants/Z7VdjgAwzDN2ZroDotQTOFKygkQ/\n\nLooking around, TLS just has the expert look for a specification, but they have a very defined process for this.\nhttps://www.rfc-editor.org/info/rfc8447/#section-17\n\nIf we need to go quite that far, that'll probably need guidance from the chairs and folks. I would not expect these registries to get quite the amount of traffic that TLS does.\n\nIt also has this text in the registries themselves:\n\n> Note:  The role of the designated expert is described in [RFC 8447](https://www.rfc-editor.org/info/rfc8447/).\n>      The designated expert [[RFC8126](https://www.rfc-editor.org/info/rfc8126/)] ensures that the specification is\n>      publicly available.  It is sufficient to have an Internet-Draft\n>      (that is posted and never published as an RFC) or a document from\n>      another standards body, industry consortium, university site, etc.\n>      The expert may provide more in-depth reviews, but their approval\n>      should not be taken as an endorsement of the extension.\n\nRFC 9162 just has a very short instruction:\nhttps://www.rfc-editor.org/rfc/rfc9162.html#name-new-ct-related-registries:~:text=RFC%209162-,The%20designated%20expert(s)%20should%20review%20the%20public%20specification%20to%20ensure%20that%20it%20is%20detailed%20enough%20to%20ensure%20implementation%20interoperability.,-10.2.4.%20Log\n\nPKIX OID arcs ask that the registration be strongly related to the PKIX WG's work, but that's probably less analogous because it's just an OID arc.\nhttps://www.rfc-editor.org/info/rfc7299/#section-3",
       "createdAt": "2026-11-14T20:23:47Z",
-      "updatedAt": "2026-11-15T21:31:13Z",
+      "updatedAt": "2026-11-25T22:18:33Z",
       "closedAt": null,
       "comments": [
         {
@@ -4413,15 +4413,15 @@
       "id": "I_kwDOJIBkVc8AAAABgUDaGQ",
       "title": "Update trust anchor ID guidance for PR 144",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/366",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "When/if https://github.com/tlswg/tls-trust-anchor-ids/pull/144 goes in, update the corresponding text here.",
       "createdAt": "2026-11-18T08:53:12Z",
-      "updatedAt": "2026-11-18T08:53:12Z",
-      "closedAt": null,
+      "updatedAt": "2026-11-25T22:18:46Z",
+      "closedAt": "2026-11-25T22:18:46Z",
       "comments": []
     }
   ],
@@ -24841,6 +24841,74 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 368,
+      "id": "PR_kwDOJIBkVc8AAAABR81prQ",
+      "title": "Remove references to trust_anchor_negotiation cert property",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/368",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See https://github.com/tlswg/tls-trust-anchor-ids/pull/144. The next TAI draft is going to drop this text. It was never needed anyway; the ACME client had all the information it needed based on which resource the certificate came under.",
+      "createdAt": "2026-11-25T21:38:42Z",
+      "updatedAt": "2026-11-25T22:07:10Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a551ed6750af1badac841359c3828208ac6f958f",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "tai-update-2",
+      "headRefOid": "3411dfee4ec0cea1c3b381b7bfb68f7b276350ac",
+      "closedAt": "2026-11-25T22:07:06Z",
+      "mergedAt": "2026-11-25T22:07:06Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "9ca45151a06aa9f81df1226f1686deb89763a1db"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc8AAAABaYafsw",
+          "commit": {
+            "abbreviatedOid": "3411dfe"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-25T21:44:33Z",
+          "updatedAt": "2026-11-25T21:44:33Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 369,
+      "id": "PR_kwDOJIBkVc8AAAABR9WKWQ",
+      "title": "Add a short set of instructions for designated experts",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/369",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "From the meeting, it sounds like we don't need anything quite so long as TLS has. Fixes #364.",
+      "createdAt": "2026-11-25T22:18:31Z",
+      "updatedAt": "2026-11-25T22:18:31Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "321db60281ac36344c9917f2a5abbacf9ca6bc63",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "designated-expert",
+      "headRefOid": "4c726ddb37fee4c311ba52d342de1e361ea9d9b8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
